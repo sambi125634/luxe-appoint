@@ -1,18 +1,15 @@
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "./BookingProgress";
 import { ServiceSelection } from "./ServiceSelection";
 import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
 import { BookingSummary } from "./BookingSummary";
-import { BookingConfirmation } from "./BookingConfirmation";
 import { toast } from "@/hooks/use-toast";
-import { cn } from "@/lib/utils";
 
-const steps = ["Usługa", "Specjalista", "Termin", "Dane", "Podsumowanie"];
+const steps = ["Usługa", "Specjalista", "Termin", "Dane", "Potwierdzenie"];
 
 interface Service {
   id: string;
@@ -30,33 +27,12 @@ interface StaffMember {
   rating: number;
 }
 
-// Recommendations mapping
-const serviceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
-  "1": [ // Peeling kawitacyjny
-    { id: "2", name: "Mezoterapia igłowa", price: 350, duration: 60 },
-    { id: "3", name: "Mikrodermabrazja", price: 180, duration: 50 },
-  ],
-  "2": [ // Mezoterapia
-    { id: "1", name: "Peeling kawitacyjny", price: 150, duration: 45 },
-  ],
-  "4": [ // Masaż relaksacyjny
-    { id: "5", name: "Masaż gorącymi kamieniami", price: 280, duration: 75 },
-  ],
-  "6": [ // Depilacja woskowa
-    { id: "7", name: "Depilacja laserowa bikini", price: 250, duration: 30 },
-  ],
-  "8": [ // Stylizacja brwi
-    { id: "9", name: "Przedłużanie rzęs 1:1", price: 350, duration: 120 },
-  ],
-};
-
 export function BookingWidget() {
-  const [currentStep, setCurrentStep] = useState(0); // 0 = intro
+  const [currentStep, setCurrentStep] = useState(1);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [showRecommendations, setShowRecommendations] = useState(false);
   const [clientData, setClientData] = useState<ClientData>({
     firstName: "",
     lastName: "",
@@ -65,15 +41,12 @@ export function BookingWidget() {
     notes: "",
     acceptRodo: false,
     acceptMarketing: false,
-    confirmationMethod: 'sms',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0:
-        return true;
       case 1:
         return selectedService !== null;
       case 2:
@@ -95,30 +68,21 @@ export function BookingWidget() {
     }
   };
 
-  const handleServiceSelect = (service: Service) => {
-    setSelectedService(service);
-    // Show recommendations if available
-    if (serviceRecommendations[service.id]) {
-      setShowRecommendations(true);
-    }
-  };
-
   const handleNext = () => {
     if (currentStep < 5 && canProceed()) {
-      setShowRecommendations(false);
       setCurrentStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
-      setShowRecommendations(false);
+    if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
   };
 
   const handleConfirm = async () => {
     setIsSubmitting(true);
+    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsSubmitting(false);
     setIsConfirmed(true);
@@ -135,76 +99,34 @@ export function BookingWidget() {
     }
   };
 
-  const handleStartBooking = () => {
-    setCurrentStep(1);
-  };
-
   if (isConfirmed) {
     return (
-      <BookingConfirmation
-        service={selectedService}
-        staff={selectedStaff}
-        date={selectedDate}
-        time={selectedTime}
-        clientName={`${clientData.firstName} ${clientData.lastName}`}
-      />
-    );
-  }
-
-  // Intro screen
-  if (currentStep === 0) {
-    return (
-      <div className="w-full max-w-2xl mx-auto animate-fade-in">
-        <div className="text-center py-8">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-6 shadow-glow">
-            <Sparkles className="w-8 h-8 text-primary-foreground" />
-          </div>
-          <h1 className="text-3xl font-serif font-bold mb-3">Zarezerwuj wizytę</h1>
-          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Rezerwacja online w 3 prostych krokach. Wybierz usługę, termin i gotowe!
-          </p>
-
-          {/* Steps preview */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="flex flex-col items-center p-4 rounded-xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-medium">1. Wybierz usługę</span>
-            </div>
-            <div className="flex flex-col items-center p-4 rounded-xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-medium">2. Wybierz termin</span>
-            </div>
-            <div className="flex flex-col items-center p-4 rounded-xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-medium">3. Potwierdź</span>
-            </div>
-          </div>
-
-          <Button 
-            variant="luxury" 
-            size="lg" 
-            onClick={handleStartBooking}
-            className="gap-2 px-8"
-          >
-            Zacznij rezerwację
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-
-          <p className="text-xs text-muted-foreground mt-6">
-            🕐 Zajmie Ci to tylko 2 minuty
+      <div className="min-h-[500px] flex flex-col items-center justify-center text-center p-8 animate-scale-in">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6 shadow-glow">
+          <Check className="w-10 h-10 text-primary-foreground" />
+        </div>
+        <h2 className="text-3xl font-serif font-bold mb-3">Dziękujemy!</h2>
+        <p className="text-muted-foreground mb-6 max-w-md">
+          Twoja rezerwacja została przyjęta. Otrzymasz SMS oraz e-mail z potwierdzeniem
+          szczegółów wizyty.
+        </p>
+        <div className="glass-card p-6 text-left w-full max-w-sm">
+          <p className="text-sm text-muted-foreground mb-1">Twoja wizyta</p>
+          <p className="font-semibold text-lg">{selectedService?.name}</p>
+          <p className="text-accent font-medium">
+            {selectedDate &&
+              new Intl.DateTimeFormat("pl-PL", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }).format(selectedDate)}{" "}
+            o {selectedTime}
           </p>
         </div>
       </div>
     );
   }
-
-  const recommendations = selectedService ? serviceRecommendations[selectedService.id] : [];
 
   return (
     <div className="w-full max-w-2xl mx-auto">
@@ -212,43 +134,10 @@ export function BookingWidget() {
 
       <div className="mt-8">
         {currentStep === 1 && (
-          <>
-            <ServiceSelection
-              onSelect={handleServiceSelect}
-              selectedService={selectedService}
-            />
-            
-            {/* Recommendations */}
-            {showRecommendations && recommendations && recommendations.length > 0 && (
-              <div className="mt-6 p-4 bg-secondary/5 border border-secondary/20 rounded-xl animate-fade-in">
-                <p className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-secondary" />
-                  Często łączone z tym zabiegiem:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {recommendations.map((rec) => (
-                    <Badge 
-                      key={rec.id}
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-secondary/20 transition-colors py-2 px-3"
-                      onClick={() => {
-                        toast({
-                          title: "Dodaj następnym razem",
-                          description: `${rec.name} możesz dodać przy kolejnej wizycie.`,
-                        });
-                      }}
-                    >
-                      {rec.name} 
-                      <span className="ml-2 text-xs opacity-70">+{rec.price} zł</span>
-                    </Badge>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Kliknij, aby dodać do listy życzeń na przyszłość
-                </p>
-              </div>
-            )}
-          </>
+          <ServiceSelection
+            onSelect={setSelectedService}
+            selectedService={selectedService}
+          />
         )}
         {currentStep === 2 && (
           <StaffSelection
@@ -261,7 +150,6 @@ export function BookingWidget() {
             onSelect={handleDateTimeSelect}
             selectedDate={selectedDate}
             selectedTime={selectedTime}
-            serviceDuration={selectedService?.duration}
           />
         )}
         {currentStep === 4 && (
@@ -278,37 +166,12 @@ export function BookingWidget() {
         )}
       </div>
 
-      {/* Selected service summary - sticky on mobile */}
-      {selectedService && currentStep > 1 && currentStep < 5 && (
-        <div className="fixed bottom-20 left-4 right-4 sm:static sm:mt-4 z-10">
-          <div className="bg-card/95 backdrop-blur-sm border border-border rounded-xl p-3 shadow-lg sm:shadow-none flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <p className="font-medium text-sm">{selectedService.name}</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-2">
-                  <Clock className="w-3 h-3" />
-                  {selectedService.duration} min
-                </p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="font-bold text-primary">{selectedService.price} zł</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Navigation */}
-      <div className={cn(
-        "flex items-center justify-between mt-8 pt-6 border-t border-border",
-        selectedService && currentStep > 1 && currentStep < 5 && "mb-24 sm:mb-0"
-      )}>
+      <div className="flex items-center justify-between mt-8 pt-6 border-t border-border">
         <Button
           variant="ghost"
           onClick={handleBack}
+          disabled={currentStep === 1}
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />

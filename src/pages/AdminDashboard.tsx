@@ -4,30 +4,19 @@ import { Menu, X, Plus, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
-import { DashboardHome } from "@/components/admin/DashboardHome";
 import { WeeklyCalendar } from "@/components/admin/WeeklyCalendar";
-import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
-import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
-import { OnboardingWizard } from "@/components/admin/OnboardingWizard";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("home");
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    // Check if onboarding was completed before
-    return !localStorage.getItem("onboarding_completed");
-  });
+  const [activeTab, setActiveTab] = useState<TabType>("calendar");
 
   const getPageTitle = () => {
     switch (activeTab) {
-      case "home": return "Dashboard";
       case "calendar": return "Kalendarz";
-      case "clients": return "Klienci";
       case "staff": return "Personel";
       case "services": return "Usługi";
-      case "time-off": return "Urlopy i dni wolne";
       case "stats": return "Statystyki";
       case "settings": return "Ustawienia";
       default: return "Dashboard";
@@ -36,18 +25,12 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "home":
-        return <DashboardHome />;
       case "calendar":
         return <WeeklyCalendar />;
-      case "clients":
-        return <ClientsManagement />;
       case "services":
         return <ServicesManagement />;
       case "staff":
         return <StaffManagement />;
-      case "time-off":
-        return <TimeOffManagement />;
       case "stats":
         return (
           <div className="glass-card p-6 text-center text-muted-foreground">
@@ -66,15 +49,6 @@ export default function AdminDashboard() {
         return null;
     }
   };
-
-  const handleOnboardingComplete = () => {
-    localStorage.setItem("onboarding_completed", "true");
-    setShowOnboarding(false);
-  };
-
-  if (showOnboarding) {
-    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
-  }
 
   return (
     <div className="min-h-screen bg-background flex">

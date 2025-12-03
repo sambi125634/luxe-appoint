@@ -40,7 +40,7 @@ interface Appointment {
   time: string;
   duration: number;
   notes: string;
-  status: "confirmed" | "pending" | "cancelled" | "no-show" | "completed";
+  status: "confirmed" | "pending" | "cancelled";
 }
 
 interface AppointmentModalProps {
