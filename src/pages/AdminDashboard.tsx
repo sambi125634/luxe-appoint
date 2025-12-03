@@ -10,10 +10,15 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
+import { OnboardingWizard } from "@/components/admin/OnboardingWizard";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("home");
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    // Check if onboarding was completed before
+    return !localStorage.getItem("onboarding_completed");
+  });
 
   const getPageTitle = () => {
     switch (activeTab) {
@@ -61,6 +66,15 @@ export default function AdminDashboard() {
         return null;
     }
   };
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem("onboarding_completed", "true");
+    setShowOnboarding(false);
+  };
+
+  if (showOnboarding) {
+    return <OnboardingWizard onComplete={handleOnboardingComplete} />;
+  }
 
   return (
     <div className="min-h-screen bg-background flex">
