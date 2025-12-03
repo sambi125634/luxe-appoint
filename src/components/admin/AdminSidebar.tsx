@@ -1,14 +1,15 @@
 import { Link } from "react-router-dom";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff
+  LogOut, Sparkles, CalendarOff, LayoutDashboard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type TabType = "calendar" | "staff" | "services" | "time-off" | "stats" | "settings";
+type TabType = "home" | "calendar" | "staff" | "services" | "time-off" | "stats" | "settings";
 
 const navItems: { icon: typeof Calendar; label: string; tab: TabType }[] = [
+  { icon: LayoutDashboard, label: "Dashboard", tab: "home" },
   { icon: Calendar, label: "Kalendarz", tab: "calendar" },
   { icon: Users, label: "Personel", tab: "staff" },
   { icon: Scissors, label: "Usługi", tab: "services" },

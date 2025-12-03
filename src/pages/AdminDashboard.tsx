@@ -4,6 +4,7 @@ import { Menu, X, Plus, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
+import { DashboardHome } from "@/components/admin/DashboardHome";
 import { WeeklyCalendar } from "@/components/admin/WeeklyCalendar";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
@@ -11,10 +12,11 @@ import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("calendar");
+  const [activeTab, setActiveTab] = useState<TabType>("home");
 
   const getPageTitle = () => {
     switch (activeTab) {
+      case "home": return "Dashboard";
       case "calendar": return "Kalendarz";
       case "staff": return "Personel";
       case "services": return "Usługi";
@@ -27,6 +29,8 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "home":
+        return <DashboardHome />;
       case "calendar":
         return <WeeklyCalendar />;
       case "services":
