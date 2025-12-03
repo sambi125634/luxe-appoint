@@ -1,5 +1,8 @@
-import { User, Star } from "lucide-react";
+import { useState } from "react";
+import { User, Star, Clock, CalendarDays, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface StaffMember {
   id: string;
@@ -7,6 +10,7 @@ interface StaffMember {
   role: string;
   avatar?: string;
   rating: number;
+  nextAvailable?: string;
 }
 
 interface StaffSelectionProps {
@@ -15,14 +19,26 @@ interface StaffSelectionProps {
 }
 
 const staffMembers: StaffMember[] = [
-  { id: "1", name: "Anna Kowalska", role: "Kosmetolog", rating: 4.9 },
-  { id: "2", name: "Maria Nowak", role: "Specjalista depilacji", rating: 4.8 },
-  { id: "3", name: "Karolina Wiśniewska", role: "Stylistka brwi i rzęs", rating: 5.0 },
-  { id: "4", name: "Joanna Lewandowska", role: "Masażystka", rating: 4.7 },
+  { id: "1", name: "Anna Kowalska", role: "Kosmetolog", rating: 4.9, nextAvailable: "Dziś, 14:00" },
+  { id: "2", name: "Maria Nowak", role: "Specjalista depilacji", rating: 4.8, nextAvailable: "Jutro, 10:00" },
+  { id: "3", name: "Karolina Wiśniewska", role: "Stylistka brwi i rzęs", rating: 5.0, nextAvailable: "Dziś, 16:30" },
+  { id: "4", name: "Joanna Lewandowska", role: "Masażystka", rating: 4.7, nextAvailable: "Pojutrze, 09:00" },
 ];
 
+type SelectionMode = 'specialist' | 'time';
+
 export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps) {
+  const [mode, setMode] = useState<SelectionMode>('specialist');
   const isAnySelected = selectedStaff === null;
+
+  // Sort by next available for "time first" mode
+  const sortedStaff = mode === 'time' 
+    ? [...staffMembers].sort((a, b) => {
+        if (a.nextAvailable?.includes('Dziś') && !b.nextAvailable?.includes('Dziś')) return -1;
+        if (!a.nextAvailable?.includes('Dziś') && b.nextAvailable?.includes('Dziś')) return 1;
+        return 0;
+      })
+    : staffMembers;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -30,6 +46,43 @@ export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps)
         <h2 className="text-2xl font-serif font-semibold mb-2">Wybierz specjalistę</h2>
         <p className="text-muted-foreground">Możesz wybrać konkretną osobę lub pozwolić nam dopasować</p>
       </div>
+
+      {/* Mode toggle */}
+      <div className="flex gap-2 p-1 bg-muted rounded-xl">
+        <Button
+          variant={mode === 'specialist' ? 'default' : 'ghost'}
+          size="sm"
+          className="flex-1 gap-2"
+          onClick={() => setMode('specialist')}
+        >
+          <Users className="w-4 h-4" />
+          Wybierz specjalistę
+        </Button>
+        <Button
+          variant={mode === 'time' ? 'default' : 'ghost'}
+          size="sm"
+          className="flex-1 gap-2"
+          onClick={() => setMode('time')}
+        >
+          <Clock className="w-4 h-4" />
+          Najszybszy termin
+        </Button>
+      </div>
+
+      {mode === 'time' && (
+        <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl animate-fade-in">
+          <div className="flex items-center gap-2 text-sm">
+            <CalendarDays className="w-4 h-4 text-primary" />
+            <span className="font-medium">Najbliższy dostępny termin:</span>
+            <Badge variant="secondary" className="bg-primary/10 text-primary">
+              Dziś, 14:00 - Anna Kowalska
+            </Badge>
+          </div>
+          <p className="text-xs text-muted-foreground mt-2">
+            Pokaże Ci terminy posortowane od najwcześniejszego
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-4">
         {/* Any specialist option */}
@@ -51,7 +104,7 @@ export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps)
             )}>
               <User className="w-6 h-6" />
             </div>
-            <div>
+            <div className="flex-1">
               <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
                 Dowolny specjalista
               </h3>
@@ -59,11 +112,16 @@ export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps)
                 Dopasujemy najlepszą dostępną osobę
               </p>
             </div>
+            {mode === 'time' && (
+              <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50">
+                Najszybciej
+              </Badge>
+            )}
           </div>
         </button>
 
         {/* Staff members */}
-        {staffMembers.map((staff, index) => (
+        {sortedStaff.map((staff, index) => (
           <button
             key={staff.id}
             onClick={() => onSelect(staff)}
@@ -92,10 +150,23 @@ export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps)
                 <p className="text-sm text-muted-foreground">
                   {staff.role}
                 </p>
+                {mode === 'time' && staff.nextAvailable && (
+                  <p className="text-xs text-primary mt-1 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {staff.nextAvailable}
+                  </p>
+                )}
               </div>
-              <div className="flex items-center gap-1 text-accent">
-                <Star className="w-4 h-4 fill-current" />
-                <span className="font-medium">{staff.rating}</span>
+              <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-1 text-accent">
+                  <Star className="w-4 h-4 fill-current" />
+                  <span className="font-medium">{staff.rating}</span>
+                </div>
+                {mode === 'time' && staff.nextAvailable?.includes('Dziś') && (
+                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-800 dark:bg-green-900/50">
+                    Dziś
+                  </Badge>
+                )}
               </div>
             </div>
           </button>

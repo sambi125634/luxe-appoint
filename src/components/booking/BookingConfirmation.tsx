@@ -1,8 +1,11 @@
-import { Check, Calendar, Clock, User, MapPin, Phone, CalendarPlus, Navigation, Share2, Sparkles, Home } from "lucide-react";
+import { useState } from "react";
+import { Check, Calendar, Clock, User, MapPin, Phone, CalendarPlus, Navigation, Share2, Sparkles, UserPlus, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
+import { toast } from "@/hooks/use-toast";
 
 interface Service {
   name: string;
@@ -30,6 +33,28 @@ const salonInfo = {
   phone: "+48 22 123 45 67",
 };
 
+// Service-specific preparation instructions
+const preparationInstructions: Record<string, string[]> = {
+  "Mezoterapia igłowa": [
+    "Nie stosuj retinolu 3 dni przed zabiegiem",
+    "Unikaj ekspozycji na słońce",
+    "Przyjdź z oczyszczoną twarzą, bez makijażu",
+  ],
+  "Depilacja laserowa bikini": [
+    "Ogól obszar zabiegowy 1-2 dni przed wizytą",
+    "Unikaj opalania 2 tygodnie przed zabiegiem",
+    "Nie stosuj kremów samoopalających",
+  ],
+  "Peeling kawitacyjny": [
+    "Przyjdź z oczyszczoną twarzą",
+    "Unikaj silnych peelingów 3 dni przed",
+  ],
+  "default": [
+    "Przyjdź 5-10 minut przed umówioną godziną",
+    "W razie pytań skontaktuj się z nami",
+  ],
+};
+
 export function BookingConfirmation({ 
   service, 
   staff, 
@@ -38,6 +63,8 @@ export function BookingConfirmation({
   clientName,
   bookingRef = "BC" + Date.now().toString().slice(-6)
 }: BookingConfirmationProps) {
+  const [showPreparation, setShowPreparation] = useState(true);
+  const [accountCreated, setAccountCreated] = useState(false);
   
   const endTime = () => {
     if (!time || !service) return "";
@@ -78,13 +105,29 @@ export function BookingConfirmation({
       } catch (err) {
         // User cancelled or error
       }
+    } else {
+      navigator.clipboard.writeText(text);
+      toast({ title: "Skopiowano", description: "Szczegóły rezerwacji skopiowane do schowka" });
     }
   };
+
+  const handleCreateAccount = () => {
+    // Simulate account creation
+    setAccountCreated(true);
+    toast({
+      title: "Konto utworzone!",
+      description: "Możesz teraz szybciej rezerwować kolejne wizyty.",
+    });
+  };
+
+  const instructions = service?.name 
+    ? (preparationInstructions[service.name] || preparationInstructions["default"])
+    : preparationInstructions["default"];
 
   return (
     <div className="min-h-[500px] flex flex-col items-center animate-scale-in">
       {/* Success icon */}
-      <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6 shadow-glow animate-bounce-once">
+      <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6 shadow-glow">
         <Check className="w-10 h-10 text-primary-foreground" />
       </div>
       
@@ -218,17 +261,73 @@ export function BookingConfirmation({
           </div>
         </div>
 
-        {/* Preparation info */}
-        <div className="mt-6 p-4 bg-muted/50 rounded-xl">
-          <p className="text-sm font-medium mb-2">📋 Przygotowanie do wizyty</p>
-          <ul className="text-sm text-muted-foreground space-y-1">
-            <li>• Przyjdź 5-10 minut wcześniej</li>
-            <li>• W razie pytań zadzwoń: {salonInfo.phone}</li>
-          </ul>
+        {/* Preparation instructions */}
+        <div className="mt-6">
+          <button 
+            onClick={() => setShowPreparation(!showPreparation)}
+            className="w-full flex items-center justify-between p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl text-left"
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-amber-600" />
+              <span className="font-medium text-amber-800 dark:text-amber-200">Przygotowanie do wizyty</span>
+            </div>
+            {showPreparation ? (
+              <ChevronUp className="w-4 h-4 text-amber-600" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-amber-600" />
+            )}
+          </button>
+          
+          {showPreparation && (
+            <div className="p-4 border border-t-0 border-amber-200 dark:border-amber-800 rounded-b-xl bg-amber-50/50 dark:bg-amber-950/20 animate-fade-in">
+              <ul className="space-y-2">
+                {instructions.map((instruction, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-amber-800 dark:text-amber-200">
+                    <span className="text-amber-600 mt-0.5">•</span>
+                    {instruction}
+                  </li>
+                ))}
+              </ul>
+              <p className="text-xs text-muted-foreground mt-3">
+                W razie pytań: {salonInfo.phone}
+              </p>
+            </div>
+          )}
         </div>
 
+        {/* Create account CTA */}
+        {!accountCreated ? (
+          <div className="mt-6 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <UserPlus className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-sm mb-1">Załóż konto i rezerwuj szybciej</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Zapisz swoje dane i historię wizyt. Kolejna rezerwacja zajmie tylko minutę!
+                </p>
+                <Button size="sm" variant="outline" onClick={handleCreateAccount} className="gap-2">
+                  <UserPlus className="w-4 h-4" />
+                  Utwórz konto (1 klik)
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-6 p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl animate-fade-in">
+            <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
+              <Check className="w-5 h-5" />
+              <span className="font-medium">Konto utworzone!</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Przy kolejnej wizycie Twoje dane będą już wypełnione.
+            </p>
+          </div>
+        )}
+
         {/* Beauty Calendar branding */}
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center space-y-2">
           <Link 
             to="/" 
             className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
@@ -236,6 +335,10 @@ export function BookingConfirmation({
             <Sparkles className="w-3 h-3" />
             Rezerwacje powered by Beauty Calendar
           </Link>
+          <p className="text-[10px] text-muted-foreground">
+            Chcesz taki kalendarz dla swojego salonu?{" "}
+            <Link to="/" className="text-primary hover:underline">Zobacz więcej</Link>
+          </p>
         </div>
       </div>
     </div>
