@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles
+  LogOut, Sparkles, CalendarOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type TabType = "calendar" | "staff" | "services" | "stats" | "settings";
+type TabType = "calendar" | "staff" | "services" | "time-off" | "stats" | "settings";
 
 const navItems: { icon: typeof Calendar; label: string; tab: TabType }[] = [
   { icon: Calendar, label: "Kalendarz", tab: "calendar" },
   { icon: Users, label: "Personel", tab: "staff" },
   { icon: Scissors, label: "Usługi", tab: "services" },
+  { icon: CalendarOff, label: "Urlopy", tab: "time-off" },
   { icon: BarChart3, label: "Statystyki", tab: "stats" },
   { icon: Settings, label: "Ustawienia", tab: "settings" },
 ];
