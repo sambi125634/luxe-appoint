@@ -2,7 +2,7 @@ import { useState } from "react";
 import { 
   Search, Plus, Phone, Mail, Calendar, Clock, 
   Star, AlertTriangle, Edit2, Trash2, X, User,
-  History, StickyNote, Tag, ChevronRight
+  History, StickyNote, Tag, ChevronRight, Filter, Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
@@ -42,12 +43,31 @@ interface Client {
 }
 
 const availableTags = [
-  { id: "vip", label: "VIP", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" },
-  { id: "new", label: "Nowa klientka", color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200" },
-  { id: "regular", label: "Stała klientka", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200" },
-  { id: "problematic", label: "Problematyczna", color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200" },
-  { id: "friday-lover", label: "Lubi piątki", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200" },
-  { id: "evening", label: "Preferuje wieczory", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200" },
+  // Status tags
+  { id: "vip", label: "VIP", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200", category: "status" },
+  { id: "new", label: "Nowa klientka", color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200", category: "status" },
+  { id: "regular", label: "Stała klientka", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200", category: "status" },
+  { id: "problematic", label: "Problematyczna", color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200", category: "status" },
+  // Time preferences
+  { id: "friday-lover", label: "Lubi piątki", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200", category: "time" },
+  { id: "evening", label: "Preferuje wieczory", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200", category: "time" },
+  { id: "morning", label: "Preferuje poranki", color: "bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-200", category: "time" },
+  { id: "weekends", label: "Tylko weekendy", color: "bg-teal-100 text-teal-800 dark:bg-teal-900/50 dark:text-teal-200", category: "time" },
+  // Purchase preferences
+  { id: "premium", label: "Premium", color: "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200", category: "purchase" },
+  { id: "budget", label: "Budżetowa", color: "bg-slate-100 text-slate-800 dark:bg-slate-900/50 dark:text-slate-200", category: "purchase" },
+  { id: "face-treatments", label: "Zabiegi na twarz", color: "bg-pink-100 text-pink-800 dark:bg-pink-900/50 dark:text-pink-200", category: "purchase" },
+  { id: "body-treatments", label: "Zabiegi na ciało", color: "bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-200", category: "purchase" },
+  { id: "nails", label: "Paznokcie", color: "bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200", category: "purchase" },
+  { id: "hair-removal", label: "Depilacja", color: "bg-fuchsia-100 text-fuchsia-800 dark:bg-fuchsia-900/50 dark:text-fuchsia-200", category: "purchase" },
+  { id: "likes-new", label: "Lubi nowości", color: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/50 dark:text-cyan-200", category: "purchase" },
+  { id: "package-buyer", label: "Kupuje pakiety", color: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200", category: "purchase" },
+];
+
+const tagCategories = [
+  { id: "status", label: "Status" },
+  { id: "time", label: "Preferencje czasowe" },
+  { id: "purchase", label: "Preferencje zakupowe" },
 ];
 
 const mockClients: Client[] = [
@@ -57,7 +77,7 @@ const mockClients: Client[] = [
     lastName: "Kowalska",
     phone: "+48 123 456 789",
     email: "anna.kowalska@email.pl",
-    tags: ["vip", "regular"],
+    tags: ["vip", "regular", "premium", "face-treatments", "likes-new"],
     notes: "Preferuje zabiegi w piątki po 16:00. Alergia na parabeny.",
     createdAt: "2024-01-15",
     lastVisit: "2024-12-01",
@@ -75,7 +95,7 @@ const mockClients: Client[] = [
     lastName: "Nowak",
     phone: "+48 987 654 321",
     email: "k.nowak@gmail.com",
-    tags: ["new"],
+    tags: ["new", "budget", "nails"],
     notes: "",
     createdAt: "2024-11-20",
     lastVisit: "2024-11-20",
@@ -91,7 +111,7 @@ const mockClients: Client[] = [
     lastName: "Wiśniewska",
     phone: "+48 555 123 456",
     email: "magda.w@wp.pl",
-    tags: ["regular", "evening"],
+    tags: ["regular", "evening", "hair-removal", "package-buyer"],
     notes: "Wrażliwa skóra. Zawsze rezerwuje na 18:00.",
     createdAt: "2023-06-10",
     lastVisit: "2024-11-28",
@@ -108,7 +128,7 @@ const mockClients: Client[] = [
     lastName: "Dąbrowska",
     phone: "+48 111 222 333",
     email: "ewa.d@email.pl",
-    tags: ["problematic"],
+    tags: ["problematic", "budget"],
     notes: "Dwukrotnie nie pojawiła się na wizycie bez uprzedzenia. Wymagać potwierdzenia SMS.",
     createdAt: "2024-03-01",
     lastVisit: "2024-10-15",
@@ -125,7 +145,7 @@ const mockClients: Client[] = [
     lastName: "Lewandowska",
     phone: "+48 444 555 666",
     email: "zofia.lew@gmail.com",
-    tags: ["vip", "friday-lover"],
+    tags: ["vip", "friday-lover", "premium", "body-treatments", "likes-new"],
     notes: "Klientka VIP - zawsze oferować kawę/herbatę. Lubi nowości w ofercie.",
     createdAt: "2022-09-01",
     lastVisit: "2024-12-02",
@@ -134,6 +154,22 @@ const mockClients: Client[] = [
     visits: [
       { id: "v9", date: "2024-12-02", time: "10:00", service: "Lifting HIFU", staff: "Joanna", status: "completed", price: 800 },
       { id: "v10", date: "2024-11-22", time: "15:00", service: "Mezoterapia", staff: "Maria", status: "completed", price: 350 },
+    ]
+  },
+  {
+    id: "6",
+    firstName: "Marta",
+    lastName: "Zielińska",
+    phone: "+48 666 777 888",
+    email: "marta.z@email.pl",
+    tags: ["regular", "morning", "nails", "package-buyer"],
+    notes: "Preferuje wizyty rano. Kupuje pakiety manicure co 3 miesiące.",
+    createdAt: "2023-03-15",
+    lastVisit: "2024-11-30",
+    totalVisits: 32,
+    totalSpent: 4200,
+    visits: [
+      { id: "v11", date: "2024-11-30", time: "09:00", service: "Manicure hybrydowy", staff: "Anna", status: "completed", price: 120 },
     ]
   },
 ];
@@ -146,17 +182,28 @@ export function ClientsManagement() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedClient, setEditedClient] = useState<Client | null>(null);
   const [activeTab, setActiveTab] = useState("info");
+  const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
+  const [groupByTag, setGroupByTag] = useState<string | null>(null);
   const { toast } = useToast();
 
   const filteredClients = clients.filter(client => {
     const query = searchQuery.toLowerCase();
-    return (
+    const matchesSearch = (
       client.firstName.toLowerCase().includes(query) ||
       client.lastName.toLowerCase().includes(query) ||
       client.phone.includes(query) ||
       client.email.toLowerCase().includes(query)
     );
+    const matchesTag = !selectedTagFilter || client.tags.includes(selectedTagFilter);
+    return matchesSearch && matchesTag;
   });
+
+  const groupedClients = groupByTag 
+    ? {
+        withTag: filteredClients.filter(c => c.tags.includes(groupByTag)),
+        withoutTag: filteredClients.filter(c => !c.tags.includes(groupByTag)),
+      }
+    : null;
 
   const openClientDetails = (client: Client) => {
     setSelectedClient(client);
@@ -257,14 +304,65 @@ export function ClientsManagement() {
       </div>
 
       {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Szukaj po imieniu, nazwisku, telefonie lub e-mail..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10"
-        />
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Szukaj po imieniu, nazwisku, telefonie lub e-mail..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
+        {/* Tag filter */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant={selectedTagFilter ? "secondary" : "outline"} className="gap-2">
+              <Filter className="w-4 h-4" />
+              {selectedTagFilter ? getTagInfo(selectedTagFilter)?.label : "Filtruj po tagu"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem onClick={() => setSelectedTagFilter(null)}>Wszystkie</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {tagCategories.map(category => (
+              <div key={category.id}>
+                <DropdownMenuLabel className="text-xs text-muted-foreground">{category.label}</DropdownMenuLabel>
+                {availableTags.filter(t => t.category === category.id).map(tag => (
+                  <DropdownMenuItem key={tag.id} onClick={() => setSelectedTagFilter(tag.id)}>
+                    <Badge variant="secondary" className={cn("text-xs mr-2", tag.color)}>{tag.label}</Badge>
+                  </DropdownMenuItem>
+                ))}
+              </div>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* Group by tag */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant={groupByTag ? "secondary" : "outline"} className="gap-2">
+              <Users className="w-4 h-4" />
+              {groupByTag ? `Grupuj: ${getTagInfo(groupByTag)?.label}` : "Grupuj"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuItem onClick={() => setGroupByTag(null)}>Bez grupowania</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            {availableTags.slice(0, 10).map(tag => (
+              <DropdownMenuItem key={tag.id} onClick={() => setGroupByTag(tag.id)}>
+                <Badge variant="secondary" className={cn("text-xs mr-2", tag.color)}>{tag.label}</Badge>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {(selectedTagFilter || groupByTag) && (
+          <Button variant="ghost" size="sm" onClick={() => { setSelectedTagFilter(null); setGroupByTag(null); }}>
+            Wyczyść
+          </Button>
+        )}
       </div>
 
       {/* Clients list */}
