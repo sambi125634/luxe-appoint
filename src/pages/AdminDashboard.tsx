@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
 import { DashboardHome } from "@/components/admin/DashboardHome";
 import { WeeklyCalendar } from "@/components/admin/WeeklyCalendar";
+import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
     switch (activeTab) {
       case "home": return "Dashboard";
       case "calendar": return "Kalendarz";
+      case "clients": return "Klienci";
       case "staff": return "Personel";
       case "services": return "Usługi";
       case "time-off": return "Urlopy i dni wolne";
@@ -33,6 +35,8 @@ export default function AdminDashboard() {
         return <DashboardHome />;
       case "calendar":
         return <WeeklyCalendar />;
+      case "clients":
+        return <ClientsManagement />;
       case "services":
         return <ServicesManagement />;
       case "staff":
