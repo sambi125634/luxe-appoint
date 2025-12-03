@@ -1,0 +1,358 @@
+import { useState } from "react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+
+interface Service {
+  id: string;
+  name: string;
+  category: string;
+  duration: number;
+  price: number;
+  description: string;
+  staffIds: string[];
+}
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+const mockCategories: Category[] = [
+  { id: "1", name: "Twarz", icon: "✨" },
+  { id: "2", name: "Ciało", icon: "💆" },
+  { id: "3", name: "Depilacja", icon: "🌸" },
+  { id: "4", name: "Paznokcie", icon: "💅" },
+];
+
+const mockServices: Service[] = [
+  { id: "1", name: "Peeling kawitacyjny", category: "1", duration: 60, price: 150, description: "Głębokie oczyszczanie skóry twarzy", staffIds: ["1", "2"] },
+  { id: "2", name: "Mezoterapia igłowa", category: "1", duration: 45, price: 350, description: "Regeneracja i nawilżenie skóry", staffIds: ["1"] },
+  { id: "3", name: "Masaż relaksacyjny", category: "2", duration: 90, price: 200, description: "Pełen relaks dla ciała i umysłu", staffIds: ["3"] },
+  { id: "4", name: "Depilacja laserowa - nogi", category: "3", duration: 60, price: 400, description: "Trwałe usuwanie owłosienia", staffIds: ["1", "4"] },
+  { id: "5", name: "Manicure hybrydowy", category: "4", duration: 75, price: 120, description: "Stylizacja paznokci z użyciem lakieru hybrydowego", staffIds: ["2", "4"] },
+];
+
+const mockStaff = [
+  { id: "1", name: "Maria Nowakowska" },
+  { id: "2", name: "Karolina Wiśniewska" },
+  { id: "3", name: "Joanna Lewandowska" },
+  { id: "4", name: "Anna Kowalczyk" },
+];
+
+export function ServicesManagement() {
+  const [services, setServices] = useState(mockServices);
+  const [categories, setCategories] = useState(mockCategories);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isServiceDialogOpen, setIsServiceDialogOpen] = useState(false);
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [editingService, setEditingService] = useState<Service | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+
+  const [serviceForm, setServiceForm] = useState({
+    name: "",
+    category: "",
+    duration: 60,
+    price: 0,
+    description: "",
+    staffIds: [] as string[],
+  });
+
+  const [categoryForm, setCategoryForm] = useState({
+    name: "",
+    icon: "✨",
+  });
+
+  const filteredServices = services.filter(service => {
+    const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = !selectedCategory || service.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const openServiceDialog = (service?: Service) => {
+    if (service) {
+      setEditingService(service);
+      setServiceForm({
+        name: service.name,
+        category: service.category,
+        duration: service.duration,
+        price: service.price,
+        description: service.description,
+        staffIds: service.staffIds,
+      });
+    } else {
+      setEditingService(null);
+      setServiceForm({ name: "", category: categories[0]?.id || "", duration: 60, price: 0, description: "", staffIds: [] });
+    }
+    setIsServiceDialogOpen(true);
+  };
+
+  const saveService = () => {
+    if (editingService) {
+      setServices(prev => prev.map(s => s.id === editingService.id ? { ...s, ...serviceForm } : s));
+    } else {
+      setServices(prev => [...prev, { ...serviceForm, id: Date.now().toString() }]);
+    }
+    setIsServiceDialogOpen(false);
+  };
+
+  const deleteService = (id: string) => {
+    setServices(prev => prev.filter(s => s.id !== id));
+  };
+
+  const openCategoryDialog = (category?: Category) => {
+    if (category) {
+      setEditingCategory(category);
+      setCategoryForm({ name: category.name, icon: category.icon });
+    } else {
+      setEditingCategory(null);
+      setCategoryForm({ name: "", icon: "✨" });
+    }
+    setIsCategoryDialogOpen(true);
+  };
+
+  const saveCategory = () => {
+    if (editingCategory) {
+      setCategories(prev => prev.map(c => c.id === editingCategory.id ? { ...c, ...categoryForm } : c));
+    } else {
+      setCategories(prev => [...prev, { ...categoryForm, id: Date.now().toString() }]);
+    }
+    setIsCategoryDialogOpen(false);
+  };
+
+  const getCategoryName = (categoryId: string) => {
+    return categories.find(c => c.id === categoryId)?.name || "Brak kategorii";
+  };
+
+  const toggleStaffSelection = (staffId: string) => {
+    setServiceForm(prev => ({
+      ...prev,
+      staffIds: prev.staffIds.includes(staffId)
+        ? prev.staffIds.filter(id => id !== staffId)
+        : [...prev.staffIds, staffId],
+    }));
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Categories */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-serif font-semibold">Kategorie usług</h3>
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => openCategoryDialog()}>
+            <Plus className="w-4 h-4" />
+            Dodaj kategorię
+          </Button>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant={selectedCategory === null ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedCategory(null)}
+          >
+            Wszystkie
+          </Button>
+          {categories.map(category => (
+            <Button
+              key={category.id}
+              variant={selectedCategory === category.id ? "default" : "outline"}
+              size="sm"
+              className="gap-2"
+              onClick={() => setSelectedCategory(category.id)}
+            >
+              <span>{category.icon}</span>
+              {category.name}
+              <button
+                className="ml-1 opacity-50 hover:opacity-100"
+                onClick={(e) => { e.stopPropagation(); openCategoryDialog(category); }}
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Services list */}
+      <div className="glass-card p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-serif font-semibold">Usługi ({filteredServices.length})</h3>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Szukaj usługi..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 w-[200px]"
+              />
+            </div>
+            <Button variant="luxury" size="sm" className="gap-2" onClick={() => openServiceDialog()}>
+              <Plus className="w-4 h-4" />
+              Dodaj usługę
+            </Button>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {filteredServices.map((service, index) => (
+            <div
+              key={service.id}
+              className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors animate-fade-in"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FolderOpen className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium">{service.name}</p>
+                <p className="text-sm text-muted-foreground">{getCategoryName(service.category)}</p>
+              </div>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Clock className="w-4 h-4" />
+                {service.duration} min
+              </div>
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Banknote className="w-4 h-4 text-accent" />
+                {service.price} zł
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="icon" onClick={() => openServiceDialog(service)}>
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => deleteService(service.id)}>
+                  <Trash2 className="w-4 h-4 text-destructive" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Service Dialog */}
+      <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif">
+              {editingService ? "Edytuj usługę" : "Nowa usługa"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Nazwa usługi</Label>
+              <Input
+                value={serviceForm.name}
+                onChange={(e) => setServiceForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="np. Peeling kawitacyjny"
+              />
+            </div>
+            <div>
+              <Label>Kategoria</Label>
+              <Select
+                value={serviceForm.category}
+                onValueChange={(value) => setServiceForm(prev => ({ ...prev, category: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Wybierz kategorię" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.icon} {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Czas trwania (min)</Label>
+                <Input
+                  type="number"
+                  value={serviceForm.duration}
+                  onChange={(e) => setServiceForm(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
+                />
+              </div>
+              <div>
+                <Label>Cena (zł)</Label>
+                <Input
+                  type="number"
+                  value={serviceForm.price}
+                  onChange={(e) => setServiceForm(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>Opis</Label>
+              <Textarea
+                value={serviceForm.description}
+                onChange={(e) => setServiceForm(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Krótki opis usługi..."
+              />
+            </div>
+            <div>
+              <Label>Personel wykonujący</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {mockStaff.map(staff => (
+                  <Button
+                    key={staff.id}
+                    type="button"
+                    variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => toggleStaffSelection(staff.id)}
+                  >
+                    {staff.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsServiceDialogOpen(false)}>Anuluj</Button>
+            <Button variant="luxury" onClick={saveService}>Zapisz</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Category Dialog */}
+      <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-serif">
+              {editingCategory ? "Edytuj kategorię" : "Nowa kategoria"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Nazwa kategorii</Label>
+              <Input
+                value={categoryForm.name}
+                onChange={(e) => setCategoryForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="np. Twarz"
+              />
+            </div>
+            <div>
+              <Label>Ikona (emoji)</Label>
+              <Input
+                value={categoryForm.icon}
+                onChange={(e) => setCategoryForm(prev => ({ ...prev, icon: e.target.value }))}
+                placeholder="✨"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCategoryDialogOpen(false)}>Anuluj</Button>
+            <Button variant="luxury" onClick={saveCategory}>Zapisz</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
