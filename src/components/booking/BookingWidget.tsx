@@ -7,9 +7,10 @@ import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
 import { BookingSummary } from "./BookingSummary";
+import { BookingConfirmation } from "./BookingConfirmation";
 import { toast } from "@/hooks/use-toast";
 
-const steps = ["Usługa", "Specjalista", "Termin", "Dane", "Potwierdzenie"];
+const steps = ["Usługa", "Specjalista", "Termin", "Dane", "Podsumowanie"];
 
 interface Service {
   id: string;
@@ -101,30 +102,13 @@ export function BookingWidget() {
 
   if (isConfirmed) {
     return (
-      <div className="min-h-[500px] flex flex-col items-center justify-center text-center p-8 animate-scale-in">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6 shadow-glow">
-          <Check className="w-10 h-10 text-primary-foreground" />
-        </div>
-        <h2 className="text-3xl font-serif font-bold mb-3">Dziękujemy!</h2>
-        <p className="text-muted-foreground mb-6 max-w-md">
-          Twoja rezerwacja została przyjęta. Otrzymasz SMS oraz e-mail z potwierdzeniem
-          szczegółów wizyty.
-        </p>
-        <div className="glass-card p-6 text-left w-full max-w-sm">
-          <p className="text-sm text-muted-foreground mb-1">Twoja wizyta</p>
-          <p className="font-semibold text-lg">{selectedService?.name}</p>
-          <p className="text-accent font-medium">
-            {selectedDate &&
-              new Intl.DateTimeFormat("pl-PL", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              }).format(selectedDate)}{" "}
-            o {selectedTime}
-          </p>
-        </div>
-      </div>
+      <BookingConfirmation
+        service={selectedService}
+        staff={selectedStaff}
+        date={selectedDate}
+        time={selectedTime}
+        clientName={`${clientData.firstName} ${clientData.lastName}`}
+      />
     );
   }
 
