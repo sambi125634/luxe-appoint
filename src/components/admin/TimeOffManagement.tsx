@@ -1,0 +1,412 @@
+import { useState } from "react";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isWithinInterval, parseISO } from "date-fns";
+import { pl } from "date-fns/locale";
+import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Calendar, Palmtree, GraduationCap, Stethoscope } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+
+interface TimeOff {
+  id: string;
+  staffId: string;
+  staffName: string;
+  staffColor: string;
+  type: "vacation" | "sick" | "training" | "other";
+  startDate: string;
+  endDate: string;
+  note?: string;
+}
+
+interface StaffMember {
+  id: string;
+  name: string;
+  color: string;
+}
+
+const mockStaff: StaffMember[] = [
+  { id: "1", name: "Anna Kowalska", color: "#8B5CF6" },
+  { id: "2", name: "Maria Nowak", color: "#EC4899" },
+  { id: "3", name: "Katarzyna Wiśniewska", color: "#10B981" },
+];
+
+const mockTimeOffs: TimeOff[] = [
+  {
+    id: "1",
+    staffId: "1",
+    staffName: "Anna Kowalska",
+    staffColor: "#8B5CF6",
+    type: "vacation",
+    startDate: "2025-12-20",
+    endDate: "2025-12-27",
+    note: "Urlop świąteczny",
+  },
+  {
+    id: "2",
+    staffId: "2",
+    staffName: "Maria Nowak",
+    staffColor: "#EC4899",
+    type: "training",
+    startDate: "2025-12-10",
+    endDate: "2025-12-11",
+    note: "Szkolenie z nowych technik makijażu",
+  },
+  {
+    id: "3",
+    staffId: "3",
+    staffName: "Katarzyna Wiśniewska",
+    staffColor: "#10B981",
+    type: "sick",
+    startDate: "2025-12-05",
+    endDate: "2025-12-06",
+  },
+];
+
+const typeLabels: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+  vacation: { label: "Urlop", icon: Palmtree, className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400" },
+  sick: { label: "Zwolnienie", icon: Stethoscope, className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" },
+  training: { label: "Szkolenie", icon: GraduationCap, className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" },
+  other: { label: "Inne", icon: Calendar, className: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400" },
+};
+
+export function TimeOffManagement() {
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [timeOffs, setTimeOffs] = useState<TimeOff[]>(mockTimeOffs);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingTimeOff, setEditingTimeOff] = useState<TimeOff | null>(null);
+  const [formData, setFormData] = useState({
+    staffId: "",
+    type: "vacation" as TimeOff["type"],
+    startDate: "",
+    endDate: "",
+    note: "",
+  });
+
+  const monthStart = startOfMonth(currentMonth);
+  const monthEnd = endOfMonth(currentMonth);
+  const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
+
+  const firstDayOfWeek = monthStart.getDay();
+  const paddingDays = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+
+  const getTimeOffsForDay = (date: Date) => {
+    return timeOffs.filter((timeOff) => {
+      const start = parseISO(timeOff.startDate);
+      const end = parseISO(timeOff.endDate);
+      return isWithinInterval(date, { start, end }) || isSameDay(date, start) || isSameDay(date, end);
+    });
+  };
+
+  const openDialog = (timeOff?: TimeOff) => {
+    if (timeOff) {
+      setEditingTimeOff(timeOff);
+      setFormData({
+        staffId: timeOff.staffId,
+        type: timeOff.type,
+        startDate: timeOff.startDate,
+        endDate: timeOff.endDate,
+        note: timeOff.note || "",
+      });
+    } else {
+      setEditingTimeOff(null);
+      setFormData({
+        staffId: "",
+        type: "vacation",
+        startDate: "",
+        endDate: "",
+        note: "",
+      });
+    }
+    setIsDialogOpen(true);
+  };
+
+  const saveTimeOff = () => {
+    const staff = mockStaff.find((s) => s.id === formData.staffId);
+    if (!staff) return;
+
+    const newTimeOff: TimeOff = {
+      id: editingTimeOff?.id || Date.now().toString(),
+      staffId: formData.staffId,
+      staffName: staff.name,
+      staffColor: staff.color,
+      type: formData.type,
+      startDate: formData.startDate,
+      endDate: formData.endDate,
+      note: formData.note || undefined,
+    };
+
+    if (editingTimeOff) {
+      setTimeOffs(timeOffs.map((t) => (t.id === editingTimeOff.id ? newTimeOff : t)));
+    } else {
+      setTimeOffs([...timeOffs, newTimeOff]);
+    }
+
+    setIsDialogOpen(false);
+  };
+
+  const deleteTimeOff = (id: string) => {
+    setTimeOffs(timeOffs.filter((t) => t.id !== id));
+  };
+
+  const weekDays = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Urlopy i dni wolne</h2>
+          <p className="text-muted-foreground">Zarządzaj nieobecnościami pracowników</p>
+        </div>
+        <Button onClick={() => openDialog()} className="gap-2">
+          <Plus className="w-4 h-4" />
+          Dodaj nieobecność
+        </Button>
+      </div>
+
+      {/* Calendar Navigation */}
+      <div className="flex items-center justify-between bg-card rounded-xl p-4 border border-border">
+        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+        <h3 className="text-lg font-semibold text-foreground capitalize">
+          {format(currentMonth, "LLLL yyyy", { locale: pl })}
+        </h3>
+        <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+          <ChevronRight className="w-5 h-5" />
+        </Button>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
+        {/* Week days header */}
+        <div className="grid grid-cols-7 border-b border-border">
+          {weekDays.map((day) => (
+            <div key={day} className="p-3 text-center text-sm font-medium text-muted-foreground bg-muted/50">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar days */}
+        <div className="grid grid-cols-7">
+          {/* Padding for days before month starts */}
+          {Array.from({ length: paddingDays }).map((_, i) => (
+            <div key={`padding-${i}`} className="min-h-24 p-2 border-b border-r border-border bg-muted/20" />
+          ))}
+
+          {days.map((day, index) => {
+            const dayTimeOffs = getTimeOffsForDay(day);
+            const isToday = isSameDay(day, new Date());
+
+            return (
+              <div
+                key={day.toISOString()}
+                className={cn(
+                  "min-h-24 p-2 border-b border-r border-border transition-colors",
+                  !isSameMonth(day, currentMonth) && "bg-muted/30",
+                  isToday && "bg-primary/5"
+                )}
+              >
+                <div
+                  className={cn(
+                    "text-sm font-medium mb-1",
+                    isToday && "text-primary font-bold",
+                    !isToday && "text-foreground"
+                  )}
+                >
+                  {format(day, "d")}
+                </div>
+                <div className="space-y-1">
+                  {dayTimeOffs.slice(0, 2).map((timeOff) => {
+                    const TypeIcon = typeLabels[timeOff.type].icon;
+                    return (
+                      <div
+                        key={timeOff.id}
+                        className="text-xs p-1 rounded truncate cursor-pointer hover:opacity-80 transition-opacity"
+                        style={{ backgroundColor: `${timeOff.staffColor}20`, borderLeft: `3px solid ${timeOff.staffColor}` }}
+                        onClick={() => openDialog(timeOff)}
+                        title={`${timeOff.staffName} - ${typeLabels[timeOff.type].label}`}
+                      >
+                        <div className="flex items-center gap-1">
+                          <TypeIcon className="w-3 h-3 flex-shrink-0" style={{ color: timeOff.staffColor }} />
+                          <span className="truncate" style={{ color: timeOff.staffColor }}>
+                            {timeOff.staffName.split(" ")[0]}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {dayTimeOffs.length > 2 && (
+                    <div className="text-xs text-muted-foreground">+{dayTimeOffs.length - 2} więcej</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div className="flex flex-wrap gap-3">
+        {Object.entries(typeLabels).map(([key, { label, icon: Icon, className }]) => (
+          <Badge key={key} variant="secondary" className={cn("gap-1", className)}>
+            <Icon className="w-3 h-3" />
+            {label}
+          </Badge>
+        ))}
+      </div>
+
+      {/* Time Off List */}
+      <div className="bg-card rounded-xl border border-border">
+        <div className="p-4 border-b border-border">
+          <h3 className="font-semibold text-foreground">Lista nieobecności</h3>
+        </div>
+        <div className="divide-y divide-border">
+          {timeOffs.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground">
+              Brak zarejestrowanych nieobecności
+            </div>
+          ) : (
+            timeOffs.map((timeOff) => {
+              const TypeIcon = typeLabels[timeOff.type].icon;
+              return (
+                <div key={timeOff.id} className="p-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium flex-shrink-0"
+                      style={{ backgroundColor: timeOff.staffColor }}
+                    >
+                      {timeOff.staffName.charAt(0)}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="font-medium text-foreground truncate">{timeOff.staffName}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {format(parseISO(timeOff.startDate), "d MMM", { locale: pl })} -{" "}
+                        {format(parseISO(timeOff.endDate), "d MMM yyyy", { locale: pl })}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Badge variant="secondary" className={cn("gap-1 hidden sm:flex", typeLabels[timeOff.type].className)}>
+                      <TypeIcon className="w-3 h-3" />
+                      {typeLabels[timeOff.type].label}
+                    </Badge>
+                    {timeOff.note && (
+                      <span className="text-sm text-muted-foreground hidden md:block max-w-48 truncate">
+                        {timeOff.note}
+                      </span>
+                    )}
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => openDialog(timeOff)}>
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteTimeOff(timeOff.id)}>
+                        <Trash2 className="w-4 h-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{editingTimeOff ? "Edytuj nieobecność" : "Dodaj nieobecność"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Pracownik</Label>
+              <Select value={formData.staffId} onValueChange={(value) => setFormData({ ...formData, staffId: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Wybierz pracownika" />
+                </SelectTrigger>
+                <SelectContent>
+                  {mockStaff.map((staff) => (
+                    <SelectItem key={staff.id} value={staff.id}>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: staff.color }} />
+                        {staff.name}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Typ nieobecności</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => setFormData({ ...formData, type: value as TimeOff["type"] })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(typeLabels).map(([key, { label, icon: Icon }]) => (
+                    <SelectItem key={key} value={key}>
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4" />
+                        {label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Data rozpoczęcia</Label>
+                <Input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Data zakończenia</Label>
+                <Input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Notatka (opcjonalnie)</Label>
+              <Textarea
+                value={formData.note}
+                onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                placeholder="Dodatkowe informacje..."
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Anuluj
+            </Button>
+            <Button
+              onClick={saveTimeOff}
+              disabled={!formData.staffId || !formData.startDate || !formData.endDate}
+            >
+              {editingTimeOff ? "Zapisz zmiany" : "Dodaj"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
