@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Clock, User } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { AppointmentModal } from "./AppointmentModal";
 
 interface Appointment {
   id: string;
@@ -39,6 +40,9 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(mockAppointments);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ date: Date; time: string } | null>(null);
 
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
@@ -84,6 +88,49 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
     return appointments.filter(apt => apt.time === hour);
   };
 
+  const handleSlotClick = (dayIndex: number, hour: string) => {
+    const date = weekDays[dayIndex];
+    setSelectedSlot({ date, time: hour });
+    setEditingAppointment(null);
+    setIsModalOpen(true);
+  };
+
+  const handleAppointmentClick = (apt: Appointment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingAppointment(apt);
+    setSelectedSlot(null);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveAppointment = (appointmentData: any) => {
+    if (editingAppointment) {
+      setAppointments(prev => prev.map(apt => 
+        apt.id === editingAppointment.id 
+          ? { ...apt, ...appointmentData, client: appointmentData.clientName, service: appointmentData.serviceName, staff: appointmentData.staffName }
+          : apt
+      ));
+    } else {
+      const newAppointment: Appointment = {
+        id: Date.now().toString(),
+        time: appointmentData.time,
+        duration: appointmentData.duration,
+        client: appointmentData.clientName,
+        service: appointmentData.serviceName,
+        staff: appointmentData.staffName,
+        staffId: appointmentData.staffId,
+        status: appointmentData.status,
+      };
+      setAppointments(prev => [...prev, newAppointment]);
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleOpenNewAppointment = () => {
+    setEditingAppointment(null);
+    setSelectedSlot({ date: new Date(), time: "09:00" });
+    setIsModalOpen(true);
+  };
+
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("pl-PL", { day: "numeric" });
   };
@@ -115,7 +162,7 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
             </Button>
           </div>
         </div>
-        <Button variant="luxury" size="sm" className="gap-2" onClick={onNewAppointment}>
+        <Button variant="luxury" size="sm" className="gap-2" onClick={handleOpenNewAppointment}>
           <Plus className="w-4 h-4" />
           Nowa wizyta
         </Button>
@@ -168,9 +215,10 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
                   return (
                     <div
                       key={dayIndex}
-                      className="min-h-[60px] border border-border/50 rounded-lg p-1 bg-muted/20 hover:bg-muted/40 transition-colors"
+                      className="min-h-[60px] border border-border/50 rounded-lg p-1 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer"
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDrop(e, dayIndex, hour)}
+                      onClick={() => handleSlotClick(dayIndex, hour)}
                     >
                       {slotAppointments.map(apt => {
                         const staffMember = staff.find(s => s.id === apt.staffId);
@@ -179,8 +227,9 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
                             key={apt.id}
                             draggable
                             onDragStart={(e) => handleDragStart(e, apt.id)}
+                            onClick={(e) => handleAppointmentClick(apt, e)}
                             className={cn(
-                              "p-2 rounded-md text-xs cursor-move transition-all hover:scale-[1.02]",
+                              "p-2 rounded-md text-xs cursor-pointer transition-all hover:scale-[1.02]",
                               staffMember?.color || "bg-primary",
                               "text-primary-foreground",
                               draggedAppointment === apt.id && "opacity-50"
@@ -203,6 +252,28 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
           </div>
         </div>
       </div>
+
+      <AppointmentModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveAppointment}
+        appointment={editingAppointment ? {
+          id: editingAppointment.id,
+          clientId: "",
+          clientName: editingAppointment.client,
+          serviceId: "",
+          serviceName: editingAppointment.service,
+          staffId: editingAppointment.staffId,
+          staffName: editingAppointment.staff,
+          date: currentDate.toISOString().split('T')[0],
+          time: editingAppointment.time,
+          duration: editingAppointment.duration,
+          notes: "",
+          status: editingAppointment.status,
+        } : null}
+        selectedDate={selectedSlot?.date}
+        selectedTime={selectedSlot?.time}
+      />
     </div>
   );
 }

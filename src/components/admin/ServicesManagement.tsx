@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { ServiceMediaUpload, MediaFile } from "./ServiceMediaUpload";
+import { CSVImport } from "./CSVImport";
 
 interface Service {
   id: string;
@@ -16,6 +18,7 @@ interface Service {
   price: number;
   description: string;
   staffIds: string[];
+  media: MediaFile[];
 }
 
 interface Category {
@@ -32,11 +35,11 @@ const mockCategories: Category[] = [
 ];
 
 const mockServices: Service[] = [
-  { id: "1", name: "Peeling kawitacyjny", category: "1", duration: 60, price: 150, description: "Głębokie oczyszczanie skóry twarzy", staffIds: ["1", "2"] },
-  { id: "2", name: "Mezoterapia igłowa", category: "1", duration: 45, price: 350, description: "Regeneracja i nawilżenie skóry", staffIds: ["1"] },
-  { id: "3", name: "Masaż relaksacyjny", category: "2", duration: 90, price: 200, description: "Pełen relaks dla ciała i umysłu", staffIds: ["3"] },
-  { id: "4", name: "Depilacja laserowa - nogi", category: "3", duration: 60, price: 400, description: "Trwałe usuwanie owłosienia", staffIds: ["1", "4"] },
-  { id: "5", name: "Manicure hybrydowy", category: "4", duration: 75, price: 120, description: "Stylizacja paznokci z użyciem lakieru hybrydowego", staffIds: ["2", "4"] },
+  { id: "1", name: "Peeling kawitacyjny", category: "1", duration: 60, price: 150, description: "Głębokie oczyszczanie skóry twarzy", staffIds: ["1", "2"], media: [] },
+  { id: "2", name: "Mezoterapia igłowa", category: "1", duration: 45, price: 350, description: "Regeneracja i nawilżenie skóry", staffIds: ["1"], media: [] },
+  { id: "3", name: "Masaż relaksacyjny", category: "2", duration: 90, price: 200, description: "Pełen relaks dla ciała i umysłu", staffIds: ["3"], media: [] },
+  { id: "4", name: "Depilacja laserowa - nogi", category: "3", duration: 60, price: 400, description: "Trwałe usuwanie owłosienia", staffIds: ["1", "4"], media: [] },
+  { id: "5", name: "Manicure hybrydowy", category: "4", duration: 75, price: 120, description: "Stylizacja paznokci z użyciem lakieru hybrydowego", staffIds: ["2", "4"], media: [] },
 ];
 
 const mockStaff = [
@@ -53,6 +56,7 @@ export function ServicesManagement() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isServiceDialogOpen, setIsServiceDialogOpen] = useState(false);
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false);
+  const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
@@ -63,6 +67,7 @@ export function ServicesManagement() {
     price: 0,
     description: "",
     staffIds: [] as string[],
+    media: [] as MediaFile[],
   });
 
   const [categoryForm, setCategoryForm] = useState({
@@ -86,12 +91,23 @@ export function ServicesManagement() {
         price: service.price,
         description: service.description,
         staffIds: service.staffIds,
+        media: service.media || [],
       });
     } else {
       setEditingService(null);
-      setServiceForm({ name: "", category: categories[0]?.id || "", duration: 60, price: 0, description: "", staffIds: [] });
+      setServiceForm({ name: "", category: categories[0]?.id || "", duration: 60, price: 0, description: "", staffIds: [], media: [] });
     }
     setIsServiceDialogOpen(true);
+  };
+
+  const handleCSVImport = (importedServices: { name: string; category: string; duration: number; price: number; description: string }[]) => {
+    const newServices = importedServices.map((s, index) => ({
+      ...s,
+      id: `csv-${Date.now()}-${index}`,
+      staffIds: [] as string[],
+      media: [] as MediaFile[],
+    }));
+    setServices(prev => [...prev, ...newServices]);
   };
 
   const saveService = () => {
@@ -194,6 +210,10 @@ export function ServicesManagement() {
                 className="pl-9 w-[200px]"
               />
             </div>
+            <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsCSVImportOpen(true)}>
+              <Upload className="w-4 h-4" />
+              Import CSV
+            </Button>
             <Button variant="luxury" size="sm" className="gap-2" onClick={() => openServiceDialog()}>
               <Plus className="w-4 h-4" />
               Dodaj usługę
@@ -202,15 +222,32 @@ export function ServicesManagement() {
         </div>
 
         <div className="space-y-3">
-          {filteredServices.map((service, index) => (
+        {filteredServices.map((service, index) => (
             <div
               key={service.id}
               className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors animate-fade-in"
               style={{ animationDelay: `${index * 50}ms` }}
             >
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                <FolderOpen className="w-5 h-5 text-primary" />
-              </div>
+              {service.media && service.media.length > 0 ? (
+                <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 relative">
+                  {service.media[0].type === "image" ? (
+                    <img src={service.media[0].url} alt={service.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <Video className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                  )}
+                  {service.media.length > 1 && (
+                    <span className="absolute bottom-1 right-1 text-xs bg-foreground/70 text-background px-1 rounded">
+                      +{service.media.length - 1}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <FolderOpen className="w-6 h-6 text-primary" />
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium">{service.name}</p>
                 <p className="text-sm text-muted-foreground">{getCategoryName(service.category)}</p>
@@ -238,7 +275,7 @@ export function ServicesManagement() {
 
       {/* Service Dialog */}
       <Dialog open={isServiceDialogOpen} onOpenChange={setIsServiceDialogOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif">
               {editingService ? "Edytuj usługę" : "Nowa usługa"}
@@ -313,6 +350,20 @@ export function ServicesManagement() {
                 ))}
               </div>
             </div>
+            <div>
+              <Label className="flex items-center gap-2">
+                <Image className="w-4 h-4" />
+                Multimedia (zdjęcia i wideo)
+              </Label>
+              <p className="text-sm text-muted-foreground mb-2">
+                Dodaj zdjęcia lub wideo prezentujące usługę dla lepszego doświadczenia klientek
+              </p>
+              <ServiceMediaUpload
+                media={serviceForm.media}
+                onChange={(media) => setServiceForm(prev => ({ ...prev, media }))}
+                maxFiles={5}
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsServiceDialogOpen(false)}>Anuluj</Button>
@@ -320,6 +371,14 @@ export function ServicesManagement() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* CSV Import Dialog */}
+      <CSVImport
+        isOpen={isCSVImportOpen}
+        onClose={() => setIsCSVImportOpen(false)}
+        onImport={handleCSVImport}
+        categories={categories}
+      />
 
       {/* Category Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
