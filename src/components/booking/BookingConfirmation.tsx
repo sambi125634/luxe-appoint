@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, Calendar, Clock, User, MapPin, Phone, CalendarPlus, Navigation, Share2, Sparkles, UserPlus, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "@/hooks/use-toast";
+import { Confetti } from "./Confetti";
 
 interface Service {
   name: string;
@@ -65,6 +66,15 @@ export function BookingConfirmation({
 }: BookingConfirmationProps) {
   const [showPreparation, setShowPreparation] = useState(true);
   const [accountCreated, setAccountCreated] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(true);
+
+  useEffect(() => {
+    // Hide confetti after animation
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, []);
   
   const endTime = () => {
     if (!time || !service) return "";
@@ -126,6 +136,9 @@ export function BookingConfirmation({
 
   return (
     <div className="min-h-[500px] flex flex-col items-center animate-scale-in">
+      {/* Confetti animation */}
+      {showConfetti && <Confetti duration={4000} />}
+      
       {/* Success icon */}
       <div className="w-20 h-20 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mb-6 shadow-glow">
         <Check className="w-10 h-10 text-primary-foreground" />
