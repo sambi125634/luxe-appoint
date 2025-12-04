@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,8 +11,23 @@ import { BookingSummary } from "./BookingSummary";
 import { BookingConfirmation } from "./BookingConfirmation";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { BookingWidget as WidgetConfig, WidgetStep, defaultWidgetSteps, defaultWidgetTheme } from "@/components/admin/widgets/types";
 
-const steps = ["Usługa", "Specjalista", "Termin", "Dane", "Podsumowanie"];
+const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane", "Podsumowanie"];
+
+// Map step IDs to component names
+const stepIdToName: Record<string, string> = {
+  intro: "Wprowadzenie",
+  services: "Usługa",
+  staff: "Specjalista",
+  datetime: "Termin",
+  form: "Dane",
+  summary: "Podsumowanie",
+};
+
+interface BookingWidgetProps {
+  widgetConfig?: WidgetConfig | null;
+}
 
 interface Service {
   id: string;
@@ -50,10 +65,45 @@ const serviceRecommendations: Record<string, { id: string; name: string; price: 
   ],
 };
 
-export function BookingWidget() {
-  const [currentStep, setCurrentStep] = useState(0); // 0 = intro
-  const [previousStep, setPreviousStep] = useState(0);
+export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
+  // Build dynamic steps from widget configuration
+  const { steps, stepMapping } = useMemo(() => {
+    if (!widgetConfig?.steps) {
+      return { 
+        steps: defaultSteps, 
+        stepMapping: ["intro", "services", "staff", "datetime", "form", "summary"] 
+      };
+    }
+    
+    const enabledSteps = widgetConfig.steps
+      .filter(s => s.enabled)
+      .sort((a, b) => a.order - b.order);
+    
+    // Build step names array (excluding intro which is step 0)
+    const stepNames = enabledSteps
+      .filter(s => s.id !== "intro")
+      .map(s => stepIdToName[s.id] || s.name);
+    
+    // Build step ID mapping for navigation
+    const mapping = enabledSteps.map(s => s.id);
+    
+    return { steps: stepNames, stepMapping: mapping };
+  }, [widgetConfig?.steps]);
+
+  const hasIntro = stepMapping.includes("intro");
+  const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
+  const [previousStep, setPreviousStep] = useState(hasIntro ? 0 : 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  // Get current step ID based on currentStep index
+  const getCurrentStepId = (stepIndex: number): string => {
+    if (hasIntro) {
+      return stepMapping[stepIndex] || "intro";
+    }
+    return stepMapping[stepIndex - 1] || "services";
+  };
+
+  const currentStepId = getCurrentStepId(currentStep);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -82,16 +132,16 @@ export function BookingWidget() {
   };
 
   const canProceed = () => {
-    switch (currentStep) {
-      case 0:
+    switch (currentStepId) {
+      case "intro":
         return true;
-      case 1:
+      case "services":
         return selectedService !== null;
-      case 2:
+      case "staff":
         return true; // Staff can be null (any)
-      case 3:
+      case "datetime":
         return selectedDate !== null && selectedTime !== null;
-      case 4:
+      case "form":
         return (
           clientData.firstName.trim() !== "" &&
           clientData.lastName.trim() !== "" &&
@@ -99,12 +149,24 @@ export function BookingWidget() {
           clientData.email.trim() !== "" &&
           clientData.acceptRodo
         );
-      case 5:
+      case "summary":
         return true;
       default:
         return false;
     }
   };
+
+  const getNextStepIndex = () => {
+    const currentIndex = stepMapping.indexOf(currentStepId);
+    return currentIndex + 1 < stepMapping.length ? currentIndex + 1 : currentIndex;
+  };
+
+  const getPrevStepIndex = () => {
+    const currentIndex = stepMapping.indexOf(currentStepId);
+    return currentIndex > 0 ? currentIndex - 1 : 0;
+  };
+
+  const isLastStep = currentStepId === "summary";
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
@@ -115,16 +177,19 @@ export function BookingWidget() {
   };
 
   const handleNext = () => {
-    if (currentStep < 5 && canProceed()) {
+    if (!isLastStep && canProceed()) {
       setShowRecommendations(false);
-      changeStep(currentStep + 1);
+      const nextIndex = getNextStepIndex();
+      changeStep(hasIntro ? nextIndex : nextIndex + 1);
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
+    const currentIndex = stepMapping.indexOf(currentStepId);
+    if (currentIndex > 0) {
       setShowRecommendations(false);
-      changeStep(currentStep - 1);
+      const prevIndex = getPrevStepIndex();
+      changeStep(hasIntro ? prevIndex : prevIndex + 1);
     }
   };
 
@@ -165,14 +230,16 @@ export function BookingWidget() {
   }
 
   // Intro screen
-  if (currentStep === 0) {
+  if (currentStepId === "intro") {
     return (
       <div className="w-full max-w-2xl mx-auto animate-fade-in">
         <div className="text-center py-8">
           <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-6 shadow-glow">
             <Sparkles className="w-8 h-8 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-serif font-bold mb-3">Zarezerwuj wizytę</h1>
+          <h1 className="text-3xl font-serif font-bold mb-3">
+            {widgetConfig?.theme?.headerText || "Zarezerwuj wizytę"}
+          </h1>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
             Rezerwacja online w 3 prostych krokach. Wybierz usługę, termin i gotowe!
           </p>
@@ -219,9 +286,12 @@ export function BookingWidget() {
 
   const recommendations = selectedService ? serviceRecommendations[selectedService.id] : [];
 
+  // Calculate progress step index for BookingProgress
+  const progressStepIndex = stepMapping.indexOf(currentStepId);
+
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <BookingProgress currentStep={currentStep} steps={steps} />
+      <BookingProgress currentStep={progressStepIndex} steps={steps} />
 
       <div className={cn(
         "mt-8 transition-all duration-300",
@@ -229,12 +299,12 @@ export function BookingWidget() {
           ? "opacity-0 translate-x-4" 
           : "opacity-100 translate-x-0"
       )}>
-        {currentStep === 1 && (
+        {currentStepId === "services" && (
           <>
             <ServiceSelection
               onSelect={handleServiceSelect}
               selectedService={selectedService}
-              onProceed={() => changeStep(2)}
+              onProceed={handleNext}
             />
             
             {/* Recommendations */}
@@ -269,13 +339,13 @@ export function BookingWidget() {
             )}
           </>
         )}
-        {currentStep === 2 && (
+        {currentStepId === "staff" && (
           <StaffSelection
             onSelect={setSelectedStaff}
             selectedStaff={selectedStaff}
           />
         )}
-        {currentStep === 3 && (
+        {currentStepId === "datetime" && (
           <DateTimeSelection
             onSelect={handleDateTimeSelect}
             selectedDate={selectedDate}
@@ -283,10 +353,10 @@ export function BookingWidget() {
             serviceDuration={selectedService?.duration}
           />
         )}
-        {currentStep === 4 && (
+        {currentStepId === "form" && (
           <ClientForm onUpdate={setClientData} data={clientData} />
         )}
-        {currentStep === 5 && (
+        {currentStepId === "summary" && (
           <BookingSummary
             service={selectedService}
             staff={selectedStaff}
@@ -298,7 +368,7 @@ export function BookingWidget() {
       </div>
 
       {/* Selected service summary - sticky on mobile */}
-      {selectedService && currentStep > 1 && currentStep < 5 && (
+      {selectedService && currentStepId !== "services" && currentStepId !== "summary" && (
         <div className="fixed bottom-20 left-4 right-4 sm:static sm:mt-4 z-10">
           <div className="bg-card/95 backdrop-blur-sm border border-border rounded-xl p-3 shadow-lg sm:shadow-none flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -323,18 +393,19 @@ export function BookingWidget() {
       {/* Navigation */}
       <div className={cn(
         "flex items-center justify-between mt-8 pt-6 border-t border-border",
-        selectedService && currentStep > 1 && currentStep < 5 && "mb-24 sm:mb-0"
+        selectedService && currentStepId !== "services" && currentStepId !== "summary" && "mb-24 sm:mb-0"
       )}>
         <Button
           variant="ghost"
           onClick={handleBack}
           className="gap-2"
+          disabled={stepMapping.indexOf(currentStepId) === 0}
         >
           <ArrowLeft className="w-4 h-4" />
           Wstecz
         </Button>
 
-        {currentStep < 5 ? (
+        {!isLastStep ? (
           <Button
             variant="luxury"
             size="lg"
