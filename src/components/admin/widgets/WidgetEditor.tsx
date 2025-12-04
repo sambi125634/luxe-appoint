@@ -156,9 +156,28 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
       .replace(/^-|-$/g, '');
   };
 
+  const [showPreview, setShowPreview] = useState(true);
+
+  // Generate preview styles based on theme
+  const previewStyles = {
+    '--preview-primary': formData.theme?.primaryColor || '#7c3aed',
+    '--preview-secondary': formData.theme?.secondaryColor || '#a78bfa',
+  } as React.CSSProperties;
+
+  const getBorderRadiusClass = () => {
+    switch (formData.theme?.borderRadius) {
+      case 'none': return 'rounded-none';
+      case 'sm': return 'rounded-sm';
+      case 'md': return 'rounded-md';
+      case 'lg': return 'rounded-lg';
+      case 'full': return 'rounded-2xl';
+      default: return 'rounded-lg';
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden">
+      <DialogContent className="max-w-6xl max-h-[90vh] p-0 overflow-hidden">
         <DialogHeader className="p-6 pb-0">
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
@@ -166,10 +185,10 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col md:flex-row h-[70vh]">
+        <div className="flex flex-col lg:flex-row h-[70vh]">
           {/* Sidebar */}
-          <div className="md:w-56 border-b md:border-b-0 md:border-r border-border p-2 md:p-4">
-            <nav className="flex md:flex-col gap-1 overflow-x-auto md:overflow-x-visible">
+          <div className="lg:w-48 border-b lg:border-b-0 lg:border-r border-border p-2 lg:p-4">
+            <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible">
               {[
                 { id: "basic", icon: Sparkles, label: "Podstawowe" },
                 { id: "services", icon: ListChecks, label: "Usługi" },
@@ -558,6 +577,110 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
               </div>
             )}
           </ScrollArea>
+
+          {/* Live Preview Panel */}
+          {showPreview && (
+            <div className="hidden lg:flex flex-col w-80 border-l border-border bg-muted/30">
+              <div className="p-3 border-b border-border flex items-center justify-between">
+                <span className="text-sm font-medium flex items-center gap-2">
+                  <Eye className="w-4 h-4" />
+                  Podgląd na żywo
+                </span>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 w-6 p-0"
+                  onClick={() => setShowPreview(false)}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
+              <ScrollArea className="flex-1 p-3">
+                <div 
+                  className={`bg-background border border-border ${getBorderRadiusClass()} overflow-hidden shadow-lg`}
+                  style={previewStyles}
+                >
+                  {/* Header */}
+                  {formData.theme?.showLogo && (
+                    <div className="p-3 border-b border-border flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-primary/20" />
+                      <span className="text-xs font-medium">Demo Salon</span>
+                    </div>
+                  )}
+                  
+                  {/* Header Text */}
+                  <div 
+                    className="p-4 text-center"
+                    style={{ background: `linear-gradient(135deg, ${formData.theme?.primaryColor || '#7c3aed'}20, ${formData.theme?.secondaryColor || '#a78bfa'}20)` }}
+                  >
+                    <h3 className="text-sm font-semibold" style={{ color: formData.theme?.primaryColor }}>
+                      {formData.theme?.headerText || "Zarezerwuj wizytę"}
+                    </h3>
+                  </div>
+
+                  {/* Steps Preview */}
+                  <div className="p-3 space-y-2">
+                    <div className="flex justify-center gap-1 mb-3">
+                      {formData.steps?.filter(s => s.enabled).map((step, i) => (
+                        <div 
+                          key={step.id}
+                          className={`w-2 h-2 rounded-full ${i === 0 ? '' : 'bg-muted'}`}
+                          style={{ backgroundColor: i === 0 ? formData.theme?.primaryColor : undefined }}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Mock Service Cards */}
+                    <div className="space-y-2">
+                      {(formData.showAllServices ? mockServices.slice(0, 3) : mockServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)).map(service => (
+                        <div 
+                          key={service.id}
+                          className={`p-2 border border-border ${getBorderRadiusClass()} hover:border-primary/50 transition-colors cursor-pointer`}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <p className="text-xs font-medium">{service.name}</p>
+                              <p className="text-[10px] text-muted-foreground">{service.category}</p>
+                            </div>
+                            <span 
+                              className="text-xs font-bold"
+                              style={{ color: formData.theme?.primaryColor }}
+                            >
+                              {service.price} zł
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Mock Button */}
+                    <button 
+                      className={`w-full mt-3 py-2 text-xs font-medium text-white ${getBorderRadiusClass()}`}
+                      style={{ backgroundColor: formData.theme?.primaryColor }}
+                    >
+                      Dalej
+                    </button>
+                  </div>
+
+                  {/* Footer */}
+                  {formData.theme?.showFooter && (
+                    <div className="p-2 border-t border-border text-center">
+                      <span className="text-[10px] text-muted-foreground">
+                        Powered by Beauty Calendar
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Preview Info */}
+                <div className="mt-3 p-2 bg-muted rounded-lg">
+                  <p className="text-[10px] text-muted-foreground text-center">
+                    Podgląd aktualizuje się w czasie rzeczywistym
+                  </p>
+                </div>
+              </ScrollArea>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
@@ -566,10 +689,12 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
             Anuluj
           </Button>
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2">
-              <Eye className="w-4 h-4" />
-              Podgląd
-            </Button>
+            {!showPreview && (
+              <Button variant="outline" className="gap-2" onClick={() => setShowPreview(true)}>
+                <Eye className="w-4 h-4" />
+                Podgląd
+              </Button>
+            )}
             <Button variant="luxury" className="gap-2" onClick={handleSave}>
               <Save className="w-4 h-4" />
               {isNew ? "Utwórz widget" : "Zapisz zmiany"}
