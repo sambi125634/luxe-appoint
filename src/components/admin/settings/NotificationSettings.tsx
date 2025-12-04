@@ -1,62 +1,30 @@
-import { useState } from "react";
-import { Mail, MessageSquare, Bell, Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Mail, MessageSquare, Bell, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "@/hooks/use-toast";
-import { NotificationSettings as NotificationSettingsType } from "./types";
+import { NotificationSettings as NotificationSettingsType } from "@/hooks/useSalonSettings";
 
-export function NotificationSettings() {
-  const [settings, setSettings] = useState<NotificationSettingsType>({
-    emailConfirmationEnabled: true,
-    emailReminderEnabled: true,
-    emailReminderHoursBefore: 24,
-    smsConfirmationEnabled: false,
-    smsReminderEnabled: false,
-    smsReminderHoursBefore: 2,
-    confirmationEmailTemplate: `Cześć {imie}!
+interface NotificationSettingsProps {
+  settings: NotificationSettingsType;
+  isLoading: boolean;
+  isSaving: boolean;
+  onSave: (updates: Partial<NotificationSettingsType>) => Promise<boolean>;
+}
 
-Twoja wizyta w {nazwa_salonu} została potwierdzona.
+export function NotificationSettings({ settings, isLoading, isSaving, onSave }: NotificationSettingsProps) {
+  const [formData, setFormData] = useState<NotificationSettingsType>(settings);
 
-📅 Data: {data}
-🕐 Godzina: {godzina}
-💇 Usługa: {usluga}
-👤 Specjalista: {specjalista}
-
-Adres: {adres}
-
-Do zobaczenia!
-{nazwa_salonu}`,
-    reminderEmailTemplate: `Cześć {imie}!
-
-Przypominamy o Twojej wizycie jutro w {nazwa_salonu}.
-
-📅 Data: {data}
-🕐 Godzina: {godzina}
-💇 Usługa: {usluga}
-
-Jeśli chcesz zmienić termin, skontaktuj się z nami: {telefon}
-
-Do zobaczenia!`,
-    confirmationSmsTemplate: `{nazwa_salonu}: Wizyta potwierdzona na {data} o {godzina}. Usługa: {usluga}. Do zobaczenia!`,
-    reminderSmsTemplate: `{nazwa_salonu}: Przypomnienie - jutro o {godzina} masz wizytę ({usluga}). Odwołaj: {telefon}`,
-  });
-
-  const [isSaving, setIsSaving] = useState(false);
+  useEffect(() => {
+    setFormData(settings);
+  }, [settings]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    toast({
-      title: "Zapisano",
-      description: "Ustawienia powiadomień zostały zaktualizowane.",
-    });
+    await onSave(formData);
   };
 
   const templateVariables = [
@@ -70,6 +38,14 @@ Do zobaczenia!`,
     { key: "{adres}", desc: "Adres salonu" },
     { key: "{telefon}", desc: "Telefon salonu" },
   ];
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -101,21 +77,21 @@ Do zobaczenia!`,
                   </CardDescription>
                 </div>
                 <Switch
-                  checked={settings.emailConfirmationEnabled}
+                  checked={formData.emailConfirmationEnabled}
                   onCheckedChange={(checked) => 
-                    setSettings({ ...settings, emailConfirmationEnabled: checked })
+                    setFormData({ ...formData, emailConfirmationEnabled: checked })
                   }
                 />
               </div>
             </CardHeader>
-            {settings.emailConfirmationEnabled && (
+            {formData.emailConfirmationEnabled && (
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Treść wiadomości</Label>
                   <Textarea
-                    value={settings.confirmationEmailTemplate}
+                    value={formData.confirmationEmailTemplate}
                     onChange={(e) => 
-                      setSettings({ ...settings, confirmationEmailTemplate: e.target.value })
+                      setFormData({ ...formData, confirmationEmailTemplate: e.target.value })
                     }
                     rows={10}
                     className="font-mono text-sm"
@@ -139,21 +115,21 @@ Do zobaczenia!`,
                   </CardDescription>
                 </div>
                 <Switch
-                  checked={settings.emailReminderEnabled}
+                  checked={formData.emailReminderEnabled}
                   onCheckedChange={(checked) => 
-                    setSettings({ ...settings, emailReminderEnabled: checked })
+                    setFormData({ ...formData, emailReminderEnabled: checked })
                   }
                 />
               </div>
             </CardHeader>
-            {settings.emailReminderEnabled && (
+            {formData.emailReminderEnabled && (
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Wyślij przypomnienie przed wizytą</Label>
                   <Select
-                    value={settings.emailReminderHoursBefore.toString()}
+                    value={formData.emailReminderHoursBefore.toString()}
                     onValueChange={(v) => 
-                      setSettings({ ...settings, emailReminderHoursBefore: parseInt(v) })
+                      setFormData({ ...formData, emailReminderHoursBefore: parseInt(v) })
                     }
                   >
                     <SelectTrigger>
@@ -171,9 +147,9 @@ Do zobaczenia!`,
                 <div className="space-y-2">
                   <Label>Treść wiadomości</Label>
                   <Textarea
-                    value={settings.reminderEmailTemplate}
+                    value={formData.reminderEmailTemplate}
                     onChange={(e) => 
-                      setSettings({ ...settings, reminderEmailTemplate: e.target.value })
+                      setFormData({ ...formData, reminderEmailTemplate: e.target.value })
                     }
                     rows={8}
                     className="font-mono text-sm"
@@ -190,7 +166,7 @@ Do zobaczenia!`,
             <CardContent className="pt-6">
               <p className="text-sm text-amber-800 dark:text-amber-200">
                 <strong>Uwaga:</strong> Powiadomienia SMS wymagają integracji z GoHighLevel. 
-                Skonfiguruj integrację w zakładce "Integracje", aby włączyć wysyłkę SMS.
+                Skonfiguruj integrację w zakładce &quot;Integracje&quot;, aby włączyć wysyłkę SMS.
               </p>
             </CardContent>
           </Card>
@@ -209,28 +185,28 @@ Do zobaczenia!`,
                   </CardDescription>
                 </div>
                 <Switch
-                  checked={settings.smsConfirmationEnabled}
+                  checked={formData.smsConfirmationEnabled}
                   onCheckedChange={(checked) => 
-                    setSettings({ ...settings, smsConfirmationEnabled: checked })
+                    setFormData({ ...formData, smsConfirmationEnabled: checked })
                   }
                 />
               </div>
             </CardHeader>
-            {settings.smsConfirmationEnabled && (
+            {formData.smsConfirmationEnabled && (
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Treść SMS (max 160 znaków)</Label>
                   <Textarea
-                    value={settings.confirmationSmsTemplate}
+                    value={formData.confirmationSmsTemplate}
                     onChange={(e) => 
-                      setSettings({ ...settings, confirmationSmsTemplate: e.target.value })
+                      setFormData({ ...formData, confirmationSmsTemplate: e.target.value })
                     }
                     rows={3}
                     maxLength={160}
                     className="font-mono text-sm"
                   />
                   <p className="text-xs text-muted-foreground text-right">
-                    {settings.confirmationSmsTemplate.length}/160 znaków
+                    {formData.confirmationSmsTemplate.length}/160 znaków
                   </p>
                 </div>
               </CardContent>
@@ -251,21 +227,21 @@ Do zobaczenia!`,
                   </CardDescription>
                 </div>
                 <Switch
-                  checked={settings.smsReminderEnabled}
+                  checked={formData.smsReminderEnabled}
                   onCheckedChange={(checked) => 
-                    setSettings({ ...settings, smsReminderEnabled: checked })
+                    setFormData({ ...formData, smsReminderEnabled: checked })
                   }
                 />
               </div>
             </CardHeader>
-            {settings.smsReminderEnabled && (
+            {formData.smsReminderEnabled && (
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Wyślij przypomnienie przed wizytą</Label>
                   <Select
-                    value={settings.smsReminderHoursBefore.toString()}
+                    value={formData.smsReminderHoursBefore.toString()}
                     onValueChange={(v) => 
-                      setSettings({ ...settings, smsReminderHoursBefore: parseInt(v) })
+                      setFormData({ ...formData, smsReminderHoursBefore: parseInt(v) })
                     }
                   >
                     <SelectTrigger>
@@ -282,16 +258,16 @@ Do zobaczenia!`,
                 <div className="space-y-2">
                   <Label>Treść SMS (max 160 znaków)</Label>
                   <Textarea
-                    value={settings.reminderSmsTemplate}
+                    value={formData.reminderSmsTemplate}
                     onChange={(e) => 
-                      setSettings({ ...settings, reminderSmsTemplate: e.target.value })
+                      setFormData({ ...formData, reminderSmsTemplate: e.target.value })
                     }
                     rows={3}
                     maxLength={160}
                     className="font-mono text-sm"
                   />
                   <p className="text-xs text-muted-foreground text-right">
-                    {settings.reminderSmsTemplate.length}/160 znaków
+                    {formData.reminderSmsTemplate.length}/160 znaków
                   </p>
                 </div>
               </CardContent>
@@ -324,7 +300,11 @@ Do zobaczenia!`,
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={isSaving}>
-          <Save className="w-4 h-4 mr-2" />
+          {isSaving ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 mr-2" />
+          )}
           {isSaving ? "Zapisywanie..." : "Zapisz zmiany"}
         </Button>
       </div>

@@ -1,39 +1,38 @@
-import { useState } from "react";
-import { Calendar, Clock, Ban, CreditCard, Save } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, Clock, Ban, CreditCard, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "@/hooks/use-toast";
-import { BookingSettings } from "./types";
+import { BookingSettings } from "@/hooks/useSalonSettings";
 
-export function BookingSettingsPanel() {
-  const [settings, setSettings] = useState<BookingSettings>({
-    advanceBookingDays: 30,
-    minAdvanceHours: 2,
-    cancellationPolicyHours: 24,
-    allowOnlinePayments: false,
-    requirePhoneConfirmation: false,
-    autoConfirmBookings: true,
-    defaultWorkingHoursStart: "09:00",
-    defaultWorkingHoursEnd: "18:00",
-    slotInterval: 15,
-    bufferBetweenAppointments: 0,
-  });
+interface BookingSettingsPanelProps {
+  settings: BookingSettings;
+  isLoading: boolean;
+  isSaving: boolean;
+  onSave: (updates: Partial<BookingSettings>) => Promise<boolean>;
+}
 
-  const [isSaving, setIsSaving] = useState(false);
+export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: BookingSettingsPanelProps) {
+  const [formData, setFormData] = useState<BookingSettings>(settings);
+
+  useEffect(() => {
+    setFormData(settings);
+  }, [settings]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    toast({
-      title: "Zapisano",
-      description: "Ustawienia rezerwacji zostały zaktualizowane.",
-    });
+    await onSave(formData);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -53,8 +52,8 @@ export function BookingSettingsPanel() {
             <div className="space-y-2">
               <Label htmlFor="advanceDays">Maksymalne wyprzedzenie (dni)</Label>
               <Select
-                value={settings.advanceBookingDays.toString()}
-                onValueChange={(v) => setSettings({ ...settings, advanceBookingDays: parseInt(v) })}
+                value={formData.advanceBookingDays.toString()}
+                onValueChange={(v) => setFormData({ ...formData, advanceBookingDays: parseInt(v) })}
               >
                 <SelectTrigger id="advanceDays">
                   <SelectValue />
@@ -68,14 +67,14 @@ export function BookingSettingsPanel() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Klienci mogą rezerwować z wyprzedzeniem do {settings.advanceBookingDays} dni
+                Klienci mogą rezerwować z wyprzedzeniem do {formData.advanceBookingDays} dni
               </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="minAdvance">Minimalne wyprzedzenie (godziny)</Label>
               <Select
-                value={settings.minAdvanceHours.toString()}
-                onValueChange={(v) => setSettings({ ...settings, minAdvanceHours: parseInt(v) })}
+                value={formData.minAdvanceHours.toString()}
+                onValueChange={(v) => setFormData({ ...formData, minAdvanceHours: parseInt(v) })}
               >
                 <SelectTrigger id="minAdvance">
                   <SelectValue />
@@ -89,7 +88,7 @@ export function BookingSettingsPanel() {
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Klient musi zarezerwować co najmniej {settings.minAdvanceHours}h przed wizytą
+                Klient musi zarezerwować co najmniej {formData.minAdvanceHours}h przed wizytą
               </p>
             </div>
           </div>
@@ -114,8 +113,8 @@ export function BookingSettingsPanel() {
               <Input
                 id="workStart"
                 type="time"
-                value={settings.defaultWorkingHoursStart}
-                onChange={(e) => setSettings({ ...settings, defaultWorkingHoursStart: e.target.value })}
+                value={formData.defaultWorkingHoursStart}
+                onChange={(e) => setFormData({ ...formData, defaultWorkingHoursStart: e.target.value })}
               />
             </div>
             <div className="space-y-2">
@@ -123,8 +122,8 @@ export function BookingSettingsPanel() {
               <Input
                 id="workEnd"
                 type="time"
-                value={settings.defaultWorkingHoursEnd}
-                onChange={(e) => setSettings({ ...settings, defaultWorkingHoursEnd: e.target.value })}
+                value={formData.defaultWorkingHoursEnd}
+                onChange={(e) => setFormData({ ...formData, defaultWorkingHoursEnd: e.target.value })}
               />
             </div>
           </div>
@@ -133,8 +132,8 @@ export function BookingSettingsPanel() {
             <div className="space-y-2">
               <Label htmlFor="slotInterval">Interwał slotów (minuty)</Label>
               <Select
-                value={settings.slotInterval.toString()}
-                onValueChange={(v) => setSettings({ ...settings, slotInterval: parseInt(v) })}
+                value={formData.slotInterval.toString()}
+                onValueChange={(v) => setFormData({ ...formData, slotInterval: parseInt(v) })}
               >
                 <SelectTrigger id="slotInterval">
                   <SelectValue />
@@ -149,8 +148,8 @@ export function BookingSettingsPanel() {
             <div className="space-y-2">
               <Label htmlFor="buffer">Bufor między wizytami (minuty)</Label>
               <Select
-                value={settings.bufferBetweenAppointments.toString()}
-                onValueChange={(v) => setSettings({ ...settings, bufferBetweenAppointments: parseInt(v) })}
+                value={formData.bufferBetweenAppointments.toString()}
+                onValueChange={(v) => setFormData({ ...formData, bufferBetweenAppointments: parseInt(v) })}
               >
                 <SelectTrigger id="buffer">
                   <SelectValue />
@@ -182,8 +181,8 @@ export function BookingSettingsPanel() {
           <div className="space-y-2">
             <Label htmlFor="cancelPolicy">Limit anulowania (godziny przed wizytą)</Label>
             <Select
-              value={settings.cancellationPolicyHours.toString()}
-              onValueChange={(v) => setSettings({ ...settings, cancellationPolicyHours: parseInt(v) })}
+              value={formData.cancellationPolicyHours.toString()}
+              onValueChange={(v) => setFormData({ ...formData, cancellationPolicyHours: parseInt(v) })}
             >
               <SelectTrigger id="cancelPolicy">
                 <SelectValue />
@@ -198,7 +197,7 @@ export function BookingSettingsPanel() {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Klienci mogą anulować wizytę do {settings.cancellationPolicyHours} godzin przed terminem
+              Klienci mogą anulować wizytę do {formData.cancellationPolicyHours} godzin przed terminem
             </p>
           </div>
         </CardContent>
@@ -221,8 +220,8 @@ export function BookingSettingsPanel() {
               </p>
             </div>
             <Switch
-              checked={settings.autoConfirmBookings}
-              onCheckedChange={(checked) => setSettings({ ...settings, autoConfirmBookings: checked })}
+              checked={formData.autoConfirmBookings}
+              onCheckedChange={(checked) => setFormData({ ...formData, autoConfirmBookings: checked })}
             />
           </div>
 
@@ -234,8 +233,8 @@ export function BookingSettingsPanel() {
               </p>
             </div>
             <Switch
-              checked={settings.requirePhoneConfirmation}
-              onCheckedChange={(checked) => setSettings({ ...settings, requirePhoneConfirmation: checked })}
+              checked={formData.requirePhoneConfirmation}
+              onCheckedChange={(checked) => setFormData({ ...formData, requirePhoneConfirmation: checked })}
             />
           </div>
 
@@ -247,8 +246,8 @@ export function BookingSettingsPanel() {
               </p>
             </div>
             <Switch
-              checked={settings.allowOnlinePayments}
-              onCheckedChange={(checked) => setSettings({ ...settings, allowOnlinePayments: checked })}
+              checked={formData.allowOnlinePayments}
+              onCheckedChange={(checked) => setFormData({ ...formData, allowOnlinePayments: checked })}
               disabled
             />
           </div>
@@ -257,7 +256,11 @@ export function BookingSettingsPanel() {
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={isSaving}>
-          <Save className="w-4 h-4 mr-2" />
+          {isSaving ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 mr-2" />
+          )}
           {isSaving ? "Zapisywanie..." : "Zapisz zmiany"}
         </Button>
       </div>
