@@ -1,49 +1,43 @@
-import { useState } from "react";
-import { Calendar, Zap, Check, X, ExternalLink, Save, Eye, EyeOff } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, Zap, Check, X, ExternalLink, Save, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "@/hooks/use-toast";
-import { IntegrationSettings as IntegrationSettingsType } from "./types";
+import { IntegrationSettings as IntegrationSettingsType } from "@/hooks/useSalonSettings";
 
-export function IntegrationSettings() {
-  const [settings, setSettings] = useState<IntegrationSettingsType>({
-    googleCalendar: {
-      enabled: false,
-      syncToGoogle: true,
-      blockFromGoogle: true,
-    },
-    ghl: {
-      enabled: false,
-      apiKey: "",
-      locationId: "",
-      pipelineId: "",
-      defaultStageId: "",
-    },
-  });
+interface IntegrationSettingsProps {
+  settings: IntegrationSettingsType;
+  isLoading: boolean;
+  isSaving: boolean;
+  onSave: (updates: Partial<IntegrationSettingsType>) => Promise<boolean>;
+}
 
+export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: IntegrationSettingsProps) {
+  const [formData, setFormData] = useState<IntegrationSettingsType>(settings);
   const [showApiKey, setShowApiKey] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    setFormData(settings);
+  }, [settings]);
 
   const handleSave = async () => {
-    setIsSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsSaving(false);
-    toast({
-      title: "Zapisano",
-      description: "Ustawienia integracji zostały zaktualizowane.",
-    });
+    await onSave(formData);
   };
 
   const handleGoogleConnect = () => {
-    toast({
-      title: "Łączenie z Google Calendar",
-      description: "Ta funkcja wymaga konfiguracji OAuth. Wkrótce dostępna.",
-    });
+    // TODO: Implement OAuth flow
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -58,7 +52,7 @@ export function IntegrationSettings() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   Google Calendar
-                  {settings.googleCalendar.enabled ? (
+                  {formData.googleCalendar.enabled ? (
                     <Badge variant="outline" className="text-green-600 border-green-600">
                       <Check className="w-3 h-3 mr-1" />
                       Połączony
@@ -78,7 +72,7 @@ export function IntegrationSettings() {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!settings.googleCalendar.enabled ? (
+          {!formData.googleCalendar.enabled ? (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 Połącz Google Calendar, aby automatycznie synchronizować wizyty z kalendarzami Twoich pracowników.
@@ -99,11 +93,11 @@ export function IntegrationSettings() {
                   </p>
                 </div>
                 <Switch
-                  checked={settings.googleCalendar.syncToGoogle}
+                  checked={formData.googleCalendar.syncToGoogle}
                   onCheckedChange={(checked) =>
-                    setSettings({
-                      ...settings,
-                      googleCalendar: { ...settings.googleCalendar, syncToGoogle: checked },
+                    setFormData({
+                      ...formData,
+                      googleCalendar: { ...formData.googleCalendar, syncToGoogle: checked },
                     })
                   }
                 />
@@ -117,11 +111,11 @@ export function IntegrationSettings() {
                   </p>
                 </div>
                 <Switch
-                  checked={settings.googleCalendar.blockFromGoogle}
+                  checked={formData.googleCalendar.blockFromGoogle}
                   onCheckedChange={(checked) =>
-                    setSettings({
-                      ...settings,
-                      googleCalendar: { ...settings.googleCalendar, blockFromGoogle: checked },
+                    setFormData({
+                      ...formData,
+                      googleCalendar: { ...formData.googleCalendar, blockFromGoogle: checked },
                     })
                   }
                 />
@@ -146,7 +140,7 @@ export function IntegrationSettings() {
               <div>
                 <CardTitle className="flex items-center gap-2">
                   GoHighLevel (GHL)
-                  {settings.ghl.enabled && settings.ghl.apiKey ? (
+                  {formData.ghl.enabled && formData.ghl.apiKey ? (
                     <Badge variant="outline" className="text-green-600 border-green-600">
                       <Check className="w-3 h-3 mr-1" />
                       Skonfigurowany
@@ -174,17 +168,17 @@ export function IntegrationSettings() {
               </p>
             </div>
             <Switch
-              checked={settings.ghl.enabled}
+              checked={formData.ghl.enabled}
               onCheckedChange={(checked) =>
-                setSettings({
-                  ...settings,
-                  ghl: { ...settings.ghl, enabled: checked },
+                setFormData({
+                  ...formData,
+                  ghl: { ...formData.ghl, enabled: checked },
                 })
               }
             />
           </div>
 
-          {settings.ghl.enabled && (
+          {formData.ghl.enabled && (
             <div className="space-y-4 pt-4 border-t">
               <div className="space-y-2">
                 <Label htmlFor="ghlApiKey">Klucz API</Label>
@@ -193,11 +187,11 @@ export function IntegrationSettings() {
                     <Input
                       id="ghlApiKey"
                       type={showApiKey ? "text" : "password"}
-                      value={settings.ghl.apiKey}
+                      value={formData.ghl.apiKey}
                       onChange={(e) =>
-                        setSettings({
-                          ...settings,
-                          ghl: { ...settings.ghl, apiKey: e.target.value },
+                        setFormData({
+                          ...formData,
+                          ghl: { ...formData.ghl, apiKey: e.target.value },
                         })
                       }
                       placeholder="pit-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
@@ -227,11 +221,11 @@ export function IntegrationSettings() {
                 <Label htmlFor="ghlLocationId">Location ID</Label>
                 <Input
                   id="ghlLocationId"
-                  value={settings.ghl.locationId}
+                  value={formData.ghl.locationId}
                   onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      ghl: { ...settings.ghl, locationId: e.target.value },
+                    setFormData({
+                      ...formData,
+                      ghl: { ...formData.ghl, locationId: e.target.value },
                     })
                   }
                   placeholder="xxxxxxxxxxxxxxxxxxxxxxxx"
@@ -243,11 +237,11 @@ export function IntegrationSettings() {
                   <Label htmlFor="ghlPipelineId">Pipeline ID</Label>
                   <Input
                     id="ghlPipelineId"
-                    value={settings.ghl.pipelineId}
+                    value={formData.ghl.pipelineId}
                     onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        ghl: { ...settings.ghl, pipelineId: e.target.value },
+                      setFormData({
+                        ...formData,
+                        ghl: { ...formData.ghl, pipelineId: e.target.value },
                       })
                     }
                     placeholder="ID pipeline"
@@ -257,11 +251,11 @@ export function IntegrationSettings() {
                   <Label htmlFor="ghlStageId">Domyślny Stage ID</Label>
                   <Input
                     id="ghlStageId"
-                    value={settings.ghl.defaultStageId}
+                    value={formData.ghl.defaultStageId}
                     onChange={(e) =>
-                      setSettings({
-                        ...settings,
-                        ghl: { ...settings.ghl, defaultStageId: e.target.value },
+                      setFormData({
+                        ...formData,
+                        ghl: { ...formData.ghl, defaultStageId: e.target.value },
                       })
                     }
                     placeholder="ID stage (Zarezerwowane)"
@@ -295,7 +289,11 @@ export function IntegrationSettings() {
 
       <div className="flex justify-end">
         <Button onClick={handleSave} disabled={isSaving}>
-          <Save className="w-4 h-4 mr-2" />
+          {isSaving ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 mr-2" />
+          )}
           {isSaving ? "Zapisywanie..." : "Zapisz zmiany"}
         </Button>
       </div>

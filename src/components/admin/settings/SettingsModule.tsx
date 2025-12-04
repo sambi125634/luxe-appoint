@@ -5,10 +5,12 @@ import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
+import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 
 export function SettingsModule() {
   const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
+  const { profile, settings, isLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
 
   const tabs = [
     { id: "profile" as const, label: "Profil salonu", icon: Building2 },
@@ -35,16 +37,36 @@ export function SettingsModule() {
 
         <div className="mt-6">
           <TabsContent value="profile" className="m-0">
-            <SalonProfileSettings />
+            <SalonProfileSettings
+              profile={profile}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              onSave={updateProfile}
+            />
           </TabsContent>
           <TabsContent value="booking" className="m-0">
-            <BookingSettingsPanel />
+            <BookingSettingsPanel
+              settings={settings.booking}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              onSave={(updates) => updateSettings("booking", updates)}
+            />
           </TabsContent>
           <TabsContent value="notifications" className="m-0">
-            <NotificationSettings />
+            <NotificationSettings
+              settings={settings.notifications}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              onSave={(updates) => updateSettings("notifications", updates)}
+            />
           </TabsContent>
           <TabsContent value="integrations" className="m-0">
-            <IntegrationSettings />
+            <IntegrationSettings
+              settings={settings.integrations}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              onSave={(updates) => updateSettings("integrations", updates)}
+            />
           </TabsContent>
         </div>
       </Tabs>
