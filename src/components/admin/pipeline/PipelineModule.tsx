@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   Filter, 
   Search, 
@@ -24,6 +25,7 @@ import {
 } from "./types";
 
 export function PipelineModule() {
+  const { t } = useTranslation();
   const [contacts, setContacts] = useState<PipelineContact[]>(mockPipelineContacts);
   const [searchQuery, setSearchQuery] = useState("");
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
@@ -163,11 +165,11 @@ export function PipelineModule() {
       <TabsList>
         <TabsTrigger value="board" className="gap-2">
           <Kanban className="w-4 h-4" />
-          Tablica
+          {t('pipeline.board')}
         </TabsTrigger>
         <TabsTrigger value="reports" className="gap-2">
           <BarChart3 className="w-4 h-4" />
-          Raporty
+          {t('pipeline.reports')}
         </TabsTrigger>
       </TabsList>
 
@@ -181,7 +183,7 @@ export function PipelineModule() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalContacts}</p>
-                <p className="text-xs text-muted-foreground">W pipeline</p>
+                <p className="text-xs text-muted-foreground">{t('pipeline.inPipeline')}</p>
               </div>
             </div>
           </div>
@@ -193,7 +195,7 @@ export function PipelineModule() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalValue.toLocaleString()} <span className="text-sm font-normal">zł</span></p>
-                <p className="text-xs text-muted-foreground">Wartość pipeline</p>
+                <p className="text-xs text-muted-foreground">{t('pipeline.pipelineValue')}</p>
               </div>
             </div>
           </div>
@@ -205,7 +207,7 @@ export function PipelineModule() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{noShowCount}</p>
-                <p className="text-xs text-muted-foreground">Nie stawiło się</p>
+                <p className="text-xs text-muted-foreground">{t('pipeline.didNotShow')}</p>
               </div>
             </div>
           </div>
@@ -217,7 +219,7 @@ export function PipelineModule() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{completedCount}</p>
-                <p className="text-xs text-muted-foreground">Ukończone pakiety</p>
+                <p className="text-xs text-muted-foreground">{t('pipeline.completedPackages')}</p>
               </div>
             </div>
           </div>
@@ -230,21 +232,20 @@ export function PipelineModule() {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Szukaj po imieniu, nazwisku, email lub usłudze..."
+              placeholder={t('pipeline.searchPlaceholder')}
               className="pl-10"
             />
           </div>
           <Button variant="outline" className="gap-2">
             <Filter className="w-4 h-4" />
-            Filtry
+            {t('pipeline.filters')}
           </Button>
         </div>
         
         {/* Info Banner */}
         <div className="glass-card p-3 bg-primary/5 border-primary/20">
           <p className="text-sm text-center">
-            <span className="font-medium">Demo mode</span> – Przeciągaj kontakty między stage'ami. 
-            W wersji produkcyjnej zmiany synchronizują się z GoHighLevel.
+            <span className="font-medium">{t('pipeline.demoMode')}</span> – {t('pipeline.demoDescription')}
           </p>
         </div>
         
