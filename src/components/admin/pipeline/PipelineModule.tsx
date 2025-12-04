@@ -2,19 +2,21 @@ import { useState } from "react";
 import { 
   Filter, 
   Search, 
-  ChevronLeft, 
-  ChevronRight,
   Users,
   TrendingUp,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Kanban,
+  BarChart3
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PipelineColumn } from "./PipelineColumn";
 import { ContactDetailModal } from "./ContactDetailModal";
+import { PipelineReports } from "./PipelineReports";
 import {
   PipelineContact,
   defaultPipelineStages,
@@ -157,120 +159,137 @@ export function PipelineModule() {
   };
   
   return (
-    <div className="space-y-4">
-      {/* Stats Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="glass-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary" />
+    <Tabs defaultValue="board" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="board" className="gap-2">
+          <Kanban className="w-4 h-4" />
+          Tablica
+        </TabsTrigger>
+        <TabsTrigger value="reports" className="gap-2">
+          <BarChart3 className="w-4 h-4" />
+          Raporty
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="board" className="space-y-4">
+        {/* Stats Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="glass-card p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{totalContacts}</p>
+                <p className="text-xs text-muted-foreground">W pipeline</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold">{totalContacts}</p>
-              <p className="text-xs text-muted-foreground">W pipeline</p>
+          </div>
+          
+          <div className="glass-card p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-green-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{totalValue.toLocaleString()} <span className="text-sm font-normal">zł</span></p>
+                <p className="text-xs text-muted-foreground">Wartość pipeline</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="glass-card p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{noShowCount}</p>
+                <p className="text-xs text-muted-foreground">Nie stawiło się</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="glass-card p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                <CheckCircle2 className="w-5 h-5 text-purple-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{completedCount}</p>
+                <p className="text-xs text-muted-foreground">Ukończone pakiety</p>
+              </div>
             </div>
           </div>
         </div>
         
-        <div className="glass-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-green-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{totalValue.toLocaleString()} <span className="text-sm font-normal">zł</span></p>
-              <p className="text-xs text-muted-foreground">Wartość pipeline</p>
-            </div>
+        {/* Search & Filters */}
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Szukaj po imieniu, nazwisku, email lub usłudze..."
+              className="pl-10"
+            />
           </div>
+          <Button variant="outline" className="gap-2">
+            <Filter className="w-4 h-4" />
+            Filtry
+          </Button>
         </div>
         
-        <div className="glass-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-red-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{noShowCount}</p>
-              <p className="text-xs text-muted-foreground">Nie stawiło się</p>
-            </div>
-          </div>
+        {/* Info Banner */}
+        <div className="glass-card p-3 bg-primary/5 border-primary/20">
+          <p className="text-sm text-center">
+            <span className="font-medium">Demo mode</span> – Przeciągaj kontakty między stage'ami. 
+            W wersji produkcyjnej zmiany synchronizują się z GoHighLevel.
+          </p>
         </div>
         
-        <div className="glass-card p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-purple-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{completedCount}</p>
-              <p className="text-xs text-muted-foreground">Ukończone pakiety</p>
-            </div>
+        {/* Pipeline Board */}
+        <ScrollArea className="w-full">
+          <div 
+            className="flex gap-4 pb-4"
+            onDragLeave={handleDragLeave}
+          >
+            {defaultPipelineStages.map((stage) => (
+              <div
+                key={stage.id}
+                onDragEnter={() => handleDragEnter(stage.id)}
+              >
+                <PipelineColumn
+                  stage={stage}
+                  contacts={contactsByStage[stage.id] || []}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onContactClick={handleContactClick}
+                  isDragOver={dragOverStage === stage.id}
+                />
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
-      
-      {/* Search & Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Szukaj po imieniu, nazwisku, email lub usłudze..."
-            className="pl-10"
-          />
-        </div>
-        <Button variant="outline" className="gap-2">
-          <Filter className="w-4 h-4" />
-          Filtry
-        </Button>
-      </div>
-      
-      {/* Info Banner */}
-      <div className="glass-card p-3 bg-primary/5 border-primary/20">
-        <p className="text-sm text-center">
-          <span className="font-medium">Demo mode</span> – Przeciągaj kontakty między stage'ami. 
-          W wersji produkcyjnej zmiany synchronizują się z GoHighLevel.
-        </p>
-      </div>
-      
-      {/* Pipeline Board */}
-      <ScrollArea className="w-full">
-        <div 
-          className="flex gap-4 pb-4"
-          onDragLeave={handleDragLeave}
-        >
-          {defaultPipelineStages.map((stage) => (
-            <div
-              key={stage.id}
-              onDragEnter={() => handleDragEnter(stage.id)}
-            >
-              <PipelineColumn
-                stage={stage}
-                contacts={contactsByStage[stage.id] || []}
-                onDragStart={handleDragStart}
-                onDragOver={handleDragOver}
-                onDrop={handleDrop}
-                onContactClick={handleContactClick}
-                isDragOver={dragOverStage === stage.id}
-              />
-            </div>
-          ))}
-        </div>
-        <ScrollBar orientation="horizontal" />
-      </ScrollArea>
-      
-      {/* Contact Detail Modal */}
-      <ContactDetailModal
-        contact={selectedContact}
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedContact(null);
-        }}
-        onStageChange={handleStageChange}
-        onSurveySubmit={handleSurveySubmit}
-      />
-    </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        
+        {/* Contact Detail Modal */}
+        <ContactDetailModal
+          contact={selectedContact}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedContact(null);
+          }}
+          onStageChange={handleStageChange}
+          onSurveySubmit={handleSurveySubmit}
+        />
+      </TabsContent>
+
+      <TabsContent value="reports">
+        <PipelineReports />
+      </TabsContent>
+    </Tabs>
   );
 }
