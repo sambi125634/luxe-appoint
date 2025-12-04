@@ -24,7 +24,6 @@ interface ClientFormProps {
 }
 
 const referralSources = [
-  { value: "", label: "Wybierz..." },
   { value: "google", label: "Google" },
   { value: "instagram", label: "Instagram" },
   { value: "facebook", label: "Facebook" },
