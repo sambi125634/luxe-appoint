@@ -15,43 +15,47 @@
     "secondaryCta": "Zobacz demo"
   },
   "painPoints": {
-    "title": "Czy to brzmi znajomo?",
-    "subtitle": "Problemy, z którymi mierzą się właściciele salonów każdego dnia",
+    "title": "Ile kosztuje Cię chaos?",
+    "subtitle": "Każdy z tych problemów to stracone pieniądze i nerwy",
     "chaos": {
-      "title": "Chaos w kalendarzu",
-      "description": "Podwójne rezerwacje, pomyłki w terminach, ciągłe telefony"
+      "title": "15 nieodebranych = 15 straconych klientek",
+      "description": "Telefony rozrywają Cię w trakcie zabiegu. Klientki rezygnują, bo nie mogą się dodzwonić."
     },
     "noShows": {
-      "title": "No-shows i odwołania",
-      "description": "Klienci nie przychodzą, a Ty tracisz pieniądze"
+      "title": "No-show kosztował Cię 200 zł?",
+      "description": "Pusta godzina w grafiku to nie tylko strata – to też zepsuty dzień i frustracja."
     },
     "manual": {
-      "title": "Ręczne zarządzanie",
-      "description": "Godziny spędzone na organizacji zamiast na pracy z klientami"
+      "title": "Grafik na kartce? To było słodkie. W 2010.",
+      "description": "Godziny spędzone na organizacji, podwójne rezerwacje, pomyłki – a mogłabyś zarabiać."
     },
     "noInsights": {
-      "title": "Brak wglądu w biznes",
-      "description": "Nie wiesz, które usługi są najpopularniejsze ani ile zarabiasz"
+      "title": "Nie wiesz, co przynosi zysk",
+      "description": "Które usługi się opłacają? Kto generuje przychód? Strzelasz na oślep."
     }
   },
   "solution": {
-    "title": "Poznaj Beauty Calendar",
-    "subtitle": "Wszystko, czego potrzebujesz do zarządzania salonem w jednym miejscu",
+    "title": "Beauty Calendar zmienia zasady gry",
+    "subtitle": "Pierwszy kalendarz, który myśli jak właściciel salonu",
     "booking": {
-      "title": "Rezerwacje online 24/7",
-      "description": "Klienci rezerwują wizyty o każdej porze, nawet gdy śpisz"
+      "title": "Klientki rezerwują o 23:00",
+      "description": "Budzisz się z pełnym grafikiem. Zero telefonów. System pracuje gdy Ty odpoczywasz."
     },
     "reminders": {
-      "title": "Automatyczne przypomnienia",
-      "description": "SMS i email przed wizytą - koniec z no-shows"
+      "title": "No-shows? Spadek o 70%",
+      "description": "Automatyczne przypomnienia SMS i email. Klientki pamiętają, Ty nie tracisz."
     },
     "calendar": {
-      "title": "Inteligentny kalendarz",
-      "description": "Przejrzysty widok, łatwe zarządzanie, zero konfliktów"
+      "title": "Jeden rzut oka – pełna kontrola",
+      "description": "Widzisz kto pracuje, kiedy i z kim. Zero konfliktów, zero chaosu."
     },
     "reports": {
-      "title": "Raporty i statystyki",
-      "description": "Pełny wgląd w wyniki Twojego biznesu"
+      "title": "Raporty w sekundę, nie w godzinę",
+      "description": "TOP usługi, TOP pracownicy, przychody – wszystko na jednym ekranie."
+    },
+    "crm": {
+      "title": "Widzisz każdą klientkę",
+      "description": "Pipeline CRM śledzi kto wrócił na 2., 3., 4. wizytę. Koniec z gubieniem kontaktów."
     }
   },
   "howItWorks": {

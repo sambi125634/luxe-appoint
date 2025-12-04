@@ -15,43 +15,47 @@
     "secondaryCta": "See demo"
   },
   "painPoints": {
-    "title": "Does this sound familiar?",
-    "subtitle": "Problems salon owners face every day",
+    "title": "How much is chaos costing you?",
+    "subtitle": "Each of these problems means lost money and stress",
     "chaos": {
-      "title": "Calendar chaos",
-      "description": "Double bookings, scheduling mistakes, constant phone calls"
+      "title": "15 missed calls = 15 lost clients",
+      "description": "Phone rings during treatments. Clients give up because they can't reach you."
     },
     "noShows": {
-      "title": "No-shows and cancellations",
-      "description": "Clients don't show up and you lose money"
+      "title": "No-show just cost you $50?",
+      "description": "An empty hour isn't just lost revenue – it's a ruined day and frustration."
     },
     "manual": {
-      "title": "Manual management",
-      "description": "Hours spent organizing instead of working with clients"
+      "title": "Paper calendar? That was cute. In 2010.",
+      "description": "Hours spent organizing, double bookings, mistakes – when you could be earning."
     },
     "noInsights": {
-      "title": "No business insights",
-      "description": "You don't know which services are popular or how much you earn"
+      "title": "You don't know what's profitable",
+      "description": "Which services pay off? Who generates revenue? You're guessing blindly."
     }
   },
   "solution": {
-    "title": "Meet Beauty Calendar",
-    "subtitle": "Everything you need to manage your salon in one place",
+    "title": "Beauty Calendar changes the game",
+    "subtitle": "The first calendar that thinks like a salon owner",
     "booking": {
-      "title": "24/7 online booking",
-      "description": "Clients book appointments anytime, even while you sleep"
+      "title": "Clients book at 11 PM",
+      "description": "Wake up to a full schedule. Zero phone calls. The system works while you rest."
     },
     "reminders": {
-      "title": "Automatic reminders",
-      "description": "SMS and email before appointments - no more no-shows"
+      "title": "No-shows? Down by 70%",
+      "description": "Automatic SMS and email reminders. Clients remember, you don't lose."
     },
     "calendar": {
-      "title": "Smart calendar",
-      "description": "Clear view, easy management, zero conflicts"
+      "title": "One glance – full control",
+      "description": "See who's working, when and with whom. Zero conflicts, zero chaos."
     },
     "reports": {
-      "title": "Reports and statistics",
-      "description": "Full insight into your business performance"
+      "title": "Reports in seconds, not hours",
+      "description": "TOP services, TOP staff, revenue – all on one screen."
+    },
+    "crm": {
+      "title": "Track every client",
+      "description": "Pipeline CRM tracks who returned for 2nd, 3rd, 4th visit. Stop losing contacts."
     }
   },
   "howItWorks": {
