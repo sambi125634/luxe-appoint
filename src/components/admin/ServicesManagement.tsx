@@ -49,7 +49,11 @@ const mockStaff = [
   { id: "4", name: "Anna Kowalczyk" },
 ];
 
-export function ServicesManagement() {
+interface ServicesManagementProps {
+  isDemo?: boolean;
+}
+
+export function ServicesManagement({ isDemo }: ServicesManagementProps) {
   const [services, setServices] = useState(mockServices);
   const [categories, setCategories] = useState(mockCategories);
   const [searchQuery, setSearchQuery] = useState("");

@@ -20,9 +20,11 @@ interface AdminSidebarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   onClose?: () => void;
+  isDemo?: boolean;
+  lockedTabs?: TabType[];
 }
 
-export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab, onTabChange, onClose, isDemo, lockedTabs = [] }: AdminSidebarProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -43,7 +45,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
         <ul className="space-y-1">
           {navItems.map((item) => (
             <li key={item.label}>
-              <button
+                <button
                 onClick={() => {
                   onTabChange(item.tab);
                   onClose?.();
@@ -52,11 +54,15 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
                   "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                   activeTab === item.tab
                     ? "bg-primary text-primary-foreground shadow-soft" 
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  isDemo && lockedTabs.includes(item.tab) && "opacity-60"
                 )}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
+                {isDemo && lockedTabs.includes(item.tab) && (
+                  <span className="ml-auto text-xs bg-muted px-2 py-0.5 rounded">🔒</span>
+                )}
               </button>
             </li>
           ))}

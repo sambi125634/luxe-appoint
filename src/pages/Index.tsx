@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Sparkles, Users, Clock, ArrowRight, Star } from "lucide-react";
+import { DemoPreviewSection } from "@/components/demo/DemoPreviewSection";
 
 const features = [
   {
@@ -135,6 +136,9 @@ export default function Index() {
           </div>
         </div>
       </section>
+
+      {/* Demo Preview Section */}
+      <DemoPreviewSection />
 
       {/* Testimonials */}
       <section className="py-20 px-4">
