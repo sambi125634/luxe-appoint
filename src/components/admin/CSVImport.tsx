@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface ImportedService {
   id: string;
@@ -31,6 +32,7 @@ interface CSVImportProps {
 }
 
 export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportProps) {
+  const { t } = useTranslation();
   const [step, setStep] = useState<"upload" | "preview" | "edit">("upload");
   const [importedServices, setImportedServices] = useState<ImportedService[]>([]);
   const [editingService, setEditingService] = useState<ImportedService | null>(null);
@@ -63,9 +65,9 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
 
   const validateService = (service: Partial<ImportedService>): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
-    if (!service.name?.trim()) errors.push("Brak nazwy");
-    if (!service.duration || service.duration <= 0) errors.push("Nieprawidłowy czas");
-    if (service.price === undefined || service.price < 0) errors.push("Nieprawidłowa cena");
+    if (!service.name?.trim()) errors.push(t('csvImport.noName'));
+    if (!service.duration || service.duration <= 0) errors.push(t('csvImport.invalidDuration'));
+    if (service.price === undefined || service.price < 0) errors.push(t('csvImport.invalidPrice'));
     return { isValid: errors.length === 0, errors };
   };
 
@@ -182,9 +184,9 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
         <DialogHeader>
           <DialogTitle className="font-serif text-xl flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-primary" />
-            {step === "upload" && "Import usług z CSV"}
-            {step === "preview" && "Podgląd importu"}
-            {step === "edit" && "Edycja usługi"}
+            {step === "upload" && t('csvImport.title')}
+            {step === "preview" && t('csvImport.preview')}
+            {step === "edit" && t('csvImport.editService')}
           </DialogTitle>
         </DialogHeader>
 
@@ -204,24 +206,24 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
                   className="hidden"
                 />
                 <Upload className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
-                <p className="font-medium mb-1">Wybierz plik CSV</p>
-                <p className="text-sm text-muted-foreground">lub przeciągnij i upuść</p>
+                <p className="font-medium mb-1">{t('csvImport.selectFile')}</p>
+                <p className="text-sm text-muted-foreground">{t('csvImport.dragAndDrop')}</p>
               </div>
 
               <div className="bg-muted/30 rounded-xl p-4">
-                <p className="font-medium mb-2">Format pliku CSV:</p>
+                <p className="font-medium mb-2">{t('csvImport.fileFormat')}</p>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Pierwsza linia powinna zawierać nagłówki kolumn. Obsługiwane kolumny:
+                  {t('csvImport.fileFormatDescription')}
                 </p>
                 <ul className="text-sm text-muted-foreground space-y-1">
-                  <li>• <code className="bg-muted px-1 rounded">nazwa</code> lub <code className="bg-muted px-1 rounded">name</code> - nazwa usługi (wymagane)</li>
-                  <li>• <code className="bg-muted px-1 rounded">kategoria</code> lub <code className="bg-muted px-1 rounded">category</code> - kategoria usługi</li>
-                  <li>• <code className="bg-muted px-1 rounded">czas</code> lub <code className="bg-muted px-1 rounded">duration</code> - czas trwania w minutach</li>
-                  <li>• <code className="bg-muted px-1 rounded">cena</code> lub <code className="bg-muted px-1 rounded">price</code> - cena usługi</li>
-                  <li>• <code className="bg-muted px-1 rounded">opis</code> lub <code className="bg-muted px-1 rounded">description</code> - opis usługi</li>
+                  <li>• <code className="bg-muted px-1 rounded">nazwa</code> / <code className="bg-muted px-1 rounded">name</code> - {t('csvImport.nameColumn')}</li>
+                  <li>• <code className="bg-muted px-1 rounded">kategoria</code> / <code className="bg-muted px-1 rounded">category</code> - {t('csvImport.categoryColumn')}</li>
+                  <li>• <code className="bg-muted px-1 rounded">czas</code> / <code className="bg-muted px-1 rounded">duration</code> - {t('csvImport.durationColumn')}</li>
+                  <li>• <code className="bg-muted px-1 rounded">cena</code> / <code className="bg-muted px-1 rounded">price</code> - {t('csvImport.priceColumn')}</li>
+                  <li>• <code className="bg-muted px-1 rounded">opis</code> / <code className="bg-muted px-1 rounded">description</code> - {t('csvImport.descriptionColumn')}</li>
                 </ul>
                 <p className="text-sm text-muted-foreground mt-3">
-                  Przykład: <code className="bg-muted px-1 rounded text-xs">nazwa,kategoria,czas,cena,opis</code>
+                  {t('csvImport.example')}: <code className="bg-muted px-1 rounded text-xs">nazwa,kategoria,czas,cena,opis</code>
                 </p>
                 <Button 
                   variant="outline" 
@@ -230,7 +232,7 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
                   onClick={downloadExampleCSV}
                 >
                   <Download className="w-4 h-4" />
-                  Pobierz przykładowy plik CSV
+                  {t('csvImport.downloadExample')}
                 </Button>
               </div>
             </div>
@@ -242,12 +244,12 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
               <div className="flex items-center gap-4 p-3 bg-muted/30 rounded-lg">
                 <div className="flex items-center gap-2 text-sm">
                   <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span>{validCount} poprawnych</span>
+                  <span>{validCount} {t('csvImport.valid')}</span>
                 </div>
                 {invalidCount > 0 && (
                   <div className="flex items-center gap-2 text-sm">
                     <AlertCircle className="w-4 h-4 text-destructive" />
-                    <span>{invalidCount} z błędami</span>
+                    <span>{invalidCount} {t('csvImport.withErrors')}</span>
                   </div>
                 )}
               </div>
@@ -269,9 +271,9 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
                       <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium truncate">{service.name || "Bez nazwy"}</p>
+                      <p className="font-medium truncate">{service.name || t('csvImport.noNameLabel')}</p>
                       <p className="text-sm text-muted-foreground">
-                        {categories.find(c => c.id === service.category)?.name || "Bez kategorii"} • {service.duration} min • {service.price} zł
+                        {categories.find(c => c.id === service.category)?.name || t('csvImport.noCategory')} • {service.duration} min • {service.price} zł
                       </p>
                       {!service.isValid && (
                         <p className="text-xs text-destructive mt-1">
@@ -307,21 +309,21 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
           {step === "edit" && editingService && (
             <div className="space-y-4">
               <div>
-                <Label>Nazwa usługi</Label>
+                <Label>{t('csvImport.serviceName')}</Label>
                 <Input
                   value={editingService.name}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, name: e.target.value } : null)}
-                  placeholder="np. Peeling kawitacyjny"
+                  placeholder={t('services.serviceNamePlaceholder')}
                 />
               </div>
               <div>
-                <Label>Kategoria</Label>
+                <Label>{t('csvImport.category')}</Label>
                 <Select
                   value={editingService.category}
                   onValueChange={(value) => setEditingService(prev => prev ? { ...prev, category: value } : null)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Wybierz kategorię" />
+                    <SelectValue placeholder={t('csvImport.selectCategory')} />
                   </SelectTrigger>
                   <SelectContent>
                     {categories.map(cat => (
@@ -334,7 +336,7 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Czas trwania (min)</Label>
+                  <Label>{t('csvImport.duration')}</Label>
                   <Input
                     type="number"
                     value={editingService.duration}
@@ -342,7 +344,7 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
                   />
                 </div>
                 <div>
-                  <Label>Cena (zł)</Label>
+                  <Label>{t('csvImport.price')}</Label>
                   <Input
                     type="number"
                     value={editingService.price}
@@ -351,11 +353,11 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
                 </div>
               </div>
               <div>
-                <Label>Opis</Label>
+                <Label>{t('csvImport.description')}</Label>
                 <Input
                   value={editingService.description}
                   onChange={(e) => setEditingService(prev => prev ? { ...prev, description: e.target.value } : null)}
-                  placeholder="Krótki opis usługi..."
+                  placeholder={t('csvImport.descriptionPlaceholder')}
                 />
               </div>
             </div>
@@ -364,24 +366,24 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
 
         <DialogFooter>
           {step === "upload" && (
-            <Button variant="outline" onClick={resetAndClose}>Anuluj</Button>
+            <Button variant="outline" onClick={resetAndClose}>{t('common.cancel')}</Button>
           )}
           {step === "preview" && (
             <>
-              <Button variant="outline" onClick={() => setStep("upload")}>Wróć</Button>
+              <Button variant="outline" onClick={() => setStep("upload")}>{t('common.back')}</Button>
               <Button 
                 variant="luxury" 
                 onClick={handleImport}
                 disabled={validCount === 0}
               >
-                Importuj {validCount} usług
+                {t('csvImport.importServices', { count: validCount })}
               </Button>
             </>
           )}
           {step === "edit" && (
             <>
-              <Button variant="outline" onClick={() => setStep("preview")}>Anuluj</Button>
-              <Button variant="luxury" onClick={saveEditedService}>Zapisz</Button>
+              <Button variant="outline" onClick={() => setStep("preview")}>{t('common.cancel')}</Button>
+              <Button variant="luxury" onClick={saveEditedService}>{t('common.save')}</Button>
             </>
           )}
         </DialogFooter>

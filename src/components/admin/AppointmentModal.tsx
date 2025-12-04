@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface Client {
   id: string;
@@ -90,6 +91,7 @@ export function AppointmentModal({
   selectedDate,
   selectedTime 
 }: AppointmentModalProps) {
+  const { t } = useTranslation();
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
@@ -193,7 +195,7 @@ export function AppointmentModal({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl">
-            {appointment ? "Edytuj wizytę" : "Nowa wizyta"}
+            {appointment ? t('appointment.editAppointment') : t('appointment.newAppointment')}
           </DialogTitle>
         </DialogHeader>
 
@@ -202,12 +204,12 @@ export function AppointmentModal({
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <User className="w-4 h-4 text-primary" />
-              Klient
+              {t('appointment.client')}
             </Label>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Szukaj klienta po imieniu, telefonie lub email..."
+                placeholder={t('appointment.searchClientPlaceholder')}
                 value={clientSearch}
                 onChange={(e) => {
                   setClientSearch(e.target.value);
@@ -232,7 +234,7 @@ export function AppointmentModal({
                     className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors text-primary font-medium"
                     onClick={handleNewClient}
                   >
-                    + Dodaj nowego klienta: "{clientSearch}"
+                    + {t('appointment.addNewClient')}: "{clientSearch}"
                   </button>
                 </div>
               )}
@@ -240,12 +242,12 @@ export function AppointmentModal({
             {isNewClient && (
               <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
                 <Input
-                  placeholder="Telefon"
+                  placeholder={t('appointment.phone')}
                   value={form.clientPhone}
                   onChange={(e) => setForm(prev => ({ ...prev, clientPhone: e.target.value }))}
                 />
                 <Input
-                  placeholder="Email"
+                  placeholder={t('appointment.email')}
                   value={form.clientEmail}
                   onChange={(e) => setForm(prev => ({ ...prev, clientEmail: e.target.value }))}
                 />
@@ -257,14 +259,14 @@ export function AppointmentModal({
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Scissors className="w-4 h-4 text-primary" />
-              Usługa
+              {t('appointment.service')}
             </Label>
             <Select
               value={form.serviceId}
               onValueChange={(value) => setForm(prev => ({ ...prev, serviceId: value }))}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Wybierz usługę" />
+                <SelectValue placeholder={t('appointment.selectService')} />
               </SelectTrigger>
               <SelectContent>
                 {mockServices.map(service => (
@@ -285,7 +287,7 @@ export function AppointmentModal({
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <User className="w-4 h-4 text-primary" />
-              Specjalista
+              {t('appointment.specialist')}
             </Label>
             <div className="grid grid-cols-2 gap-2">
               {mockStaff.map(staff => (
@@ -312,7 +314,7 @@ export function AppointmentModal({
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-primary" />
-                Data
+                {t('appointment.date')}
               </Label>
               <Input
                 type="date"
@@ -323,7 +325,7 @@ export function AppointmentModal({
             <div className="space-y-2">
               <Label className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
-                Godzina
+                {t('appointment.time')}
               </Label>
               <Select
                 value={form.time}
@@ -343,9 +345,9 @@ export function AppointmentModal({
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label>Notatki</Label>
+            <Label>{t('appointment.notes')}</Label>
             <Textarea
-              placeholder="Dodatkowe informacje o wizycie..."
+              placeholder={t('appointment.notesPlaceholder')}
               value={form.notes}
               onChange={(e) => setForm(prev => ({ ...prev, notes: e.target.value }))}
               rows={3}
@@ -355,25 +357,25 @@ export function AppointmentModal({
           {/* Summary */}
           {selectedService && selectedStaff && (
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
-              <p className="text-sm text-muted-foreground mb-2">Podsumowanie</p>
+              <p className="text-sm text-muted-foreground mb-2">{t('appointment.summary')}</p>
               <div className="space-y-1 text-sm">
-                <p><span className="font-medium">Usługa:</span> {selectedService.name}</p>
-                <p><span className="font-medium">Czas trwania:</span> {selectedService.duration} min</p>
-                <p><span className="font-medium">Cena:</span> {selectedService.price} zł</p>
-                <p><span className="font-medium">Specjalista:</span> {selectedStaff.name}</p>
+                <p><span className="font-medium">{t('appointment.service')}:</span> {selectedService.name}</p>
+                <p><span className="font-medium">{t('appointment.duration')}:</span> {selectedService.duration} min</p>
+                <p><span className="font-medium">{t('appointment.price')}:</span> {selectedService.price} zł</p>
+                <p><span className="font-medium">{t('appointment.specialist')}:</span> {selectedStaff.name}</p>
               </div>
             </div>
           )}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Anuluj</Button>
+          <Button variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
           <Button 
             variant="luxury" 
             onClick={handleSave}
             disabled={!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)}
           >
-            {appointment ? "Zapisz zmiany" : "Utwórz wizytę"}
+            {appointment ? t('appointment.saveChanges') : t('appointment.createAppointment')}
           </Button>
         </DialogFooter>
       </DialogContent>

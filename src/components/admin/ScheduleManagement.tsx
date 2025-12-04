@@ -19,8 +19,10 @@ import {
   QuickBlockModal,
   SmartScheduleHelpers 
 } from "./schedule";
+import { useTranslation } from "react-i18next";
 
 export function ScheduleManagement() {
+  const { t } = useTranslation();
   const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart">("calendar");
   const [isQuickBlockOpen, setIsQuickBlockOpen] = useState(false);
 
@@ -37,19 +39,19 @@ export function ScheduleManagement() {
           <TabsList className="grid grid-cols-4 w-full sm:w-auto">
             <TabsTrigger value="calendar" className="gap-2">
               <Calendar className="w-4 h-4" />
-              <span className="hidden sm:inline">Kalendarz</span>
+              <span className="hidden sm:inline">{t('schedule.calendar')}</span>
             </TabsTrigger>
             <TabsTrigger value="grid" className="gap-2">
               <LayoutGrid className="w-4 h-4" />
-              <span className="hidden sm:inline">Siatka</span>
+              <span className="hidden sm:inline">{t('schedule.grid')}</span>
             </TabsTrigger>
             <TabsTrigger value="templates" className="gap-2">
               <FileText className="w-4 h-4" />
-              <span className="hidden sm:inline">Szablony</span>
+              <span className="hidden sm:inline">{t('schedule.templates')}</span>
             </TabsTrigger>
             <TabsTrigger value="smart" className="gap-2">
               <Sparkles className="w-4 h-4" />
-              <span className="hidden sm:inline">Asystent</span>
+              <span className="hidden sm:inline">{t('schedule.assistant')}</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -62,11 +64,11 @@ export function ScheduleManagement() {
             onClick={() => setIsQuickBlockOpen(true)}
           >
             <Coffee className="w-4 h-4" />
-            <span className="hidden sm:inline">Szybka blokada</span>
+            <span className="hidden sm:inline">{t('schedule.quickBlock')}</span>
           </Button>
           <Button variant="luxury" size="sm" className="gap-2">
             <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Nowa wizyta</span>
+            <span className="hidden sm:inline">{t('schedule.newAppointment')}</span>
           </Button>
         </div>
       </div>

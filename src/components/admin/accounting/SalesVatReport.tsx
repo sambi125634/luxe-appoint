@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
 import { Download, ToggleLeft, ToggleRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,17 +23,20 @@ import {
 } from "@/components/ui/table";
 import { Transaction, VatSummary } from "./types";
 import { mockTransactions } from "./mockData";
+import { useTranslation } from "react-i18next";
 
 interface SalesVatReportProps {
   dateRange: { from: Date; to: Date };
 }
 
 export function SalesVatReport({ dateRange }: SalesVatReportProps) {
+  const { t, i18n } = useTranslation();
   const [isDailyView, setIsDailyView] = useState(false);
   const [filterType, setFilterType] = useState<string>("all");
   const [filterVat, setFilterVat] = useState<string>("all");
   const [filterPayment, setFilterPayment] = useState<string>("all");
   const [filterStaff, setFilterStaff] = useState<string>("all");
+  const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("pl-PL", {
@@ -103,19 +106,19 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-5 border border-primary/20">
-          <p className="text-sm text-muted-foreground mb-1">Obrót brutto</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.grossRevenue')}</p>
           <p className="text-2xl font-bold">{formatCurrency(totalGross)}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Obrót netto</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.netRevenue')}</p>
           <p className="text-2xl font-bold">{formatCurrency(totalNet)}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">VAT należny</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.vatDue')}</p>
           <p className="text-2xl font-bold">{formatCurrency(totalVat)}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Transakcji</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.transactions')}</p>
           <p className="text-2xl font-bold">{filteredTransactions.length}</p>
         </div>
       </div>
@@ -131,15 +134,15 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
             </div>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="text-muted-foreground">Netto:</span>
+                <span className="text-muted-foreground">{t('accounting.net')}:</span>
                 <span>{formatCurrency(vs.netAmount)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted-foreground">VAT:</span>
+                <span className="text-muted-foreground">{t('accounting.vat')}:</span>
                 <span>{formatCurrency(vs.vatAmount)}</span>
               </div>
               <div className="flex justify-between font-medium pt-1 border-t border-border">
-                <span>Brutto:</span>
+                <span>{t('accounting.gross')}:</span>
                 <span>{formatCurrency(vs.grossAmount)}</span>
               </div>
             </div>
@@ -151,21 +154,21 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
       <div className="flex flex-wrap items-center gap-3 p-4 bg-card rounded-xl border border-border">
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Typ" />
+            <SelectValue placeholder={t('accounting.type')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie typy</SelectItem>
-            <SelectItem value="usługa">Usługi</SelectItem>
-            <SelectItem value="produkt">Produkty</SelectItem>
+            <SelectItem value="all">{t('accounting.allTypes')}</SelectItem>
+            <SelectItem value="usługa">{t('accounting.services')}</SelectItem>
+            <SelectItem value="produkt">{t('accounting.products')}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={filterVat} onValueChange={setFilterVat}>
           <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Stawka VAT" />
+            <SelectValue placeholder={t('accounting.vatRate')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie stawki</SelectItem>
+            <SelectItem value="all">{t('accounting.allRates')}</SelectItem>
             <SelectItem value="23">23%</SelectItem>
             <SelectItem value="8">8%</SelectItem>
             <SelectItem value="0">0%</SelectItem>
@@ -174,23 +177,23 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
 
         <Select value={filterPayment} onValueChange={setFilterPayment}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Metoda płatności" />
+            <SelectValue placeholder={t('accounting.paymentMethod')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie metody</SelectItem>
-            <SelectItem value="gotówka">Gotówka</SelectItem>
-            <SelectItem value="karta">Karta</SelectItem>
-            <SelectItem value="online">Online</SelectItem>
-            <SelectItem value="voucher">Voucher</SelectItem>
+            <SelectItem value="all">{t('accounting.allMethods')}</SelectItem>
+            <SelectItem value="gotówka">{t('accounting.cash')}</SelectItem>
+            <SelectItem value="karta">{t('accounting.card')}</SelectItem>
+            <SelectItem value="online">{t('accounting.online')}</SelectItem>
+            <SelectItem value="voucher">{t('accounting.voucher')}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={filterStaff} onValueChange={setFilterStaff}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Pracownik" />
+            <SelectValue placeholder={t('accounting.employee')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszyscy pracownicy</SelectItem>
+            <SelectItem value="all">{t('accounting.allEmployees')}</SelectItem>
             {uniqueStaff.map((s) => (
               <SelectItem key={s.id} value={s.id}>
                 {s.name}
@@ -208,13 +211,13 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
             onCheckedChange={setIsDailyView}
           />
           <Label htmlFor="view-mode" className="text-sm">
-            Widok dzienny
+            {t('accounting.dailyView')}
           </Label>
         </div>
 
         <Button variant="outline" size="sm" className="gap-2">
           <Download className="w-4 h-4" />
-          Eksport CSV
+          {t('accounting.exportCsv')}
         </Button>
       </div>
 
@@ -224,18 +227,18 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead>Data</TableHead>
-                <TableHead className="text-right">Liczba transakcji</TableHead>
-                <TableHead className="text-right">Wartość netto</TableHead>
-                <TableHead className="text-right">VAT</TableHead>
-                <TableHead className="text-right">Wartość brutto</TableHead>
+                <TableHead>{t('accounting.date')}</TableHead>
+                <TableHead className="text-right">{t('accounting.transactionCount')}</TableHead>
+                <TableHead className="text-right">{t('accounting.netValue')}</TableHead>
+                <TableHead className="text-right">{t('accounting.vat')}</TableHead>
+                <TableHead className="text-right">{t('accounting.grossValue')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {dailyData.map((day) => (
                 <TableRow key={day.date}>
                   <TableCell className="font-medium">
-                    {format(new Date(day.date), "EEEE, dd MMM yyyy", { locale: pl })}
+                    {format(new Date(day.date), "EEEE, dd MMM yyyy", { locale: dateLocale })}
                   </TableCell>
                   <TableCell className="text-right">{day.count}</TableCell>
                   <TableCell className="text-right">{formatCurrency(day.net)}</TableCell>
@@ -249,57 +252,57 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/50">
-                <TableHead>Data</TableHead>
-                <TableHead>Godz.</TableHead>
-                <TableHead>Typ</TableHead>
-                <TableHead>Kategoria</TableHead>
-                <TableHead>Nazwa</TableHead>
-                <TableHead className="text-right">Ilość</TableHead>
-                <TableHead className="text-right">Cena jedn.</TableHead>
-                <TableHead className="text-right">Rabat</TableHead>
-                <TableHead className="text-right">Netto</TableHead>
-                <TableHead className="text-right">VAT</TableHead>
-                <TableHead className="text-center">Stawka</TableHead>
-                <TableHead className="text-right">Brutto</TableHead>
-                <TableHead>Metoda</TableHead>
-                <TableHead>Pracownik</TableHead>
+                <TableHead>{t('accounting.date')}</TableHead>
+                <TableHead>{t('accounting.time')}</TableHead>
+                <TableHead>{t('accounting.type')}</TableHead>
+                <TableHead>{t('accounting.category')}</TableHead>
+                <TableHead>{t('accounting.name')}</TableHead>
+                <TableHead className="text-right">{t('accounting.quantity')}</TableHead>
+                <TableHead className="text-right">{t('accounting.unitPrice')}</TableHead>
+                <TableHead className="text-right">{t('accounting.discount')}</TableHead>
+                <TableHead className="text-right">{t('accounting.net')}</TableHead>
+                <TableHead className="text-right">{t('accounting.vat')}</TableHead>
+                <TableHead className="text-center">{t('accounting.rate')}</TableHead>
+                <TableHead className="text-right">{t('accounting.gross')}</TableHead>
+                <TableHead>{t('accounting.method')}</TableHead>
+                <TableHead>{t('accounting.employee')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredTransactions.map((t) => (
-                <TableRow key={t.id}>
+              {filteredTransactions.map((tx) => (
+                <TableRow key={tx.id}>
                   <TableCell className="font-medium">
-                    {format(new Date(t.dateTime), "dd.MM.yyyy")}
+                    {format(new Date(tx.dateTime), "dd.MM.yyyy")}
                   </TableCell>
                   <TableCell className="font-mono text-sm">
-                    {format(new Date(t.dateTime), "HH:mm")}
+                    {format(new Date(tx.dateTime), "HH:mm")}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={t.itemType === "usługa" ? "default" : "secondary"} className="text-xs">
-                      {t.itemType}
+                    <Badge variant={tx.itemType === "usługa" ? "default" : "secondary"} className="text-xs">
+                      {tx.itemType}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm">{t.itemCategory}</TableCell>
-                  <TableCell className="max-w-[150px] truncate">{t.itemName}</TableCell>
-                  <TableCell className="text-right">{t.quantity}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(t.unitPriceBrutto)}</TableCell>
+                  <TableCell className="text-sm">{tx.itemCategory}</TableCell>
+                  <TableCell className="max-w-[150px] truncate">{tx.itemName}</TableCell>
+                  <TableCell className="text-right">{tx.quantity}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(tx.unitPriceBrutto)}</TableCell>
                   <TableCell className="text-right">
-                    {t.discountAmount > 0 ? (
-                      <span className="text-red-600">-{formatCurrency(t.discountAmount)}</span>
+                    {tx.discountAmount > 0 ? (
+                      <span className="text-red-600">-{formatCurrency(tx.discountAmount)}</span>
                     ) : (
                       "—"
                     )}
                   </TableCell>
-                  <TableCell className="text-right">{formatCurrency(t.netAmount)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(t.vatAmount)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(tx.netAmount)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(tx.vatAmount)}</TableCell>
                   <TableCell className="text-center">
                     <Badge variant="outline" className="text-xs">
-                      {t.vatRate}%
+                      {tx.vatRate}%
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(t.grossAmount)}</TableCell>
-                  <TableCell className="capitalize text-sm">{t.paymentMethod}</TableCell>
-                  <TableCell className="text-sm">{t.staffName || "—"}</TableCell>
+                  <TableCell className="text-right font-medium">{formatCurrency(tx.grossAmount)}</TableCell>
+                  <TableCell className="capitalize text-sm">{tx.paymentMethod}</TableCell>
+                  <TableCell className="text-sm">{tx.staffName || "—"}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
