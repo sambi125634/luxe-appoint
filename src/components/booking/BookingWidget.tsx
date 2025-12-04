@@ -52,6 +52,8 @@ const serviceRecommendations: Record<string, { id: string; name: string; price: 
 
 export function BookingWidget() {
   const [currentStep, setCurrentStep] = useState(0); // 0 = intro
+  const [previousStep, setPreviousStep] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -69,6 +71,15 @@ export function BookingWidget() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const changeStep = (newStep: number) => {
+    setPreviousStep(currentStep);
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentStep(newStep);
+      setIsTransitioning(false);
+    }, 150);
+  };
 
   const canProceed = () => {
     switch (currentStep) {
@@ -106,14 +117,14 @@ export function BookingWidget() {
   const handleNext = () => {
     if (currentStep < 5 && canProceed()) {
       setShowRecommendations(false);
-      setCurrentStep(currentStep + 1);
+      changeStep(currentStep + 1);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
       setShowRecommendations(false);
-      setCurrentStep(currentStep - 1);
+      changeStep(currentStep - 1);
     }
   };
 
@@ -136,8 +147,10 @@ export function BookingWidget() {
   };
 
   const handleStartBooking = () => {
-    setCurrentStep(1);
+    changeStep(1);
   };
+
+  const transitionDirection = currentStep > previousStep ? 'forward' : 'backward';
 
   if (isConfirmed) {
     return (
@@ -210,13 +223,18 @@ export function BookingWidget() {
     <div className="w-full max-w-2xl mx-auto">
       <BookingProgress currentStep={currentStep} steps={steps} />
 
-      <div className="mt-8">
+      <div className={cn(
+        "mt-8 transition-all duration-300",
+        isTransitioning 
+          ? "opacity-0 translate-x-4" 
+          : "opacity-100 translate-x-0"
+      )}>
         {currentStep === 1 && (
           <>
             <ServiceSelection
               onSelect={handleServiceSelect}
               selectedService={selectedService}
-              onProceed={() => setCurrentStep(2)}
+              onProceed={() => changeStep(2)}
             />
             
             {/* Recommendations */}
