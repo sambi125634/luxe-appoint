@@ -10,6 +10,7 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
+import { StatsModule } from "@/components/admin/StatsModule";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -44,12 +45,7 @@ export default function AdminDashboard() {
       case "time-off":
         return <TimeOffManagement />;
       case "stats":
-        return (
-          <div className="glass-card p-6 text-center text-muted-foreground">
-            <p className="font-serif text-lg mb-2">Statystyki</p>
-            <p className="text-sm">Moduł statystyk w przygotowaniu...</p>
-          </div>
-        );
+        return <StatsModule />;
       case "settings":
         return (
           <div className="glass-card p-6 text-center text-muted-foreground">
