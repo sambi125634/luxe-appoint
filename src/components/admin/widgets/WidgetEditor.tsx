@@ -123,6 +123,17 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
     ));
   };
 
+  const moveStep = (fromIndex: number, toIndex: number) => {
+    const steps = [...(formData.steps || [])];
+    const [movedStep] = steps.splice(fromIndex, 1);
+    steps.splice(toIndex, 0, movedStep);
+    // Update order values
+    const reorderedSteps = steps.map((s, i) => ({ ...s, order: i }));
+    updateField('steps', reorderedSteps);
+  };
+
+  const [draggedStepIndex, setDraggedStepIndex] = useState<number | null>(null);
+
   const toggleFormField = (fieldId: string) => {
     const fields = formData.formFields || [];
     updateField('formFields', fields.map(f => 
@@ -314,17 +325,28 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
             {activeTab === "steps" && (
               <div className="space-y-6">
                 <p className="text-sm text-muted-foreground">
-                  Dostosuj kroki procesu rezerwacji
+                  Dostosuj kroki procesu rezerwacji. Przeciągnij, aby zmienić kolejność.
                 </p>
                 <div className="space-y-2">
                   {formData.steps?.map((step, index) => (
                     <div
                       key={step.id}
-                      className={`flex items-center gap-3 p-3 rounded-lg border ${
+                      draggable
+                      onDragStart={() => setDraggedStepIndex(index)}
+                      onDragEnd={() => setDraggedStepIndex(null)}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={() => {
+                        if (draggedStepIndex !== null && draggedStepIndex !== index) {
+                          moveStep(draggedStepIndex, index);
+                        }
+                      }}
+                      className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
                         step.enabled ? 'border-border' : 'border-border/50 opacity-50'
+                      } ${draggedStepIndex === index ? 'opacity-50 scale-95' : ''} ${
+                        draggedStepIndex !== null && draggedStepIndex !== index ? 'hover:border-primary hover:bg-primary/5' : ''
                       }`}
                     >
-                      <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab" />
+                      <GripVertical className="w-4 h-4 text-muted-foreground cursor-grab active:cursor-grabbing" />
                       <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-medium flex items-center justify-center">
                         {index + 1}
                       </div>
