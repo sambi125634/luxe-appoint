@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Clock, Wand2, TrendingUp, Palette, BarChart3 } from "lucide-react";
+import { Clock, Wand2, TrendingUp, Users, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 const SolutionSection = () => {
@@ -22,14 +22,14 @@ const SolutionSection = () => {
       description: t("solution.calendar.description")
     },
     {
-      icon: Palette,
+      icon: BarChart3,
       title: t("solution.reports.title"),
       description: t("solution.reports.description")
     },
     {
-      icon: BarChart3,
-      title: t("solution.reports.title"),
-      description: t("solution.reports.description")
+      icon: Users,
+      title: t("solution.crm.title"),
+      description: t("solution.crm.description")
     }
   ];
 
