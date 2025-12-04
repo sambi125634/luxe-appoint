@@ -1,0 +1,11 @@
+export { default as HeroSection } from './HeroSection';
+export { default as PainPointsSection } from './PainPointsSection';
+export { default as SolutionSection } from './SolutionSection';
+export { default as HowItWorksSection } from './HowItWorksSection';
+export { default as DemoPreviewSection } from './DemoPreviewSection';
+export { default as TargetAudienceSection } from './TargetAudienceSection';
+export { default as LeadFormSection } from './LeadFormSection';
+export { default as FAQSection } from './FAQSection';
+export { default as FinalCTASection } from './FinalCTASection';
+export { default as LandingNavbar } from './LandingNavbar';
+export { default as LandingFooter } from './LandingFooter';

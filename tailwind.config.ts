@@ -63,6 +63,7 @@ export default {
         },
         violet: {
           DEFAULT: "hsl(var(--violet))",
+          deep: "hsl(var(--violet-deep))",
           light: "hsl(var(--violet-light))",
           dark: "hsl(var(--violet-dark))",
         },
