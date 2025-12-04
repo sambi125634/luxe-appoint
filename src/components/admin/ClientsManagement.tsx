@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   Search, Plus, Phone, Mail, Calendar, Clock, 
   Star, AlertTriangle, Edit2, Trash2, X, User,
@@ -40,15 +41,6 @@ interface Client {
   totalSpent: number;
   visits: Visit[];
 }
-
-const availableTags = [
-  { id: "vip", label: "VIP", color: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" },
-  { id: "new", label: "Nowa klientka", color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200" },
-  { id: "regular", label: "Stała klientka", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200" },
-  { id: "problematic", label: "Problematyczna", color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200" },
-  { id: "friday-lover", label: "Lubi piątki", color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200" },
-  { id: "evening", label: "Preferuje wieczory", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200" },
-];
 
 const mockClients: Client[] = [
   {
@@ -139,6 +131,7 @@ const mockClients: Client[] = [
 ];
 
 export function ClientsManagement() {
+  const { t, i18n } = useTranslation();
   const [clients, setClients] = useState<Client[]>(mockClients);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -147,6 +140,15 @@ export function ClientsManagement() {
   const [editedClient, setEditedClient] = useState<Client | null>(null);
   const [activeTab, setActiveTab] = useState("info");
   const { toast } = useToast();
+
+  const availableTags = [
+    { id: "vip", label: t('clients.tagLabels.vip'), color: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" },
+    { id: "new", label: t('clients.tagLabels.new'), color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200" },
+    { id: "regular", label: t('clients.tagLabels.regular'), color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200" },
+    { id: "problematic", label: t('clients.tagLabels.problematic'), color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200" },
+    { id: "friday-lover", label: t('clients.tagLabels.fridayLover'), color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200" },
+    { id: "evening", label: t('clients.tagLabels.evening'), color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200" },
+  ];
 
   const filteredClients = clients.filter(client => {
     const query = searchQuery.toLowerCase();
@@ -192,8 +194,8 @@ export function ClientsManagement() {
     
     if (!editedClient.firstName || !editedClient.lastName || !editedClient.phone) {
       toast({
-        title: "Błąd",
-        description: "Wypełnij wszystkie wymagane pola (imię, nazwisko, telefon)",
+        title: t('common.error'),
+        description: t('clients.fillRequired'),
         variant: "destructive"
       });
       return;
@@ -201,10 +203,10 @@ export function ClientsManagement() {
 
     if (selectedClient) {
       setClients(clients.map(c => c.id === editedClient.id ? editedClient : c));
-      toast({ title: "Zapisano", description: "Dane klientki zostały zaktualizowane" });
+      toast({ title: t('common.saved'), description: t('clients.clientUpdated') });
     } else {
       setClients([...clients, editedClient]);
-      toast({ title: "Dodano", description: "Nowa klientka została dodana" });
+      toast({ title: t('common.added'), description: t('clients.clientAdded') });
     }
     
     setIsDialogOpen(false);
@@ -214,7 +216,7 @@ export function ClientsManagement() {
   const deleteClient = (id: string) => {
     setClients(clients.filter(c => c.id !== id));
     setIsDialogOpen(false);
-    toast({ title: "Usunięto", description: "Klientka została usunięta" });
+    toast({ title: t('common.deleted'), description: t('clients.clientDeleted') });
   };
 
   const toggleTag = (tagId: string) => {
@@ -232,11 +234,11 @@ export function ClientsManagement() {
   const getStatusBadge = (status: Visit["status"]) => {
     switch (status) {
       case "completed":
-        return <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50">Zrealizowana</Badge>;
+        return <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50">{t('clients.visitStatus.completed')}</Badge>;
       case "cancelled":
-        return <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-900/50">Anulowana</Badge>;
+        return <Badge variant="secondary" className="bg-gray-100 text-gray-800 dark:bg-gray-900/50">{t('clients.visitStatus.cancelled')}</Badge>;
       case "no-show":
-        return <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/50">No-show</Badge>;
+        return <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/50">{t('clients.visitStatus.noShow')}</Badge>;
     }
   };
 
@@ -245,14 +247,14 @@ export function ClientsManagement() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Klienci</h2>
+          <h2 className="text-2xl font-serif font-bold">{t('clients.title')}</h2>
           <p className="text-muted-foreground">
-            {clients.length} klientek w bazie
+            {clients.length} {t('clients.clientsInDatabase')}
           </p>
         </div>
         <Button onClick={openNewClient} className="gap-2">
           <Plus className="w-4 h-4" />
-          Dodaj klientkę
+          {t('clients.addClient')}
         </Button>
       </div>
 
@@ -260,7 +262,7 @@ export function ClientsManagement() {
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
-          placeholder="Szukaj po imieniu, nazwisku, telefonie lub e-mail..."
+          placeholder={t('clients.searchPlaceholder')}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="pl-10"
@@ -310,8 +312,8 @@ export function ClientsManagement() {
                 </div>
                 <div className="flex items-center gap-6">
                   <div className="text-right hidden sm:block">
-                    <div className="text-sm font-medium">{client.totalVisits} wizyt</div>
-                    <div className="text-xs text-muted-foreground">{client.totalSpent} zł łącznie</div>
+                    <div className="text-sm font-medium">{client.totalVisits} {t('clients.visits')}</div>
+                    <div className="text-xs text-muted-foreground">{client.totalSpent} zł {t('clients.totalSpent')}</div>
                   </div>
                   <div className="flex flex-wrap gap-1 max-w-[200px] hidden md:flex">
                     {client.tags.slice(0, 3).map(tagId => {
@@ -333,8 +335,8 @@ export function ClientsManagement() {
         {filteredClients.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
             <User className="w-12 h-12 mx-auto mb-4 opacity-50" />
-            <p className="font-medium">Brak wyników</p>
-            <p className="text-sm">Spróbuj zmienić kryteria wyszukiwania</p>
+            <p className="font-medium">{t('clients.noResults')}</p>
+            <p className="text-sm">{t('clients.tryDifferentSearch')}</p>
           </div>
         )}
       </div>
@@ -344,7 +346,7 @@ export function ClientsManagement() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl">
-              {selectedClient ? `${selectedClient.firstName} ${selectedClient.lastName}` : "Nowa klientka"}
+              {selectedClient ? `${selectedClient.firstName} ${selectedClient.lastName}` : t('clients.newClient')}
             </DialogTitle>
           </DialogHeader>
 
@@ -352,15 +354,15 @@ export function ClientsManagement() {
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="info" className="gap-2">
                 <User className="w-4 h-4" />
-                Dane
+                {t('clients.data')}
               </TabsTrigger>
               <TabsTrigger value="history" className="gap-2" disabled={!selectedClient}>
                 <History className="w-4 h-4" />
-                Historia
+                {t('clients.history')}
               </TabsTrigger>
               <TabsTrigger value="notes" className="gap-2">
                 <StickyNote className="w-4 h-4" />
-                Notatki
+                {t('clients.notes')}
               </TabsTrigger>
             </TabsList>
 
@@ -368,7 +370,7 @@ export function ClientsManagement() {
               {/* Basic info */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Imię *</Label>
+                  <Label>{t('clients.firstName')} *</Label>
                   <Input
                     value={editedClient?.firstName || ""}
                     onChange={(e) => setEditedClient(prev => prev ? {...prev, firstName: e.target.value} : null)}
@@ -376,7 +378,7 @@ export function ClientsManagement() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Nazwisko *</Label>
+                  <Label>{t('clients.lastName')} *</Label>
                   <Input
                     value={editedClient?.lastName || ""}
                     onChange={(e) => setEditedClient(prev => prev ? {...prev, lastName: e.target.value} : null)}
@@ -384,7 +386,7 @@ export function ClientsManagement() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Telefon *</Label>
+                  <Label>{t('clients.phone')} *</Label>
                   <Input
                     value={editedClient?.phone || ""}
                     onChange={(e) => setEditedClient(prev => prev ? {...prev, phone: e.target.value} : null)}
@@ -392,7 +394,7 @@ export function ClientsManagement() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>E-mail</Label>
+                  <Label>{t('clients.email')}</Label>
                   <Input
                     type="email"
                     value={editedClient?.email || ""}
@@ -406,7 +408,7 @@ export function ClientsManagement() {
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
                   <Tag className="w-4 h-4" />
-                  Tagi
+                  {t('clients.tags')}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   {availableTags.map(tag => (
@@ -431,17 +433,17 @@ export function ClientsManagement() {
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold font-serif">{selectedClient.totalVisits}</div>
-                    <div className="text-xs text-muted-foreground">Wizyt</div>
+                    <div className="text-xs text-muted-foreground">{t('clients.totalVisits')}</div>
                   </div>
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold font-serif">{selectedClient.totalSpent} zł</div>
-                    <div className="text-xs text-muted-foreground">Łącznie wydane</div>
+                    <div className="text-xs text-muted-foreground">{t('clients.totalSpent')}</div>
                   </div>
                   <div className="text-center p-3 bg-muted/50 rounded-lg">
                     <div className="text-2xl font-bold font-serif">
-                      {selectedClient.lastVisit ? new Date(selectedClient.lastVisit).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' }) : "-"}
+                      {selectedClient.lastVisit ? new Date(selectedClient.lastVisit).toLocaleDateString(i18n.language === 'pl' ? 'pl-PL' : 'en-US', { day: 'numeric', month: 'short' }) : "-"}
                     </div>
-                    <div className="text-xs text-muted-foreground">Ostatnia wizyta</div>
+                    <div className="text-xs text-muted-foreground">{t('clients.lastVisit')}</div>
                   </div>
                 </div>
               )}
@@ -450,75 +452,64 @@ export function ClientsManagement() {
             <TabsContent value="history" className="mt-4">
               {selectedClient && selectedClient.visits.length > 0 ? (
                 <div className="space-y-3">
-                  {selectedClient.visits.map((visit) => (
-                    <div key={visit.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  <h4 className="font-medium">{t('clients.visitHistory')}</h4>
+                  {selectedClient.visits.map(visit => (
+                    <div key={visit.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                       <div className="flex items-center gap-3">
-                        <div className="text-center min-w-[60px]">
-                          <div className="text-sm font-semibold">
-                            {new Date(visit.date).toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' })}
-                          </div>
+                        <div className="text-center">
+                          <div className="text-sm font-medium">{visit.date}</div>
                           <div className="text-xs text-muted-foreground">{visit.time}</div>
                         </div>
-                        <div className="h-10 w-px bg-border" />
+                        <div className="h-8 w-px bg-border" />
                         <div>
-                          <div className="font-medium">{visit.service}</div>
-                          <div className="text-sm text-muted-foreground">{visit.staff}</div>
+                          <div className="font-medium text-sm">{visit.service}</div>
+                          <div className="text-xs text-muted-foreground">{visit.staff}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-3">
-                        {visit.price > 0 && (
-                          <span className="font-semibold">{visit.price} zł</span>
-                        )}
                         {getStatusBadge(visit.status)}
+                        <span className="font-medium">{visit.price} zł</span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">
-                  <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Brak historii wizyt</p>
+                  <History className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <p>{t('clients.noVisits')}</p>
                 </div>
               )}
             </TabsContent>
 
             <TabsContent value="notes" className="mt-4">
-              <div className="space-y-2">
-                <Label>Notatki o klience</Label>
+              <div className="space-y-3">
+                <Label>{t('clients.clientNotes')}</Label>
                 <Textarea
-                  placeholder="Preferencje, przeciwwskazania, uwagi..."
                   value={editedClient?.notes || ""}
                   onChange={(e) => setEditedClient(prev => prev ? {...prev, notes: e.target.value} : null)}
                   disabled={!isEditing}
-                  rows={6}
+                  placeholder={t('clients.notesPlaceholder')}
+                  className="min-h-[150px]"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Np. alergie, preferencje czasowe, ulubione zabiegi, uwagi do obsługi
-                </p>
               </div>
             </TabsContent>
           </Tabs>
 
-          <DialogFooter className="flex-col sm:flex-row gap-2 mt-4">
+          <DialogFooter className="gap-2">
             {selectedClient && !isEditing && (
               <>
                 <Button variant="destructive" size="sm" onClick={() => deleteClient(selectedClient.id)}>
                   <Trash2 className="w-4 h-4 mr-2" />
-                  Usuń
+                  {t('common.delete')}
                 </Button>
-                <div className="flex-1" />
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                  Zamknij
-                </Button>
-                <Button onClick={() => setIsEditing(true)}>
+                <Button variant="outline" onClick={() => setIsEditing(true)}>
                   <Edit2 className="w-4 h-4 mr-2" />
-                  Edytuj
+                  {t('common.edit')}
                 </Button>
               </>
             )}
             {isEditing && (
               <>
-                <div className="flex-1" />
                 <Button variant="outline" onClick={() => {
                   if (selectedClient) {
                     setEditedClient({ ...selectedClient });
@@ -527,10 +518,10 @@ export function ClientsManagement() {
                     setIsDialogOpen(false);
                   }
                 }}>
-                  Anuluj
+                  {t('common.cancel')}
                 </Button>
                 <Button onClick={saveClient}>
-                  Zapisz
+                  {t('common.save')}
                 </Button>
               </>
             )}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
@@ -21,7 +22,7 @@ const todayAppointments = [
 ];
 
 const weeklyStats = {
-  totalSlots: 168, // 7 dni * 24 godziny (uproszczone)
+  totalSlots: 168,
   bookedSlots: 89,
   occupancyRate: 53,
   previousWeekRate: 48,
@@ -46,16 +47,18 @@ const topStaff = [
   { name: "Anna Wiśniewska", appointments: 35, revenue: 5250 },
 ];
 
-const alerts = [
-  { type: "warning", message: "2 klientki nie potwierdziły wizyty", count: 2 },
-  { type: "error", message: "1 wizyta została anulowana", count: 1 },
-  { type: "info", message: "3 nowe rezerwacje z ostatniej godziny", count: 3 },
-];
-
 export function DashboardHome() {
+  const { t, i18n } = useTranslation();
+  
+  const alerts = [
+    { type: "warning", message: i18n.language === 'pl' ? "2 klientki nie potwierdziły wizyty" : "2 clients haven't confirmed", count: 2 },
+    { type: "error", message: i18n.language === 'pl' ? "1 wizyta została anulowana" : "1 appointment cancelled", count: 1 },
+    { type: "info", message: i18n.language === 'pl' ? "3 nowe rezerwacje z ostatniej godziny" : "3 new bookings in the last hour", count: 3 },
+  ];
+
   const todayRevenue = todayAppointments
     .filter(a => a.status !== "cancelled")
-    .reduce((sum) => sum + 150, 0); // Uproszczona kalkulacja
+    .reduce((sum) => sum + 150, 0);
 
   const confirmedCount = todayAppointments.filter(a => a.status === "confirmed").length;
   const pendingCount = todayAppointments.filter(a => a.status === "pending").length;
@@ -66,15 +69,15 @@ export function DashboardHome() {
       {/* Nagłówek z datą */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-serif font-bold">Witaj! 👋</h2>
+          <h2 className="text-2xl font-serif font-bold">{t('dashboard.welcome')} 👋</h2>
           <p className="text-muted-foreground">
-            Oto podsumowanie Twojego salonu na dziś
+            {t('dashboard.summary')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="gap-1">
             <Calendar className="w-3 h-3" />
-            {new Date().toLocaleDateString('pl-PL', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {new Date().toLocaleDateString(i18n.language === 'pl' ? 'pl-PL' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
           </Badge>
         </div>
       </div>
@@ -85,7 +88,7 @@ export function DashboardHome() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <AlertCircle className="w-5 h-5 text-amber-600" />
-              Co dziś wymaga uwagi
+              {t('dashboard.attentionRequired')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -115,7 +118,7 @@ export function DashboardHome() {
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Dzisiejsze wizyty
+              {t('dashboard.todayAppointments')}
             </CardTitle>
             <Calendar className="w-4 h-4 text-primary" />
           </CardHeader>
@@ -123,11 +126,11 @@ export function DashboardHome() {
             <div className="text-3xl font-bold font-serif">{todayAppointments.length}</div>
             <div className="flex items-center gap-2 mt-1">
               <span className="text-xs text-muted-foreground">
-                {confirmedCount} potwierdzone
+                {confirmedCount} {t('dashboard.confirmed')}
               </span>
               {pendingCount > 0 && (
                 <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50">
-                  {pendingCount} oczekuje
+                  {pendingCount} {t('dashboard.pending')}
                 </Badge>
               )}
             </div>
@@ -138,14 +141,14 @@ export function DashboardHome() {
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Szacowany przychód
+              {t('dashboard.estimatedRevenue')}
             </CardTitle>
             <DollarSign className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-serif">{todayRevenue} zł</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Z {todayAppointments.length - cancelledCount} wizyt
+              {t('dashboard.fromVisits', { count: todayAppointments.length - cancelledCount })}
             </p>
           </CardContent>
         </Card>
@@ -154,7 +157,7 @@ export function DashboardHome() {
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Obłożenie tygodnia
+              {t('dashboard.weeklyOccupancy')}
             </CardTitle>
             <TrendingUp className="w-4 h-4 text-primary" />
           </CardHeader>
@@ -165,14 +168,14 @@ export function DashboardHome() {
                 <>
                   <ArrowUpRight className="w-3 h-3 text-green-600" />
                   <span className="text-xs text-green-600">
-                    +{weeklyStats.occupancyRate - weeklyStats.previousWeekRate}% vs poprzedni tydzień
+                    +{weeklyStats.occupancyRate - weeklyStats.previousWeekRate}% {t('dashboard.vsPreviousWeek')}
                   </span>
                 </>
               ) : (
                 <>
                   <ArrowDownRight className="w-3 h-3 text-red-600" />
                   <span className="text-xs text-red-600">
-                    {weeklyStats.occupancyRate - weeklyStats.previousWeekRate}% vs poprzedni tydzień
+                    {weeklyStats.occupancyRate - weeklyStats.previousWeekRate}% {t('dashboard.vsPreviousWeek')}
                   </span>
                 </>
               )}
@@ -184,7 +187,7 @@ export function DashboardHome() {
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              No-shows (miesiąc)
+              {t('dashboard.monthlyNoShows')}
             </CardTitle>
             <UserX className="w-4 h-4 text-primary" />
           </CardHeader>
@@ -195,14 +198,14 @@ export function DashboardHome() {
                 <>
                   <ArrowDownRight className="w-3 h-3 text-green-600" />
                   <span className="text-xs text-green-600">
-                    {monthlyStats.noShowRate}% (było {monthlyStats.previousMonthRate}%)
+                    {monthlyStats.noShowRate}% ({t('dashboard.was')} {monthlyStats.previousMonthRate}%)
                   </span>
                 </>
               ) : (
                 <>
                   <ArrowUpRight className="w-3 h-3 text-red-600" />
                   <span className="text-xs text-red-600">
-                    {monthlyStats.noShowRate}% (było {monthlyStats.previousMonthRate}%)
+                    {monthlyStats.noShowRate}% ({t('dashboard.was')} {monthlyStats.previousMonthRate}%)
                   </span>
                 </>
               )}
@@ -216,9 +219,9 @@ export function DashboardHome() {
         {/* Dzisiejsze wizyty - lista */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-serif">Dzisiejsze wizyty</CardTitle>
+            <CardTitle className="text-lg font-serif">{t('dashboard.todayAppointments')}</CardTitle>
             <Button variant="ghost" size="sm" className="text-primary">
-              Zobacz wszystkie
+              {t('dashboard.viewAll')}
             </Button>
           </CardHeader>
           <CardContent>
@@ -249,19 +252,19 @@ export function DashboardHome() {
                     {appointment.status === "confirmed" && (
                       <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
                         <CheckCircle2 className="w-3 h-3 mr-1" />
-                        Potwierdzona
+                        {t('dashboard.appointmentStatus.confirmed')}
                       </Badge>
                     )}
                     {appointment.status === "pending" && (
                       <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
                         <Clock className="w-3 h-3 mr-1" />
-                        Oczekuje
+                        {t('dashboard.appointmentStatus.pending')}
                       </Badge>
                     )}
                     {appointment.status === "cancelled" && (
                       <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200">
                         <XCircle className="w-3 h-3 mr-1" />
-                        Anulowana
+                        {t('dashboard.appointmentStatus.cancelled')}
                       </Badge>
                     )}
                     <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -281,7 +284,7 @@ export function DashboardHome() {
             <CardHeader>
               <CardTitle className="text-lg font-serif flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-primary" />
-                TOP 3 usługi
+                {t('dashboard.topServices')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -306,7 +309,7 @@ export function DashboardHome() {
                     )}
                   </div>
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{service.count} rezerwacji</span>
+                    <span>{service.count} {t('dashboard.reservations')}</span>
                     <span>{service.revenue} zł</span>
                   </div>
                   <Progress value={(service.count / topServices[0].count) * 100} className="h-1.5" />
@@ -320,7 +323,7 @@ export function DashboardHome() {
             <CardHeader>
               <CardTitle className="text-lg font-serif flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
-                TOP personel
+                {t('dashboard.topStaff')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -337,7 +340,7 @@ export function DashboardHome() {
                     </div>
                     <div>
                       <div className="text-sm font-medium">{staff.name}</div>
-                      <div className="text-xs text-muted-foreground">{staff.appointments} wizyt</div>
+                      <div className="text-xs text-muted-foreground">{staff.appointments} {t('dashboard.visits')}</div>
                     </div>
                   </div>
                   <div className="text-sm font-semibold text-primary">{staff.revenue} zł</div>

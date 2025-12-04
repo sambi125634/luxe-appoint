@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Plus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -37,6 +38,7 @@ interface WeeklyCalendarProps {
 }
 
 export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(mockAppointments);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
@@ -131,12 +133,14 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
     setIsModalOpen(true);
   };
 
+  const locale = i18n.language === 'pl' ? 'pl-PL' : 'en-US';
+
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString("pl-PL", { day: "numeric" });
+    return date.toLocaleDateString(locale, { day: "numeric" });
   };
 
   const formatDayName = (date: Date) => {
-    return date.toLocaleDateString("pl-PL", { weekday: "short" });
+    return date.toLocaleDateString(locale, { weekday: "short" });
   };
 
   const isToday = (date: Date) => {
@@ -149,13 +153,13 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <h2 className="text-xl font-serif font-semibold">Kalendarz</h2>
+          <h2 className="text-xl font-serif font-semibold">{t('calendar.title')}</h2>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => navigateWeek(-1)}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <span className="text-sm font-medium min-w-[200px] text-center">
-              {weekDays[0].toLocaleDateString("pl-PL", { day: "numeric", month: "long" })} - {weekDays[6].toLocaleDateString("pl-PL", { day: "numeric", month: "long", year: "numeric" })}
+              {weekDays[0].toLocaleDateString(locale, { day: "numeric", month: "long" })} - {weekDays[6].toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}
             </span>
             <Button variant="ghost" size="icon" onClick={() => navigateWeek(1)}>
               <ChevronRight className="w-4 h-4" />
@@ -164,7 +168,7 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
         </div>
         <Button variant="luxury" size="sm" className="gap-2" onClick={handleOpenNewAppointment}>
           <Plus className="w-4 h-4" />
-          Nowa wizyta
+          {t('calendar.newAppointment')}
         </Button>
       </div>
 
@@ -239,7 +243,7 @@ export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
                             <p className="opacity-80 truncate">{apt.service}</p>
                             <div className="flex items-center gap-1 mt-1 opacity-70">
                               <Clock className="w-3 h-3" />
-                              <span>{apt.duration} min</span>
+                              <span>{apt.duration} {t('calendar.min')}</span>
                             </div>
                           </div>
                         );
