@@ -343,6 +343,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
           <StaffSelection
             onSelect={setSelectedStaff}
             selectedStaff={selectedStaff}
+            onProceed={handleNext}
           />
         )}
         {currentStepId === "datetime" && (
@@ -351,6 +352,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
             selectedDate={selectedDate}
             selectedTime={selectedTime}
             serviceDuration={selectedService?.duration}
+            onProceed={handleNext}
           />
         )}
         {currentStepId === "form" && (

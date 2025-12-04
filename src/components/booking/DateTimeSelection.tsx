@@ -12,6 +12,7 @@ interface DateTimeSelectionProps {
   selectedDate: Date | null;
   selectedTime: string | null;
   serviceDuration?: number;
+  onProceed?: () => void;
 }
 
 const generateTimeSlots = () => {
@@ -56,7 +57,8 @@ export function DateTimeSelection({
   onSelect, 
   selectedDate, 
   selectedTime,
-  serviceDuration = 60 
+  serviceDuration = 60,
+  onProceed
 }: DateTimeSelectionProps) {
   const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [activeTimeOfDay, setActiveTimeOfDay] = useState<TimeOfDay | 'all'>('all');
@@ -77,6 +79,14 @@ export function DateTimeSelection({
     const dateStr = format(date, 'yyyy-MM-dd');
     const busy = busySlots[dateStr] || [];
     return timeSlots.filter(slot => !busy.includes(slot));
+  };
+
+  const handleTimeSelect = (date: Date, time: string) => {
+    onSelect(date, time);
+    // Auto-advance after time selection
+    setTimeout(() => {
+      onProceed?.();
+    }, 150);
   };
 
   const availableSlots = selectedDate ? getAvailableSlots(selectedDate) : [];
@@ -217,7 +227,7 @@ export function DateTimeSelection({
                         return (
                           <button
                             key={time}
-                            onClick={() => onSelect(selectedDate, time)}
+                            onClick={() => handleTimeSelect(selectedDate, time)}
                             className={cn(
                               "relative py-3 px-2 rounded-lg text-sm font-medium transition-all duration-300",
                               "animate-scale-in flex flex-col items-center",
@@ -252,7 +262,7 @@ export function DateTimeSelection({
                 return (
                   <button
                     key={time}
-                    onClick={() => onSelect(selectedDate, time)}
+                    onClick={() => handleTimeSelect(selectedDate, time)}
                     className={cn(
                       "relative py-3 px-2 rounded-lg text-sm font-medium transition-all duration-300",
                       "animate-scale-in flex flex-col items-center",

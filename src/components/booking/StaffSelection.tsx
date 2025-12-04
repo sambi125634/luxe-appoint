@@ -16,6 +16,7 @@ interface StaffMember {
 interface StaffSelectionProps {
   onSelect: (staff: StaffMember | null) => void;
   selectedStaff: StaffMember | null;
+  onProceed?: () => void;
 }
 
 const staffMembers: StaffMember[] = [
@@ -27,9 +28,17 @@ const staffMembers: StaffMember[] = [
 
 type SelectionMode = 'specialist' | 'time';
 
-export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps) {
+export function StaffSelection({ onSelect, selectedStaff, onProceed }: StaffSelectionProps) {
   const [mode, setMode] = useState<SelectionMode>('specialist');
   const isAnySelected = selectedStaff === null;
+  
+  const handleSelect = (staff: StaffMember | null) => {
+    onSelect(staff);
+    // Auto-advance after selection
+    setTimeout(() => {
+      onProceed?.();
+    }, 150);
+  };
 
   // Sort by next available for "time first" mode
   const sortedStaff = mode === 'time' 
@@ -87,7 +96,7 @@ export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps)
       <div className="grid gap-4">
         {/* Any specialist option */}
         <button
-          onClick={() => onSelect(null)}
+          onClick={() => handleSelect(null)}
           className={cn(
             "group w-full text-left p-5 rounded-xl border transition-all duration-300",
             isAnySelected
@@ -124,7 +133,7 @@ export function StaffSelection({ onSelect, selectedStaff }: StaffSelectionProps)
         {sortedStaff.map((staff, index) => (
           <button
             key={staff.id}
-            onClick={() => onSelect(staff)}
+            onClick={() => handleSelect(staff)}
             className={cn(
               "group w-full text-left p-5 rounded-xl border transition-all duration-300",
               "animate-fade-in",
