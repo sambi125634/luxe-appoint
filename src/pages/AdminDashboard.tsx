@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Plus, ChevronRight, Bell } from "lucide-react";
+import { Menu, X, ChevronRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
 import { DashboardHome } from "@/components/admin/DashboardHome";
-import { WeeklyCalendar } from "@/components/admin/WeeklyCalendar";
+import { ScheduleManagement } from "@/components/admin/ScheduleManagement";
 import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
@@ -37,7 +37,7 @@ export default function AdminDashboard() {
       case "home":
         return <DashboardHome />;
       case "calendar":
-        return <WeeklyCalendar />;
+        return <ScheduleManagement />;
       case "clients":
         return <ClientsManagement />;
       case "conversations":
@@ -116,12 +116,6 @@ export default function AdminDashboard() {
                 Zobacz widget
               </Button>
             </Link>
-            {activeTab === "calendar" && (
-              <Button variant="luxury" size="sm" className="gap-2">
-                <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Nowa wizyta</span>
-              </Button>
-            )}
           </div>
         </header>
 
