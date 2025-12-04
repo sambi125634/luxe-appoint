@@ -14,6 +14,7 @@ import { StatsModule } from "@/components/admin/StatsModule";
 import { ConversationsModule } from "@/components/admin/conversations/ConversationsModule";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
+import { WidgetsManagement } from "@/components/admin/widgets";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -23,6 +24,7 @@ export default function AdminDashboard() {
     switch (activeTab) {
       case "home": return "Dashboard";
       case "calendar": return "Kalendarz";
+      case "widgets": return "Widgety rezerwacji";
       case "clients": return "Klienci";
       case "conversations": return "Konwersacje";
       case "pipeline": return "Pipeline sprzedażowy";
@@ -42,6 +44,8 @@ export default function AdminDashboard() {
         return <DashboardHome />;
       case "calendar":
         return <ScheduleManagement />;
+      case "widgets":
+        return <WidgetsManagement />;
       case "clients":
         return <ClientsManagement />;
       case "conversations":
