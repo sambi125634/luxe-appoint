@@ -21,6 +21,7 @@ interface Service {
 interface ServiceSelectionProps {
   onSelect: (service: Service) => void;
   selectedService: Service | null;
+  onProceed?: () => void;
 }
 
 const categories = [
@@ -135,7 +136,7 @@ const services: Service[] = [
   },
 ];
 
-export function ServiceSelection({ onSelect, selectedService }: ServiceSelectionProps) {
+export function ServiceSelection({ onSelect, selectedService, onProceed }: ServiceSelectionProps) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeDuration, setActiveDuration] = useState("all");
   const [previewService, setPreviewService] = useState<Service | null>(null);
@@ -217,39 +218,45 @@ export function ServiceSelection({ onSelect, selectedService }: ServiceSelection
             {popularServices.slice(0, 2).map((service) => (
               <button
                 key={service.id}
-                onClick={() => onSelect(service)}
+                onClick={() => {
+                  onSelect(service);
+                  onProceed?.();
+                }}
                 className={cn(
-                  "relative overflow-hidden rounded-xl border transition-all duration-300 text-left",
+                  "relative overflow-hidden rounded-xl border transition-all duration-300 text-left p-4",
+                  "bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20",
                   selectedService?.id === service.id
                     ? "border-primary shadow-glow ring-2 ring-primary/20"
-                    : "border-border hover:border-primary/50 hover:shadow-md"
+                    : "border-amber-200 dark:border-amber-800/50 hover:border-primary/50 hover:shadow-md"
                 )}
               >
-                {service.image && (
-                  <div className="h-24 w-full overflow-hidden">
-                    <img 
-                      src={service.image} 
-                      alt={service.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
-                  </div>
-                )}
-                <div className="absolute bottom-0 left-0 right-0 p-3">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-sm">{service.name}</h3>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        {service.duration} min
-                        <span className="font-semibold text-primary">{service.price} zł</span>
-                      </div>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="secondary" className="bg-amber-500 text-white text-xs">
+                        <Star className="w-3 h-3 mr-1" />
+                        Hit
+                      </Badge>
                     </div>
-                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 text-xs">
-                      <Star className="w-3 h-3 mr-1" />
-                      Hit
-                    </Badge>
+                    <h3 className="font-semibold text-base mb-1">{service.name}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{service.description}</p>
+                    <div className="flex items-center gap-3">
+                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="w-4 h-4" />
+                        {service.duration} min
+                      </span>
+                      <span className="font-bold text-primary text-lg">{service.price} zł</span>
+                    </div>
                   </div>
+                  {service.image && (
+                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      <img 
+                        src={service.image} 
+                        alt={service.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
               </button>
             ))}
@@ -262,7 +269,10 @@ export function ServiceSelection({ onSelect, selectedService }: ServiceSelection
         {filteredServices.map((service, index) => (
           <button
             key={service.id}
-            onClick={() => onSelect(service)}
+            onClick={() => {
+              onSelect(service);
+              onProceed?.();
+            }}
             className={cn(
               "group w-full text-left rounded-xl border transition-all duration-300",
               "animate-fade-in",

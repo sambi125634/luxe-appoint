@@ -216,6 +216,7 @@ export function BookingWidget() {
             <ServiceSelection
               onSelect={handleServiceSelect}
               selectedService={selectedService}
+              onProceed={() => setCurrentStep(2)}
             />
             
             {/* Recommendations */}
