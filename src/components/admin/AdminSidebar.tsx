@@ -1,18 +1,19 @@
 import { Link } from "react-router-dom";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type TabType = "home" | "calendar" | "clients" | "conversations" | "staff" | "services" | "time-off" | "stats" | "settings";
+type TabType = "home" | "calendar" | "clients" | "conversations" | "pipeline" | "staff" | "services" | "time-off" | "stats" | "settings";
 
 const navItems: { icon: typeof Calendar; label: string; tab: TabType; badge?: number }[] = [
   { icon: LayoutDashboard, label: "Dashboard", tab: "home" },
   { icon: Calendar, label: "Kalendarz", tab: "calendar" },
   { icon: UserCircle, label: "Klienci", tab: "clients" },
   { icon: MessageSquare, label: "Konwersacje", tab: "conversations", badge: 3 },
+  { icon: Workflow, label: "Pipeline", tab: "pipeline", badge: 2 },
   { icon: Users, label: "Personel", tab: "staff" },
   { icon: Scissors, label: "Usługi", tab: "services" },
   { icon: CalendarOff, label: "Urlopy", tab: "time-off" },

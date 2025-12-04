@@ -1,0 +1,276 @@
+import { useState } from "react";
+import { 
+  Filter, 
+  Search, 
+  ChevronLeft, 
+  ChevronRight,
+  Users,
+  TrendingUp,
+  AlertTriangle,
+  CheckCircle2
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { PipelineColumn } from "./PipelineColumn";
+import { ContactDetailModal } from "./ContactDetailModal";
+import {
+  PipelineContact,
+  defaultPipelineStages,
+  mockPipelineContacts
+} from "./types";
+
+export function PipelineModule() {
+  const [contacts, setContacts] = useState<PipelineContact[]>(mockPipelineContacts);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dragOverStage, setDragOverStage] = useState<string | null>(null);
+  const [selectedContact, setSelectedContact] = useState<PipelineContact | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Filter contacts by search query
+  const filteredContacts = contacts.filter(contact => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      contact.firstName.toLowerCase().includes(searchLower) ||
+      contact.lastName.toLowerCase().includes(searchLower) ||
+      contact.email.toLowerCase().includes(searchLower) ||
+      contact.serviceName.toLowerCase().includes(searchLower)
+    );
+  });
+  
+  // Group contacts by stage
+  const contactsByStage = defaultPipelineStages.reduce((acc, stage) => {
+    acc[stage.id] = filteredContacts.filter(c => c.stageId === stage.id);
+    return acc;
+  }, {} as Record<string, PipelineContact[]>);
+  
+  // Stats
+  const totalContacts = contacts.length;
+  const totalValue = contacts.reduce((acc, c) => acc + c.value, 0);
+  const noShowCount = contacts.filter(c => c.stageId === 'no-show').length;
+  const completedCount = contacts.filter(c => c.stageId === 'completed').length;
+  
+  // Drag & Drop handlers
+  const handleDragStart = (e: React.DragEvent, contactId: string) => {
+    e.dataTransfer.setData("contactId", contactId);
+  };
+  
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+  
+  const handleDragEnter = (stageId: string) => {
+    setDragOverStage(stageId);
+  };
+  
+  const handleDragLeave = () => {
+    setDragOverStage(null);
+  };
+  
+  const handleDrop = (e: React.DragEvent, newStageId: string) => {
+    e.preventDefault();
+    const contactId = e.dataTransfer.getData("contactId");
+    
+    setContacts(prev => prev.map(contact => {
+      if (contact.id === contactId && contact.stageId !== newStageId) {
+        const oldStage = contact.stageId;
+        return {
+          ...contact,
+          stageId: newStageId,
+          history: [
+            ...contact.history,
+            {
+              id: `h-${Date.now()}`,
+              fromStage: oldStage,
+              toStage: newStageId,
+              changedAt: new Date().toISOString(),
+              changedBy: 'Właściciel'
+            }
+          ]
+        };
+      }
+      return contact;
+    }));
+    
+    setDragOverStage(null);
+  };
+  
+  const handleContactClick = (contact: PipelineContact) => {
+    setSelectedContact(contact);
+    setIsModalOpen(true);
+  };
+  
+  const handleStageChange = (contactId: string, newStageId: string) => {
+    setContacts(prev => prev.map(contact => {
+      if (contact.id === contactId) {
+        const oldStage = contact.stageId;
+        return {
+          ...contact,
+          stageId: newStageId,
+          history: [
+            ...contact.history,
+            {
+              id: `h-${Date.now()}`,
+              fromStage: oldStage,
+              toStage: newStageId,
+              changedAt: new Date().toISOString(),
+              changedBy: 'Właściciel'
+            }
+          ]
+        };
+      }
+      return contact;
+    }));
+    
+    // Update selected contact
+    setSelectedContact(prev => prev ? {
+      ...prev,
+      stageId: newStageId
+    } : null);
+  };
+  
+  const handleSurveySubmit = (contactId: string, visitNumber: number, rating: number, feedback: string) => {
+    setContacts(prev => prev.map(contact => {
+      if (contact.id === contactId) {
+        return {
+          ...contact,
+          surveys: contact.surveys.map(s => 
+            s.visitNumber === visitNumber 
+              ? { ...s, completed: true, rating, feedback, completedAt: new Date().toISOString() }
+              : s
+          )
+        };
+      }
+      return contact;
+    }));
+    
+    // Update selected contact
+    setSelectedContact(prev => prev ? {
+      ...prev,
+      surveys: prev.surveys.map(s => 
+        s.visitNumber === visitNumber 
+          ? { ...s, completed: true, rating, feedback, completedAt: new Date().toISOString() }
+          : s
+      )
+    } : null);
+  };
+  
+  return (
+    <div className="space-y-4">
+      {/* Stats Bar */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="glass-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{totalContacts}</p>
+              <p className="text-xs text-muted-foreground">W pipeline</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="glass-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 text-green-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{totalValue.toLocaleString()} <span className="text-sm font-normal">zł</span></p>
+              <p className="text-xs text-muted-foreground">Wartość pipeline</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="glass-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-red-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{noShowCount}</p>
+              <p className="text-xs text-muted-foreground">Nie stawiło się</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="glass-card p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-purple-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{completedCount}</p>
+              <p className="text-xs text-muted-foreground">Ukończone pakiety</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Szukaj po imieniu, nazwisku, email lub usłudze..."
+            className="pl-10"
+          />
+        </div>
+        <Button variant="outline" className="gap-2">
+          <Filter className="w-4 h-4" />
+          Filtry
+        </Button>
+      </div>
+      
+      {/* Info Banner */}
+      <div className="glass-card p-3 bg-primary/5 border-primary/20">
+        <p className="text-sm text-center">
+          <span className="font-medium">Demo mode</span> – Przeciągaj kontakty między stage'ami. 
+          W wersji produkcyjnej zmiany synchronizują się z GoHighLevel.
+        </p>
+      </div>
+      
+      {/* Pipeline Board */}
+      <ScrollArea className="w-full">
+        <div 
+          className="flex gap-4 pb-4"
+          onDragLeave={handleDragLeave}
+        >
+          {defaultPipelineStages.map((stage) => (
+            <div
+              key={stage.id}
+              onDragEnter={() => handleDragEnter(stage.id)}
+            >
+              <PipelineColumn
+                stage={stage}
+                contacts={contactsByStage[stage.id] || []}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDrop={handleDrop}
+                onContactClick={handleContactClick}
+                isDragOver={dragOverStage === stage.id}
+              />
+            </div>
+          ))}
+        </div>
+        <ScrollBar orientation="horizontal" />
+      </ScrollArea>
+      
+      {/* Contact Detail Modal */}
+      <ContactDetailModal
+        contact={selectedContact}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedContact(null);
+        }}
+        onStageChange={handleStageChange}
+        onSurveySubmit={handleSurveySubmit}
+      />
+    </div>
+  );
+}
