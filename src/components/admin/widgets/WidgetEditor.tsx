@@ -618,48 +618,60 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     </h3>
                   </div>
 
-                  {/* Steps Preview */}
+                  {/* Steps Preview - Show actual step order */}
                   <div className="p-3 space-y-2">
-                    <div className="flex justify-center gap-1 mb-3">
-                      {formData.steps?.filter(s => s.enabled).map((step, i) => (
+                    <p className="text-[10px] text-muted-foreground mb-2">Kolejność kroków:</p>
+                    <div className="space-y-1.5">
+                      {formData.steps?.filter(s => s.enabled).sort((a, b) => a.order - b.order).map((step, i) => (
                         <div 
                           key={step.id}
-                          className={`w-2 h-2 rounded-full ${i === 0 ? '' : 'bg-muted'}`}
-                          style={{ backgroundColor: i === 0 ? formData.theme?.primaryColor : undefined }}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Mock Service Cards */}
-                    <div className="space-y-2">
-                      {(formData.showAllServices ? mockServices.slice(0, 3) : mockServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)).map(service => (
-                        <div 
-                          key={service.id}
-                          className={`p-2 border border-border ${getBorderRadiusClass()} hover:border-primary/50 transition-colors cursor-pointer`}
+                          className={`flex items-center gap-2 p-1.5 rounded text-[10px] ${i === 0 ? 'bg-primary/10' : 'bg-muted/50'}`}
                         >
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="text-xs font-medium">{service.name}</p>
-                              <p className="text-[10px] text-muted-foreground">{service.category}</p>
-                            </div>
-                            <span 
-                              className="text-xs font-bold"
-                              style={{ color: formData.theme?.primaryColor }}
-                            >
-                              {service.price} zł
-                            </span>
-                          </div>
+                          <span 
+                            className="w-4 h-4 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                            style={{ backgroundColor: i === 0 ? formData.theme?.primaryColor : 'hsl(var(--muted-foreground))' }}
+                          >
+                            {i + 1}
+                          </span>
+                          <span className={i === 0 ? 'font-medium' : 'text-muted-foreground'}>
+                            {step.name}
+                          </span>
                         </div>
                       ))}
                     </div>
+                    
+                    <div className="border-t border-border my-2 pt-2">
+                      <p className="text-[10px] text-muted-foreground mb-2">Przykładowe usługi:</p>
+                      <div className="space-y-2">
+                        {(formData.showAllServices ? mockServices.slice(0, 3) : mockServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)).map(service => (
+                          <div 
+                            key={service.id}
+                            className={`p-2 border border-border ${getBorderRadiusClass()} hover:border-primary/50 transition-colors cursor-pointer`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <p className="text-xs font-medium">{service.name}</p>
+                                <p className="text-[10px] text-muted-foreground">{service.category}</p>
+                              </div>
+                              <span 
+                                className="text-xs font-bold"
+                                style={{ color: formData.theme?.primaryColor }}
+                              >
+                                {service.price} zł
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
 
-                    {/* Mock Button */}
-                    <button 
-                      className={`w-full mt-3 py-2 text-xs font-medium text-white ${getBorderRadiusClass()}`}
-                      style={{ backgroundColor: formData.theme?.primaryColor }}
-                    >
-                      Dalej
-                    </button>
+                      {/* Mock Button */}
+                      <button 
+                        className={`w-full mt-3 py-2 text-xs font-medium text-white ${getBorderRadiusClass()}`}
+                        style={{ backgroundColor: formData.theme?.primaryColor }}
+                      >
+                        Dalej
+                      </button>
+                    </div>
                   </div>
 
                   {/* Footer */}
