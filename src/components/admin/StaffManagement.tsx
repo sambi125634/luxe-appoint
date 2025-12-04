@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,8 +35,6 @@ const defaultWorkingHours: WorkingHours[] = [
   { dayOfWeek: 5, startTime: "09:00", endTime: "17:00", isWorking: true },
   { dayOfWeek: 6, startTime: "10:00", endTime: "14:00", isWorking: false },
 ];
-
-const dayNames = ["Niedziela", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek", "Sobota"];
 
 const mockServices = [
   { id: "1", name: "Peeling kawitacyjny" },
@@ -98,10 +97,21 @@ const mockStaff: StaffMember[] = [
 ];
 
 export function StaffManagement() {
+  const { t } = useTranslation();
   const [staff, setStaff] = useState(mockStaff);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
   const [activeTab, setActiveTab] = useState<"info" | "hours">("info");
+
+  const dayNames = [
+    t('staff.days.sunday'),
+    t('staff.days.monday'),
+    t('staff.days.tuesday'),
+    t('staff.days.wednesday'),
+    t('staff.days.thursday'),
+    t('staff.days.friday'),
+    t('staff.days.saturday')
+  ];
 
   const [form, setForm] = useState({
     name: "",
@@ -180,10 +190,10 @@ export function StaffManagement() {
     <div className="space-y-6">
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-serif font-semibold">Personel ({staff.length})</h3>
+          <h3 className="text-lg font-serif font-semibold">{t('staff.title')} ({staff.length})</h3>
           <Button variant="luxury" size="sm" className="gap-2" onClick={() => openDialog()}>
             <Plus className="w-4 h-4" />
-            Dodaj pracownika
+            {t('staff.addStaff')}
           </Button>
         </div>
 
@@ -236,7 +246,7 @@ export function StaffManagement() {
                     })}
                     {member.serviceIds.length > 3 && (
                       <span className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
-                        +{member.serviceIds.length - 3} więcej
+                        +{member.serviceIds.length - 3} {t('staff.more')}
                       </span>
                     )}
                   </div>
@@ -252,7 +262,7 @@ export function StaffManagement() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle className="font-serif">
-              {editingStaff ? "Edytuj pracownika" : "Nowy pracownik"}
+              {editingStaff ? t('staff.editStaff') : t('staff.newStaff')}
             </DialogTitle>
           </DialogHeader>
 
@@ -265,7 +275,7 @@ export function StaffManagement() {
               className="gap-2"
             >
               <User className="w-4 h-4" />
-              Dane
+              {t('staff.data')}
             </Button>
             <Button
               variant={activeTab === "hours" ? "default" : "ghost"}
@@ -274,7 +284,7 @@ export function StaffManagement() {
               className="gap-2"
             >
               <Calendar className="w-4 h-4" />
-              Grafik
+              {t('staff.schedule')}
             </Button>
           </div>
 
@@ -282,7 +292,7 @@ export function StaffManagement() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Imię i nazwisko</Label>
+                  <Label>{t('staff.fullName')}</Label>
                   <Input
                     value={form.name}
                     onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
@@ -290,7 +300,7 @@ export function StaffManagement() {
                   />
                 </div>
                 <div>
-                  <Label>Stanowisko</Label>
+                  <Label>{t('staff.position')}</Label>
                   <Input
                     value={form.role}
                     onChange={(e) => setForm(prev => ({ ...prev, role: e.target.value }))}
@@ -300,7 +310,7 @@ export function StaffManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>E-mail</Label>
+                  <Label>{t('staff.email')}</Label>
                   <Input
                     type="email"
                     value={form.email}
@@ -309,7 +319,7 @@ export function StaffManagement() {
                   />
                 </div>
                 <div>
-                  <Label>Telefon</Label>
+                  <Label>{t('staff.phone')}</Label>
                   <Input
                     value={form.phone}
                     onChange={(e) => setForm(prev => ({ ...prev, phone: e.target.value }))}
@@ -318,7 +328,7 @@ export function StaffManagement() {
                 </div>
               </div>
               <div>
-                <Label>Kolor w kalendarzu</Label>
+                <Label>{t('staff.calendarColor')}</Label>
                 <div className="flex gap-2 mt-2">
                   {colors.map(color => (
                     <button
@@ -335,7 +345,7 @@ export function StaffManagement() {
                 </div>
               </div>
               <div>
-                <Label>Wykonywane usługi</Label>
+                <Label>{t('staff.performedServices')}</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {mockServices.map(service => (
                     <Button
@@ -394,8 +404,8 @@ export function StaffManagement() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Anuluj</Button>
-            <Button variant="luxury" onClick={saveStaff}>Zapisz</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button variant="luxury" onClick={saveStaff}>{t('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

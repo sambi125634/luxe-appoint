@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isWithinInterval, parseISO } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Calendar, Palmtree, GraduationCap, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -66,14 +67,8 @@ const mockTimeOffs: TimeOff[] = [
   },
 ];
 
-const typeLabels: Record<string, { label: string; icon: React.ElementType; className: string }> = {
-  vacation: { label: "Urlop", icon: Palmtree, className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400" },
-  sick: { label: "Zwolnienie", icon: Stethoscope, className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" },
-  training: { label: "Szkolenie", icon: GraduationCap, className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" },
-  other: { label: "Inne", icon: Calendar, className: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400" },
-};
-
 export function TimeOffManagement() {
+  const { t, i18n } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [timeOffs, setTimeOffs] = useState<TimeOff[]>(mockTimeOffs);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -85,6 +80,25 @@ export function TimeOffManagement() {
     endDate: "",
     note: "",
   });
+
+  const locale = i18n.language === 'pl' ? pl : enUS;
+
+  const typeLabels: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+    vacation: { label: t('timeOff.types.vacation'), icon: Palmtree, className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400" },
+    sick: { label: t('timeOff.types.sick'), icon: Stethoscope, className: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" },
+    training: { label: t('timeOff.types.training'), icon: GraduationCap, className: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" },
+    other: { label: t('timeOff.types.other'), icon: Calendar, className: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400" },
+  };
+
+  const weekDays = [
+    t('timeOff.weekDays.mon'),
+    t('timeOff.weekDays.tue'),
+    t('timeOff.weekDays.wed'),
+    t('timeOff.weekDays.thu'),
+    t('timeOff.weekDays.fri'),
+    t('timeOff.weekDays.sat'),
+    t('timeOff.weekDays.sun')
+  ];
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -152,19 +166,17 @@ export function TimeOffManagement() {
     setTimeOffs(timeOffs.filter((t) => t.id !== id));
   };
 
-  const weekDays = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Urlopy i dni wolne</h2>
-          <p className="text-muted-foreground">Zarządzaj nieobecnościami pracowników</p>
+          <h2 className="text-2xl font-bold text-foreground">{t('timeOff.title')}</h2>
+          <p className="text-muted-foreground">{t('timeOff.subtitle')}</p>
         </div>
         <Button onClick={() => openDialog()} className="gap-2">
           <Plus className="w-4 h-4" />
-          Dodaj nieobecność
+          {t('timeOff.addTimeOff')}
         </Button>
       </div>
 
@@ -174,7 +186,7 @@ export function TimeOffManagement() {
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <h3 className="text-lg font-semibold text-foreground capitalize">
-          {format(currentMonth, "LLLL yyyy", { locale: pl })}
+          {format(currentMonth, "LLLL yyyy", { locale })}
         </h3>
         <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
           <ChevronRight className="w-5 h-5" />
@@ -242,7 +254,7 @@ export function TimeOffManagement() {
                     );
                   })}
                   {dayTimeOffs.length > 2 && (
-                    <div className="text-xs text-muted-foreground">+{dayTimeOffs.length - 2} więcej</div>
+                    <div className="text-xs text-muted-foreground">+{dayTimeOffs.length - 2} {t('timeOff.more')}</div>
                   )}
                 </div>
               </div>
@@ -264,12 +276,12 @@ export function TimeOffManagement() {
       {/* Time Off List */}
       <div className="bg-card rounded-xl border border-border">
         <div className="p-4 border-b border-border">
-          <h3 className="font-semibold text-foreground">Lista nieobecności</h3>
+          <h3 className="font-semibold text-foreground">{t('timeOff.absenceList')}</h3>
         </div>
         <div className="divide-y divide-border">
           {timeOffs.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
-              Brak zarejestrowanych nieobecności
+              {t('timeOff.noAbsences')}
             </div>
           ) : (
             timeOffs.map((timeOff) => {
@@ -286,8 +298,8 @@ export function TimeOffManagement() {
                     <div className="min-w-0">
                       <div className="font-medium text-foreground truncate">{timeOff.staffName}</div>
                       <div className="text-sm text-muted-foreground">
-                        {format(parseISO(timeOff.startDate), "d MMM", { locale: pl })} -{" "}
-                        {format(parseISO(timeOff.endDate), "d MMM yyyy", { locale: pl })}
+                        {format(parseISO(timeOff.startDate), "d MMM", { locale })} -{" "}
+                        {format(parseISO(timeOff.endDate), "d MMM yyyy", { locale })}
                       </div>
                     </div>
                   </div>
@@ -321,14 +333,14 @@ export function TimeOffManagement() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{editingTimeOff ? "Edytuj nieobecność" : "Dodaj nieobecność"}</DialogTitle>
+            <DialogTitle>{editingTimeOff ? t('timeOff.editTimeOff') : t('timeOff.addTimeOff')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label>Pracownik</Label>
+              <Label>{t('timeOff.employee')}</Label>
               <Select value={formData.staffId} onValueChange={(value) => setFormData({ ...formData, staffId: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Wybierz pracownika" />
+                  <SelectValue placeholder={t('timeOff.selectEmployee')} />
                 </SelectTrigger>
                 <SelectContent>
                   {mockStaff.map((staff) => (
@@ -344,7 +356,7 @@ export function TimeOffManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label>Typ nieobecności</Label>
+              <Label>{t('timeOff.absenceType')}</Label>
               <Select
                 value={formData.type}
                 onValueChange={(value) => setFormData({ ...formData, type: value as TimeOff["type"] })}
@@ -367,7 +379,7 @@ export function TimeOffManagement() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Data rozpoczęcia</Label>
+                <Label>{t('timeOff.startDate')}</Label>
                 <Input
                   type="date"
                   value={formData.startDate}
@@ -375,7 +387,7 @@ export function TimeOffManagement() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Data zakończenia</Label>
+                <Label>{t('timeOff.endDate')}</Label>
                 <Input
                   type="date"
                   value={formData.endDate}
@@ -385,24 +397,24 @@ export function TimeOffManagement() {
             </div>
 
             <div className="space-y-2">
-              <Label>Notatka (opcjonalnie)</Label>
+              <Label>{t('timeOff.note')}</Label>
               <Textarea
                 value={formData.note}
                 onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                placeholder="Dodatkowe informacje..."
+                placeholder={t('timeOff.notePlaceholder')}
                 rows={2}
               />
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-              Anuluj
+              {t('common.cancel')}
             </Button>
             <Button
               onClick={saveTimeOff}
               disabled={!formData.staffId || !formData.startDate || !formData.endDate}
             >
-              {editingTimeOff ? "Zapisz zmiany" : "Dodaj"}
+              {editingTimeOff ? t('timeOff.saveChanges') : t('common.add')}
             </Button>
           </DialogFooter>
         </DialogContent>

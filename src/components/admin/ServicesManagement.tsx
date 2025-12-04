@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,6 +51,7 @@ const mockStaff = [
 ];
 
 export function ServicesManagement() {
+  const { t } = useTranslation();
   const [services, setServices] = useState(mockServices);
   const [categories, setCategories] = useState(mockCategories);
   const [searchQuery, setSearchQuery] = useState("");
@@ -144,7 +146,7 @@ export function ServicesManagement() {
   };
 
   const getCategoryName = (categoryId: string) => {
-    return categories.find(c => c.id === categoryId)?.name || "Brak kategorii";
+    return categories.find(c => c.id === categoryId)?.name || t('services.noCategory');
   };
 
   const toggleStaffSelection = (staffId: string) => {
@@ -161,10 +163,10 @@ export function ServicesManagement() {
       {/* Categories */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-serif font-semibold">Kategorie usług</h3>
+          <h3 className="text-lg font-serif font-semibold">{t('services.categories')}</h3>
           <Button variant="outline" size="sm" className="gap-2" onClick={() => openCategoryDialog()}>
             <Plus className="w-4 h-4" />
-            Dodaj kategorię
+            {t('services.addCategory')}
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -173,7 +175,7 @@ export function ServicesManagement() {
             size="sm"
             onClick={() => setSelectedCategory(null)}
           >
-            Wszystkie
+            {t('common.all')}
           </Button>
           {categories.map(category => (
             <Button
@@ -199,12 +201,12 @@ export function ServicesManagement() {
       {/* Services list */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-serif font-semibold">Usługi ({filteredServices.length})</h3>
+          <h3 className="text-lg font-serif font-semibold">{t('services.title')} ({filteredServices.length})</h3>
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Szukaj usługi..."
+                placeholder={t('services.searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 w-[200px]"
@@ -212,11 +214,11 @@ export function ServicesManagement() {
             </div>
             <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsCSVImportOpen(true)}>
               <Upload className="w-4 h-4" />
-              Import CSV
+              {t('services.importCsv')}
             </Button>
             <Button variant="luxury" size="sm" className="gap-2" onClick={() => openServiceDialog()}>
               <Plus className="w-4 h-4" />
-              Dodaj usługę
+              {t('services.addService')}
             </Button>
           </div>
         </div>
@@ -254,7 +256,7 @@ export function ServicesManagement() {
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Clock className="w-4 h-4" />
-                {service.duration} min
+                {service.duration} {t('calendar.min')}
               </div>
               <div className="flex items-center gap-2 text-sm font-medium">
                 <Banknote className="w-4 h-4 text-accent" />
@@ -278,26 +280,26 @@ export function ServicesManagement() {
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif">
-              {editingService ? "Edytuj usługę" : "Nowa usługa"}
+              {editingService ? t('services.editService') : t('services.newService')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Nazwa usługi</Label>
+              <Label>{t('services.serviceName')}</Label>
               <Input
                 value={serviceForm.name}
                 onChange={(e) => setServiceForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="np. Peeling kawitacyjny"
+                placeholder={t('services.serviceNamePlaceholder')}
               />
             </div>
             <div>
-              <Label>Kategoria</Label>
+              <Label>{t('services.category')}</Label>
               <Select
                 value={serviceForm.category}
                 onValueChange={(value) => setServiceForm(prev => ({ ...prev, category: value }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Wybierz kategorię" />
+                  <SelectValue placeholder={t('services.selectCategory')} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map(cat => (
@@ -310,7 +312,7 @@ export function ServicesManagement() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Czas trwania (min)</Label>
+                <Label>{t('services.duration')}</Label>
                 <Input
                   type="number"
                   value={serviceForm.duration}
@@ -318,7 +320,7 @@ export function ServicesManagement() {
                 />
               </div>
               <div>
-                <Label>Cena (zł)</Label>
+                <Label>{t('services.price')}</Label>
                 <Input
                   type="number"
                   value={serviceForm.price}
@@ -327,15 +329,15 @@ export function ServicesManagement() {
               </div>
             </div>
             <div>
-              <Label>Opis</Label>
+              <Label>{t('services.description')}</Label>
               <Textarea
                 value={serviceForm.description}
                 onChange={(e) => setServiceForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Krótki opis usługi..."
+                placeholder={t('services.descriptionPlaceholder')}
               />
             </div>
             <div>
-              <Label>Personel wykonujący</Label>
+              <Label>{t('services.performingStaff')}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {mockStaff.map(staff => (
                   <Button
@@ -353,10 +355,10 @@ export function ServicesManagement() {
             <div>
               <Label className="flex items-center gap-2">
                 <Image className="w-4 h-4" />
-                Multimedia (zdjęcia i wideo)
+                {t('services.multimedia')}
               </Label>
               <p className="text-sm text-muted-foreground mb-2">
-                Dodaj zdjęcia lub wideo prezentujące usługę dla lepszego doświadczenia klientek
+                {t('services.multimediaDescription')}
               </p>
               <ServiceMediaUpload
                 media={serviceForm.media}
@@ -366,8 +368,8 @@ export function ServicesManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsServiceDialogOpen(false)}>Anuluj</Button>
-            <Button variant="luxury" onClick={saveService}>Zapisz</Button>
+            <Button variant="outline" onClick={() => setIsServiceDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button variant="luxury" onClick={saveService}>{t('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -385,20 +387,20 @@ export function ServicesManagement() {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="font-serif">
-              {editingCategory ? "Edytuj kategorię" : "Nowa kategoria"}
+              {editingCategory ? t('services.editCategory') : t('services.newCategory')}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Nazwa kategorii</Label>
+              <Label>{t('services.categoryName')}</Label>
               <Input
                 value={categoryForm.name}
                 onChange={(e) => setCategoryForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="np. Twarz"
+                placeholder={t('services.categoryNamePlaceholder')}
               />
             </div>
             <div>
-              <Label>Ikona (emoji)</Label>
+              <Label>{t('services.icon')}</Label>
               <Input
                 value={categoryForm.icon}
                 onChange={(e) => setCategoryForm(prev => ({ ...prev, icon: e.target.value }))}
@@ -407,8 +409,8 @@ export function ServicesManagement() {
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsCategoryDialogOpen(false)}>Anuluj</Button>
-            <Button variant="luxury" onClick={saveCategory}>Zapisz</Button>
+            <Button variant="outline" onClick={() => setIsCategoryDialogOpen(false)}>{t('common.cancel')}</Button>
+            <Button variant="luxury" onClick={saveCategory}>{t('common.save')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
