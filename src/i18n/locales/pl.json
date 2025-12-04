@@ -1010,6 +1010,8 @@
     "service": "Usługa",
     "specialist": "Specjalista",
     "dateTime": "Termin",
+    "selectDateTime": "Wybierz termin",
+    "findConvenientTime": "Znajdź idealną datę i godzinę wizyty",
     "data": "Dane",
     "summary": "Podsumowanie",
     "back": "Wstecz",
@@ -1021,6 +1023,47 @@
     "oftenCombinedWith": "Często łączone z tym zabiegiem:",
     "addNextTime": "Dodaj następnym razem",
     "canAddNextVisit": "{{name}} możesz dodać przy kolejnej wizycie.",
-    "clickToAddToWishlist": "Kliknij, aby dodać do listy życzeń na przyszłość"
+    "clickToAddToWishlist": "Kliknij, aby dodać do listy życzeń na przyszłość",
+    "quickPicks": {
+      "title": "⚡ Szybki wybór",
+      "nearest": "Najbliższy wolny",
+      "popular": "Najpopularniejszy",
+      "afterWork": "Po pracy",
+      "today": "Dziś",
+      "tomorrow": "Jutro"
+    },
+    "day": {
+      "today": "Dziś",
+      "tomorrow": "Jutro"
+    },
+    "selectDay": "Wybierz dzień",
+    "slots": "terminów",
+    "availability": {
+      "high": "Dużo wolnych",
+      "low": "Mało wolnych"
+    },
+    "availableSlots": "Dostępne godziny",
+    "filter": {
+      "all": "Wszystkie",
+      "morning": "Rano",
+      "afternoon": "Popołudnie",
+      "evening": "Wieczór"
+    },
+    "slot": {
+      "recommended": "Polecamy",
+      "popular": "Popularny",
+      "recommendedDesc": "Polecane terminy",
+      "popularDesc": "Popularne godziny"
+    },
+    "social": {
+      "watching": "{{count}} osoby oglądają"
+    },
+    "showAll": "Pokaż pozostałe (+{{count}})",
+    "showLess": "Pokaż mniej",
+    "orChooseManually": "lub wybierz samodzielnie",
+    "cancellationPolicy": "Rezerwacja bezpłatna. Zmiana terminu możliwa min. 24h przed wizytą.",
+    "cancellationPolicyFull": "Nieodwołane wizyty bez uprzedzenia mogą skutkować koniecznością wpłaty depozytu przy kolejnych rezerwacjach.",
+    "moreInfo": "Więcej info",
+    "greatChoice": "Świetny wybór!"
   }
 }
