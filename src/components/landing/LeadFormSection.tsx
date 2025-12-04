@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,25 +25,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CheckCircle, Loader2, Send } from "lucide-react";
 
-const formSchema = z.object({
-  first_name: z.string().min(2, "Imię musi mieć minimum 2 znaki").max(50),
-  last_name: z.string().min(2, "Nazwisko musi mieć minimum 2 znaki").max(50),
-  email: z.string().email("Podaj poprawny adres email"),
-  phone: z.string().min(9, "Podaj poprawny numer telefonu").max(15),
-  salon_name: z.string().min(2, "Nazwa salonu musi mieć minimum 2 znaki").max(100),
-  city: z.string().min(2, "Miejscowość musi mieć minimum 2 znaki").max(100),
-  team_size: z.string().min(1, "Wybierz wielkość zespołu"),
-  website_url: z.string().url("Podaj poprawny adres URL").optional().or(z.literal("")),
-  rodo_consent: z.boolean().refine((val) => val === true, {
-    message: "Musisz wyrazić zgodę na przetwarzanie danych"
-  })
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 const LeadFormSection = () => {
+  const { t } = useTranslation();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const formSchema = z.object({
+    first_name: z.string().min(2).max(50),
+    last_name: z.string().min(2).max(50),
+    email: z.string().email(),
+    phone: z.string().min(9).max(15),
+    salon_name: z.string().min(2).max(100),
+    city: z.string().min(2).max(100),
+    team_size: z.string().min(1),
+    website_url: z.string().url().optional().or(z.literal("")),
+    rodo_consent: z.boolean().refine((val) => val === true)
+  });
+
+  type FormValues = z.infer<typeof formSchema>;
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -79,10 +79,10 @@ const LeadFormSection = () => {
       if (error) throw error;
 
       setIsSubmitted(true);
-      toast.success("Dziękujemy za zgłoszenie!");
+      toast.success(t("leadForm.success"));
     } catch (error) {
       console.error("Error submitting lead:", error);
-      toast.error("Wystąpił błąd. Spróbuj ponownie.");
+      toast.error(t("settings.error"));
     } finally {
       setIsSubmitting(false);
     }
@@ -99,13 +99,12 @@ const LeadFormSection = () => {
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
             <h3 className="text-2xl font-bold text-foreground mb-4">
-              Dziękujemy!
+              {t("leadForm.success")}
             </h3>
             <p className="text-muted-foreground text-lg">
-              Skontaktujemy się z Tobą w ciągu 24 godzin. W międzyczasie możesz{" "}
               <a href="/demo" className="text-gold hover:underline">
-                wypróbować demo
-              </a>.
+                {t("demo.fullPreview")}
+              </a>
             </p>
           </div>
         </div>
@@ -120,10 +119,10 @@ const LeadFormSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Zainteresowana? Zostaw kontakt
+            {t("leadForm.title")}
           </h2>
           <p className="text-muted-foreground text-lg">
-            Oddzwonimy w ciągu 24 godzin i pomożemy Ci skonfigurować kalendarz
+            {t("leadForm.subtitle")}
           </p>
         </div>
         
@@ -136,7 +135,7 @@ const LeadFormSection = () => {
                   name="first_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Imię *</FormLabel>
+                      <FormLabel>{t("leadForm.firstName")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Anna" {...field} />
                       </FormControl>
@@ -150,7 +149,7 @@ const LeadFormSection = () => {
                   name="last_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nazwisko *</FormLabel>
+                      <FormLabel>{t("leadForm.lastName")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Kowalska" {...field} />
                       </FormControl>
@@ -166,7 +165,7 @@ const LeadFormSection = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email *</FormLabel>
+                      <FormLabel>{t("leadForm.email")} *</FormLabel>
                       <FormControl>
                         <Input type="email" placeholder="anna@salon.pl" {...field} />
                       </FormControl>
@@ -180,7 +179,7 @@ const LeadFormSection = () => {
                   name="phone"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Telefon *</FormLabel>
+                      <FormLabel>{t("leadForm.phone")} *</FormLabel>
                       <FormControl>
                         <Input type="tel" placeholder="500 123 456" {...field} />
                       </FormControl>
@@ -196,7 +195,7 @@ const LeadFormSection = () => {
                   name="salon_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nazwa salonu *</FormLabel>
+                      <FormLabel>{t("leadForm.salonName")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Studio Urody Anna" {...field} />
                       </FormControl>
@@ -210,7 +209,7 @@ const LeadFormSection = () => {
                   name="city"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Miejscowość *</FormLabel>
+                      <FormLabel>{t("leadForm.city")} *</FormLabel>
                       <FormControl>
                         <Input placeholder="Warszawa" {...field} />
                       </FormControl>
@@ -226,18 +225,18 @@ const LeadFormSection = () => {
                   name="team_size"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Wielkość zespołu *</FormLabel>
+                      <FormLabel>{t("leadForm.teamSize")} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Wybierz..." />
+                            <SelectValue placeholder={t("common.search")} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="1">Tylko ja</SelectItem>
-                          <SelectItem value="2-5">2-5 osób</SelectItem>
-                          <SelectItem value="6-10">6-10 osób</SelectItem>
-                          <SelectItem value="10+">Ponad 10 osób</SelectItem>
+                          <SelectItem value="1">{t("leadForm.teamSizeOptions.solo")}</SelectItem>
+                          <SelectItem value="2-5">{t("leadForm.teamSizeOptions.small")}</SelectItem>
+                          <SelectItem value="6-10">{t("leadForm.teamSizeOptions.medium")}</SelectItem>
+                          <SelectItem value="10+">{t("leadForm.teamSizeOptions.large")}</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -250,7 +249,7 @@ const LeadFormSection = () => {
                   name="website_url"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Link do strony/Instagram</FormLabel>
+                      <FormLabel>{t("leadForm.website")}</FormLabel>
                       <FormControl>
                         <Input placeholder="https://instagram.com/twojsalon" {...field} />
                       </FormControl>
@@ -273,8 +272,7 @@ const LeadFormSection = () => {
                     </FormControl>
                     <div className="space-y-1 leading-none">
                       <FormLabel className="text-sm font-normal text-muted-foreground">
-                        Wyrażam zgodę na przetwarzanie moich danych osobowych w celu kontaktu handlowego. 
-                        Administratorem danych jest Beauty Funnels. *
+                        {t("leadForm.consent")} *
                       </FormLabel>
                       <FormMessage />
                     </div>
@@ -291,12 +289,12 @@ const LeadFormSection = () => {
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Wysyłanie...
+                    {t("common.loading")}
                   </>
                 ) : (
                   <>
                     <Send className="mr-2 h-5 w-5" />
-                    Wyślij zgłoszenie
+                    {t("leadForm.submit")}
                   </>
                 )}
               </Button>

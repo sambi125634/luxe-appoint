@@ -1,0 +1,217 @@
+{
+  "nav": {
+    "features": "Features",
+    "howItWorks": "How it works",
+    "demo": "Demo",
+    "faq": "FAQ",
+    "bookDemo": "Book a demo"
+  },
+  "hero": {
+    "badge": "Revolution in salon management",
+    "title": "Your salon deserves a calendar that",
+    "titleHighlight": "works as hard as you do",
+    "description": "Beauty Calendar is an intelligent booking system that automates your work, eliminates empty slots, and lets you focus on what you do best.",
+    "cta": "Start for free",
+    "secondaryCta": "See demo"
+  },
+  "painPoints": {
+    "title": "Does this sound familiar?",
+    "subtitle": "Problems salon owners face every day",
+    "chaos": {
+      "title": "Calendar chaos",
+      "description": "Double bookings, scheduling mistakes, constant phone calls"
+    },
+    "noShows": {
+      "title": "No-shows and cancellations",
+      "description": "Clients don't show up and you lose money"
+    },
+    "manual": {
+      "title": "Manual management",
+      "description": "Hours spent organizing instead of working with clients"
+    },
+    "noInsights": {
+      "title": "No business insights",
+      "description": "You don't know which services are popular or how much you earn"
+    }
+  },
+  "solution": {
+    "title": "Meet Beauty Calendar",
+    "subtitle": "Everything you need to manage your salon in one place",
+    "booking": {
+      "title": "24/7 online booking",
+      "description": "Clients book appointments anytime, even while you sleep"
+    },
+    "reminders": {
+      "title": "Automatic reminders",
+      "description": "SMS and email before appointments - no more no-shows"
+    },
+    "calendar": {
+      "title": "Smart calendar",
+      "description": "Clear view, easy management, zero conflicts"
+    },
+    "reports": {
+      "title": "Reports and statistics",
+      "description": "Full insight into your business performance"
+    }
+  },
+  "howItWorks": {
+    "title": "How does it work?",
+    "subtitle": "4 simple steps to full automation",
+    "step1": {
+      "title": "Create an account",
+      "description": "Free registration in 2 minutes"
+    },
+    "step2": {
+      "title": "Configure your salon",
+      "description": "Add services, staff, and working hours"
+    },
+    "step3": {
+      "title": "Embed the calendar",
+      "description": "Paste the code on your website or share the link"
+    },
+    "step4": {
+      "title": "Accept bookings",
+      "description": "Clients book 24/7, you focus on your work"
+    }
+  },
+  "demo": {
+    "title": "Try Beauty Calendar",
+    "subtitle": "See how it works without registration",
+    "clientView": "Client view",
+    "salonView": "Salon panel",
+    "fullPreview": "Full preview"
+  },
+  "audience": {
+    "title": "Who is it for?",
+    "subtitle": "Beauty Calendar is perfect for",
+    "beautySalons": "Beauty salons",
+    "hairSalons": "Hair salons",
+    "spas": "SPA & wellness",
+    "clinics": "Aesthetic clinics",
+    "nailStudios": "Nail studios",
+    "barbershops": "Barbershops"
+  },
+  "leadForm": {
+    "title": "Book a free demo",
+    "subtitle": "Talk to us and find out how Beauty Calendar can help your salon",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "salonName": "Salon name",
+    "city": "City",
+    "teamSize": "Team size",
+    "website": "Website (optional)",
+    "consent": "I consent to the processing of my personal data in accordance with GDPR",
+    "submit": "Book a demo",
+    "success": "Thank you! We'll contact you within 24 hours.",
+    "teamSizeOptions": {
+      "solo": "Solo (1 person)",
+      "small": "2-3 people",
+      "medium": "4-6 people",
+      "large": "7+ people"
+    }
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "q1": "How much does Beauty Calendar cost?",
+    "a1": "We offer a free starter plan with basic features. Paid plans start from €12/month.",
+    "q2": "Can I try before buying?",
+    "a2": "Yes! We offer a 14-day free trial of all features.",
+    "q3": "How long does setup take?",
+    "a3": "Basic setup takes 5-10 minutes. You can start accepting bookings the same day.",
+    "q4": "Do my clients need to register?",
+    "a4": "No, clients can book appointments without creating an account.",
+    "q5": "Can I integrate with my website?",
+    "a5": "Yes, you get an embed code for your website and a direct link to share.",
+    "q6": "Is my data secure?",
+    "a6": "Yes, we use the highest security and encryption standards compliant with GDPR."
+  },
+  "finalCta": {
+    "title": "Ready for a change?",
+    "subtitle": "Join hundreds of salons already using Beauty Calendar",
+    "cta": "Start now"
+  },
+  "footer": {
+    "description": "Intelligent booking system for beauty salons",
+    "product": "Product",
+    "company": "Company",
+    "legal": "Legal",
+    "features": "Features",
+    "pricing": "Pricing",
+    "demo": "Demo",
+    "about": "About us",
+    "contact": "Contact",
+    "blog": "Blog",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "cookies": "Cookies",
+    "rights": "All rights reserved"
+  },
+  "auth": {
+    "welcome": "Welcome!",
+    "loginOrSignup": "Sign in or create a new account to manage your salon",
+    "login": "Login",
+    "signup": "Sign up",
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "loginButton": "Sign in",
+    "signupButton": "Sign up",
+    "loggingIn": "Signing in...",
+    "signingUp": "Signing up...",
+    "loginSuccess": "Successfully logged in!",
+    "signupSuccess": "Account created! Check your email to confirm registration.",
+    "loginError": "Login error",
+    "signupError": "Registration error"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "calendar": "Calendar",
+    "staff": "Staff",
+    "services": "Services",
+    "clients": "Clients",
+    "reports": "Reports",
+    "conversations": "Conversations",
+    "pipeline": "Pipeline",
+    "widgets": "Widgets",
+    "settings": "Settings",
+    "logout": "Logout",
+    "profile": "Salon profile",
+    "loading": "Loading..."
+  },
+  "settings": {
+    "salonProfile": "Salon profile",
+    "bookingSettings": "Booking settings",
+    "notifications": "Notifications",
+    "integrations": "Integrations",
+    "salonName": "Salon name",
+    "address": "Address",
+    "city": "City",
+    "phone": "Phone",
+    "email": "Email",
+    "description": "Salon description",
+    "primaryColor": "Primary color",
+    "secondaryColor": "Secondary color",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saved": "Saved successfully",
+    "error": "An error occurred"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "back": "Back",
+    "next": "Next",
+    "confirm": "Confirm",
+    "close": "Close"
+  }
+}

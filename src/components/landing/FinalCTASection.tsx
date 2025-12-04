@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, Sparkles } from "lucide-react";
 
@@ -6,6 +7,8 @@ interface FinalCTASectionProps {
 }
 
 const FinalCTASection = ({ onScrollToForm }: FinalCTASectionProps) => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background */}
@@ -16,16 +19,15 @@ const FinalCTASection = ({ onScrollToForm }: FinalCTASectionProps) => {
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 mb-8">
             <Sparkles className="w-4 h-4 text-gold" />
-            <span className="text-sm font-medium text-white/90">Dołącz do salonów, które przestały walczyć z chaosem</span>
+            <span className="text-sm font-medium text-white/90">{t("finalCta.subtitle")}</span>
           </div>
           
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6">
-            Gotowa na kalendarz, który{" "}
-            <span className="text-gold">wreszcie działa?</span>
+            {t("finalCta.title")}
           </h2>
           
           <p className="text-lg text-white/80 mb-10 max-w-xl mx-auto">
-            Skonfiguruj swój salon w 10 minut i zacznij przyjmować rezerwacje 24/7 – bez telefonów, bez chaosu, bez stresu.
+            {t("hero.description")}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -35,7 +37,7 @@ const FinalCTASection = ({ onScrollToForm }: FinalCTASectionProps) => {
               onClick={() => window.location.href = '/demo'}
             >
               <Calendar className="mr-2 h-5 w-5" />
-              Wypróbuj demo
+              {t("hero.secondaryCta")}
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             
@@ -45,7 +47,7 @@ const FinalCTASection = ({ onScrollToForm }: FinalCTASectionProps) => {
               className="border-2 border-white/30 bg-white/10 hover:bg-white/20 text-white px-8 py-6 text-lg"
               onClick={onScrollToForm}
             >
-              Zostaw kontakt
+              {t("nav.bookDemo")}
             </Button>
           </div>
         </div>

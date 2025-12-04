@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,20 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Loader2, Sparkles } from "lucide-react";
 import { z } from "zod";
-
-const loginSchema = z.object({
-  email: z.string().trim().email("Nieprawidłowy adres email"),
-  password: z.string().min(6, "Hasło musi mieć co najmniej 6 znaków"),
-});
-
-const signupSchema = z.object({
-  email: z.string().trim().email("Nieprawidłowy adres email"),
-  password: z.string().min(6, "Hasło musi mieć co najmniej 6 znaków"),
-  firstName: z.string().trim().min(2, "Imię musi mieć co najmniej 2 znaki").max(50),
-  lastName: z.string().trim().min(2, "Nazwisko musi mieć co najmniej 2 znaki").max(50),
-});
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function AuthPage() {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
@@ -36,6 +27,18 @@ export default function AuthPage() {
   const [signupPassword, setSignupPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+
+  const loginSchema = z.object({
+    email: z.string().trim().email(t("auth.loginError")),
+    password: z.string().min(6, t("auth.loginError")),
+  });
+
+  const signupSchema = z.object({
+    email: z.string().trim().email(t("auth.signupError")),
+    password: z.string().min(6, t("auth.signupError")),
+    firstName: z.string().trim().min(2, t("auth.signupError")).max(50),
+    lastName: z.string().trim().min(2, t("auth.signupError")).max(50),
+  });
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -74,13 +77,9 @@ export default function AuthPage() {
     });
 
     if (error) {
-      if (error.message.includes("Invalid login credentials")) {
-        toast.error("Nieprawidłowy email lub hasło");
-      } else if (error.message.includes("Email not confirmed")) {
-        toast.error("Email nie został potwierdzony");
-      } else {
-        toast.error("Błąd logowania: " + error.message);
-      }
+      toast.error(t("auth.loginError"));
+    } else {
+      toast.success(t("auth.loginSuccess"));
     }
     
     setIsLoading(false);
@@ -118,13 +117,9 @@ export default function AuthPage() {
     });
 
     if (error) {
-      if (error.message.includes("User already registered")) {
-        toast.error("Ten email jest już zarejestrowany");
-      } else {
-        toast.error("Błąd rejestracji: " + error.message);
-      }
+      toast.error(t("auth.signupError"));
     } else {
-      toast.success("Konto utworzone! Możesz się teraz zalogować.");
+      toast.success(t("auth.signupSuccess"));
     }
     
     setIsLoading(false);
@@ -140,26 +135,29 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md border-border/50 shadow-xl">
+      <Card className="w-full max-w-md border-border/50 shadow-xl relative">
+        <div className="absolute top-4 right-4">
+          <LanguageSwitcher variant="compact" />
+        </div>
         <CardHeader className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-2">
             <Sparkles className="w-8 h-8 text-primary" />
             <span className="font-serif text-2xl font-bold text-foreground">Beauty Calendar</span>
           </div>
-          <CardTitle className="font-serif text-xl">Witaj!</CardTitle>
-          <CardDescription>Zaloguj się lub utwórz nowe konto</CardDescription>
+          <CardTitle className="font-serif text-xl">{t("auth.welcome")}</CardTitle>
+          <CardDescription>{t("auth.loginOrSignup")}</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Logowanie</TabsTrigger>
-              <TabsTrigger value="signup">Rejestracja</TabsTrigger>
+              <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
+              <TabsTrigger value="signup">{t("auth.signup")}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">{t("auth.email")}</Label>
                   <Input
                     id="login-email"
                     type="email"
@@ -171,7 +169,7 @@ export default function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Hasło</Label>
+                  <Label htmlFor="login-password">{t("auth.password")}</Label>
                   <Input
                     id="login-password"
                     type="password"
@@ -186,10 +184,10 @@ export default function AuthPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Logowanie...
+                      {t("auth.loggingIn")}
                     </>
                   ) : (
-                    "Zaloguj się"
+                    t("auth.loginButton")
                   )}
                 </Button>
               </form>
@@ -199,7 +197,7 @@ export default function AuthPage() {
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first-name">Imię</Label>
+                    <Label htmlFor="first-name">{t("auth.firstName")}</Label>
                     <Input
                       id="first-name"
                       placeholder="Anna"
@@ -210,7 +208,7 @@ export default function AuthPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="last-name">Nazwisko</Label>
+                    <Label htmlFor="last-name">{t("auth.lastName")}</Label>
                     <Input
                       id="last-name"
                       placeholder="Kowalska"
@@ -222,7 +220,7 @@ export default function AuthPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t("auth.email")}</Label>
                   <Input
                     id="signup-email"
                     type="email"
@@ -234,7 +232,7 @@ export default function AuthPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Hasło</Label>
+                  <Label htmlFor="signup-password">{t("auth.password")}</Label>
                   <Input
                     id="signup-password"
                     type="password"
@@ -249,10 +247,10 @@ export default function AuthPage() {
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Rejestracja...
+                      {t("auth.signingUp")}
                     </>
                   ) : (
-                    "Utwórz konto"
+                    t("auth.signupButton")
                   )}
                 </Button>
               </form>

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Calendar, ArrowRight, Sparkles } from "lucide-react";
 
@@ -6,6 +7,8 @@ interface HeroSectionProps {
 }
 
 const HeroSection = ({ onScrollToForm }: HeroSectionProps) => {
+  const { t } = useTranslation();
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background gradient */}
@@ -20,19 +23,18 @@ const HeroSection = ({ onScrollToForm }: HeroSectionProps) => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 mb-8 animate-fade-in">
             <Sparkles className="w-4 h-4 text-gold" />
-            <span className="text-sm font-medium text-gold">Rewolucja w zarządzaniu salonem</span>
+            <span className="text-sm font-medium text-gold">{t("hero.badge")}</span>
           </div>
           
           {/* Main headline */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 animate-fade-in leading-tight">
-            Twój salon zasługuje na kalendarz, który{" "}
-            <span className="text-gradient-luxury">pracuje tak ciężko jak Ty</span>
+            {t("hero.title")}{" "}
+            <span className="text-gradient-luxury">{t("hero.titleHighlight")}</span>
           </h1>
           
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto animate-fade-in leading-relaxed">
-            Koniec z chaosem w rezerwacjach, telefonami w środku zabiegu i pustymi slotami w grafiku. 
-            Beauty Calendar to pierwszy system stworzony przez właścicieli salonów – dla właścicieli salonów.
+            {t("hero.description")}
           </p>
           
           {/* CTAs */}
@@ -43,7 +45,7 @@ const HeroSection = ({ onScrollToForm }: HeroSectionProps) => {
               onClick={() => window.location.href = '/demo'}
             >
               <Calendar className="mr-2 h-5 w-5" />
-              Wypróbuj demo za darmo
+              {t("hero.secondaryCta")}
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             
@@ -53,7 +55,7 @@ const HeroSection = ({ onScrollToForm }: HeroSectionProps) => {
               className="border-2 border-gold/30 hover:bg-gold/10 px-8 py-6 text-lg"
               onClick={onScrollToForm}
             >
-              Zostaw kontakt – oddzwonimy
+              {t("hero.cta")}
             </Button>
           </div>
           
@@ -61,15 +63,11 @@ const HeroSection = ({ onScrollToForm }: HeroSectionProps) => {
           <div className="mt-12 flex flex-wrap justify-center gap-8 text-muted-foreground animate-fade-in">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm">Bez zobowiązań</span>
+              <span className="text-sm">{t("hero.badge")}</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm">Konfiguracja w 10 minut</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-green-500" />
-              <span className="text-sm">Wsparcie na każdym etapie</span>
+              <span className="text-sm">{t("howItWorks.step3.description")}</span>
             </div>
           </div>
         </div>

@@ -1,39 +1,42 @@
+import { useTranslation } from "react-i18next";
 import { Phone, Calendar, Ghost, Frown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-const painPoints = [
-  {
-    icon: Phone,
-    title: "Telefony w środku zabiegu",
-    description: "Klientka dzwoni, żeby się umówić, ale Ty masz ręce w parafinie. Albo odbierasz i tracisz flow, albo nie odbierasz i tracisz klientkę."
-  },
-  {
-    icon: Calendar,
-    title: "Chaos w grafiku",
-    description: "Jeden zeszyt, dwa telefony, trzy karteczki samoprzylepne. I nagle okazuje się, że dwie klientki są umówione na tę samą godzinę."
-  },
-  {
-    icon: Ghost,
-    title: "No-showy i puste sloty",
-    description: "Klientka nie przyszła, nie odwołała, a Ty siedzisz z pustym fotelem i czekasz. Pieniądze uciekają."
-  },
-  {
-    icon: Frown,
-    title: "Skomplikowane systemy",
-    description: "Booksy? Fresha? Piękne w reklamie, ale żeby ustawić grafik na wakacje, trzeba mieć dyplom inżyniera."
-  }
-];
-
 const PainPointsSection = () => {
+  const { t } = useTranslation();
+
+  const painPoints = [
+    {
+      icon: Phone,
+      title: t("painPoints.chaos.title"),
+      description: t("painPoints.chaos.description")
+    },
+    {
+      icon: Calendar,
+      title: t("painPoints.noShows.title"),
+      description: t("painPoints.noShows.description")
+    },
+    {
+      icon: Ghost,
+      title: t("painPoints.manual.title"),
+      description: t("painPoints.manual.description")
+    },
+    {
+      icon: Frown,
+      title: t("painPoints.noInsights.title"),
+      description: t("painPoints.noInsights.description")
+    }
+  ];
+
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Znasz to uczucie?
+            {t("painPoints.title")}
           </h2>
           <p className="text-muted-foreground text-lg">
-            Nie jesteś sama. 87% właścicielek salonów boryka się z tymi samymi problemami.
+            {t("painPoints.subtitle")}
           </p>
         </div>
         

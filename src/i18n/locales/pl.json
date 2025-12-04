@@ -1,0 +1,217 @@
+{
+  "nav": {
+    "features": "Funkcje",
+    "howItWorks": "Jak to działa",
+    "demo": "Demo",
+    "faq": "FAQ",
+    "bookDemo": "Umów prezentację"
+  },
+  "hero": {
+    "badge": "Rewolucja w zarządzaniu salonem",
+    "title": "Twój salon zasługuje na kalendarz, który",
+    "titleHighlight": "pracuje tak ciężko jak Ty",
+    "description": "Beauty Calendar to inteligentny system rezerwacji, który automatyzuje Twoją pracę, eliminuje puste terminy i pozwala Ci skupić się na tym, co robisz najlepiej.",
+    "cta": "Rozpocznij za darmo",
+    "secondaryCta": "Zobacz demo"
+  },
+  "painPoints": {
+    "title": "Czy to brzmi znajomo?",
+    "subtitle": "Problemy, z którymi mierzą się właściciele salonów każdego dnia",
+    "chaos": {
+      "title": "Chaos w kalendarzu",
+      "description": "Podwójne rezerwacje, pomyłki w terminach, ciągłe telefony"
+    },
+    "noShows": {
+      "title": "No-shows i odwołania",
+      "description": "Klienci nie przychodzą, a Ty tracisz pieniądze"
+    },
+    "manual": {
+      "title": "Ręczne zarządzanie",
+      "description": "Godziny spędzone na organizacji zamiast na pracy z klientami"
+    },
+    "noInsights": {
+      "title": "Brak wglądu w biznes",
+      "description": "Nie wiesz, które usługi są najpopularniejsze ani ile zarabiasz"
+    }
+  },
+  "solution": {
+    "title": "Poznaj Beauty Calendar",
+    "subtitle": "Wszystko, czego potrzebujesz do zarządzania salonem w jednym miejscu",
+    "booking": {
+      "title": "Rezerwacje online 24/7",
+      "description": "Klienci rezerwują wizyty o każdej porze, nawet gdy śpisz"
+    },
+    "reminders": {
+      "title": "Automatyczne przypomnienia",
+      "description": "SMS i email przed wizytą - koniec z no-shows"
+    },
+    "calendar": {
+      "title": "Inteligentny kalendarz",
+      "description": "Przejrzysty widok, łatwe zarządzanie, zero konfliktów"
+    },
+    "reports": {
+      "title": "Raporty i statystyki",
+      "description": "Pełny wgląd w wyniki Twojego biznesu"
+    }
+  },
+  "howItWorks": {
+    "title": "Jak to działa?",
+    "subtitle": "W 4 prostych krokach do pełnej automatyzacji",
+    "step1": {
+      "title": "Załóż konto",
+      "description": "Bezpłatna rejestracja w 2 minuty"
+    },
+    "step2": {
+      "title": "Skonfiguruj salon",
+      "description": "Dodaj usługi, personel i godziny pracy"
+    },
+    "step3": {
+      "title": "Osadź kalendarz",
+      "description": "Wklej kod na swoją stronę lub udostępnij link"
+    },
+    "step4": {
+      "title": "Przyjmuj rezerwacje",
+      "description": "Klienci rezerwują 24/7, Ty się skupiasz na pracy"
+    }
+  },
+  "demo": {
+    "title": "Wypróbuj Beauty Calendar",
+    "subtitle": "Zobacz jak to działa bez rejestracji",
+    "clientView": "Widok klientki",
+    "salonView": "Panel salonu",
+    "fullPreview": "Pełny podgląd"
+  },
+  "audience": {
+    "title": "Dla kogo?",
+    "subtitle": "Beauty Calendar jest idealny dla",
+    "beautySalons": "Salony kosmetyczne",
+    "hairSalons": "Salony fryzjerskie",
+    "spas": "SPA i wellness",
+    "clinics": "Kliniki estetyczne",
+    "nailStudios": "Studia paznokci",
+    "barbershops": "Barbershopy"
+  },
+  "leadForm": {
+    "title": "Umów bezpłatną prezentację",
+    "subtitle": "Porozmawiaj z nami i dowiedz się, jak Beauty Calendar może pomóc Twojemu salonowi",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "email": "Email",
+    "phone": "Telefon",
+    "salonName": "Nazwa salonu",
+    "city": "Miasto",
+    "teamSize": "Liczba stanowisk",
+    "website": "Strona WWW (opcjonalnie)",
+    "consent": "Wyrażam zgodę na przetwarzanie moich danych osobowych zgodnie z RODO",
+    "submit": "Umów prezentację",
+    "success": "Dziękujemy! Skontaktujemy się z Tobą w ciągu 24 godzin.",
+    "teamSizeOptions": {
+      "solo": "Solo (1 osoba)",
+      "small": "2-3 osoby",
+      "medium": "4-6 osób",
+      "large": "7+ osób"
+    }
+  },
+  "faq": {
+    "title": "Często zadawane pytania",
+    "q1": "Ile kosztuje Beauty Calendar?",
+    "a1": "Oferujemy bezpłatny plan startowy z podstawowymi funkcjami. Płatne plany zaczynają się od 49 zł/miesiąc.",
+    "q2": "Czy mogę przetestować przed zakupem?",
+    "a2": "Tak! Oferujemy 14-dniowy bezpłatny okres próbny wszystkich funkcji.",
+    "q3": "Jak długo trwa konfiguracja?",
+    "a3": "Podstawowa konfiguracja zajmuje 5-10 minut. Możesz zacząć przyjmować rezerwacje tego samego dnia.",
+    "q4": "Czy moi klienci muszą się rejestrować?",
+    "a4": "Nie, klienci mogą rezerwować wizyty bez zakładania konta.",
+    "q5": "Czy mogę integrować z moją stroną?",
+    "a5": "Tak, dostajesz kod do osadzenia na stronie oraz bezpośredni link do udostępnienia.",
+    "q6": "Czy dane są bezpieczne?",
+    "a6": "Tak, stosujemy najwyższe standardy bezpieczeństwa i szyfrowania danych zgodne z RODO."
+  },
+  "finalCta": {
+    "title": "Gotowy na zmianę?",
+    "subtitle": "Dołącz do setek salonów, które już korzystają z Beauty Calendar",
+    "cta": "Rozpocznij teraz"
+  },
+  "footer": {
+    "description": "Inteligentny system rezerwacji dla salonów beauty",
+    "product": "Produkt",
+    "company": "Firma",
+    "legal": "Prawne",
+    "features": "Funkcje",
+    "pricing": "Cennik",
+    "demo": "Demo",
+    "about": "O nas",
+    "contact": "Kontakt",
+    "blog": "Blog",
+    "privacy": "Polityka prywatności",
+    "terms": "Regulamin",
+    "cookies": "Cookies",
+    "rights": "Wszelkie prawa zastrzeżone"
+  },
+  "auth": {
+    "welcome": "Witaj!",
+    "loginOrSignup": "Zaloguj się lub utwórz nowe konto, aby zarządzać swoim salonem",
+    "login": "Logowanie",
+    "signup": "Rejestracja",
+    "email": "Email",
+    "password": "Hasło",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "loginButton": "Zaloguj się",
+    "signupButton": "Zarejestruj się",
+    "loggingIn": "Logowanie...",
+    "signingUp": "Rejestracja...",
+    "loginSuccess": "Zalogowano pomyślnie!",
+    "signupSuccess": "Konto utworzone! Sprawdź email, aby potwierdzić rejestrację.",
+    "loginError": "Błąd logowania",
+    "signupError": "Błąd rejestracji"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "calendar": "Kalendarz",
+    "staff": "Zespół",
+    "services": "Usługi",
+    "clients": "Klienci",
+    "reports": "Raporty",
+    "conversations": "Konwersacje",
+    "pipeline": "Pipeline",
+    "widgets": "Widgety",
+    "settings": "Ustawienia",
+    "logout": "Wyloguj",
+    "profile": "Profil salonu",
+    "loading": "Ładowanie..."
+  },
+  "settings": {
+    "salonProfile": "Profil salonu",
+    "bookingSettings": "Ustawienia rezerwacji",
+    "notifications": "Powiadomienia",
+    "integrations": "Integracje",
+    "salonName": "Nazwa salonu",
+    "address": "Adres",
+    "city": "Miasto",
+    "phone": "Telefon",
+    "email": "Email",
+    "description": "Opis salonu",
+    "primaryColor": "Kolor główny",
+    "secondaryColor": "Kolor dodatkowy",
+    "save": "Zapisz zmiany",
+    "saving": "Zapisywanie...",
+    "saved": "Zapisano pomyślnie",
+    "error": "Wystąpił błąd"
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "save": "Zapisz",
+    "cancel": "Anuluj",
+    "delete": "Usuń",
+    "edit": "Edytuj",
+    "add": "Dodaj",
+    "search": "Szukaj",
+    "filter": "Filtruj",
+    "export": "Eksportuj",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "confirm": "Potwierdź",
+    "close": "Zamknij"
+  }
+}

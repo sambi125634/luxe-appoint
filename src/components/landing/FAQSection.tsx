@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   Accordion,
   AccordionContent,
@@ -5,40 +6,24 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const faqs = [
-  {
-    question: "Czy Beauty Calendar jest darmowe?",
-    answer: "Tak! Podstawowa wersja jest całkowicie bezpłatna. Wystarczy zostawić kontakt, a my skontaktujemy się z Tobą osobiście i pomożemy skonfigurować kalendarz."
-  },
-  {
-    question: "Czy muszę mieć stronę internetową?",
-    answer: "Nie. Możesz udostępniać link do rezerwacji bezpośrednio na Instagramie, Facebooku lub w wiadomościach do klientek. Widget działa samodzielnie i nie wymaga strony www."
-  },
-  {
-    question: "Jak długo trwa konfiguracja?",
-    answer: "Większość salonów jest gotowa w 10-15 minut. Przeprowadzimy Cię przez cały proces podczas rozmowy – od dodania usług po osadzenie widgetu na stronie."
-  },
-  {
-    question: "Czy moje dane są bezpieczne?",
-    answer: "Absolutnie. Używamy szyfrowania klasy bankowej i nie udostępniamy danych osobom trzecim. Twoje dane i dane Twoich klientek są w pełni chronione."
-  },
-  {
-    question: "Co jeśli mam pytania podczas konfiguracji?",
-    answer: "Jesteśmy dostępni na czacie i telefonie. Pomagamy na każdym etapie – od pierwszej konfiguracji po codzienne używanie systemu."
-  },
-  {
-    question: "Czy mogę zrezygnować w dowolnym momencie?",
-    answer: "Oczywiście. Bez żadnych umów, zobowiązań i ukrytych opłat. Możesz zrezygnować w dowolnej chwili bez podawania przyczyny."
-  }
-];
-
 const FAQSection = () => {
+  const { t } = useTranslation();
+
+  const faqs = [
+    { question: t("faq.q1"), answer: t("faq.a1") },
+    { question: t("faq.q2"), answer: t("faq.a2") },
+    { question: t("faq.q3"), answer: t("faq.a3") },
+    { question: t("faq.q4"), answer: t("faq.a4") },
+    { question: t("faq.q5"), answer: t("faq.a5") },
+    { question: t("faq.q6"), answer: t("faq.a6") },
+  ];
+
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Najczęściej zadawane pytania
+            {t("faq.title")}
           </h2>
         </div>
         

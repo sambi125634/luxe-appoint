@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Calendar } from "lucide-react";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 interface LandingNavbarProps {
   onScrollToForm: () => void;
 }
 
 const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -48,45 +51,49 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               onClick={() => scrollToSection("features")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Funkcje
+              {t("nav.features")}
             </button>
             <button 
               onClick={() => scrollToSection("how-it-works")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Jak to działa
+              {t("nav.howItWorks")}
             </button>
             <button 
               onClick={() => scrollToSection("demo-preview")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              Demo
+              {t("nav.demo")}
             </button>
             <button 
               onClick={() => scrollToSection("faq")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              FAQ
+              {t("nav.faq")}
             </button>
           </div>
           
-          {/* CTA */}
-          <div className="hidden md:block">
+          {/* CTA + Language Switcher */}
+          <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             <Button 
               onClick={onScrollToForm}
               className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white"
             >
-              Umów prezentację
+              {t("nav.bookDemo")}
             </Button>
           </div>
           
           {/* Mobile menu button */}
-          <button 
-            className="md:hidden text-foreground p-2"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher variant="compact" />
+            <button 
+              className="text-foreground p-2"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
         
         {/* Mobile menu */}
@@ -97,25 +104,25 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
                 onClick={() => scrollToSection("features")}
                 className="text-left text-muted-foreground hover:text-foreground py-2"
               >
-                Funkcje
+                {t("nav.features")}
               </button>
               <button 
                 onClick={() => scrollToSection("how-it-works")}
                 className="text-left text-muted-foreground hover:text-foreground py-2"
               >
-                Jak to działa
+                {t("nav.howItWorks")}
               </button>
               <button 
                 onClick={() => scrollToSection("demo-preview")}
                 className="text-left text-muted-foreground hover:text-foreground py-2"
               >
-                Demo
+                {t("nav.demo")}
               </button>
               <button 
                 onClick={() => scrollToSection("faq")}
                 className="text-left text-muted-foreground hover:text-foreground py-2"
               >
-                FAQ
+                {t("nav.faq")}
               </button>
               <Button 
                 onClick={() => {
@@ -124,7 +131,7 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
                 }}
                 className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2"
               >
-                Umów prezentację
+                {t("nav.bookDemo")}
               </Button>
             </div>
           </div>
