@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft, Phone, Mail, MoreVertical, Send, Paperclip, Smile } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,20 +32,20 @@ function formatTime(date: Date): string {
   return date.toLocaleTimeString("pl-PL", { hour: "2-digit", minute: "2-digit" });
 }
 
-function formatDate(date: Date): string {
+function formatDate(date: Date, t: (key: string) => string): string {
   const today = new Date();
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
 
   if (date.toDateString() === today.toDateString()) {
-    return "Dzisiaj";
+    return t('conversations.today');
   } else if (date.toDateString() === yesterday.toDateString()) {
-    return "Wczoraj";
+    return t('conversations.yesterday');
   }
   return date.toLocaleDateString("pl-PL", { day: "numeric", month: "long" });
 }
 
-function groupMessagesByDate(messages: Message[]): { date: string; messages: Message[] }[] {
+function groupMessagesByDate(messages: Message[], t: (key: string) => string): { date: string; messages: Message[] }[] {
   const groups: { [key: string]: Message[] } = {};
   
   messages.forEach((message) => {
@@ -56,7 +57,7 @@ function groupMessagesByDate(messages: Message[]): { date: string; messages: Mes
   });
 
   return Object.entries(groups).map(([dateKey, msgs]) => ({
-    date: formatDate(new Date(dateKey)),
+    date: formatDate(new Date(dateKey), t),
     messages: msgs.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime()),
   }));
 }
@@ -67,10 +68,11 @@ export function ConversationView({
   onSendMessage,
   onBack,
 }: ConversationViewProps) {
+  const { t } = useTranslation();
   const [newMessage, setNewMessage] = useState("");
   const [messageType, setMessageType] = useState<"SMS" | "Email" | "WhatsApp">("SMS");
 
-  const groupedMessages = groupMessagesByDate(messages);
+  const groupedMessages = groupMessagesByDate(messages, t);
 
   const handleSend = () => {
     if (newMessage.trim()) {
@@ -127,10 +129,10 @@ export function ConversationView({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Zobacz profil w GHL</DropdownMenuItem>
-              <DropdownMenuItem>Dodaj notatkę</DropdownMenuItem>
-              <DropdownMenuItem>Utwórz wizytę</DropdownMenuItem>
-              <DropdownMenuItem className="text-destructive">Zablokuj kontakt</DropdownMenuItem>
+              <DropdownMenuItem>{t('conversations.viewProfileInGHL')}</DropdownMenuItem>
+              <DropdownMenuItem>{t('conversations.addNote')}</DropdownMenuItem>
+              <DropdownMenuItem>{t('conversations.createAppointment')}</DropdownMenuItem>
+              <DropdownMenuItem className="text-destructive">{t('conversations.blockContact')}</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -221,7 +223,7 @@ export function ConversationView({
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Napisz wiadomość..."
+              placeholder={t('conversations.writeMessage')}
               className="min-h-[44px] max-h-32 resize-none pr-20 bg-muted/50 border-0"
               rows={1}
             />
@@ -244,7 +246,7 @@ export function ConversationView({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          Wiadomości są wysyłane przez GoHighLevel
+          {t('conversations.messagesSentViaGHL')}
         </p>
       </div>
     </>

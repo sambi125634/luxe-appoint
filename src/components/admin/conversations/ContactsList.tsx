@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Search, RefreshCw, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ interface ContactsListProps {
   onSearchChange: (query: string) => void;
 }
 
-function formatTimeAgo(date?: Date): string {
+function formatTimeAgo(date?: Date, t?: (key: string) => string): string {
   if (!date) return "";
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -22,11 +23,11 @@ function formatTimeAgo(date?: Date): string {
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffMins < 1) return "teraz";
-  if (diffMins < 60) return `${diffMins} min`;
-  if (diffHours < 24) return `${diffHours} godz.`;
-  if (diffDays === 1) return "wczoraj";
-  return `${diffDays} dni`;
+  if (diffMins < 1) return t ? t('conversations.now') : "now";
+  if (diffMins < 60) return `${diffMins} ${t ? t('conversations.min') : 'min'}`;
+  if (diffHours < 24) return `${diffHours} ${t ? t('conversations.hours') : 'hrs'}`;
+  if (diffDays === 1) return t ? t('conversations.yesterday') : "yesterday";
+  return `${diffDays} ${t ? t('conversations.daysAgo') : 'days'}`;
 }
 
 function getInitials(firstName: string, lastName: string): string {
@@ -40,12 +41,14 @@ export function ContactsList({
   searchQuery,
   onSearchChange,
 }: ContactsListProps) {
+  const { t } = useTranslation();
+  
   return (
     <>
       {/* Header */}
       <div className="p-4 border-b border-border space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-serif text-lg font-semibold">Konwersacje</h2>
+          <h2 className="font-serif text-lg font-semibold">{t('conversations.title')}</h2>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <RefreshCw className="w-4 h-4" />
@@ -58,7 +61,7 @@ export function ContactsList({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Szukaj kontaktu..."
+            placeholder={t('conversations.searchContact')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-9 bg-muted/50 border-0"
@@ -101,14 +104,14 @@ export function ContactsList({
                       {contact.firstName} {contact.lastName}
                     </span>
                     <span className="text-xs text-muted-foreground flex-shrink-0">
-                      {formatTimeAgo(contact.lastMessageAt)}
+                      {formatTimeAgo(contact.lastMessageAt, t)}
                     </span>
                   </div>
                   <p className={cn(
                     "text-sm truncate",
                     contact.unreadCount > 0 ? "text-foreground font-medium" : "text-muted-foreground"
                   )}>
-                    {contact.lastMessagePreview || "Brak wiadomości"}
+                    {contact.lastMessagePreview || t('conversations.noMessages')}
                   </p>
                   {contact.tags.length > 0 && (
                     <div className="flex gap-1 mt-2 flex-wrap">
@@ -138,7 +141,7 @@ export function ContactsList({
       {/* Demo notice */}
       <div className="p-3 border-t border-border bg-muted/30">
         <p className="text-xs text-center text-muted-foreground">
-          🔗 Demo: Wiadomości zsynchronizowane z GoHighLevel
+          🔗 {t('conversations.demoSyncNote')}
         </p>
       </div>
     </>
