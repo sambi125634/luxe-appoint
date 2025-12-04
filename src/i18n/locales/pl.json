@@ -7,12 +7,14 @@
     "bookDemo": "Umów prezentację"
   },
   "hero": {
-    "badge": "Rewolucja w zarządzaniu salonem",
-    "title": "Twój salon zasługuje na kalendarz, który",
-    "titleHighlight": "pracuje tak ciężko jak Ty",
-    "description": "Beauty Calendar to inteligentny system rezerwacji, który automatyzuje Twoją pracę, eliminuje puste terminy i pozwala Ci skupić się na tym, co robisz najlepiej.",
-    "cta": "Rozpocznij za darmo",
-    "secondaryCta": "Zobacz demo"
+    "badge": "#1 System rezerwacji dla salonów beauty",
+    "title": "Skończ z telefonami.",
+    "titleHighlight": "Zacznij zarabiać.",
+    "description": "Klientki rezerwują 24/7, automatyczne przypomnienia eliminują no-showy, a Ty wreszcie skupiasz się na zabiegach – nie na kalendarzu.",
+    "cta": "Chcę pełny grafik",
+    "secondaryCta": "Zobacz jak to działa",
+    "trustBadge1": "Bez karty kredytowej",
+    "trustBadge2": "Gotowe w 5 minut"
   },
   "painPoints": {
     "title": "Ile kosztuje Cię chaos?",
