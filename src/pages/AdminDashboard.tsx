@@ -11,6 +11,7 @@ import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
 import { StatsModule } from "@/components/admin/StatsModule";
+import { ConversationsModule } from "@/components/admin/conversations/ConversationsModule";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,6 +22,7 @@ export default function AdminDashboard() {
       case "home": return "Dashboard";
       case "calendar": return "Kalendarz";
       case "clients": return "Klienci";
+      case "conversations": return "Konwersacje";
       case "staff": return "Personel";
       case "services": return "Usługi";
       case "time-off": return "Urlopy i dni wolne";
@@ -38,6 +40,8 @@ export default function AdminDashboard() {
         return <WeeklyCalendar />;
       case "clients":
         return <ClientsManagement />;
+      case "conversations":
+        return <ConversationsModule />;
       case "services":
         return <ServicesManagement />;
       case "staff":
