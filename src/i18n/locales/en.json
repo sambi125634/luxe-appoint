@@ -62,22 +62,32 @@
   },
   "howItWorks": {
     "title": "How does it work?",
-    "subtitle": "4 simple steps to full automation",
+    "subtitle": "From zero to a full schedule in one day. No IT, no stress.",
+    "badge": "Ready in 10 minutes",
     "step1": {
       "title": "Create an account",
-      "description": "Free registration in 2 minutes"
+      "description": "Enter email and password – that's it. No credit card, no commitments. In 2 minutes you have access to the full system.",
+      "highlight": "2 minutes"
     },
     "step2": {
       "title": "Configure your salon",
-      "description": "Add services, staff, and working hours"
+      "description": "Add your services, staff and working hours. Excel import? Sure. You can also copy from another system.",
+      "highlight": "CSV import"
     },
     "step3": {
       "title": "Embed the calendar",
-      "description": "Paste the code on your website or share the link"
+      "description": "Paste one code on your site or just send a link to clients. Works on any site – WordPress, Wix, or custom.",
+      "highlight": "One code"
     },
     "step4": {
       "title": "Accept bookings",
-      "description": "Clients book 24/7, you focus on your work"
+      "description": "Clients book anytime – even at 11 PM. You sleep, the system works. Wake up to a full schedule.",
+      "highlight": "24/7"
+    },
+    "cta": {
+      "title": "Ready for change?",
+      "subtitle": "Join salons already saving 10+ hours per week",
+      "button": "Book a demo"
     }
   },
   "demo": {
@@ -159,7 +169,69 @@
       "settings": "Customize the system to your salon. Logo, colors, working hours, notifications – everything under control.",
       "conversations": "All client messages in one place. SMS, email, chat – no switching between apps.",
       "pipeline": "Track client journey from first visit to regular. Pipeline shows who returns and who needs attention.",
-      "accounting": "Daily cash reports, staff commissions, VAT – everything ready to send to your accountant."
+      "accounting": "Daily cash reports, staff commissions, VAT – everything ready to send to your accountant.",
+      "features": {
+        "home": {
+          "todayAppointments": "Today's appointments",
+          "estimatedRevenue": "Estimated revenue",
+          "alerts": "Alerts & notes"
+        },
+        "calendar": {
+          "dragDrop": "Drag & drop",
+          "weekView": "Week view",
+          "quickBlocks": "Quick blocks"
+        },
+        "clients": {
+          "visitHistory": "Visit history",
+          "vipTags": "VIP tags",
+          "preferences": "Preferences"
+        },
+        "services": {
+          "categories": "Categories",
+          "csvImport": "CSV import",
+          "multimedia": "Multimedia"
+        },
+        "staff": {
+          "workSchedule": "Work schedule",
+          "assignedServices": "Assigned services",
+          "calendarColors": "Calendar colors"
+        },
+        "widgets": {
+          "customWidgets": "Custom widgets",
+          "embedCode": "Embed code",
+          "promotions": "Promotions"
+        },
+        "timeOff": {
+          "vacations": "Vacations",
+          "sickLeave": "Sick leave",
+          "autoBlock": "Auto-blocks"
+        },
+        "stats": {
+          "topServices": "TOP services",
+          "topStaff": "TOP staff",
+          "trends": "Trends"
+        },
+        "settings": {
+          "branding": "Branding",
+          "workingHours": "Working hours",
+          "notifications": "Notifications"
+        },
+        "conversations": {
+          "allMessages": "All messages",
+          "smsEmail": "SMS & email",
+          "unified": "Unified view"
+        },
+        "pipeline": {
+          "clientJourney": "Client journey",
+          "returnTracking": "Return tracking",
+          "attention": "Needs attention"
+        },
+        "accounting": {
+          "dailyReports": "Daily reports",
+          "commissions": "Commissions",
+          "vatReady": "VAT ready"
+        }
+      }
     }
   },
   "audience": {

@@ -62,22 +62,32 @@
   },
   "howItWorks": {
     "title": "Jak to działa?",
-    "subtitle": "W 4 prostych krokach do pełnej automatyzacji",
+    "subtitle": "Od zera do pełnego grafiku w jeden dzień. Bez IT, bez stresu.",
+    "badge": "Gotowe w 10 minut",
     "step1": {
       "title": "Załóż konto",
-      "description": "Bezpłatna rejestracja w 2 minuty"
+      "description": "Podajesz email i hasło – to wszystko. Zero karty kredytowej, zero zobowiązań. W 2 minuty masz dostęp do pełnego systemu.",
+      "highlight": "2 minuty"
     },
     "step2": {
       "title": "Skonfiguruj salon",
-      "description": "Dodaj usługi, personel i godziny pracy"
+      "description": "Dodaj swoje usługi, personel i godziny pracy. Import z Excela? Proszę bardzo. Możesz też skopiować z innego systemu.",
+      "highlight": "Import z CSV"
     },
     "step3": {
       "title": "Osadź kalendarz",
-      "description": "Wklej kod na swoją stronę lub udostępnij link"
+      "description": "Wklej jeden kod na swoją stronę lub po prostu wyślij link klientkom. Działa na każdej stronie – WordPress, Wix, czy własna.",
+      "highlight": "Jeden kod"
     },
     "step4": {
       "title": "Przyjmuj rezerwacje",
-      "description": "Klienci rezerwują 24/7, Ty się skupiasz na pracy"
+      "description": "Klientki rezerwują o dowolnej porze – nawet o 23:00. Ty śpisz, system pracuje. Rano budzisz się z pełnym grafikiem.",
+      "highlight": "24/7"
+    },
+    "cta": {
+      "title": "Gotowy na zmianę?",
+      "subtitle": "Dołącz do salonów, które już oszczędzają 10+ godzin tygodniowo",
+      "button": "Umów prezentację"
     }
   },
   "demo": {
@@ -159,7 +169,69 @@
       "settings": "Dostosuj system do swojego salonu. Logo, kolory, godziny pracy, powiadomienia – wszystko pod kontrolą.",
       "conversations": "Wszystkie wiadomości od klientek w jednym miejscu. SMS, email, chat – bez przeskakiwania między aplikacjami.",
       "pipeline": "Śledź ścieżkę klientki od pierwszej wizyty po stałą klientkę. Pipeline pokazuje kto wraca, a kto wymaga uwagi.",
-      "accounting": "Dzienne raporty kasowe, prowizje pracowników, VAT – wszystko gotowe do wysłania księgowej."
+      "accounting": "Dzienne raporty kasowe, prowizje pracowników, VAT – wszystko gotowe do wysłania księgowej.",
+      "features": {
+        "home": {
+          "todayAppointments": "Dzisiejsze wizyty",
+          "estimatedRevenue": "Szacowane przychody",
+          "alerts": "Alerty i uwagi"
+        },
+        "calendar": {
+          "dragDrop": "Przeciągnij i upuść",
+          "weekView": "Widok tygodnia",
+          "quickBlocks": "Szybkie blokady"
+        },
+        "clients": {
+          "visitHistory": "Historia wizyt",
+          "vipTags": "Tagi VIP",
+          "preferences": "Preferencje"
+        },
+        "services": {
+          "categories": "Kategorie",
+          "csvImport": "Import CSV",
+          "multimedia": "Multimedia"
+        },
+        "staff": {
+          "workSchedule": "Grafik pracy",
+          "assignedServices": "Przypisane usługi",
+          "calendarColors": "Kolory w kalendarzu"
+        },
+        "widgets": {
+          "customWidgets": "Własne widgety",
+          "embedCode": "Kod do osadzenia",
+          "promotions": "Promocje"
+        },
+        "timeOff": {
+          "vacations": "Urlopy",
+          "sickLeave": "Zwolnienia",
+          "autoBlock": "Auto-blokady"
+        },
+        "stats": {
+          "topServices": "TOP usługi",
+          "topStaff": "TOP personel",
+          "trends": "Trendy"
+        },
+        "settings": {
+          "branding": "Branding",
+          "workingHours": "Godziny pracy",
+          "notifications": "Powiadomienia"
+        },
+        "conversations": {
+          "allMessages": "Wszystkie wiadomości",
+          "smsEmail": "SMS i email",
+          "unified": "Jeden widok"
+        },
+        "pipeline": {
+          "clientJourney": "Ścieżka klientki",
+          "returnTracking": "Śledzenie powrotów",
+          "attention": "Wymaga uwagi"
+        },
+        "accounting": {
+          "dailyReports": "Raporty dzienne",
+          "commissions": "Prowizje",
+          "vatReady": "VAT gotowy"
+        }
+      }
     }
   },
   "audience": {
