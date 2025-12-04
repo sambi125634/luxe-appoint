@@ -1,12 +1,13 @@
 import { useState, useMemo } from "react";
-import { Sun, Sunset, Moon, Info, Users, Clock } from "lucide-react";
-import { format, addDays } from "date-fns";
+import { Sun, Sunset, Moon, Info, Users, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { format, addDays, isSameDay, isBefore, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
+import { pl, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 import { QuickPicks } from "./QuickPicks";
-import { DaySelector } from "./DaySelector";
 import { TimeSlotCard, getSlotType } from "./TimeSlotCard";
 
 interface DateTimeSelectionProps {
@@ -71,10 +72,12 @@ export function DateTimeSelection({
   serviceDuration = 60,
   onProceed
 }: DateTimeSelectionProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === 'pl' ? pl : enUS;
   const [activeTimeOfDay, setActiveTimeOfDay] = useState<TimeOfDay | 'all'>('all');
   const [showAllSlots, setShowAllSlots] = useState(false);
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const getAvailableSlots = (date: Date): string[] => {
     const dateStr = format(date, 'yyyy-MM-dd');
@@ -85,13 +88,27 @@ export function DateTimeSelection({
   // Build available slots map for QuickPicks
   const availableSlotsMap = useMemo(() => {
     const map: Record<string, string[]> = {};
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < 60; i++) {
       const date = addDays(new Date(), i);
       const dateStr = format(date, 'yyyy-MM-dd');
       map[dateStr] = getAvailableSlots(date);
     }
     return map;
   }, []);
+
+  // Get calendar days for current month
+  const calendarDays = useMemo(() => {
+    const start = startOfMonth(currentMonth);
+    const end = endOfMonth(currentMonth);
+    const days = eachDayOfInterval({ start, end });
+    
+    // Add padding days at the start (Monday = 0)
+    const startDayOfWeek = getDay(start);
+    const paddingStart = startDayOfWeek === 0 ? 6 : startDayOfWeek - 1;
+    const paddingDays: (Date | null)[] = Array(paddingStart).fill(null);
+    
+    return [...paddingDays, ...days];
+  }, [currentMonth]);
 
   const handleQuickSelect = (date: Date, time: string) => {
     onSelect(date, time);
@@ -112,6 +129,28 @@ export function DateTimeSelection({
       }, 150);
     }
   };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth(subMonths(currentMonth, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth(addMonths(currentMonth, 1));
+  };
+
+  const canGoPrevious = !isBefore(startOfMonth(currentMonth), startOfMonth(new Date()));
+
+  const getAvailabilityLevel = (date: Date) => {
+    const slots = getAvailableSlots(date);
+    if (slots.length === 0) return 'none';
+    if (slots.length <= 3) return 'low';
+    if (slots.length <= 8) return 'medium';
+    return 'high';
+  };
+
+  const weekDays = i18n.language === 'pl' 
+    ? ['Pn', 'Wt', 'Śr', 'Cz', 'Pt', 'Sb', 'Nd']
+    : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   const availableSlots = selectedDate ? getAvailableSlots(selectedDate) : [];
   
@@ -165,12 +204,113 @@ export function DateTimeSelection({
         <div className="flex-1 h-px bg-border" />
       </div>
 
-      {/* Day Selector */}
-      <DaySelector
-        selectedDate={selectedDate}
-        onSelect={handleDaySelect}
-        getAvailableSlots={getAvailableSlots}
-      />
+      {/* Monthly Calendar */}
+      <div className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+        {/* Calendar Header */}
+        <div className="flex items-center justify-between mb-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goToPreviousMonth}
+            disabled={!canGoPrevious}
+            className="h-8 w-8"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <h3 className="font-semibold text-lg capitalize">
+            {format(currentMonth, 'LLLL yyyy', { locale })}
+          </h3>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={goToNextMonth}
+            className="h-8 w-8"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Week day headers */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {weekDays.map((day) => (
+            <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7 gap-1">
+          {calendarDays.map((day, index) => {
+            if (!day) {
+              return <div key={`empty-${index}`} className="aspect-square" />;
+            }
+
+            const isPast = isBefore(startOfDay(day), startOfDay(new Date()));
+            const isSelected = selectedDate && isSameDay(day, selectedDate);
+            const isToday = isSameDay(day, new Date());
+            const availableSlots = getAvailableSlots(day);
+            const hasAvailability = availableSlots.length > 0 && !isPast;
+            const availability = getAvailabilityLevel(day);
+
+            return (
+              <button
+                key={day.toISOString()}
+                onClick={() => hasAvailability && handleDaySelect(day)}
+                disabled={!hasAvailability}
+                className={cn(
+                  "aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-200 relative",
+                  isSelected
+                    ? "bg-primary text-primary-foreground shadow-lg scale-105 z-10"
+                    : hasAvailability
+                    ? "hover:bg-muted hover:scale-105 cursor-pointer"
+                    : "text-muted-foreground/40 cursor-not-allowed",
+                  isToday && !isSelected && "ring-2 ring-primary/30"
+                )}
+              >
+                <span className={cn(
+                  "text-sm font-medium",
+                  isSelected && "font-bold"
+                )}>
+                  {format(day, 'd')}
+                </span>
+                
+                {/* Availability indicator */}
+                {hasAvailability && !isSelected && (
+                  <div className="flex gap-0.5 mt-0.5">
+                    <span className={cn(
+                      "w-1.5 h-1.5 rounded-full",
+                      availability === 'high' && "bg-emerald-500",
+                      availability === 'medium' && "bg-amber-500",
+                      availability === 'low' && "bg-rose-400"
+                    )} />
+                  </div>
+                )}
+                
+                {isSelected && (
+                  <span className="text-[10px] opacity-80">{availableSlots.length} {t('booking.slots')}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Legend */}
+        <div className="flex justify-center gap-4 mt-4 pt-3 border-t border-border text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>{t('booking.availability.high')}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-amber-500" />
+            <span>{t('booking.availability.medium')}</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-400" />
+            <span>{t('booking.availability.low')}</span>
+          </div>
+        </div>
+      </div>
 
       {/* Time Slots */}
       {selectedDate && (
