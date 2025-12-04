@@ -1,27 +1,14 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
   LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "staff" | "services" | "time-off" | "stats" | "settings";
-
-const navItems: { icon: typeof Calendar; label: string; tab: TabType; badge?: number }[] = [
-  { icon: LayoutDashboard, label: "Dashboard", tab: "home" },
-  { icon: Calendar, label: "Kalendarz", tab: "calendar" },
-  { icon: Code, label: "Widgety", tab: "widgets" },
-  { icon: UserCircle, label: "Klienci", tab: "clients" },
-  { icon: MessageSquare, label: "Konwersacje", tab: "conversations", badge: 3 },
-  { icon: Workflow, label: "Pipeline", tab: "pipeline", badge: 2 },
-  { icon: Calculator, label: "Księgowość", tab: "accounting" },
-  { icon: Users, label: "Personel", tab: "staff" },
-  { icon: Scissors, label: "Usługi", tab: "services" },
-  { icon: CalendarOff, label: "Urlopy", tab: "time-off" },
-  { icon: BarChart3, label: "Statystyki", tab: "stats" },
-  { icon: Settings, label: "Ustawienia", tab: "settings" },
-];
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -30,6 +17,23 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarProps) {
+  const { t } = useTranslation();
+
+  const navItems: { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number }[] = [
+    { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
+    { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
+    { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
+    { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
+    { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations", badge: 3 },
+    { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline", badge: 2 },
+    { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
+    { icon: Users, labelKey: "admin.staff", tab: "staff" },
+    { icon: Scissors, labelKey: "admin.services", tab: "services" },
+    { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
+    { icon: BarChart3, labelKey: "admin.reports", tab: "stats" },
+    { icon: Settings, labelKey: "admin.settings", tab: "settings" },
+  ];
+
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -40,7 +44,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
           </div>
           <div>
             <p className="font-serif font-semibold">Beauty Calendar</p>
-            <p className="text-xs text-muted-foreground">Panel salonu</p>
+            <p className="text-xs text-muted-foreground">{t("admin.profile")}</p>
           </div>
         </Link>
       </div>
@@ -49,7 +53,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
       <nav className="flex-1 p-4">
         <ul className="space-y-1">
           {navItems.map((item) => (
-            <li key={item.label}>
+            <li key={item.tab}>
               <button
                 onClick={() => {
                   onTabChange(item.tab);
@@ -63,7 +67,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
                 )}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="flex-1 text-left">{item.label}</span>
+                <span className="flex-1 text-left">{t(item.labelKey)}</span>
                 {item.badge && item.badge > 0 && (
                   <span className={cn(
                     "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
@@ -80,6 +84,11 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
         </ul>
       </nav>
 
+      {/* Language Switcher */}
+      <div className="px-4 pb-2">
+        <LanguageSwitcher className="w-full justify-center" />
+      </div>
+
       {/* User section */}
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 mb-4">
@@ -93,7 +102,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
         </div>
         <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground">
           <LogOut className="w-4 h-4" />
-          Wyloguj się
+          {t("admin.logout")}
         </Button>
       </div>
     </div>

@@ -1,41 +1,46 @@
+import { useTranslation } from "react-i18next";
 import { Settings, Users, Code, CheckCircle } from "lucide-react";
 
-const steps = [
-  {
-    icon: Settings,
-    number: "01",
-    title: "Skonfiguruj salon",
-    description: "Dodaj usługi, ustaw ceny, wgraj logo"
-  },
-  {
-    icon: Users,
-    number: "02",
-    title: "Dodaj zespół",
-    description: "Przypisz specjalistki i ich godziny pracy"
-  },
-  {
-    icon: Code,
-    number: "03",
-    title: "Wklej widget",
-    description: "Jedna linijka kodu na Twoją stronę lub Instagram"
-  },
-  {
-    icon: CheckCircle,
-    number: "04",
-    title: "Odbieraj rezerwacje",
-    description: "Klientki umawiają się same, 24/7"
-  }
-];
-
 const HowItWorksSection = () => {
+  const { t } = useTranslation();
+
+  const steps = [
+    {
+      icon: Settings,
+      number: "01",
+      title: t("howItWorks.step1.title"),
+      description: t("howItWorks.step1.description")
+    },
+    {
+      icon: Users,
+      number: "02",
+      title: t("howItWorks.step2.title"),
+      description: t("howItWorks.step2.description")
+    },
+    {
+      icon: Code,
+      number: "03",
+      title: t("howItWorks.step3.title"),
+      description: t("howItWorks.step3.description")
+    },
+    {
+      icon: CheckCircle,
+      number: "04",
+      title: t("howItWorks.step4.title"),
+      description: t("howItWorks.step4.description")
+    }
+  ];
+
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Od rejestracji do pierwszej rezerwacji w{" "}
-            <span className="text-gold">10 minut</span>
+            {t("howItWorks.title")}
           </h2>
+          <p className="text-muted-foreground text-lg">
+            {t("howItWorks.subtitle")}
+          </p>
         </div>
         
         <div className="max-w-5xl mx-auto">

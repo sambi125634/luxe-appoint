@@ -1,35 +1,38 @@
+import { useTranslation } from "react-i18next";
 import { Clock, Wand2, TrendingUp, Palette, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-const solutions = [
-  {
-    icon: Clock,
-    title: "Rezerwacje 24/7 bez Twojego udziału",
-    description: "Klientki umawiają się same, o 23:00 w sobotę, kiedy Ty oglądasz serial. Rano budzisz się z pełnym grafikiem."
-  },
-  {
-    icon: Wand2,
-    title: "Grafik, który sam się układa",
-    description: "Kopiuj tygodnie jednym kliknięciem. System sam znajduje luki i podpowiada optymalne terminy."
-  },
-  {
-    icon: TrendingUp,
-    title: "Więcej wizyt, mniej pustych foteli",
-    description: "Inteligentne podpowiedzi wypełniają przerwy między wizytami. Każda godzina pracuje na Ciebie."
-  },
-  {
-    icon: Palette,
-    title: "Piękny widget na Twojej stronie",
-    description: "Elegancki formularz rezerwacji, który wygląda jakby kosztował fortunę. Dopasowany do Twojej marki."
-  },
-  {
-    icon: BarChart3,
-    title: "Wiesz dokładnie, ile zarabiasz",
-    description: "Raporty dzienne, prowizje zespołu, najpopularniejsze usługi – wszystko w jednym miejscu."
-  }
-];
-
 const SolutionSection = () => {
+  const { t } = useTranslation();
+
+  const solutions = [
+    {
+      icon: Clock,
+      title: t("solution.booking.title"),
+      description: t("solution.booking.description")
+    },
+    {
+      icon: Wand2,
+      title: t("solution.reminders.title"),
+      description: t("solution.reminders.description")
+    },
+    {
+      icon: TrendingUp,
+      title: t("solution.calendar.title"),
+      description: t("solution.calendar.description")
+    },
+    {
+      icon: Palette,
+      title: t("solution.reports.title"),
+      description: t("solution.reports.description")
+    },
+    {
+      icon: BarChart3,
+      title: t("solution.reports.title"),
+      description: t("solution.reports.description")
+    }
+  ];
+
   return (
     <section className="py-20 relative overflow-hidden">
       {/* Background decoration */}
@@ -38,9 +41,11 @@ const SolutionSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Beauty Calendar – pierwszy kalendarz, który{" "}
-            <span className="text-gradient-luxury">myśli jak właścicielka salonu</span>
+            {t("solution.title")}
           </h2>
+          <p className="text-muted-foreground text-lg">
+            {t("solution.subtitle")}
+          </p>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
