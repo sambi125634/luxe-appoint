@@ -1,19 +1,23 @@
 import { useState } from "react";
 import { startOfMonth, endOfMonth } from "date-fns";
-import { Calculator, Receipt, Users, Ticket, Download } from "lucide-react";
+import { Calculator, Receipt, Users, Ticket, Download, BarChart3 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountingFiltersBar } from "./AccountingFilters";
+import { AccountingCharts } from "./AccountingCharts";
 import { DailyCashUp } from "./DailyCashUp";
 import { SalesVatReport } from "./SalesVatReport";
 import { EmployeeCommissions } from "./EmployeeCommissions";
 import { VouchersReport } from "./VouchersReport";
 import { ExportSection } from "./ExportSection";
-import { AccountingFilters } from "./types";
+import { ManualEntryModal, ManualTransaction } from "./ManualEntryModal";
+import { AccountingFilters, Transaction } from "./types";
+import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
 
 export function AccountingModule() {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState("daily");
+  const [activeTab, setActiveTab] = useState("charts");
+  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
   const [filters, setFilters] = useState<AccountingFilters>({
     dateRange: {
       from: startOfMonth(new Date()),
@@ -37,19 +41,58 @@ export function AccountingModule() {
     });
   };
 
+  const handleAddManualTransaction = (manualTx: ManualTransaction) => {
+    const newTransaction: Transaction = {
+      id: `manual-${Date.now()}`,
+      salonId: "demo",
+      dateTime: `${manualTx.date}T${manualTx.time}:00`,
+      clientId: null,
+      clientName: manualTx.clientName || null,
+      staffId: null,
+      staffName: manualTx.staffName || null,
+      locationId: null,
+      itemType: manualTx.itemType,
+      itemCategory: manualTx.itemCategory,
+      itemName: manualTx.itemName,
+      quantity: manualTx.quantity,
+      unitPriceBrutto: manualTx.unitPriceBrutto,
+      discountAmount: manualTx.discountAmount,
+      vatRate: manualTx.vatRate,
+      netAmount: (manualTx.unitPriceBrutto * manualTx.quantity - manualTx.discountAmount) / (1 + manualTx.vatRate / 100),
+      vatAmount: (manualTx.unitPriceBrutto * manualTx.quantity - manualTx.discountAmount) - 
+        (manualTx.unitPriceBrutto * manualTx.quantity - manualTx.discountAmount) / (1 + manualTx.vatRate / 100),
+      grossAmount: manualTx.unitPriceBrutto * manualTx.quantity - manualTx.discountAmount,
+      paymentMethod: manualTx.paymentMethod,
+      tipAmount: manualTx.tipAmount,
+      relatedVoucherId: null,
+      status: "opłacone",
+    };
+    setTransactions((prev) => [newTransaction, ...prev]);
+  };
+
   return (
     <div className="space-y-6">
-      {/* Global Filters */}
-      <AccountingFiltersBar
-        filters={filters}
-        onFiltersChange={setFilters}
-        onExportCSV={handleExportCSV}
-        onExportPDF={handleExportPDF}
-      />
+      {/* Global Filters + Manual Entry */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-between">
+        <div className="flex-1 w-full">
+          <AccountingFiltersBar
+            filters={filters}
+            onFiltersChange={setFilters}
+            onExportCSV={handleExportCSV}
+            onExportPDF={handleExportPDF}
+          />
+        </div>
+        <ManualEntryModal onAddTransaction={handleAddManualTransaction} />
+      </div>
 
       {/* Main Content with Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+        <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
+          <TabsTrigger value="charts" className="gap-2">
+            <BarChart3 className="w-4 h-4 hidden sm:inline" />
+            <span className="hidden sm:inline">Wykresy</span>
+            <span className="sm:hidden">Wykresy</span>
+          </TabsTrigger>
           <TabsTrigger value="daily" className="gap-2">
             <Calculator className="w-4 h-4 hidden sm:inline" />
             <span className="hidden sm:inline">Dzienny raport</span>
@@ -76,6 +119,10 @@ export function AccountingModule() {
             <span className="sm:hidden">Eksport</span>
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="charts" className="mt-6">
+          <AccountingCharts transactions={transactions} dateRange={filters.dateRange} />
+        </TabsContent>
 
         <TabsContent value="daily" className="mt-6">
           <DailyCashUp dateRange={filters.dateRange} />
