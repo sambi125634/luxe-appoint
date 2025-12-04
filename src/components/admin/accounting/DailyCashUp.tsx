@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
 import { Eye, FileText, Download, Lock, LockOpen, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,14 +16,17 @@ import { DailyClosing } from "./types";
 import { mockDailyClosings } from "./mockData";
 import { DailyCashUpDetail } from "./DailyCashUpDetail";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface DailyCashUpProps {
   dateRange: { from: Date; to: Date };
 }
 
 export function DailyCashUp({ dateRange }: DailyCashUpProps) {
+  const { t, i18n } = useTranslation();
   const [selectedDay, setSelectedDay] = useState<DailyClosing | null>(null);
   const [closings, setClosings] = useState<DailyClosing[]>(mockDailyClosings);
+  const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("pl-PL", {
@@ -77,27 +80,27 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="bg-card rounded-xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Usługi (brutto)</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('accounting.servicesGross')}</p>
           <p className="text-xl font-semibold">{formatCurrency(totalStats.services)}</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Produkty (brutto)</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('accounting.productsGross')}</p>
           <p className="text-xl font-semibold">{formatCurrency(totalStats.products)}</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Napiwki</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('accounting.tips')}</p>
           <p className="text-xl font-semibold">{formatCurrency(totalStats.tips)}</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Gotówka</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('accounting.cash')}</p>
           <p className="text-xl font-semibold">{formatCurrency(totalStats.cash)}</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Karta</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('accounting.card')}</p>
           <p className="text-xl font-semibold">{formatCurrency(totalStats.card)}</p>
         </div>
         <div className="bg-card rounded-xl p-4 border border-border">
-          <p className="text-xs text-muted-foreground mb-1">Online</p>
+          <p className="text-xs text-muted-foreground mb-1">{t('accounting.online')}</p>
           <p className="text-xl font-semibold">{formatCurrency(totalStats.online)}</p>
         </div>
       </div>
@@ -107,24 +110,24 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead>Data</TableHead>
-              <TableHead className="text-right">Usługi</TableHead>
-              <TableHead className="text-right">Produkty</TableHead>
-              <TableHead className="text-right">Napiwki</TableHead>
-              <TableHead className="text-right">Gotówka</TableHead>
-              <TableHead className="text-right">Karta</TableHead>
-              <TableHead className="text-right">Online</TableHead>
-              <TableHead className="text-right">Vouchery</TableHead>
-              <TableHead className="text-right">Różnica</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-              <TableHead className="text-right">Akcje</TableHead>
+              <TableHead>{t('accounting.date')}</TableHead>
+              <TableHead className="text-right">{t('accounting.services')}</TableHead>
+              <TableHead className="text-right">{t('accounting.products')}</TableHead>
+              <TableHead className="text-right">{t('accounting.tips')}</TableHead>
+              <TableHead className="text-right">{t('accounting.cash')}</TableHead>
+              <TableHead className="text-right">{t('accounting.card')}</TableHead>
+              <TableHead className="text-right">{t('accounting.online')}</TableHead>
+              <TableHead className="text-right">{t('accounting.vouchers')}</TableHead>
+              <TableHead className="text-right">{t('accounting.difference')}</TableHead>
+              <TableHead className="text-center">{t('accounting.status')}</TableHead>
+              <TableHead className="text-right">{t('accounting.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {closings.map((day) => (
               <TableRow key={day.id} className="hover:bg-muted/30">
                 <TableCell className="font-medium">
-                  {format(new Date(day.date), "EEEE, dd MMM", { locale: pl })}
+                  {format(new Date(day.date), "EEEE, dd MMM", { locale: dateLocale })}
                 </TableCell>
                 <TableCell className="text-right">{formatCurrency(day.totalServicesGross)}</TableCell>
                 <TableCell className="text-right">{formatCurrency(day.totalProductsGross)}</TableCell>
@@ -156,12 +159,12 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
                   {day.status === "zamknięte" ? (
                     <Badge variant="secondary" className="gap-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
                       <CheckCircle2 className="w-3 h-3" />
-                      Zamknięte
+                      {t('accounting.closed')}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="gap-1 border-amber-500 text-amber-600">
                       <AlertCircle className="w-3 h-3" />
-                      Otwarte
+                      {t('accounting.open')}
                     </Badge>
                   )}
                 </TableCell>
@@ -171,7 +174,7 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
                       variant="ghost"
                       size="icon"
                       onClick={() => setSelectedDay(day)}
-                      title="Podgląd"
+                      title={t('accounting.preview')}
                     >
                       <Eye className="w-4 h-4" />
                     </Button>

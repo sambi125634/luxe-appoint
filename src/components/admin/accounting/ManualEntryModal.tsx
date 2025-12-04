@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 interface ManualEntryModalProps {
   onAddTransaction: (transaction: ManualTransaction) => void;
@@ -61,6 +62,7 @@ const STAFF_MEMBERS = [
 ];
 
 export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState<ManualTransaction>({
@@ -92,8 +94,8 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
   const handleSubmit = () => {
     if (!formData.itemName || formData.unitPriceBrutto <= 0) {
       toast({
-        title: "Błąd walidacji",
-        description: "Uzupełnij nazwę i cenę pozycji.",
+        title: t('accounting.validationError'),
+        description: t('accounting.fillNameAndPrice'),
         variant: "destructive",
       });
       return;
@@ -101,7 +103,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
 
     onAddTransaction(formData);
     toast({
-      title: "Dodano transakcję",
+      title: t('accounting.transactionAdded'),
       description: `${formData.itemName} - ${gross} PLN`,
     });
     setOpen(false);
@@ -129,17 +131,17 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Plus className="w-4 h-4" />
-          Dodaj ręcznie
+          {t('accounting.addManually')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calculator className="w-5 h-5" />
-            Dodaj transakcję ręcznie
+            {t('accounting.addManualTransaction')}
           </DialogTitle>
           <DialogDescription>
-            Wprowadź dane transakcji, które nie zostały zarejestrowane automatycznie.
+            {t('accounting.manualTransactionDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -147,7 +149,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
           {/* Date & Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="date">Data</Label>
+              <Label htmlFor="date">{t('accounting.date')}</Label>
               <Input
                 id="date"
                 type="date"
@@ -156,7 +158,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="time">Godzina</Label>
+              <Label htmlFor="time">{t('accounting.time')}</Label>
               <Input
                 id="time"
                 type="time"
@@ -169,7 +171,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
           {/* Type & Category */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Typ</Label>
+              <Label>{t('accounting.type')}</Label>
               <Select
                 value={formData.itemType}
                 onValueChange={(v: "usługa" | "produkt") =>
@@ -180,13 +182,13 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="usługa">Usługa</SelectItem>
-                  <SelectItem value="produkt">Produkt</SelectItem>
+                  <SelectItem value="usługa">{t('accounting.services')}</SelectItem>
+                  <SelectItem value="produkt">{t('accounting.products')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Kategoria</Label>
+              <Label>{t('accounting.category')}</Label>
               <Select
                 value={formData.itemCategory}
                 onValueChange={(v) => setFormData({ ...formData, itemCategory: v })}
@@ -207,19 +209,19 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
 
           {/* Item Name */}
           <div className="space-y-2">
-            <Label htmlFor="itemName">Nazwa usługi / produktu *</Label>
+            <Label htmlFor="itemName">{t('accounting.serviceProductName')} *</Label>
             <Input
               id="itemName"
               value={formData.itemName}
               onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
-              placeholder="np. Mezoterapia twarzy, Krem nawilżający"
+              placeholder={t('accounting.serviceProductPlaceholder')}
             />
           </div>
 
           {/* Pricing */}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="quantity">Ilość</Label>
+              <Label htmlFor="quantity">{t('accounting.quantity')}</Label>
               <Input
                 id="quantity"
                 type="number"
@@ -231,7 +233,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price">Cena brutto (PLN) *</Label>
+              <Label htmlFor="price">{t('accounting.grossPrice')} *</Label>
               <Input
                 id="price"
                 type="number"
@@ -248,7 +250,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="discount">Rabat (PLN)</Label>
+              <Label htmlFor="discount">{t('accounting.discountPln')}</Label>
               <Input
                 id="discount"
                 type="number"
@@ -269,7 +271,7 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
           {/* VAT & Payment */}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Stawka VAT</Label>
+              <Label>{t('accounting.vatRate')}</Label>
               <Select
                 value={formData.vatRate.toString()}
                 onValueChange={(v) => setFormData({ ...formData, vatRate: parseInt(v) })}
@@ -280,12 +282,12 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
                 <SelectContent>
                   <SelectItem value="23">23%</SelectItem>
                   <SelectItem value="8">8%</SelectItem>
-                  <SelectItem value="0">0% (zw.)</SelectItem>
+                  <SelectItem value="0">0% ({t('accounting.exempt')})</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Metoda płatności</Label>
+              <Label>{t('accounting.paymentMethod')}</Label>
               <Select
                 value={formData.paymentMethod}
                 onValueChange={(v: any) => setFormData({ ...formData, paymentMethod: v })}
@@ -294,16 +296,16 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="gotówka">Gotówka</SelectItem>
-                  <SelectItem value="karta">Karta</SelectItem>
-                  <SelectItem value="online">Online / BLIK</SelectItem>
-                  <SelectItem value="voucher">Voucher</SelectItem>
-                  <SelectItem value="depozyt">Depozyt</SelectItem>
+                  <SelectItem value="gotówka">{t('accounting.cash')}</SelectItem>
+                  <SelectItem value="karta">{t('accounting.card')}</SelectItem>
+                  <SelectItem value="online">{t('accounting.onlineBlik')}</SelectItem>
+                  <SelectItem value="voucher">{t('accounting.voucher')}</SelectItem>
+                  <SelectItem value="depozyt">{t('accounting.deposit')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="tip">Napiwek (PLN)</Label>
+              <Label htmlFor="tip">{t('accounting.tipPln')}</Label>
               <Input
                 id="tip"
                 type="number"
@@ -324,22 +326,22 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
           {/* Client & Staff */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="client">Klient (opcjonalnie)</Label>
+              <Label htmlFor="client">{t('accounting.clientOptional')}</Label>
               <Input
                 id="client"
                 value={formData.clientName}
                 onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                placeholder="Imię i nazwisko"
+                placeholder={t('accounting.nameAndSurname')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Pracownik</Label>
+              <Label>{t('accounting.employee')}</Label>
               <Select
                 value={formData.staffName}
                 onValueChange={(v) => setFormData({ ...formData, staffName: v })}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Wybierz pracownika" />
+                  <SelectValue placeholder={t('accounting.selectEmployee')} />
                 </SelectTrigger>
                 <SelectContent>
                   {STAFF_MEMBERS.map((staff) => (
@@ -354,30 +356,30 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes">Notatki</Label>
+            <Label htmlFor="notes">{t('accounting.notesField')}</Label>
             <Textarea
               id="notes"
               value={formData.notes}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              placeholder="Dodatkowe informacje o transakcji..."
+              placeholder={t('accounting.additionalInfo')}
               rows={2}
             />
           </div>
 
           {/* Calculation Summary */}
           <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-            <h4 className="font-medium text-sm">Podsumowanie kalkulacji</h4>
+            <h4 className="font-medium text-sm">{t('accounting.calculationSummary')}</h4>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <span className="text-muted-foreground">Netto:</span>
+                <span className="text-muted-foreground">{t('accounting.net')}:</span>
                 <span className="ml-2 font-medium">{net} PLN</span>
               </div>
               <div>
-                <span className="text-muted-foreground">VAT ({formData.vatRate}%):</span>
+                <span className="text-muted-foreground">{t('accounting.vat')} ({formData.vatRate}%):</span>
                 <span className="ml-2 font-medium">{vat} PLN</span>
               </div>
               <div>
-                <span className="text-muted-foreground">Brutto:</span>
+                <span className="text-muted-foreground">{t('accounting.gross')}:</span>
                 <span className="ml-2 font-bold text-primary">{gross} PLN</span>
               </div>
             </div>
@@ -386,9 +388,9 @@ export function ManualEntryModal({ onAddTransaction }: ManualEntryModalProps) {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
-            Anuluj
+            {t('common.cancel')}
           </Button>
-          <Button onClick={handleSubmit}>Dodaj transakcję</Button>
+          <Button onClick={handleSubmit}>{t('accounting.addTransaction')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

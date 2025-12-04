@@ -13,8 +13,10 @@ import { ManualEntryModal, ManualTransaction } from "./ManualEntryModal";
 import { AccountingFilters, Transaction } from "./types";
 import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "react-i18next";
 
 export function AccountingModule() {
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("charts");
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
@@ -29,15 +31,15 @@ export function AccountingModule() {
 
   const handleExportCSV = () => {
     toast({
-      title: "Eksport CSV",
-      description: "Raport został wygenerowany i jest gotowy do pobrania.",
+      title: t('accounting.exportCsv'),
+      description: t('accounting.canDownloadBelow'),
     });
   };
 
   const handleExportPDF = () => {
     toast({
-      title: "Eksport PDF",
-      description: "Podsumowanie PDF zostało wygenerowane.",
+      title: t('accounting.exportPdf'),
+      description: t('accounting.canDownloadBelow'),
     });
   };
 
@@ -90,33 +92,33 @@ export function AccountingModule() {
         <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
           <TabsTrigger value="charts" className="gap-2">
             <BarChart3 className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Wykresy</span>
-            <span className="sm:hidden">Wykresy</span>
+            <span className="hidden sm:inline">{t('accounting.charts')}</span>
+            <span className="sm:hidden">{t('accounting.charts')}</span>
           </TabsTrigger>
           <TabsTrigger value="daily" className="gap-2">
             <Calculator className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Dzienny raport</span>
-            <span className="sm:hidden">Dzienny</span>
+            <span className="hidden sm:inline">{t('accounting.dailyReport')}</span>
+            <span className="sm:hidden">{t('accounting.dailyReport')}</span>
           </TabsTrigger>
           <TabsTrigger value="sales" className="gap-2">
             <Receipt className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Sprzedaż & VAT</span>
-            <span className="sm:hidden">Sprzedaż</span>
+            <span className="hidden sm:inline">{t('accounting.salesVat')}</span>
+            <span className="sm:hidden">{t('accounting.salesVat')}</span>
           </TabsTrigger>
           <TabsTrigger value="commissions" className="gap-2">
             <Users className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Prowizje</span>
-            <span className="sm:hidden">Prowizje</span>
+            <span className="hidden sm:inline">{t('accounting.commissions')}</span>
+            <span className="sm:hidden">{t('accounting.commissions')}</span>
           </TabsTrigger>
           <TabsTrigger value="vouchers" className="gap-2">
             <Ticket className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Vouchery</span>
-            <span className="sm:hidden">Vouchery</span>
+            <span className="hidden sm:inline">{t('accounting.vouchers')}</span>
+            <span className="sm:hidden">{t('accounting.vouchers')}</span>
           </TabsTrigger>
           <TabsTrigger value="export" className="gap-2">
             <Download className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">Eksport</span>
-            <span className="sm:hidden">Eksport</span>
+            <span className="hidden sm:inline">{t('accounting.export')}</span>
+            <span className="sm:hidden">{t('accounting.export')}</span>
           </TabsTrigger>
         </TabsList>
 

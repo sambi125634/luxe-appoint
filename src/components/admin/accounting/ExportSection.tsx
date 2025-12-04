@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
 import { Download, Send, FileSpreadsheet, FileText, Mail, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,17 +24,20 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { AccountingExport } from "./types";
 import { mockAccountingExports } from "./mockData";
+import { useTranslation } from "react-i18next";
 
 interface ExportSectionProps {
   dateRange: { from: Date; to: Date };
 }
 
 export function ExportSection({ dateRange }: ExportSectionProps) {
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [exportType, setExportType] = useState<string>("pełny");
   const [exportFormat, setExportFormat] = useState<string>("csv");
   const [accountantEmail, setAccountantEmail] = useState<string>("ksiegowosc@salon.pl");
   const [exports, setExports] = useState<AccountingExport[]>(mockAccountingExports);
+  const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const handleExport = () => {
     const newExport: AccountingExport = {
@@ -54,16 +57,16 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
     setExports([newExport, ...exports]);
 
     toast({
-      title: "Raport wygenerowany",
-      description: "Możesz go pobrać z listy poniżej.",
+      title: t('accounting.reportGenerated'),
+      description: t('accounting.canDownloadBelow'),
     });
   };
 
   const handleExportAndSend = () => {
     if (!accountantEmail) {
       toast({
-        title: "Błąd",
-        description: "Wprowadź adres e-mail księgowej.",
+        title: t('accounting.error'),
+        description: t('accounting.enterAccountantEmail'),
         variant: "destructive",
       });
       return;
@@ -86,8 +89,8 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
     setExports([newExport, ...exports]);
 
     toast({
-      title: "Raport wysłany",
-      description: `Raport został wysłany na adres ${accountantEmail}`,
+      title: t('accounting.reportSent'),
+      description: t('accounting.reportSentTo', { email: accountantEmail }),
     });
   };
 
@@ -106,13 +109,13 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
   const getTypeBadge = (type: string) => {
     switch (type) {
       case "pełny":
-        return <Badge>Pełny pakiet</Badge>;
+        return <Badge>{t('accounting.fullPackage').split(' ')[0]} {t('accounting.fullPackage').split(' ')[1]}</Badge>;
       case "sprzedaż VAT":
-        return <Badge variant="secondary">Sprzedaż VAT</Badge>;
+        return <Badge variant="secondary">{t('accounting.salesVat')}</Badge>;
       case "prowizje":
-        return <Badge variant="outline">Prowizje</Badge>;
+        return <Badge variant="outline">{t('accounting.commissions')}</Badge>;
       case "vouchery":
-        return <Badge variant="outline">Vouchery</Badge>;
+        return <Badge variant="outline">{t('accounting.vouchers')}</Badge>;
       default:
         return <Badge variant="outline">{type}</Badge>;
     }
@@ -124,38 +127,38 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
       <div className="bg-card rounded-xl border border-border p-6">
         <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
           <Download className="w-5 h-5" />
-          Eksport dla księgowej
+          {t('accounting.exportForAccountant')}
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Rodzaj eksportu</Label>
+              <Label>{t('accounting.exportType')}</Label>
               <Select value={exportType} onValueChange={setExportType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="pełny">
-                    Pełny pakiet (sprzedaż, dzienne raporty, prowizje, vouchery)
+                    {t('accounting.fullPackage')}
                   </SelectItem>
-                  <SelectItem value="sprzedaż VAT">Tylko sprzedaż & VAT</SelectItem>
-                  <SelectItem value="prowizje">Tylko prowizje pracowników</SelectItem>
-                  <SelectItem value="vouchery">Tylko vouchery / pakiety</SelectItem>
+                  <SelectItem value="sprzedaż VAT">{t('accounting.salesVatOnly')}</SelectItem>
+                  <SelectItem value="prowizje">{t('accounting.commissionsOnly')}</SelectItem>
+                  <SelectItem value="vouchery">{t('accounting.vouchersOnly')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label>Format</Label>
+              <Label>{t('accounting.format')}</Label>
               <Select value={exportFormat} onValueChange={setExportFormat}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="csv">CSV (standard)</SelectItem>
-                  <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
-                  <SelectItem value="pdf">PDF (podsumowanie)</SelectItem>
+                  <SelectItem value="csv">{t('accounting.csvStandard')}</SelectItem>
+                  <SelectItem value="xlsx">{t('accounting.excelXlsx')}</SelectItem>
+                  <SelectItem value="pdf">{t('accounting.pdfSummary')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -163,7 +166,7 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>E-mail księgowej</Label>
+              <Label>{t('accounting.accountantEmail')}</Label>
               <Input
                 type="email"
                 placeholder="ksiegowosc@firma.pl"
@@ -175,11 +178,11 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
             <div className="flex gap-3 pt-2">
               <Button onClick={handleExport} variant="outline" className="flex-1 gap-2">
                 <Download className="w-4 h-4" />
-                Eksportuj teraz
+                {t('accounting.exportNow')}
               </Button>
               <Button onClick={handleExportAndSend} className="flex-1 gap-2">
                 <Send className="w-4 h-4" />
-                Eksportuj i wyślij
+                {t('accounting.exportAndSend')}
               </Button>
             </div>
           </div>
@@ -187,25 +190,25 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
 
         {/* Period Info */}
         <div className="mt-4 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
-          Okres: {format(dateRange.from, "dd MMMM yyyy", { locale: pl })} -{" "}
-          {format(dateRange.to, "dd MMMM yyyy", { locale: pl })}
+          {t('accounting.period')}: {format(dateRange.from, "dd MMMM yyyy", { locale: dateLocale })} -{" "}
+          {format(dateRange.to, "dd MMMM yyyy", { locale: dateLocale })}
         </div>
       </div>
 
       {/* Export History */}
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="p-4 border-b border-border">
-          <h3 className="font-semibold">Historia eksportów</h3>
+          <h3 className="font-semibold">{t('accounting.exportHistory')}</h3>
         </div>
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead>Data wygenerowania</TableHead>
-              <TableHead>Okres</TableHead>
-              <TableHead>Rodzaj</TableHead>
-              <TableHead>Format</TableHead>
-              <TableHead>E-mail docelowy</TableHead>
-              <TableHead className="text-right">Akcje</TableHead>
+              <TableHead>{t('accounting.generatedDate')}</TableHead>
+              <TableHead>{t('accounting.period')}</TableHead>
+              <TableHead>{t('accounting.exportType')}</TableHead>
+              <TableHead>{t('accounting.format')}</TableHead>
+              <TableHead>{t('accounting.targetEmail')}</TableHead>
+              <TableHead className="text-right">{t('accounting.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -239,7 +242,7 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
                 <TableCell className="text-right">
                   <Button variant="ghost" size="sm" className="gap-2">
                     <Download className="w-4 h-4" />
-                    Pobierz
+                    {t('accounting.download')}
                   </Button>
                 </TableCell>
               </TableRow>

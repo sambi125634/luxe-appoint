@@ -22,12 +22,14 @@ import {
 import { Voucher } from "./types";
 import { mockVouchers } from "./mockData";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface VouchersReportProps {
   dateRange: { from: Date; to: Date };
 }
 
 export function VouchersReport({ dateRange }: VouchersReportProps) {
+  const { t } = useTranslation();
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterExpiring, setFilterExpiring] = useState<boolean>(false);
@@ -87,19 +89,19 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
       case "aktywny":
         return (
           <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-            Aktywny
+            {t('accounting.active')}
           </Badge>
         );
       case "wykorzystany":
         return (
           <Badge variant="secondary">
-            Wykorzystany
+            {t('accounting.used')}
           </Badge>
         );
       case "wygasły":
         return (
           <Badge variant="destructive">
-            Wygasły
+            {t('accounting.expired')}
           </Badge>
         );
       default:
@@ -120,26 +122,26 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
         <div className="bg-gradient-to-br from-amber-500/10 to-amber-500/5 rounded-xl p-5 border border-amber-500/20">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-5 h-5 text-amber-600" />
-            <p className="text-sm text-muted-foreground">Zobowiązania</p>
+            <p className="text-sm text-muted-foreground">{t('accounting.liabilities')}</p>
           </div>
           <p className="text-2xl font-bold">{formatCurrency(totalLiability)}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Suma niewykorzystanych voucherów
+            {t('accounting.unusedVouchersSum')}
           </p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Wygasa w 30 dni</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.expiresIn30Days')}</p>
           <p className="text-2xl font-bold text-amber-600">{formatCurrency(expiringValue)}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            {expiringIn30Days.length} voucherów
+            {expiringIn30Days.length} {t('accounting.vouchersCount')}
           </p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Aktywne vouchery</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.activeVouchers')}</p>
           <p className="text-2xl font-bold">{activeVouchers.length}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Wszystkie vouchery</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.allVouchers')}</p>
           <p className="text-2xl font-bold">{mockVouchers.length}</p>
         </div>
       </div>
@@ -148,25 +150,25 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
       <div className="flex flex-wrap items-center gap-3 p-4 bg-card rounded-xl border border-border">
         <Select value={filterStatus} onValueChange={setFilterStatus}>
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('accounting.status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie statusy</SelectItem>
-            <SelectItem value="aktywny">Aktywne</SelectItem>
-            <SelectItem value="wykorzystany">Wykorzystane</SelectItem>
-            <SelectItem value="wygasły">Wygasłe</SelectItem>
+            <SelectItem value="all">{t('accounting.allStatuses')}</SelectItem>
+            <SelectItem value="aktywny">{t('accounting.active')}</SelectItem>
+            <SelectItem value="wykorzystany">{t('accounting.used')}</SelectItem>
+            <SelectItem value="wygasły">{t('accounting.expired')}</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={filterType} onValueChange={setFilterType}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Typ" />
+            <SelectValue placeholder={t('accounting.type')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Wszystkie typy</SelectItem>
-            <SelectItem value="voucher kwotowy">Voucher kwotowy</SelectItem>
-            <SelectItem value="voucher zabiegowy">Voucher zabiegowy</SelectItem>
-            <SelectItem value="pakiet">Pakiet</SelectItem>
+            <SelectItem value="all">{t('accounting.allTypesVoucher')}</SelectItem>
+            <SelectItem value="voucher kwotowy">{t('accounting.amountVoucher')}</SelectItem>
+            <SelectItem value="voucher zabiegowy">{t('accounting.serviceVoucher')}</SelectItem>
+            <SelectItem value="pakiet">{t('accounting.package')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -177,14 +179,14 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
           className="gap-2"
         >
           <AlertTriangle className="w-4 h-4" />
-          Wygasające (30 dni)
+          {t('accounting.expiring30Days')}
         </Button>
 
         <div className="flex-1" />
 
         <Button variant="outline" className="gap-2">
           <Download className="w-4 h-4" />
-          Eksport CSV – vouchery i pakiety
+          {t('accounting.exportCsvVouchers')}
         </Button>
       </div>
 
@@ -193,14 +195,14 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead>Kod</TableHead>
-              <TableHead>Typ</TableHead>
-              <TableHead>Klient</TableHead>
-              <TableHead>Data wystawienia</TableHead>
-              <TableHead>Data ważności</TableHead>
-              <TableHead className="text-right">Wartość nominalna</TableHead>
-              <TableHead className="text-right">Pozostało</TableHead>
-              <TableHead className="text-center">Status</TableHead>
+              <TableHead>{t('accounting.code')}</TableHead>
+              <TableHead>{t('accounting.type')}</TableHead>
+              <TableHead>{t('accounting.client')}</TableHead>
+              <TableHead>{t('accounting.issueDate')}</TableHead>
+              <TableHead>{t('accounting.expiryDate')}</TableHead>
+              <TableHead className="text-right">{t('accounting.originalValue')}</TableHead>
+              <TableHead className="text-right">{t('accounting.remainingValue')}</TableHead>
+              <TableHead className="text-center">{t('accounting.status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -233,7 +235,7 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
                         <span>{format(new Date(v.expiryDate), "dd.MM.yyyy")}</span>
                         {isExpiringSoon && (
                           <Badge variant="outline" className="text-xs border-amber-500 text-amber-600">
-                            za {daysToExpiry} dni
+                            {t('accounting.inDays', { days: daysToExpiry })}
                           </Badge>
                         )}
                       </div>
@@ -265,7 +267,7 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
             {filteredVouchers.length === 0 && (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                  Nie znaleziono voucherów spełniających kryteria.
+                  {t('accounting.noVouchersFound')}
                 </TableCell>
               </TableRow>
             )}

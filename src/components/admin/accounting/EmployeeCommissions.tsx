@@ -19,12 +19,14 @@ import {
 } from "@/components/ui/collapsible";
 import { EmployeeCommission, Transaction } from "./types";
 import { mockEmployeeCommissions, mockTransactions } from "./mockData";
+import { useTranslation } from "react-i18next";
 
 interface EmployeeCommissionsProps {
   dateRange: { from: Date; to: Date };
 }
 
 export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
+  const { t } = useTranslation();
   const [expandedStaff, setExpandedStaff] = useState<string | null>(null);
 
   const formatCurrency = (amount: number) => {
@@ -71,19 +73,19 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-5 border border-primary/20">
-          <p className="text-sm text-muted-foreground mb-1">Do wypłaty łącznie</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.totalPayout')}</p>
           <p className="text-2xl font-bold">{formatCurrency(totals.totalPayout)}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Prowizje</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.commissionsTotal')}</p>
           <p className="text-2xl font-bold">{formatCurrency(totals.totalCommission)}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Napiwki</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.tips')}</p>
           <p className="text-2xl font-bold">{formatCurrency(totals.tipsTotal)}</p>
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
-          <p className="text-sm text-muted-foreground mb-1">Pracowników</p>
+          <p className="text-sm text-muted-foreground mb-1">{t('accounting.employeesCount')}</p>
           <p className="text-2xl font-bold">{commissions.length}</p>
         </div>
       </div>
@@ -92,7 +94,7 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
       <div className="flex justify-end">
         <Button variant="outline" className="gap-2">
           <Download className="w-4 h-4" />
-          Eksport CSV – prowizje pracowników
+          {t('accounting.exportCsvCommissions')}
         </Button>
       </div>
 
@@ -102,14 +104,14 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
           <TableHeader>
             <TableRow className="bg-muted/50">
               <TableHead className="w-[50px]"></TableHead>
-              <TableHead>Pracownik</TableHead>
-              <TableHead className="text-right">Usługi (brutto)</TableHead>
-              <TableHead className="text-right">Produkty (brutto)</TableHead>
-              <TableHead className="text-right">Napiwki</TableHead>
-              <TableHead className="text-right">Prowizja usługi</TableHead>
-              <TableHead className="text-right">Prowizja produkty</TableHead>
-              <TableHead className="text-right">Razem prowizje</TableHead>
-              <TableHead className="text-right">Do wypłaty</TableHead>
+              <TableHead>{t('accounting.employee')}</TableHead>
+              <TableHead className="text-right">{t('accounting.servicesGross')}</TableHead>
+              <TableHead className="text-right">{t('accounting.productsGross')}</TableHead>
+              <TableHead className="text-right">{t('accounting.tips')}</TableHead>
+              <TableHead className="text-right">{t('accounting.serviceCommission')}</TableHead>
+              <TableHead className="text-right">{t('accounting.productCommission')}</TableHead>
+              <TableHead className="text-right">{t('accounting.totalCommissions')}</TableHead>
+              <TableHead className="text-right">{t('accounting.payout')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -156,41 +158,41 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
                       <TableCell colSpan={9} className="p-0">
                         <div className="p-4">
                           <h4 className="text-sm font-medium mb-3">
-                            Transakcje pracownika ({getStaffTransactions(c.staffId).length})
+                            {t('accounting.employeeTransactions')} ({getStaffTransactions(c.staffId).length})
                           </h4>
                           <div className="bg-background rounded-lg border border-border overflow-hidden">
                             <Table>
                               <TableHeader>
                                 <TableRow>
-                                  <TableHead>Data</TableHead>
-                                  <TableHead>Klient</TableHead>
-                                  <TableHead>Typ</TableHead>
-                                  <TableHead>Usługa/Produkt</TableHead>
-                                  <TableHead className="text-right">Kwota brutto</TableHead>
-                                  <TableHead className="text-right">Napiwek</TableHead>
+                                  <TableHead>{t('accounting.date')}</TableHead>
+                                  <TableHead>{t('accounting.client')}</TableHead>
+                                  <TableHead>{t('accounting.type')}</TableHead>
+                                  <TableHead>{t('accounting.serviceProduct')}</TableHead>
+                                  <TableHead className="text-right">{t('accounting.grossAmount')}</TableHead>
+                                  <TableHead className="text-right">{t('accounting.tip')}</TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {getStaffTransactions(c.staffId).map((t) => (
-                                  <TableRow key={t.id}>
+                                {getStaffTransactions(c.staffId).map((tx) => (
+                                  <TableRow key={tx.id}>
                                     <TableCell>
-                                      {format(new Date(t.dateTime), "dd.MM.yyyy HH:mm")}
+                                      {format(new Date(tx.dateTime), "dd.MM.yyyy HH:mm")}
                                     </TableCell>
-                                    <TableCell>{t.clientName || "—"}</TableCell>
+                                    <TableCell>{tx.clientName || "—"}</TableCell>
                                     <TableCell>
                                       <Badge
-                                        variant={t.itemType === "usługa" ? "default" : "secondary"}
+                                        variant={tx.itemType === "usługa" ? "default" : "secondary"}
                                         className="text-xs"
                                       >
-                                        {t.itemType}
+                                        {tx.itemType}
                                       </Badge>
                                     </TableCell>
-                                    <TableCell>{t.itemName}</TableCell>
+                                    <TableCell>{tx.itemName}</TableCell>
                                     <TableCell className="text-right">
-                                      {formatCurrency(t.grossAmount)}
+                                      {formatCurrency(tx.grossAmount)}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                      {t.tipAmount > 0 ? formatCurrency(t.tipAmount) : "—"}
+                                      {tx.tipAmount > 0 ? formatCurrency(tx.tipAmount) : "—"}
                                     </TableCell>
                                   </TableRow>
                                 ))}
@@ -207,7 +209,7 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
             {/* Totals Row */}
             <TableRow className="bg-muted/50 font-semibold">
               <TableCell></TableCell>
-              <TableCell>RAZEM</TableCell>
+              <TableCell>{t('accounting.total')}</TableCell>
               <TableCell className="text-right">{formatCurrency(totals.servicesGross)}</TableCell>
               <TableCell className="text-right">{formatCurrency(totals.productsGross)}</TableCell>
               <TableCell className="text-right">{formatCurrency(totals.tipsTotal)}</TableCell>
