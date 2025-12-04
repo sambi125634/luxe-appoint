@@ -95,6 +95,57 @@
       "description": "This feature is only available for registered users. Leave your contact to unlock the full potential of Beauty Calendar.",
       "cta": "Book a demo"
     },
+    "tour": {
+      "step": "Step {{current}} of {{total}}",
+      "skip": "Skip tour",
+      "start": "Start exploring",
+      "steps": {
+        "welcome": {
+          "title": "Welcome to Beauty Calendar!",
+          "description": "We'll show you how easy it is to manage a beauty salon. This quick guide will walk you through the main features."
+        },
+        "dashboard": {
+          "title": "Your Dashboard",
+          "description": "This is your command center. See today's appointments, revenue, and what needs attention – all at a glance.",
+          "feature1": "Today's appointments",
+          "feature2": "Estimated revenue",
+          "feature3": "Alerts & notifications"
+        },
+        "calendar": {
+          "title": "Appointment Calendar",
+          "description": "Drag and drop appointments, see free slots for each employee. Manage your schedule stress-free.",
+          "feature1": "Drag & drop",
+          "feature2": "Week view",
+          "feature3": "Quick blocks"
+        },
+        "clients": {
+          "title": "Client Database",
+          "description": "Visit history, preferences, notes – everything in one place. Know your clients better than ever.",
+          "feature1": "Visit history",
+          "feature2": "VIP/problematic tags",
+          "feature3": "Notes & preferences"
+        },
+        "services": {
+          "title": "Service Management",
+          "description": "Add categories, set prices and duration. CSV import – ready in 5 minutes.",
+          "feature1": "Service categories",
+          "feature2": "CSV import",
+          "feature3": "Multimedia"
+        },
+        "staff": {
+          "title": "Your Team",
+          "description": "Assign services, set work schedules, track performance. Everyone knows what to do.",
+          "feature1": "Work schedule",
+          "feature2": "Assigned services",
+          "feature3": "Calendar colors"
+        },
+        "cta": {
+          "title": "All done! Time to explore",
+          "description": "That's it! Now you can freely browse all features. Click the menu on the left to see more.",
+          "highlight": "Want this system for your salon? Leave your contact and we'll reach out within 24h!"
+        }
+      }
+    },
     "benefits": {
       "forYou": "What does this mean for you?",
       "home": "See at a glance how much you'll earn today and what needs your attention. No more chaos – everything in one place.",
@@ -102,7 +153,13 @@
       "clients": "Visit history, preferences, VIPs and problematic clients. Know your clients better than ever.",
       "services": "Manage prices, duration and descriptions. Import from Excel – ready in 5 minutes.",
       "staff": "Assign services, set schedules, track results. Everyone knows what to do.",
-      "widgets": "Create the perfect booking calendar for every promotion. Embed it on your site with one click."
+      "widgets": "Create the perfect booking calendar for every promotion. Embed it on your site with one click.",
+      "timeOff": "Vacations, sick leave, training – manage absences without sticky notes. Calendar automatically blocks slots.",
+      "stats": "TOP services, TOP staff, revenue trends. Make decisions based on data, not gut feeling.",
+      "settings": "Customize the system to your salon. Logo, colors, working hours, notifications – everything under control.",
+      "conversations": "All client messages in one place. SMS, email, chat – no switching between apps.",
+      "pipeline": "Track client journey from first visit to regular. Pipeline shows who returns and who needs attention.",
+      "accounting": "Daily cash reports, staff commissions, VAT – everything ready to send to your accountant."
     }
   },
   "audience": {

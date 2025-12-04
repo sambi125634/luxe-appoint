@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X, ChevronRight, Bell, Lock, Sparkles } from "lucide-react";
+import { Menu, X, ChevronRight, Bell, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -10,80 +10,59 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { WidgetsManagement } from "@/components/admin/widgets";
+import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
+import { StatsModule } from "@/components/admin/StatsModule";
+import { SettingsModule } from "@/components/admin/settings";
+import { ConversationsModule } from "@/components/admin/conversations";
+import { PipelineModule } from "@/components/admin/pipeline";
+import { AccountingModule } from "@/components/admin/accounting";
 import { DemoBenefitBanner } from "@/components/demo/DemoBenefitBanner";
-
-// Locked tabs that require registration
-const lockedTabs: TabType[] = ["time-off", "stats", "settings", "conversations", "pipeline", "accounting"];
-
-function LockedContent({ tabName }: { tabName: string }) {
-  const { t } = useTranslation();
-  
-  const tabLabels: Record<string, string> = {
-    "time-off": t("timeOff.title"),
-    "stats": t("admin.reports"),
-    "settings": t("admin.settings"),
-    "conversations": t("admin.conversations"),
-    "pipeline": t("admin.pipeline"),
-    "accounting": t("accounting.charts"),
-  };
-
-  return (
-    <div className="relative">
-      {/* Blurred background content */}
-      <div className="absolute inset-0 bg-gradient-to-br from-card/50 to-muted/30 backdrop-blur-sm rounded-xl" />
-      
-      {/* Lock overlay */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
-        <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-          <Lock className="w-10 h-10 text-primary" />
-        </div>
-        <h3 className="font-serif text-2xl font-semibold mb-3">
-          {tabLabels[tabName] || tabName}
-        </h3>
-        <p className="text-muted-foreground mb-6 max-w-md">
-          {t("demo.locked.description")}
-        </p>
-        <a href="/#lead-form">
-          <Button size="lg" className="gap-2">
-            <Sparkles className="w-4 h-4" />
-            {t("demo.locked.cta")}
-          </Button>
-        </a>
-      </div>
-    </div>
-  );
-}
+import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 
 export default function DemoPage() {
   const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("home");
+  const { showTour, setShowTour } = useTourState();
 
   const getPageTitle = () => {
     switch (activeTab) {
       case "home": return "Dashboard";
-      case "calendar": return "Kalendarz";
-      case "widgets": return "Widgety rezerwacji";
-      case "clients": return "Klienci";
-      case "conversations": return "Konwersacje";
-      case "pipeline": return "Pipeline sprzedażowy";
-      case "accounting": return "Księgowość & Raporty";
-      case "staff": return "Personel";
-      case "services": return "Usługi";
-      case "time-off": return "Urlopy i dni wolne";
-      case "stats": return "Statystyki";
-      case "settings": return "Ustawienia";
+      case "calendar": return t("admin.calendar");
+      case "widgets": return t("admin.widgets");
+      case "clients": return t("admin.clients");
+      case "conversations": return t("admin.conversations");
+      case "pipeline": return t("admin.pipeline");
+      case "accounting": return t("accounting.charts");
+      case "staff": return t("admin.staff");
+      case "services": return t("admin.services");
+      case "time-off": return t("timeOff.title");
+      case "stats": return t("admin.reports");
+      case "settings": return t("admin.settings");
       default: return "Dashboard";
     }
   };
 
-  const renderContent = () => {
-    // Check if tab is locked
-    if (lockedTabs.includes(activeTab)) {
-      return <LockedContent tabName={activeTab} />;
-    }
+  const getBenefitKey = (tab: TabType): string => {
+    const benefitMap: Record<TabType, string> = {
+      home: "home",
+      calendar: "calendar",
+      clients: "clients",
+      services: "services",
+      staff: "staff",
+      widgets: "widgets",
+      "time-off": "timeOff",
+      stats: "stats",
+      settings: "settings",
+      conversations: "conversations",
+      pipeline: "pipeline",
+      accounting: "accounting",
+    };
+    return benefitMap[tab] || tab;
+  };
 
-    const benefitKey = activeTab === "calendar" ? "calendar" : activeTab;
+  const renderContent = () => {
+    const benefitKey = getBenefitKey(activeTab);
 
     const content = (() => {
       switch (activeTab) {
@@ -99,6 +78,18 @@ export default function DemoPage() {
           return <ServicesManagement />;
         case "staff":
           return <StaffManagement />;
+        case "time-off":
+          return <TimeOffManagement />;
+        case "stats":
+          return <StatsModule />;
+        case "settings":
+          return <SettingsModule />;
+        case "conversations":
+          return <ConversationsModule />;
+        case "pipeline":
+          return <PipelineModule />;
+        case "accounting":
+          return <AccountingModule />;
         default:
           return null;
       }
@@ -112,8 +103,20 @@ export default function DemoPage() {
     );
   };
 
+  const handleTourComplete = () => {
+    setShowTour(false);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Guided Tour */}
+      {showTour && (
+        <GuidedTour 
+          onTabChange={setActiveTab} 
+          onComplete={handleTourComplete}
+        />
+      )}
+
       {/* Demo banner */}
       <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2 px-4 text-center text-sm flex items-center justify-center gap-3 flex-wrap">
         <span className="flex items-center gap-2">

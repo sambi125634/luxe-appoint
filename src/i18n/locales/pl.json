@@ -95,6 +95,57 @@
       "description": "Ta funkcja jest dostępna tylko dla zarejestrowanych użytkowników. Zostaw kontakt, aby odblokować pełne możliwości Beauty Calendar.",
       "cta": "Umów prezentację"
     },
+    "tour": {
+      "step": "Krok {{current}} z {{total}}",
+      "skip": "Pomiń przewodnik",
+      "start": "Zacznij eksplorować",
+      "steps": {
+        "welcome": {
+          "title": "Witaj w Beauty Calendar!",
+          "description": "Zaraz pokażemy Ci, jak łatwo zarządzać salonem beauty. Ten krótki przewodnik pokaże Ci główne funkcje systemu."
+        },
+        "dashboard": {
+          "title": "Twój Dashboard",
+          "description": "To Twoje centrum dowodzenia. Widzisz tu dzisiejsze wizyty, przychody i co wymaga uwagi – wszystko na pierwszy rzut oka.",
+          "feature1": "Dzisiejsze wizyty",
+          "feature2": "Szacowane przychody",
+          "feature3": "Alerty i powiadomienia"
+        },
+        "calendar": {
+          "title": "Kalendarz wizyt",
+          "description": "Przeciągnij i upuść wizyty, zobacz wolne terminy każdego pracownika. Zarządzaj grafikiem bez stresu.",
+          "feature1": "Drag & drop",
+          "feature2": "Widok tygodnia",
+          "feature3": "Szybkie blokady"
+        },
+        "clients": {
+          "title": "Baza klientek",
+          "description": "Historia wizyt, preferencje, notatki – wszystko w jednym miejscu. Poznaj swoje klientki lepiej niż kiedykolwiek.",
+          "feature1": "Historia wizyt",
+          "feature2": "Tagi VIP/problematyczna",
+          "feature3": "Notatki i preferencje"
+        },
+        "services": {
+          "title": "Zarządzanie usługami",
+          "description": "Dodawaj kategorie, ustawiaj ceny i czas trwania. Import z CSV – gotowe w 5 minut.",
+          "feature1": "Kategorie usług",
+          "feature2": "Import CSV",
+          "feature3": "Multimedia"
+        },
+        "staff": {
+          "title": "Twój zespół",
+          "description": "Przypisz usługi, ustaw grafik pracy, śledź wydajność. Każdy pracownik wie co ma robić.",
+          "feature1": "Grafik pracy",
+          "feature2": "Przypisane usługi",
+          "feature3": "Kolory w kalendarzu"
+        },
+        "cta": {
+          "title": "Gotowe! Czas na eksplorację",
+          "description": "To wszystko! Teraz możesz swobodnie przeglądać wszystkie funkcje. Kliknij w menu po lewej, aby zobaczyć więcej.",
+          "highlight": "Chcesz mieć taki system dla swojego salonu? Zostaw kontakt, a odezwiemy się w 24h!"
+        }
+      }
+    },
     "benefits": {
       "forYou": "Co to oznacza dla Ciebie?",
       "home": "Zobacz na pierwszy rzut oka ile dziś zarobisz i co wymaga Twojej uwagi. Koniec z chaosem – wszystko w jednym miejscu.",
@@ -102,7 +153,13 @@
       "clients": "Historia wizyt, preferencje, VIP-ki i klientki problematyczne. Poznaj swoje klientki lepiej niż kiedykolwiek.",
       "services": "Zarządzaj cenami, czasem trwania i opisami. Import z Excela – gotowe w 5 minut.",
       "staff": "Przypisz usługi, ustaw grafik, śledź wyniki. Każdy wie co ma robić.",
-      "widgets": "Stwórz kalendarz rezerwacji idealny dla każdej promocji. Osadź go na stronie jednym kliknięciem."
+      "widgets": "Stwórz kalendarz rezerwacji idealny dla każdej promocji. Osadź go na stronie jednym kliknięciem.",
+      "timeOff": "Urlopy, zwolnienia, szkolenia – zarządzaj nieobecnościami bez karteczek. Kalendarz automatycznie blokuje terminy.",
+      "stats": "TOP usługi, TOP pracownicy, trendy przychodów. Podejmuj decyzje na podstawie danych, nie intuicji.",
+      "settings": "Dostosuj system do swojego salonu. Logo, kolory, godziny pracy, powiadomienia – wszystko pod kontrolą.",
+      "conversations": "Wszystkie wiadomości od klientek w jednym miejscu. SMS, email, chat – bez przeskakiwania między aplikacjami.",
+      "pipeline": "Śledź ścieżkę klientki od pierwszej wizyty po stałą klientkę. Pipeline pokazuje kto wraca, a kto wymaga uwagi.",
+      "accounting": "Dzienne raporty kasowe, prowizje pracowników, VAT – wszystko gotowe do wysłania księgowej."
     }
   },
   "audience": {
