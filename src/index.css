@@ -49,6 +49,7 @@
 
     /* Custom luxury tokens */
     --violet: 270 45% 35%;
+    --violet-deep: 270 50% 30%;
     --violet-light: 270 40% 55%;
     --violet-dark: 270 50% 25%;
     --burgundy: 345 45% 40%;
@@ -112,6 +113,7 @@
     --ring: 270 40% 60%;
 
     --violet: 270 40% 60%;
+    --violet-deep: 270 45% 50%;
     --violet-light: 270 35% 70%;
     --violet-dark: 270 45% 45%;
     --burgundy: 345 40% 55%;
