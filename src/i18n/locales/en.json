@@ -1010,6 +1010,8 @@
     "service": "Service",
     "specialist": "Specialist",
     "dateTime": "Date & Time",
+    "selectDateTime": "Select date & time",
+    "findConvenientTime": "Find your perfect date and time",
     "data": "Data",
     "summary": "Summary",
     "back": "Back",
@@ -1021,6 +1023,47 @@
     "oftenCombinedWith": "Often combined with this treatment:",
     "addNextTime": "Add next time",
     "canAddNextVisit": "You can add {{name}} on your next visit.",
-    "clickToAddToWishlist": "Click to add to wishlist for future"
+    "clickToAddToWishlist": "Click to add to wishlist for future",
+    "quickPicks": {
+      "title": "⚡ Quick picks",
+      "nearest": "Nearest available",
+      "popular": "Most popular",
+      "afterWork": "After work",
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "day": {
+      "today": "Today",
+      "tomorrow": "Tomorrow"
+    },
+    "selectDay": "Select a day",
+    "slots": "slots",
+    "availability": {
+      "high": "Good availability",
+      "low": "Limited availability"
+    },
+    "availableSlots": "Available times",
+    "filter": {
+      "all": "All",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "slot": {
+      "recommended": "Recommended",
+      "popular": "Popular",
+      "recommendedDesc": "Recommended slots",
+      "popularDesc": "Popular times"
+    },
+    "social": {
+      "watching": "{{count}} people viewing"
+    },
+    "showAll": "Show more (+{{count}})",
+    "showLess": "Show less",
+    "orChooseManually": "or choose manually",
+    "cancellationPolicy": "Free booking. Reschedule at least 24h before appointment.",
+    "cancellationPolicyFull": "Unattended appointments without notice may require a deposit for future bookings.",
+    "moreInfo": "More info",
+    "greatChoice": "Great choice!"
   }
 }

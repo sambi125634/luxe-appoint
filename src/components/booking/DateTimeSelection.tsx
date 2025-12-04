@@ -1,11 +1,13 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Clock, Sun, Sunset, Moon, Info, Sparkles } from "lucide-react";
-import { format, addDays, startOfWeek, addWeeks, isSameDay, isToday, isBefore } from "date-fns";
-import { pl } from "date-fns/locale";
+import { useState, useMemo } from "react";
+import { Sun, Sunset, Moon, Info, Users, Clock } from "lucide-react";
+import { format, addDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
+import { QuickPicks } from "./QuickPicks";
+import { DaySelector } from "./DaySelector";
+import { TimeSlotCard, getSlotType } from "./TimeSlotCard";
 
 interface DateTimeSelectionProps {
   onSelect: (date: Date, time: string) => void;
@@ -26,17 +28,32 @@ const generateTimeSlots = () => {
   return slots;
 };
 
-const timeSlots = generateTimeSlots();
+const allTimeSlots = generateTimeSlots();
 
-// Simulate some busy slots
-const busySlots: Record<string, string[]> = {
-  [format(new Date(), 'yyyy-MM-dd')]: ['10:00', '11:30', '14:00'],
-  [format(addDays(new Date(), 1), 'yyyy-MM-dd')]: ['09:00', '09:30', '15:00', '15:30'],
-  [format(addDays(new Date(), 2), 'yyyy-MM-dd')]: ['12:00', '12:30', '13:00'],
+// Simulate busy slots (in real app, this comes from API)
+const generateBusySlots = () => {
+  const busy: Record<string, string[]> = {};
+  for (let i = 0; i < 14; i++) {
+    const date = addDays(new Date(), i);
+    const dateStr = format(date, 'yyyy-MM-dd');
+    // Random busy slots
+    const numBusy = Math.floor(Math.random() * 6) + 2;
+    const busyTimes: string[] = [];
+    for (let j = 0; j < numBusy; j++) {
+      const randomIndex = Math.floor(Math.random() * allTimeSlots.length);
+      busyTimes.push(allTimeSlots[randomIndex]);
+    }
+    busy[dateStr] = busyTimes;
+  }
+  return busy;
 };
 
-// Popular/recommended hours
-const popularHours = ['17:00', '17:30', '18:00', '18:30'];
+const busySlots = generateBusySlots();
+
+// Slots that fill gaps in schedule (recommended for salon)
+const recommendedSlots = ['10:00', '14:00', '14:30'];
+// Popular after-work slots
+const popularSlots = ['17:00', '17:30', '18:00', '18:30'];
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening';
 
@@ -47,12 +64,6 @@ const getTimeOfDay = (time: string): TimeOfDay => {
   return 'evening';
 };
 
-const timeOfDayLabels: Record<TimeOfDay, { label: string; icon: typeof Sun }> = {
-  morning: { label: 'Poranek', icon: Sun },
-  afternoon: { label: 'Popołudnie', icon: Sunset },
-  evening: { label: 'Wieczór', icon: Moon },
-};
-
 export function DateTimeSelection({ 
   onSelect, 
   selectedDate, 
@@ -60,33 +71,46 @@ export function DateTimeSelection({
   serviceDuration = 60,
   onProceed
 }: DateTimeSelectionProps) {
-  const [currentWeekStart, setCurrentWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }));
+  const { t } = useTranslation();
   const [activeTimeOfDay, setActiveTimeOfDay] = useState<TimeOfDay | 'all'>('all');
+  const [showAllSlots, setShowAllSlots] = useState(false);
+  const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
 
-  const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
-
-  const goToPreviousWeek = () => {
-    setCurrentWeekStart(addWeeks(currentWeekStart, -1));
-  };
-
-  const goToNextWeek = () => {
-    setCurrentWeekStart(addWeeks(currentWeekStart, 1));
-  };
-
-  const canGoPrevious = !isBefore(addWeeks(currentWeekStart, -1), startOfWeek(new Date(), { weekStartsOn: 1 }));
-
-  const getAvailableSlots = (date: Date) => {
+  const getAvailableSlots = (date: Date): string[] => {
     const dateStr = format(date, 'yyyy-MM-dd');
     const busy = busySlots[dateStr] || [];
-    return timeSlots.filter(slot => !busy.includes(slot));
+    return allTimeSlots.filter(slot => !busy.includes(slot));
   };
 
-  const handleTimeSelect = (date: Date, time: string) => {
+  // Build available slots map for QuickPicks
+  const availableSlotsMap = useMemo(() => {
+    const map: Record<string, string[]> = {};
+    for (let i = 0; i < 14; i++) {
+      const date = addDays(new Date(), i);
+      const dateStr = format(date, 'yyyy-MM-dd');
+      map[dateStr] = getAvailableSlots(date);
+    }
+    return map;
+  }, []);
+
+  const handleQuickSelect = (date: Date, time: string) => {
     onSelect(date, time);
-    // Auto-advance after time selection
     setTimeout(() => {
       onProceed?.();
-    }, 150);
+    }, 200);
+  };
+
+  const handleDaySelect = (date: Date) => {
+    onSelect(date, selectedTime || '');
+  };
+
+  const handleTimeSelect = (time: string) => {
+    if (selectedDate) {
+      onSelect(selectedDate, time);
+      setTimeout(() => {
+        onProceed?.();
+      }, 150);
+    }
   };
 
   const availableSlots = selectedDate ? getAvailableSlots(selectedDate) : [];
@@ -95,11 +119,15 @@ export function DateTimeSelection({
     ? availableSlots 
     : availableSlots.filter(slot => getTimeOfDay(slot) === activeTimeOfDay);
 
-  const groupedSlots = {
-    morning: availableSlots.filter(s => getTimeOfDay(s) === 'morning'),
-    afternoon: availableSlots.filter(s => getTimeOfDay(s) === 'afternoon'),
-    evening: availableSlots.filter(s => getTimeOfDay(s) === 'evening'),
-  };
+  // Sort slots: recommended first, then popular, then standard
+  const sortedSlots = [...filteredSlots].sort((a, b) => {
+    const typeA = getSlotType(a, recommendedSlots, popularSlots);
+    const typeB = getSlotType(b, recommendedSlots, popularSlots);
+    const order = { recommended: 0, popular: 1, standard: 2 };
+    return order[typeA] - order[typeB];
+  });
+
+  const displayedSlots = showAllSlots ? sortedSlots : sortedSlots.slice(0, 6);
 
   const getEndTime = (startTime: string) => {
     const [hours, minutes] = startTime.split(':').map(Number);
@@ -109,204 +137,126 @@ export function DateTimeSelection({
     return `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
   };
 
+  const timeOfDayFilters = [
+    { key: 'all' as const, label: t('booking.filter.all'), icon: Clock },
+    { key: 'morning' as const, label: t('booking.filter.morning'), icon: Sun },
+    { key: 'afternoon' as const, label: t('booking.filter.afternoon'), icon: Sunset },
+    { key: 'evening' as const, label: t('booking.filter.evening'), icon: Moon },
+  ];
+
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* Header */}
       <div>
-        <h2 className="text-2xl font-serif font-semibold mb-2">Wybierz termin</h2>
-        <p className="text-muted-foreground">Znajdź dogodną datę i godzinę wizyty</p>
+        <h2 className="text-2xl font-serif font-semibold mb-2">{t('booking.selectDateTime')}</h2>
+        <p className="text-muted-foreground">{t('booking.findConvenientTime')}</p>
       </div>
 
-      {/* Week navigation */}
-      <div className="glass-card p-4">
-        <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={goToPreviousWeek}
-            disabled={!canGoPrevious}
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </Button>
-          <span className="font-medium">
-            {format(currentWeekStart, 'd MMM', { locale: pl })} - {format(addDays(currentWeekStart, 6), 'd MMM yyyy', { locale: pl })}
-          </span>
-          <Button variant="ghost" size="icon" onClick={goToNextWeek}>
-            <ChevronRight className="w-5 h-5" />
-          </Button>
-        </div>
+      {/* Quick Picks Section */}
+      <QuickPicks 
+        onSelect={handleQuickSelect}
+        availableSlots={availableSlotsMap}
+      />
 
-        {/* Days */}
-        <div className="grid grid-cols-7 gap-2">
-          {weekDays.map((day, index) => {
-            const isPast = isBefore(day, new Date()) && !isToday(day);
-            const isSelected = selectedDate && isSameDay(day, selectedDate);
-            const dayAvailableSlots = getAvailableSlots(day);
-            const hasAvailability = dayAvailableSlots.length > 0 && !isPast;
-
-            return (
-              <button
-                key={day.toISOString()}
-                onClick={() => !isPast && hasAvailability && onSelect(day, selectedTime || '')}
-                disabled={isPast || !hasAvailability}
-                className={cn(
-                  "flex flex-col items-center p-3 rounded-xl transition-all duration-300",
-                  "animate-fade-in",
-                  isSelected
-                    ? "bg-primary text-primary-foreground shadow-soft"
-                    : hasAvailability
-                    ? "bg-card hover:bg-muted border border-border hover:border-primary/50"
-                    : "bg-muted/50 text-muted-foreground cursor-not-allowed"
-                )}
-                style={{ animationDelay: `${index * 30}ms` }}
-              >
-                <span className="text-xs uppercase opacity-70">
-                  {format(day, 'EEE', { locale: pl })}
-                </span>
-                <span className="text-lg font-semibold">
-                  {format(day, 'd')}
-                </span>
-                {hasAvailability && (
-                  <span className={cn(
-                    "text-xs mt-1",
-                    isSelected ? "text-primary-foreground/80" : "text-accent"
-                  )}>
-                    {dayAvailableSlots.length} terminów
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
+      {/* Divider */}
+      <div className="flex items-center gap-4">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-xs text-muted-foreground uppercase tracking-wider">{t('booking.orChooseManually')}</span>
+        <div className="flex-1 h-px bg-border" />
       </div>
 
-      {/* Time slots */}
+      {/* Day Selector */}
+      <DaySelector
+        selectedDate={selectedDate}
+        onSelect={handleDaySelect}
+        getAvailableSlots={getAvailableSlots}
+      />
+
+      {/* Time Slots */}
       {selectedDate && (
-        <div className="animate-fade-in space-y-4">
-          {/* Time of day filter */}
+        <div className="space-y-4 animate-fade-in">
+          {/* Social proof */}
           <div className="flex items-center justify-between">
-            <h3 className="font-medium">Dostępne godziny</h3>
-            <div className="flex gap-1">
-              <Badge 
-                variant={activeTimeOfDay === 'all' ? 'default' : 'secondary'}
-                className="cursor-pointer"
-                onClick={() => setActiveTimeOfDay('all')}
-              >
-                Wszystkie
-              </Badge>
-              {Object.entries(timeOfDayLabels).map(([key, { label, icon: Icon }]) => (
-                <Badge 
-                  key={key}
-                  variant={activeTimeOfDay === key ? 'default' : 'secondary'}
-                  className="cursor-pointer gap-1"
-                  onClick={() => setActiveTimeOfDay(key as TimeOfDay)}
-                >
-                  <Icon className="w-3 h-3" />
-                  <span className="hidden sm:inline">{label}</span>
-                </Badge>
-              ))}
+            <h3 className="font-medium">{t('booking.availableSlots')}</h3>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Users className="w-3.5 h-3.5" />
+              <span>{t('booking.social.watching', { count: viewingUsers })}</span>
             </div>
           </div>
 
-          {/* Grouped time slots */}
-          {activeTimeOfDay === 'all' ? (
-            <div className="space-y-4">
-              {Object.entries(groupedSlots).map(([period, slots]) => {
-                if (slots.length === 0) return null;
-                const { label, icon: Icon } = timeOfDayLabels[period as TimeOfDay];
-                
-                return (
-                  <div key={period}>
-                    <div className="flex items-center gap-2 mb-2 text-sm text-muted-foreground">
-                      <Icon className="w-4 h-4" />
-                      <span>{label}</span>
-                      <span className="text-xs">({slots.length} terminów)</span>
-                    </div>
-                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-                      {slots.map((time, index) => {
-                        const isPopular = popularHours.includes(time);
-                        return (
-                          <button
-                            key={time}
-                            onClick={() => handleTimeSelect(selectedDate, time)}
-                            className={cn(
-                              "relative py-3 px-2 rounded-lg text-sm font-medium transition-all duration-300",
-                              "animate-scale-in flex flex-col items-center",
-                              selectedTime === time
-                                ? "bg-primary text-primary-foreground shadow-soft"
-                                : "bg-card border border-border hover:border-primary/50 hover:bg-muted"
-                            )}
-                            style={{ animationDelay: `${index * 20}ms` }}
-                          >
-                            {isPopular && selectedTime !== time && (
-                              <span className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full" />
-                            )}
-                            <span className="font-semibold">{time}</span>
-                            <span className={cn(
-                              "text-xs",
-                              selectedTime === time ? "text-primary-foreground/70" : "text-muted-foreground"
-                            )}>
-                              — {getEndTime(time)}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
-              {filteredSlots.map((time, index) => {
-                const isPopular = popularHours.includes(time);
-                return (
-                  <button
-                    key={time}
-                    onClick={() => handleTimeSelect(selectedDate, time)}
-                    className={cn(
-                      "relative py-3 px-2 rounded-lg text-sm font-medium transition-all duration-300",
-                      "animate-scale-in flex flex-col items-center",
-                      selectedTime === time
-                        ? "bg-primary text-primary-foreground shadow-soft"
-                        : "bg-card border border-border hover:border-primary/50 hover:bg-muted"
-                    )}
-                    style={{ animationDelay: `${index * 20}ms` }}
-                  >
-                    {isPopular && selectedTime !== time && (
-                      <span className="absolute -top-1 -right-1 w-2 h-2 bg-accent rounded-full" />
-                    )}
-                    <span className="font-semibold">{time}</span>
-                    <span className={cn(
-                      "text-xs",
-                      selectedTime === time ? "text-primary-foreground/70" : "text-muted-foreground"
-                    )}>
-                      — {getEndTime(time)}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+          {/* Time of day filters */}
+          <div className="flex gap-1.5 flex-wrap">
+            {timeOfDayFilters.map(({ key, label, icon: Icon }) => (
+              <Badge 
+                key={key}
+                variant={activeTimeOfDay === key ? 'default' : 'secondary'}
+                className={cn(
+                  "cursor-pointer gap-1.5 transition-all",
+                  activeTimeOfDay === key && "shadow-md"
+                )}
+                onClick={() => setActiveTimeOfDay(key)}
+              >
+                <Icon className="w-3 h-3" />
+                <span>{label}</span>
+              </Badge>
+            ))}
+          </div>
+
+          {/* Time slots grid */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+            {displayedSlots.map((time, index) => (
+              <TimeSlotCard
+                key={time}
+                time={time}
+                endTime={getEndTime(time)}
+                isSelected={selectedTime === time}
+                slotType={getSlotType(time, recommendedSlots, popularSlots)}
+                onClick={() => handleTimeSelect(time)}
+                animationDelay={index * 30}
+                viewerCount={getSlotType(time, recommendedSlots, popularSlots) === 'popular' ? 
+                  Math.floor(Math.random() * 2) + 1 : undefined}
+              />
+            ))}
+          </div>
+
+          {/* Show all toggle */}
+          {sortedSlots.length > 6 && (
+            <button
+              onClick={() => setShowAllSlots(!showAllSlots)}
+              className="w-full py-2 text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-2"
+            >
+              {showAllSlots 
+                ? t('booking.showLess')
+                : t('booking.showAll', { count: sortedSlots.length - 6 })
+              }
+            </button>
           )}
 
-          {/* Popular hours hint */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="w-2 h-2 bg-accent rounded-full" />
-            <span>Popularne godziny</span>
+          {/* Slot type legend */}
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-gradient-to-br from-emerald-500/30 to-emerald-500/10 border border-emerald-500/40" />
+              <span>{t('booking.slot.recommendedDesc')}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 rounded bg-gradient-to-br from-amber-500/30 to-amber-500/10 border border-amber-500/40" />
+              <span>{t('booking.slot.popularDesc')}</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* No-show rules */}
+      {/* Booking policy info */}
       <div className="flex items-start gap-2 p-3 bg-muted/50 rounded-lg text-sm text-muted-foreground">
         <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
         <p>
-          Rezerwacja bezpłatna. W razie potrzeby zmiany terminu prosimy o kontakt min. 24h przed wizytą. 
+          {t('booking.cancellationPolicy')}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button className="text-primary underline ml-1">Więcej info</button>
+              <button className="text-primary underline ml-1">{t('booking.moreInfo')}</button>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
-              <p>Nieodwołane wizyty bez uprzedzenia mogą skutkować koniecznością wpłaty depozytu przy kolejnych rezerwacjach.</p>
+              <p>{t('booking.cancellationPolicyFull')}</p>
             </TooltipContent>
           </Tooltip>
         </p>
