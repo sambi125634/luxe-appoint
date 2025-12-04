@@ -16,6 +16,7 @@ import { ConversationsModule } from "@/components/admin/conversations/Conversati
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { WidgetsManagement } from "@/components/admin/widgets";
+import { SettingsModule } from "@/components/admin/settings";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -91,12 +92,7 @@ export default function AdminDashboard() {
       case "stats":
         return <StatsModule />;
       case "settings":
-        return (
-          <div className="glass-card p-6 text-center text-muted-foreground">
-            <p className="font-serif text-lg mb-2">Ustawienia</p>
-            <p className="text-sm">Moduł ustawień w przygotowaniu...</p>
-          </div>
-        );
+        return <SettingsModule />;
       default:
         return null;
     }
