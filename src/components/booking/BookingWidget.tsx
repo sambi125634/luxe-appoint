@@ -7,13 +7,12 @@ import { ServiceSelection } from "./ServiceSelection";
 import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
-import { BookingSummary } from "./BookingSummary";
 import { BookingConfirmation } from "./BookingConfirmation";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { BookingWidget as WidgetConfig, WidgetStep, defaultWidgetSteps, defaultWidgetTheme } from "@/components/admin/widgets/types";
 
-const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane", "Podsumowanie"];
+const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane"];
 
 // Map step IDs to component names
 const stepIdToName: Record<string, string> = {
@@ -22,7 +21,6 @@ const stepIdToName: Record<string, string> = {
   staff: "Specjalista",
   datetime: "Termin",
   form: "Dane",
-  summary: "Podsumowanie",
 };
 
 interface BookingWidgetProps {
@@ -71,12 +69,12 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     if (!widgetConfig?.steps) {
       return { 
         steps: defaultSteps, 
-        stepMapping: ["intro", "services", "staff", "datetime", "form", "summary"] 
+        stepMapping: ["intro", "services", "staff", "datetime", "form"] 
       };
     }
     
     const enabledSteps = widgetConfig.steps
-      .filter(s => s.enabled)
+      .filter(s => s.enabled && s.id !== "summary") // Exclude summary step
       .sort((a, b) => a.order - b.order);
     
     // Build step names array (excluding intro which is step 0)
@@ -149,8 +147,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
           clientData.email.trim() !== "" &&
           clientData.acceptRodo
         );
-      case "summary":
-        return true;
       default:
         return false;
     }
@@ -166,7 +162,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     return currentIndex > 0 ? currentIndex - 1 : 0;
   };
 
-  const isLastStep = currentStepId === "summary";
+  const isLastStep = currentStepId === "form";
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
@@ -358,19 +354,10 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
         {currentStepId === "form" && (
           <ClientForm onUpdate={setClientData} data={clientData} />
         )}
-        {currentStepId === "summary" && (
-          <BookingSummary
-            service={selectedService}
-            staff={selectedStaff}
-            date={selectedDate}
-            time={selectedTime}
-            client={clientData}
-          />
-        )}
       </div>
 
       {/* Selected service summary - sticky on mobile */}
-      {selectedService && currentStepId !== "services" && currentStepId !== "summary" && (
+      {selectedService && currentStepId !== "services" && (
         <div className="fixed bottom-20 left-4 right-4 sm:static sm:mt-4 z-10">
           <div className="bg-card/95 backdrop-blur-sm border border-border rounded-xl p-3 shadow-lg sm:shadow-none flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -382,6 +369,9 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" />
                   {selectedService.duration} min
+                  {selectedDate && selectedTime && (
+                    <span className="ml-2">• {selectedTime}</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -395,7 +385,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
       {/* Navigation */}
       <div className={cn(
         "flex items-center justify-between mt-8 pt-6 border-t border-border",
-        selectedService && currentStepId !== "services" && currentStepId !== "summary" && "mb-24 sm:mb-0"
+        selectedService && currentStepId !== "services" && "mb-24 sm:mb-0"
       )}>
         <Button
           variant="ghost"
