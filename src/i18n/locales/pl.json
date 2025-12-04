@@ -1040,6 +1040,7 @@
     "slots": "terminów",
     "availability": {
       "high": "Dużo wolnych",
+      "medium": "Średnia",
       "low": "Mało wolnych"
     },
     "availableSlots": "Dostępne godziny",
