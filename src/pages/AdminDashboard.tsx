@@ -13,6 +13,7 @@ import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
 import { StatsModule } from "@/components/admin/StatsModule";
 import { ConversationsModule } from "@/components/admin/conversations/ConversationsModule";
 import { PipelineModule } from "@/components/admin/pipeline";
+import { AccountingModule } from "@/components/admin/accounting";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
       case "clients": return "Klienci";
       case "conversations": return "Konwersacje";
       case "pipeline": return "Pipeline sprzedażowy";
+      case "accounting": return "Księgowość & Raporty";
       case "staff": return "Personel";
       case "services": return "Usługi";
       case "time-off": return "Urlopy i dni wolne";
@@ -46,6 +48,8 @@ export default function AdminDashboard() {
         return <ConversationsModule />;
       case "pipeline":
         return <PipelineModule />;
+      case "accounting":
+        return <AccountingModule />;
       case "services":
         return <ServicesManagement />;
       case "staff":

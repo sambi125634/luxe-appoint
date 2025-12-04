@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type TabType = "home" | "calendar" | "clients" | "conversations" | "pipeline" | "staff" | "services" | "time-off" | "stats" | "settings";
+type TabType = "home" | "calendar" | "clients" | "conversations" | "pipeline" | "accounting" | "staff" | "services" | "time-off" | "stats" | "settings";
 
 const navItems: { icon: typeof Calendar; label: string; tab: TabType; badge?: number }[] = [
   { icon: LayoutDashboard, label: "Dashboard", tab: "home" },
@@ -14,6 +14,7 @@ const navItems: { icon: typeof Calendar; label: string; tab: TabType; badge?: nu
   { icon: UserCircle, label: "Klienci", tab: "clients" },
   { icon: MessageSquare, label: "Konwersacje", tab: "conversations", badge: 3 },
   { icon: Workflow, label: "Pipeline", tab: "pipeline", badge: 2 },
+  { icon: Calculator, label: "Księgowość", tab: "accounting" },
   { icon: Users, label: "Personel", tab: "staff" },
   { icon: Scissors, label: "Usługi", tab: "services" },
   { icon: CalendarOff, label: "Urlopy", tab: "time-off" },
