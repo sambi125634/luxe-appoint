@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "./BookingProgress";
@@ -8,6 +8,7 @@ import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
 import { BookingConfirmation } from "./BookingConfirmation";
+import { SakuraBackground } from "./SakuraBackground";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { BookingWidget as WidgetConfig, WidgetStep, defaultWidgetSteps, defaultWidgetTheme } from "@/components/admin/widgets/types";
@@ -225,56 +226,117 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     );
   }
 
-  // Intro screen
+  // Intro screen with Sakura animation
   if (currentStepId === "intro") {
     return (
-      <div className="w-full max-w-2xl mx-auto animate-fade-in">
-        <div className="text-center py-8">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center mx-auto mb-6 shadow-glow">
-            <Sparkles className="w-8 h-8 text-primary-foreground" />
+      <div className="relative min-h-[100dvh] w-full overflow-hidden">
+        {/* Animated Sakura Background */}
+        <SakuraBackground />
+        
+        {/* Content */}
+        <div className="relative z-20 min-h-[100dvh] flex flex-col items-center justify-center px-4 py-8">
+          {/* Main Card */}
+          <div className="w-full max-w-md mx-auto">
+            {/* Floating badge */}
+            <div 
+              className="flex justify-center mb-6 animate-fade-in"
+              style={{ animationDelay: '0.2s' }}
+            >
+              <Badge 
+                variant="secondary" 
+                className="px-4 py-1.5 text-xs font-medium bg-white/80 dark:bg-black/40 backdrop-blur-md border-pink-200/50 dark:border-pink-800/50 shadow-lg"
+              >
+                <Heart className="w-3 h-3 mr-1.5 text-pink-500 fill-pink-500" />
+                Rezerwacja online 24/7
+              </Badge>
+            </div>
+
+            {/* Logo/Icon with glow */}
+            <div 
+              className="flex justify-center mb-8 animate-fade-in"
+              style={{ animationDelay: '0.4s' }}
+            >
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-violet-500 rounded-full blur-2xl opacity-40 scale-150 animate-pulse" />
+                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-pink-400 via-rose-400 to-violet-500 flex items-center justify-center shadow-2xl">
+                  <Sparkles className="w-12 h-12 text-white drop-shadow-lg" />
+                </div>
+              </div>
+            </div>
+
+            {/* Headline */}
+            <div 
+              className="text-center mb-8 animate-fade-in"
+              style={{ animationDelay: '0.6s' }}
+            >
+              <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-gray-900 via-pink-900 to-violet-900 dark:from-white dark:via-pink-100 dark:to-violet-100 bg-clip-text text-transparent leading-tight">
+                {widgetConfig?.theme?.headerText || "Zarezerwuj wizytę"}
+              </h1>
+              <p className="text-lg text-muted-foreground/80 max-w-sm mx-auto leading-relaxed">
+                Twój moment relaksu czeka. Zarezerwuj w kilka chwil.
+              </p>
+            </div>
+
+            {/* Steps - elegant minimal version */}
+            <div 
+              className="flex justify-center gap-8 mb-10 animate-fade-in"
+              style={{ animationDelay: '0.8s' }}
+            >
+              {[
+                { icon: Sparkles, label: "Usługa" },
+                { icon: Calendar, label: "Termin" },
+                { icon: UserCheck, label: "Gotowe" },
+              ].map((step, index) => (
+                <div key={index} className="flex flex-col items-center gap-2">
+                  <div className="w-12 h-12 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-sm border border-white/50 dark:border-white/20 flex items-center justify-center shadow-lg transition-transform hover:scale-110 hover:-rotate-3">
+                    <step.icon className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                  </div>
+                  <span className="text-xs font-medium text-muted-foreground">{step.label}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* CTA Button */}
+            <div 
+              className="flex flex-col items-center gap-4 animate-fade-in"
+              style={{ animationDelay: '1s' }}
+            >
+              <Button 
+                onClick={handleStartBooking}
+                size="lg"
+                className="relative group px-10 py-7 text-lg font-medium rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-600 hover:via-rose-600 hover:to-violet-600 text-white shadow-2xl shadow-pink-500/30 transition-all duration-300 hover:scale-105 hover:shadow-pink-500/40"
+              >
+                <span className="relative z-10 flex items-center gap-3">
+                  Zacznij rezerwację
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </Button>
+              
+              <p className="text-sm text-muted-foreground/70 flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Zajmie Ci to tylko 2 minuty
+              </p>
+            </div>
+
+            {/* Trust indicators */}
+            <div 
+              className="mt-12 flex justify-center gap-6 text-xs text-muted-foreground/60 animate-fade-in"
+              style={{ animationDelay: '1.2s' }}
+            >
+              <span className="flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                Bezpłatne
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                Bez zobowiązań
+              </span>
+              <span className="flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                SMS przypomnienie
+              </span>
+            </div>
           </div>
-          <h1 className="text-3xl font-serif font-bold mb-3">
-            {widgetConfig?.theme?.headerText || "Zarezerwuj wizytę"}
-          </h1>
-          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Rezerwacja online w 3 prostych krokach. Wybierz usługę, termin i gotowe!
-          </p>
-
-          {/* Steps preview */}
-          <div className="grid grid-cols-3 gap-4 mb-8">
-            <div className="flex flex-col items-center p-4 rounded-xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-medium">1. Wybierz usługę</span>
-            </div>
-            <div className="flex flex-col items-center p-4 rounded-xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <Calendar className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-medium">2. Wybierz termin</span>
-            </div>
-            <div className="flex flex-col items-center p-4 rounded-xl bg-card border border-border">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-medium">3. Potwierdź</span>
-            </div>
-          </div>
-
-          <Button 
-            variant="luxury" 
-            size="lg" 
-            onClick={handleStartBooking}
-            className="gap-2 px-8"
-          >
-            Zacznij rezerwację
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-
-          <p className="text-xs text-muted-foreground mt-6">
-            🕐 Zajmie Ci to tylko 2 minuty
-          </p>
         </div>
       </div>
     );
