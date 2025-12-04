@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, X, Pencil, Trash2 } from "lucide-react";
+import { Upload, FileSpreadsheet, CheckCircle, AlertCircle, Pencil, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,31 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
   const [importedServices, setImportedServices] = useState<ImportedService[]>([]);
   const [editingService, setEditingService] = useState<ImportedService | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const downloadExampleCSV = () => {
+    const exampleData = [
+      ["nazwa", "kategoria", "czas", "cena", "opis"],
+      ["Peeling kawitacyjny", "Twarz", "60", "150", "Głębokie oczyszczanie skóry twarzy z użyciem ultradźwięków"],
+      ["Mezoterapia igłowa", "Twarz", "45", "350", "Regeneracja i nawilżenie skóry poprzez mikroiniekcje"],
+      ["Masaż relaksacyjny", "Ciało", "90", "200", "Pełen relaks dla ciała i umysłu z użyciem aromaterapii"],
+      ["Depilacja laserowa - nogi", "Depilacja", "60", "400", "Trwałe usuwanie owłosienia laserem diodowym"],
+      ["Manicure hybrydowy", "Paznokcie", "75", "120", "Stylizacja paznokci z użyciem lakieru hybrydowego"],
+      ["Mikrodermabrazja", "Twarz", "50", "180", "Złuszczanie naskórka kryształkami korundowymi"],
+      ["Lifting RF", "Twarz", "45", "280", "Nieinwazyjne liftingowanie skóry falami radiowymi"],
+      ["Drenaż limfatyczny", "Ciało", "60", "160", "Masaż wspomagający odpływ limfy i redukcję obrzęków"],
+    ];
+    
+    const csvContent = exampleData.map(row => row.join(",")).join("\n");
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "przyklad_uslugi.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const validateService = (service: Partial<ImportedService>): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
@@ -198,6 +223,15 @@ export function CSVImport({ isOpen, onClose, onImport, categories }: CSVImportPr
                 <p className="text-sm text-muted-foreground mt-3">
                   Przykład: <code className="bg-muted px-1 rounded text-xs">nazwa,kategoria,czas,cena,opis</code>
                 </p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-4 gap-2 w-full"
+                  onClick={downloadExampleCSV}
+                >
+                  <Download className="w-4 h-4" />
+                  Pobierz przykładowy plik CSV
+                </Button>
               </div>
             </div>
           )}

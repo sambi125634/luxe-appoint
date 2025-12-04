@@ -97,11 +97,7 @@ const mockStaff: StaffMember[] = [
   },
 ];
 
-interface StaffManagementProps {
-  isDemo?: boolean;
-}
-
-export function StaffManagement({ isDemo }: StaffManagementProps) {
+export function StaffManagement() {
   const [staff, setStaff] = useState(mockStaff);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);

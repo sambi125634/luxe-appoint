@@ -1,17 +1,20 @@
 import { Link } from "react-router-dom";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type TabType = "calendar" | "staff" | "services" | "stats" | "settings";
+type TabType = "home" | "calendar" | "clients" | "staff" | "services" | "time-off" | "stats" | "settings";
 
 const navItems: { icon: typeof Calendar; label: string; tab: TabType }[] = [
+  { icon: LayoutDashboard, label: "Dashboard", tab: "home" },
   { icon: Calendar, label: "Kalendarz", tab: "calendar" },
+  { icon: UserCircle, label: "Klienci", tab: "clients" },
   { icon: Users, label: "Personel", tab: "staff" },
   { icon: Scissors, label: "Usługi", tab: "services" },
+  { icon: CalendarOff, label: "Urlopy", tab: "time-off" },
   { icon: BarChart3, label: "Statystyki", tab: "stats" },
   { icon: Settings, label: "Ustawienia", tab: "settings" },
 ];
@@ -20,11 +23,9 @@ interface AdminSidebarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   onClose?: () => void;
-  isDemo?: boolean;
-  lockedTabs?: TabType[];
 }
 
-export function AdminSidebar({ activeTab, onTabChange, onClose, isDemo, lockedTabs = [] }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -45,7 +46,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, isDemo, lockedTa
         <ul className="space-y-1">
           {navItems.map((item) => (
             <li key={item.label}>
-                <button
+              <button
                 onClick={() => {
                   onTabChange(item.tab);
                   onClose?.();
@@ -54,15 +55,11 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, isDemo, lockedTa
                   "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                   activeTab === item.tab
                     ? "bg-primary text-primary-foreground shadow-soft" 
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                  isDemo && lockedTabs.includes(item.tab) && "opacity-60"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
                 <item.icon className="w-5 h-5" />
                 {item.label}
-                {isDemo && lockedTabs.includes(item.tab) && (
-                  <span className="ml-auto text-xs bg-muted px-2 py-0.5 rounded">🔒</span>
-                )}
               </button>
             </li>
           ))}

@@ -34,10 +34,9 @@ const hours = Array.from({ length: 12 }, (_, i) => `${(8 + i).toString().padStar
 
 interface WeeklyCalendarProps {
   onNewAppointment?: () => void;
-  isDemo?: boolean;
 }
 
-export function WeeklyCalendar({ onNewAppointment, isDemo }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(mockAppointments);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
