@@ -7,12 +7,14 @@
     "bookDemo": "Book a demo"
   },
   "hero": {
-    "badge": "Revolution in salon management",
-    "title": "Your salon deserves a calendar that",
-    "titleHighlight": "works as hard as you do",
-    "description": "Beauty Calendar is an intelligent booking system that automates your work, eliminates empty slots, and lets you focus on what you do best.",
-    "cta": "Start for free",
-    "secondaryCta": "See demo"
+    "badge": "#1 Booking system for beauty salons",
+    "title": "Stop chasing calls.",
+    "titleHighlight": "Start earning more.",
+    "description": "Clients book 24/7, automatic reminders eliminate no-shows, and you finally focus on treatments – not your calendar.",
+    "cta": "I want a full schedule",
+    "secondaryCta": "See how it works",
+    "trustBadge1": "No credit card required",
+    "trustBadge2": "Ready in 5 minutes"
   },
   "painPoints": {
     "title": "How much is chaos costing you?",
