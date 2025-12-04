@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { Menu, X, ChevronRight, Bell, Lock, Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
@@ -10,18 +10,21 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { WidgetsManagement } from "@/components/admin/widgets";
+import { DemoBenefitBanner } from "@/components/demo/DemoBenefitBanner";
 
 // Locked tabs that require registration
 const lockedTabs: TabType[] = ["time-off", "stats", "settings", "conversations", "pipeline", "accounting"];
 
 function LockedContent({ tabName }: { tabName: string }) {
+  const { t } = useTranslation();
+  
   const tabLabels: Record<string, string> = {
-    "time-off": "Urlopy i dni wolne",
-    "stats": "Statystyki",
-    "settings": "Ustawienia",
-    "conversations": "Konwersacje",
-    "pipeline": "Pipeline sprzedażowy",
-    "accounting": "Księgowość & Raporty",
+    "time-off": t("timeOff.title"),
+    "stats": t("admin.reports"),
+    "settings": t("admin.settings"),
+    "conversations": t("admin.conversations"),
+    "pipeline": t("admin.pipeline"),
+    "accounting": t("accounting.charts"),
   };
 
   return (
@@ -38,21 +41,21 @@ function LockedContent({ tabName }: { tabName: string }) {
           {tabLabels[tabName] || tabName}
         </h3>
         <p className="text-muted-foreground mb-6 max-w-md">
-          Ta funkcja jest dostępna tylko dla zarejestrowanych użytkowników. 
-          Załóż bezpłatne konto, aby odblokować pełne możliwości Beauty Calendar.
+          {t("demo.locked.description")}
         </p>
-        <Link to="/auth">
+        <a href="/#lead-form">
           <Button size="lg" className="gap-2">
             <Sparkles className="w-4 h-4" />
-            Zarejestruj się za darmo
+            {t("demo.locked.cta")}
           </Button>
-        </Link>
+        </a>
       </div>
     </div>
   );
 }
 
 export default function DemoPage() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("home");
 
@@ -80,22 +83,33 @@ export default function DemoPage() {
       return <LockedContent tabName={activeTab} />;
     }
 
-    switch (activeTab) {
-      case "home":
-        return <DashboardHome />;
-      case "calendar":
-        return <ScheduleManagement />;
-      case "widgets":
-        return <WidgetsManagement />;
-      case "clients":
-        return <ClientsManagement />;
-      case "services":
-        return <ServicesManagement />;
-      case "staff":
-        return <StaffManagement />;
-      default:
-        return null;
-    }
+    const benefitKey = activeTab === "calendar" ? "calendar" : activeTab;
+
+    const content = (() => {
+      switch (activeTab) {
+        case "home":
+          return <DashboardHome />;
+        case "calendar":
+          return <ScheduleManagement />;
+        case "widgets":
+          return <WidgetsManagement />;
+        case "clients":
+          return <ClientsManagement />;
+        case "services":
+          return <ServicesManagement />;
+        case "staff":
+          return <StaffManagement />;
+        default:
+          return null;
+      }
+    })();
+
+    return (
+      <>
+        <DemoBenefitBanner benefitKey={benefitKey} />
+        {content}
+      </>
+    );
   };
 
   return (
@@ -104,13 +118,13 @@ export default function DemoPage() {
       <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2 px-4 text-center text-sm flex items-center justify-center gap-3 flex-wrap">
         <span className="flex items-center gap-2">
           <Sparkles className="w-4 h-4" />
-          <strong>To jest wersja demo</strong> • Twoje dane nie zostaną zapisane
+          <strong>{t("demo.banner.title")}</strong> • {t("demo.banner.subtitle")}
         </span>
-        <Link to="/auth">
+        <a href="/#lead-form">
           <Button variant="secondary" size="sm" className="h-7 text-xs">
-            Załóż konto
+            {t("demo.banner.cta")}
           </Button>
-        </Link>
+        </a>
       </div>
 
       <div className="flex-1 flex">
@@ -160,12 +174,12 @@ export default function DemoPage() {
                 <Bell className="w-5 h-5" />
                 <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full" />
               </Button>
-              <Link to="/book/demo-salon">
+              <a href="/book/demo-salon">
                 <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
                   <ChevronRight className="w-4 h-4" />
-                  Zobacz widget
+                  {t("demo.fullPreview")}
                 </Button>
-              </Link>
+              </a>
             </div>
           </header>
 

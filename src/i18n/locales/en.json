@@ -85,7 +85,25 @@
     "subtitle": "See how it works without registration",
     "clientView": "Client view",
     "salonView": "Salon panel",
-    "fullPreview": "Full preview"
+    "fullPreview": "Full preview",
+    "banner": {
+      "title": "This is a demo version",
+      "subtitle": "Your data will not be saved",
+      "cta": "Book a demo"
+    },
+    "locked": {
+      "description": "This feature is only available for registered users. Leave your contact to unlock the full potential of Beauty Calendar.",
+      "cta": "Book a demo"
+    },
+    "benefits": {
+      "forYou": "What does this mean for you?",
+      "home": "See at a glance how much you'll earn today and what needs your attention. No more chaos – everything in one place.",
+      "calendar": "Drag and drop appointments, see who has free slots. Your salon schedule under control without calling every employee.",
+      "clients": "Visit history, preferences, VIPs and problematic clients. Know your clients better than ever.",
+      "services": "Manage prices, duration and descriptions. Import from Excel – ready in 5 minutes.",
+      "staff": "Assign services, set schedules, track results. Everyone knows what to do.",
+      "widgets": "Create the perfect booking calendar for every promotion. Embed it on your site with one click."
+    }
   },
   "audience": {
     "title": "Who is it for?",

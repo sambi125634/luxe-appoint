@@ -85,7 +85,25 @@
     "subtitle": "Zobacz jak to działa bez rejestracji",
     "clientView": "Widok klientki",
     "salonView": "Panel salonu",
-    "fullPreview": "Pełny podgląd"
+    "fullPreview": "Pełny podgląd",
+    "banner": {
+      "title": "To jest wersja demo",
+      "subtitle": "Twoje dane nie zostaną zapisane",
+      "cta": "Umów prezentację"
+    },
+    "locked": {
+      "description": "Ta funkcja jest dostępna tylko dla zarejestrowanych użytkowników. Zostaw kontakt, aby odblokować pełne możliwości Beauty Calendar.",
+      "cta": "Umów prezentację"
+    },
+    "benefits": {
+      "forYou": "Co to oznacza dla Ciebie?",
+      "home": "Zobacz na pierwszy rzut oka ile dziś zarobisz i co wymaga Twojej uwagi. Koniec z chaosem – wszystko w jednym miejscu.",
+      "calendar": "Przeciągnij i upuść wizyty, zobacz kto ma wolne okienka. Grafik Twojego salonu pod kontrolą bez dzwonienia do każdego pracownika.",
+      "clients": "Historia wizyt, preferencje, VIP-ki i klientki problematyczne. Poznaj swoje klientki lepiej niż kiedykolwiek.",
+      "services": "Zarządzaj cenami, czasem trwania i opisami. Import z Excela – gotowe w 5 minut.",
+      "staff": "Przypisz usługi, ustaw grafik, śledź wyniki. Każdy wie co ma robić.",
+      "widgets": "Stwórz kalendarz rezerwacji idealny dla każdej promocji. Osadź go na stronie jednym kliknięciem."
+    }
   },
   "audience": {
     "title": "Dla kogo?",
