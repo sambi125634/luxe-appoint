@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type TabType = "home" | "calendar" | "clients" | "staff" | "services" | "time-off" | "stats" | "settings";
+type TabType = "home" | "calendar" | "clients" | "conversations" | "staff" | "services" | "time-off" | "stats" | "settings";
 
-const navItems: { icon: typeof Calendar; label: string; tab: TabType }[] = [
+const navItems: { icon: typeof Calendar; label: string; tab: TabType; badge?: number }[] = [
   { icon: LayoutDashboard, label: "Dashboard", tab: "home" },
   { icon: Calendar, label: "Kalendarz", tab: "calendar" },
   { icon: UserCircle, label: "Klienci", tab: "clients" },
+  { icon: MessageSquare, label: "Konwersacje", tab: "conversations", badge: 3 },
   { icon: Users, label: "Personel", tab: "staff" },
   { icon: Scissors, label: "Usługi", tab: "services" },
   { icon: CalendarOff, label: "Urlopy", tab: "time-off" },
@@ -59,7 +60,17 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
                 )}
               >
                 <item.icon className="w-5 h-5" />
-                {item.label}
+                <span className="flex-1 text-left">{item.label}</span>
+                {item.badge && item.badge > 0 && (
+                  <span className={cn(
+                    "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
+                    activeTab === item.tab 
+                      ? "bg-primary-foreground/20 text-primary-foreground" 
+                      : "bg-secondary text-secondary-foreground"
+                  )}>
+                    {item.badge}
+                  </span>
+                )}
               </button>
             </li>
           ))}
