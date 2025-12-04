@@ -62,6 +62,51 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_google_calendar: {
+        Row: {
+          access_token: string | null
+          block_from_google: boolean | null
+          calendar_id: string
+          created_at: string | null
+          google_email: string
+          id: string
+          is_active: boolean | null
+          refresh_token: string | null
+          staff_id: string
+          sync_to_google: boolean | null
+          token_expires_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token?: string | null
+          block_from_google?: boolean | null
+          calendar_id?: string
+          created_at?: string | null
+          google_email: string
+          id?: string
+          is_active?: boolean | null
+          refresh_token?: string | null
+          staff_id: string
+          sync_to_google?: boolean | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token?: string | null
+          block_from_google?: boolean | null
+          calendar_id?: string
+          created_at?: string | null
+          google_email?: string
+          id?: string
+          is_active?: boolean | null
+          refresh_token?: string | null
+          staff_id?: string
+          sync_to_google?: boolean | null
+          token_expires_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
