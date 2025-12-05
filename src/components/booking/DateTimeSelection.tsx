@@ -1,9 +1,8 @@
-import { useState, useMemo } from "react";
-import { Sun, Sunset, Moon, Info, Users, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { Sun, Sunset, Moon, Info, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import { format, addDays, isSameDay, isBefore, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useTranslation } from "react-i18next";
@@ -74,9 +73,23 @@ export function DateTimeSelection({
 }: DateTimeSelectionProps) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pl' ? pl : enUS;
-  const [activeTimeOfDay, setActiveTimeOfDay] = useState<TimeOfDay | 'all'>('all');
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const timeSlotsRef = useRef<HTMLDivElement>(null);
+  const [showTimeSlots, setShowTimeSlots] = useState(false);
+
+  // Smooth scroll to time slots when date is selected
+  useEffect(() => {
+    if (selectedDate && timeSlotsRef.current) {
+      setShowTimeSlots(false);
+      setTimeout(() => {
+        setShowTimeSlots(true);
+        setTimeout(() => {
+          timeSlotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }, 50);
+    }
+  }, [selectedDate]);
 
   const getAvailableSlots = (date: Date): string[] => {
     const dateStr = format(date, 'yyyy-MM-dd');
@@ -152,20 +165,22 @@ export function DateTimeSelection({
     : ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
   const availableSlots = selectedDate ? getAvailableSlots(selectedDate) : [];
-  
-  const filteredSlots = activeTimeOfDay === 'all' 
-    ? availableSlots 
-    : availableSlots.filter(slot => getTimeOfDay(slot) === activeTimeOfDay);
 
-  // Sort slots: recommended first, then popular, then standard
-  const sortedSlots = [...filteredSlots].sort((a, b) => {
-    const typeA = getSlotType(a, recommendedSlots, popularSlots);
-    const typeB = getSlotType(b, recommendedSlots, popularSlots);
-    const order = { recommended: 0, popular: 1, standard: 2 };
-    return order[typeA] - order[typeB];
-  });
-
-  // Show all slots immediately after date selection for better UX
+  // Group slots by time of day
+  const groupedSlots = useMemo(() => {
+    const groups: Record<TimeOfDay, string[]> = {
+      morning: [],
+      afternoon: [],
+      evening: []
+    };
+    
+    availableSlots.forEach(slot => {
+      const timeOfDay = getTimeOfDay(slot);
+      groups[timeOfDay].push(slot);
+    });
+    
+    return groups;
+  }, [availableSlots]);
 
   const getEndTime = (startTime: string) => {
     const [hours, minutes] = startTime.split(':').map(Number);
@@ -175,11 +190,31 @@ export function DateTimeSelection({
     return `${endHours.toString().padStart(2, '0')}:${endMins.toString().padStart(2, '0')}`;
   };
 
-  const timeOfDayFilters = [
-    { key: 'all' as const, label: t('booking.filter.all'), icon: Clock },
-    { key: 'morning' as const, label: t('booking.filter.morning'), icon: Sun },
-    { key: 'afternoon' as const, label: t('booking.filter.afternoon'), icon: Sunset },
-    { key: 'evening' as const, label: t('booking.filter.evening'), icon: Moon },
+  const timeOfDaySections = [
+    { 
+      key: 'morning' as TimeOfDay, 
+      label: t('booking.filter.morning'), 
+      sublabel: '9:00 - 12:00',
+      icon: Sun,
+      gradient: 'from-amber-500/20 to-orange-500/10',
+      iconColor: 'text-amber-500'
+    },
+    { 
+      key: 'afternoon' as TimeOfDay, 
+      label: t('booking.filter.afternoon'), 
+      sublabel: '12:00 - 17:00',
+      icon: Sunset,
+      gradient: 'from-orange-500/20 to-rose-500/10',
+      iconColor: 'text-orange-500'
+    },
+    { 
+      key: 'evening' as TimeOfDay, 
+      label: t('booking.filter.evening'), 
+      sublabel: '17:00 - 19:00',
+      icon: Moon,
+      gradient: 'from-violet-500/20 to-indigo-500/10',
+      iconColor: 'text-violet-500'
+    },
   ];
 
   return (
@@ -311,55 +346,74 @@ export function DateTimeSelection({
         </div>
       </div>
 
-      {/* Time Slots */}
-      {selectedDate && (
-        <div className="space-y-4 animate-fade-in">
-          {/* Social proof */}
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">{t('booking.availableSlots')}</h3>
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+      {/* Time Slots - Grouped by time of day */}
+      {selectedDate && showTimeSlots && (
+        <div ref={timeSlotsRef} className="space-y-6 scroll-mt-4">
+          {/* Header with social proof */}
+          <div 
+            className="flex items-center justify-between animate-fade-in"
+            style={{ animationDelay: '0ms' }}
+          >
+            <h3 className="font-semibold text-lg">{t('booking.availableSlots')}</h3>
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground bg-muted/50 px-2.5 py-1 rounded-full">
               <Users className="w-3.5 h-3.5" />
               <span>{t('booking.social.watching', { count: viewingUsers })}</span>
             </div>
           </div>
 
-          {/* Time of day filters */}
-          <div className="flex gap-1.5 flex-wrap">
-            {timeOfDayFilters.map(({ key, label, icon: Icon }) => (
-              <Badge 
-                key={key}
-                variant={activeTimeOfDay === key ? 'default' : 'secondary'}
-                className={cn(
-                  "cursor-pointer gap-1.5 transition-all",
-                  activeTimeOfDay === key && "shadow-md"
-                )}
-                onClick={() => setActiveTimeOfDay(key)}
+          {/* Time of day sections */}
+          {timeOfDaySections.map(({ key, label, sublabel, icon: Icon, gradient, iconColor }, sectionIndex) => {
+            const slots = groupedSlots[key];
+            if (slots.length === 0) return null;
+            
+            return (
+              <div 
+                key={key} 
+                className="space-y-3 animate-fade-in"
+                style={{ animationDelay: `${(sectionIndex + 1) * 100}ms` }}
               >
-                <Icon className="w-3 h-3" />
-                <span>{label}</span>
-              </Badge>
-            ))}
-          </div>
+                {/* Section header */}
+                <div className={cn(
+                  "flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r border border-border/50",
+                  gradient
+                )}>
+                  <div className={cn(
+                    "w-10 h-10 rounded-full bg-background/80 backdrop-blur flex items-center justify-center shadow-sm",
+                    iconColor
+                  )}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium">{label}</h4>
+                    <p className="text-xs text-muted-foreground">{sublabel} • {slots.length} {t('booking.slots')}</p>
+                  </div>
+                </div>
 
-          {/* Time slots grid - all slots visible for easy assessment */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin">
-            {sortedSlots.map((time, index) => (
-              <TimeSlotCard
-                key={time}
-                time={time}
-                endTime={getEndTime(time)}
-                isSelected={selectedTime === time}
-                slotType={getSlotType(time, recommendedSlots, popularSlots)}
-                onClick={() => handleTimeSelect(time)}
-                animationDelay={index * 20}
-                viewerCount={getSlotType(time, recommendedSlots, popularSlots) === 'popular' ? 
-                  Math.floor(Math.random() * 2) + 1 : undefined}
-              />
-            ))}
-          </div>
+                {/* Time slots grid */}
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 pl-1">
+                  {slots.map((time, index) => (
+                    <TimeSlotCard
+                      key={time}
+                      time={time}
+                      endTime={getEndTime(time)}
+                      isSelected={selectedTime === time}
+                      slotType={getSlotType(time, recommendedSlots, popularSlots)}
+                      onClick={() => handleTimeSelect(time)}
+                      animationDelay={(sectionIndex * 100) + (index * 30)}
+                      viewerCount={getSlotType(time, recommendedSlots, popularSlots) === 'popular' ? 
+                        Math.floor(Math.random() * 2) + 1 : undefined}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
 
           {/* Slot type legend */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
+          <div 
+            className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2 animate-fade-in"
+            style={{ animationDelay: '400ms' }}
+          >
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded bg-gradient-to-br from-emerald-500/30 to-emerald-500/10 border border-emerald-500/40" />
               <span>{t('booking.slot.recommendedDesc')}</span>
