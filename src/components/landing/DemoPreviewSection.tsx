@@ -87,7 +87,7 @@ const DemoPreviewSection = () => {
             </div>
           </Tabs>
           
-          <div className="text-center mt-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <Button 
               size="lg"
               className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white px-8"
@@ -95,6 +95,15 @@ const DemoPreviewSection = () => {
             >
               Wypróbuj rezerwację
               <Calendar className="ml-2 w-4 h-4" />
+            </Button>
+            <Button 
+              size="lg"
+              variant="outline"
+              className="border-violet-deep/30 text-foreground hover:bg-violet-deep/10 px-8"
+              onClick={() => window.location.href = '/demo'}
+            >
+              Zobacz panel salonu
+              <Settings className="ml-2 w-4 h-4" />
             </Button>
           </div>
         </div>
