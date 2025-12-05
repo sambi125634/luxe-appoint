@@ -75,7 +75,6 @@ export function DateTimeSelection({
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pl' ? pl : enUS;
   const [activeTimeOfDay, setActiveTimeOfDay] = useState<TimeOfDay | 'all'>('all');
-  const [showAllSlots, setShowAllSlots] = useState(false);
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -166,7 +165,7 @@ export function DateTimeSelection({
     return order[typeA] - order[typeB];
   });
 
-  const displayedSlots = showAllSlots ? sortedSlots : sortedSlots.slice(0, 6);
+  // Show all slots immediately after date selection for better UX
 
   const getEndTime = (startTime: string) => {
     const [hours, minutes] = startTime.split(':').map(Number);
@@ -342,9 +341,9 @@ export function DateTimeSelection({
             ))}
           </div>
 
-          {/* Time slots grid */}
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-            {displayedSlots.map((time, index) => (
+          {/* Time slots grid - all slots visible for easy assessment */}
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3 max-h-[400px] overflow-y-auto pr-1 scrollbar-thin">
+            {sortedSlots.map((time, index) => (
               <TimeSlotCard
                 key={time}
                 time={time}
@@ -352,25 +351,12 @@ export function DateTimeSelection({
                 isSelected={selectedTime === time}
                 slotType={getSlotType(time, recommendedSlots, popularSlots)}
                 onClick={() => handleTimeSelect(time)}
-                animationDelay={index * 30}
+                animationDelay={index * 20}
                 viewerCount={getSlotType(time, recommendedSlots, popularSlots) === 'popular' ? 
                   Math.floor(Math.random() * 2) + 1 : undefined}
               />
             ))}
           </div>
-
-          {/* Show all toggle */}
-          {sortedSlots.length > 6 && (
-            <button
-              onClick={() => setShowAllSlots(!showAllSlots)}
-              className="w-full py-2 text-sm text-primary hover:text-primary/80 transition-colors flex items-center justify-center gap-2"
-            >
-              {showAllSlots 
-                ? t('booking.showLess')
-                : t('booking.showAll', { count: sortedSlots.length - 6 })
-              }
-            </button>
-          )}
 
           {/* Slot type legend */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground pt-2">
