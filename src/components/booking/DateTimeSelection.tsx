@@ -76,18 +76,13 @@ export function DateTimeSelection({
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const timeSlotsRef = useRef<HTMLDivElement>(null);
-  const [showTimeSlots, setShowTimeSlots] = useState(false);
 
   // Smooth scroll to time slots when date is selected
   useEffect(() => {
     if (selectedDate && timeSlotsRef.current) {
-      setShowTimeSlots(false);
       setTimeout(() => {
-        setShowTimeSlots(true);
-        setTimeout(() => {
-          timeSlotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }, 50);
+        timeSlotsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
     }
   }, [selectedDate]);
 
@@ -347,7 +342,7 @@ export function DateTimeSelection({
       </div>
 
       {/* Time Slots - Grouped by time of day */}
-      {selectedDate && showTimeSlots && (
+      {selectedDate && (
         <div ref={timeSlotsRef} className="space-y-6 scroll-mt-4">
           {/* Header with social proof */}
           <div 
