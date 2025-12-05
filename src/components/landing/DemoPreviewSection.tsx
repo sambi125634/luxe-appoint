@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ExternalLink, User, Settings } from "lucide-react";
+import { Calendar, User, Settings } from "lucide-react";
 
 const DemoPreviewSection = () => {
   const [activeTab, setActiveTab] = useState("client");
@@ -91,10 +91,10 @@ const DemoPreviewSection = () => {
             <Button 
               size="lg"
               className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white px-8"
-              onClick={() => window.location.href = '/demo'}
+              onClick={() => window.location.href = '/book/demo-salon'}
             >
-              Otwórz pełne demo
-              <ExternalLink className="ml-2 w-4 h-4" />
+              Wypróbuj rezerwację
+              <Calendar className="ml-2 w-4 h-4" />
             </Button>
           </div>
         </div>
