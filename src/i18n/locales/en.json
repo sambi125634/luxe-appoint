@@ -95,8 +95,8 @@
     "subtitle": "See how it works without registration",
     "clientView": "Client view",
     "salonView": "Salon panel",
-    "fullPreview": "View salon panel",
-    "tryBooking": "Try booking",
+    "fullPreview": "Try booking",
+    "viewSalonPanel": "View salon panel",
     "banner": {
       "title": "This is a demo version",
       "subtitle": "Your data will not be saved",
