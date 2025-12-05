@@ -3,8 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import pl from './locales/pl.json';
 import en from './locales/en.json';
 
-const savedLanguage = localStorage.getItem('language') || 
-  (navigator.language.startsWith('pl') ? 'pl' : 'en');
+const savedLanguage = localStorage.getItem('language') || 'pl';
 
 i18n
   .use(initReactI18next)
