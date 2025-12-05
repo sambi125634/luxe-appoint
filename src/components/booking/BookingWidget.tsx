@@ -296,24 +296,40 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               ))}
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Button - Hero Style */}
             <div 
-              className="flex flex-col items-center gap-4 animate-fade-in"
+              className="flex flex-col items-center gap-6 animate-fade-in"
               style={{ animationDelay: '1s' }}
             >
-              <Button 
-                onClick={handleStartBooking}
-                size="lg"
-                className="relative group px-10 py-7 text-lg font-medium rounded-2xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-600 hover:via-rose-600 hover:to-violet-600 text-white shadow-2xl shadow-pink-500/30 transition-all duration-300 hover:scale-105 hover:shadow-pink-500/40"
-              >
-                <span className="relative z-10 flex items-center gap-3">
-                  Zacznij rezerwację
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </span>
-              </Button>
+              {/* Outer glow container */}
+              <div className="relative group">
+                {/* Animated glow rings */}
+                <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 rounded-3xl opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-500 animate-pulse" />
+                <div className="absolute -inset-2 bg-gradient-to-r from-violet-500 via-pink-500 to-rose-500 rounded-3xl opacity-20 blur-xl group-hover:opacity-40 transition-all duration-500 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                
+                {/* Button with shimmer effect */}
+                <Button 
+                  onClick={handleStartBooking}
+                  className="relative overflow-hidden px-16 py-10 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
+                >
+                  {/* Shimmer overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
+                  
+                  {/* Sparkle decorations */}
+                  <div className="absolute top-3 left-4 w-2 h-2 bg-white/60 rounded-full animate-pulse" />
+                  <div className="absolute bottom-4 right-5 w-1.5 h-1.5 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
+                  <div className="absolute top-5 right-8 w-1 h-1 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }} />
+                  
+                  <span className="relative z-10 flex items-center gap-4">
+                    <Sparkles className="w-7 h-7 animate-pulse" />
+                    Zacznij rezerwację
+                    <ArrowRight className="w-7 h-7 group-hover:translate-x-2 transition-transform duration-300" />
+                  </span>
+                </Button>
+              </div>
               
-              <p className="text-sm text-muted-foreground/70 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
+              <p className="text-base text-muted-foreground/80 flex items-center gap-2 font-medium">
+                <Clock className="w-5 h-5" />
                 Zajmie Ci to tylko 2 minuty
               </p>
             </div>
