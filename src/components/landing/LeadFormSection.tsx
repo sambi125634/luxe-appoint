@@ -102,8 +102,8 @@ const LeadFormSection = () => {
               {t("leadForm.success")}
             </h3>
             <p className="text-muted-foreground text-lg">
-              <a href="/book/demo-salon" className="text-gold hover:underline">
-                {t("demo.tryBooking")}
+              <a href="/demo" className="text-gold hover:underline">
+                {t("demo.viewSalonPanel")}
               </a>
             </p>
           </div>
