@@ -94,6 +94,60 @@ export type Database = {
           },
         ]
       }
+      client_risk_scores: {
+        Row: {
+          calculated_at: string
+          client_id: string
+          created_at: string
+          factors: Json | null
+          id: string
+          recommendations: Json | null
+          risk_level: string
+          risk_score: number
+          salon_id: string
+          updated_at: string
+        }
+        Insert: {
+          calculated_at?: string
+          client_id: string
+          created_at?: string
+          factors?: Json | null
+          id?: string
+          recommendations?: Json | null
+          risk_level?: string
+          risk_score?: number
+          salon_id: string
+          updated_at?: string
+        }
+        Update: {
+          calculated_at?: string
+          client_id?: string
+          created_at?: string
+          factors?: Json | null
+          id?: string
+          recommendations?: Json | null
+          risk_level?: string
+          risk_score?: number
+          salon_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_risk_scores_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_risk_scores_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           created_at: string

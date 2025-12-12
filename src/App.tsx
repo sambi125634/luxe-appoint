@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import AuthPage from "./pages/AuthPage";
 import DemoPage from "./pages/DemoPage";
+import InstagramLanding from "./pages/InstagramLanding";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/book/:slug" element={<BookingPage />} />
           <Route path="/s/:slug" element={<BookingPage />} />
+          <Route path="/i/:slug" element={<InstagramLanding />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
           <Route path="/demo" element={<DemoPage />} />
