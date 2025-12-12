@@ -4,4 +4,6 @@ export { StockManagement } from './StockManagement';
 export { DeliveriesManagement } from './DeliveriesManagement';
 export { ProductSalesReport } from './ProductSalesReport';
 export { SuppliersManagement } from './SuppliersManagement';
+export { ProductSaleSection } from './ProductSaleSection';
+export { QuickProductSale } from './QuickProductSale';
 export * from './types';

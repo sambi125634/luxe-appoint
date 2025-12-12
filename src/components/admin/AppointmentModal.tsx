@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Scissors, X, Search } from "lucide-react";
+import { Calendar, Clock, User, Scissors, Search, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { ProductSaleSection, type CartItem } from "./products/ProductSaleSection";
 
 interface Client {
   id: string;
@@ -95,6 +98,8 @@ export function AppointmentModal({
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
+  const [productCart, setProductCart] = useState<CartItem[]>([]);
+  const [showProducts, setShowProducts] = useState(false);
   
   const [form, setForm] = useState({
     clientId: "",
@@ -137,6 +142,8 @@ export function AppointmentModal({
       setClientSearch("");
     }
     setIsNewClient(false);
+    setProductCart([]);
+    setShowProducts(false);
   }, [appointment, selectedDate, selectedTime, isOpen]);
 
   const filteredClients = mockClients.filter(client =>
@@ -354,6 +361,26 @@ export function AppointmentModal({
             />
           </div>
 
+          {/* Product Sales Section */}
+          <Collapsible open={showProducts} onOpenChange={setShowProducts}>
+            <CollapsibleTrigger asChild>
+              <Button variant="outline" className="w-full gap-2 justify-between">
+                <span className="flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4" />
+                  {t('products.addProductsToSale')}
+                </span>
+                {productCart.length > 0 && (
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                    {productCart.length} {t('products.items')}
+                  </span>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-3">
+              <ProductSaleSection cart={productCart} onCartChange={setProductCart} />
+            </CollapsibleContent>
+          </Collapsible>
+
           {/* Summary */}
           {selectedService && selectedStaff && (
             <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
@@ -361,8 +388,24 @@ export function AppointmentModal({
               <div className="space-y-1 text-sm">
                 <p><span className="font-medium">{t('appointment.service')}:</span> {selectedService.name}</p>
                 <p><span className="font-medium">{t('appointment.duration')}:</span> {selectedService.duration} min</p>
-                <p><span className="font-medium">{t('appointment.price')}:</span> {selectedService.price} zł</p>
-                <p><span className="font-medium">{t('appointment.specialist')}:</span> {selectedStaff.name}</p>
+                <div className="flex justify-between">
+                  <span className="font-medium">{t('appointment.servicePrice')}:</span>
+                  <span>{selectedService.price} zł</span>
+                </div>
+                {productCart.length > 0 && (
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>{t('products.productsTotal')} ({productCart.length}):</span>
+                    <span>{productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0).toLocaleString()} zł</span>
+                  </div>
+                )}
+                <Separator className="my-2" />
+                <div className="flex justify-between font-bold text-base">
+                  <span>{t('appointment.total')}:</span>
+                  <span className="text-primary">
+                    {(selectedService.price + productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0)).toLocaleString()} zł
+                  </span>
+                </div>
+                <p className="pt-1"><span className="font-medium">{t('appointment.specialist')}:</span> {selectedStaff.name}</p>
               </div>
             </div>
           )}
