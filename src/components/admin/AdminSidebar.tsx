@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "staff" | "services" | "time-off" | "stats" | "settings";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "stats" | "settings";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -27,6 +27,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
     { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations", badge: 3 },
     { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline", badge: 2 },
     { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
+    { icon: Package, labelKey: "admin.products", tab: "products" },
     { icon: Users, labelKey: "admin.staff", tab: "staff" },
     { icon: Scissors, labelKey: "admin.services", tab: "services" },
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
