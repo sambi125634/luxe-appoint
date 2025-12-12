@@ -204,6 +204,90 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          brand: string | null
+          category: string
+          created_at: string
+          current_stock: number
+          description: string | null
+          ean: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          is_for_internal_use: boolean
+          min_stock: number
+          name: string
+          purchase_price_net: number | null
+          sale_price_gross: number
+          salon_id: string
+          sku: string | null
+          supplier_id: string | null
+          updated_at: string
+          variant: string | null
+          vat_rate: number
+        }
+        Insert: {
+          brand?: string | null
+          category: string
+          created_at?: string
+          current_stock?: number
+          description?: string | null
+          ean?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_for_internal_use?: boolean
+          min_stock?: number
+          name: string
+          purchase_price_net?: number | null
+          sale_price_gross?: number
+          salon_id: string
+          sku?: string | null
+          supplier_id?: string | null
+          updated_at?: string
+          variant?: string | null
+          vat_rate?: number
+        }
+        Update: {
+          brand?: string | null
+          category?: string
+          created_at?: string
+          current_stock?: number
+          description?: string | null
+          ean?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          is_for_internal_use?: boolean
+          min_stock?: number
+          name?: string
+          purchase_price_net?: number | null
+          sale_price_gross?: number
+          salon_id?: string
+          sku?: string | null
+          supplier_id?: string | null
+          updated_at?: string
+          variant?: string | null
+          vat_rate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           approved_at: string | null
@@ -535,6 +619,149 @@ export type Database = {
           },
         ]
       }
+      stock_movements: {
+        Row: {
+          created_at: string
+          expiry_date: string | null
+          id: string
+          invoice_number: string | null
+          note: string | null
+          product_id: string
+          quantity: number
+          salon_id: string
+          staff_id: string | null
+          supplier_id: string | null
+          total_value: number | null
+          transaction_id: string | null
+          type: string
+          unit_price: number | null
+        }
+        Insert: {
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          note?: string | null
+          product_id: string
+          quantity: number
+          salon_id: string
+          staff_id?: string | null
+          supplier_id?: string | null
+          total_value?: number | null
+          transaction_id?: string | null
+          type: string
+          unit_price?: number | null
+        }
+        Update: {
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          invoice_number?: string | null
+          note?: string | null
+          product_id?: string
+          quantity?: number
+          salon_id?: string
+          staff_id?: string | null
+          supplier_id?: string | null
+          total_value?: number | null
+          transaction_id?: string | null
+          type?: string
+          unit_price?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stock_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          address: string | null
+          contact_person: string | null
+          created_at: string
+          discount_info: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          name: string
+          notes: string | null
+          payment_terms: string | null
+          phone: string | null
+          salon_id: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          discount_info?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          salon_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          contact_person?: string | null
+          created_at?: string
+          discount_info?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          notes?: string | null
+          payment_terms?: string | null
+          phone?: string | null
+          salon_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suppliers_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       time_off: {
         Row: {
           created_at: string
@@ -582,15 +809,19 @@ export type Database = {
           appointment_id: string | null
           category: string | null
           client_id: string | null
+          cost_price: number | null
           created_at: string
           description: string | null
           id: string
           payment_method: string
+          product_id: string | null
+          quantity: number | null
           salon_id: string
           staff_id: string | null
           tip_amount: number | null
           transaction_date: string
           type: string
+          unit_price: number | null
           updated_at: string
           vat_rate: number | null
         }
@@ -599,15 +830,19 @@ export type Database = {
           appointment_id?: string | null
           category?: string | null
           client_id?: string | null
+          cost_price?: number | null
           created_at?: string
           description?: string | null
           id?: string
           payment_method?: string
+          product_id?: string | null
+          quantity?: number | null
           salon_id: string
           staff_id?: string | null
           tip_amount?: number | null
           transaction_date?: string
           type: string
+          unit_price?: number | null
           updated_at?: string
           vat_rate?: number | null
         }
@@ -616,15 +851,19 @@ export type Database = {
           appointment_id?: string | null
           category?: string | null
           client_id?: string | null
+          cost_price?: number | null
           created_at?: string
           description?: string | null
           id?: string
           payment_method?: string
+          product_id?: string | null
+          quantity?: number | null
           salon_id?: string
           staff_id?: string | null
           tip_amount?: number | null
           transaction_date?: string
           type?: string
+          unit_price?: number | null
           updated_at?: string
           vat_rate?: number | null
         }
@@ -641,6 +880,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
           {
