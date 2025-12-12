@@ -30,8 +30,7 @@ export default function InstagramLanding() {
   }, [salon.name]);
 
   return (
-    <
-      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex flex-col items-center justify-center p-4">
         {/* Animated background elements */}
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse" />

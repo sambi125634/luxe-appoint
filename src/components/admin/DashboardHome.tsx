@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
 import { StockAlertsCard } from "./products/StockAlertsCard";
+import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useStockAlerts } from "@/hooks/useStockAlerts";
 
@@ -244,6 +245,9 @@ export function DashboardHome() {
           </CardContent>
         </Card>
       </div>
+
+      {/* AI Revenue Prediction */}
+      <RevenuePredictionCard salonId={salonId ?? undefined} />
 
       {/* Sekcja dolna - 3 kolumny */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

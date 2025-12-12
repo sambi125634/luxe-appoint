@@ -6,13 +6,14 @@ import { useClientRiskScore } from "@/hooks/useClientRiskScore";
 
 interface ClientRiskBadgeProps {
   clientId: string;
-  salonId: string;
+  salonId?: string;
   showTooltip?: boolean;
   size?: "sm" | "md";
+  compact?: boolean;
 }
 
-export function ClientRiskBadge({ clientId, salonId, showTooltip = true, size = "sm" }: ClientRiskBadgeProps) {
-  const { data: riskData, isLoading } = useClientRiskScore(clientId, salonId);
+export function ClientRiskBadge({ clientId, salonId, showTooltip = true, size = "sm", compact = false }: ClientRiskBadgeProps) {
+  const { data: riskData, isLoading } = useClientRiskScore(clientId, salonId || "demo-salon");
 
   if (isLoading) {
     return <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />;
@@ -45,17 +46,19 @@ export function ClientRiskBadge({ clientId, salonId, showTooltip = true, size = 
 
   const { icon: Icon, label, className, iconClass } = config[riskLevel];
 
+  const effectiveSize = compact ? "sm" : size;
+
   const badge = (
     <Badge 
       variant="outline" 
       className={cn(
         "gap-1 font-normal",
         className,
-        size === "sm" ? "text-xs px-1.5 py-0" : "text-sm px-2 py-0.5"
+        effectiveSize === "sm" ? "text-xs px-1.5 py-0" : "text-sm px-2 py-0.5"
       )}
     >
       <Icon className={cn("w-3 h-3", iconClass)} />
-      {size === "md" && <span>{riskScore}</span>}
+      {effectiveSize === "md" && !compact && <span>{riskScore}</span>}
     </Badge>
   );
 

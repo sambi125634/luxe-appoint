@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { ClientRiskBadge } from "./ClientRiskBadge";
 
 interface Visit {
   id: string;
@@ -297,6 +298,7 @@ export function ClientsManagement() {
                       {client.tags.includes("problematic") && (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
                       )}
+                      <ClientRiskBadge clientId={client.id} compact />
                     </div>
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <span className="flex items-center gap-1">
