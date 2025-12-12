@@ -18,6 +18,7 @@ import { AccountingModule } from "@/components/admin/accounting";
 import { WidgetsManagement } from "@/components/admin/widgets";
 import { SettingsModule } from "@/components/admin/settings";
 import { ProductsModule } from "@/components/admin/products";
+import { SupportModule } from "@/components/admin/support";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -65,6 +66,7 @@ export default function AdminDashboard() {
       case "time-off": return "Urlopy i dni wolne";
       case "stats": return "Statystyki";
       case "settings": return "Ustawienia";
+      case "support": return "Pomoc & AI Asystent";
       default: return "Dashboard";
     }
   };
@@ -97,6 +99,8 @@ export default function AdminDashboard() {
         return <StatsModule />;
       case "settings":
         return <SettingsModule />;
+      case "support":
+        return <SupportModule />;
       default:
         return null;
     }

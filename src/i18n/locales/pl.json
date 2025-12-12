@@ -338,6 +338,7 @@
     "widgets": "Widgety",
     "settings": "Ustawienia",
     "products": "Produkty",
+    "support": "Pomoc",
     "logout": "Wyloguj",
     "profile": "Profil salonu",
     "loading": "Ładowanie..."
@@ -1231,5 +1232,29 @@
     "cancellationPolicyFull": "Nieodwołane wizyty bez uprzedzenia mogą skutkować koniecznością wpłaty depozytu przy kolejnych rezerwacjach.",
     "moreInfo": "Więcej info",
     "greatChoice": "Świetny wybór!"
+  },
+  "support": {
+    "title": "Pomoc & AI Asystent",
+    "subtitle": "Zapytaj o cokolwiek związanego z Beauty Calendar",
+    "placeholder": "Zadaj pytanie...",
+    "send": "Wyślij",
+    "clearHistory": "Wyczyść historię",
+    "thinking": "AI myśli...",
+    "online": "Online",
+    "quickActions": "Szybkie pytania",
+    "welcome": "Cześć! 👋 Jestem AI Asystentem Beauty Calendar. Pomogę Ci skonfigurować platformę i odpowiem na każde pytanie. Jak mogę Ci pomóc?",
+    "needHuman": "Potrzebujesz ludzkiej pomocy?",
+    "humanDescription": "Skontaktuj się z naszym zespołem",
+    "documentation": "Dokumentacja",
+    "quick": {
+      "payments": "Jak skonfigurować płatności?",
+      "service": "Jak dodać nową usługę?",
+      "staff": "Jak ustawić grafik pracownika?",
+      "embed": "Jak osadzić widget na stronie?",
+      "sms": "Jak włączyć przypomnienia SMS?",
+      "products": "Jak dodać produkty?",
+      "settings": "Jak zmienić logo salonu?",
+      "reports": "Jak wygenerować raport?"
+    }
   }
 }
