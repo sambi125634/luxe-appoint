@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
 import { BookingConfirmation } from "./BookingConfirmation";
+import { PaymentStep } from "./PaymentStep";
 import { SakuraBackground } from "./SakuraBackground";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ const stepIdToName: Record<string, string> = {
   staff: "Specjalista",
   datetime: "Termin",
   form: "Dane",
+  payment: "Płatność",
 };
 
 interface BookingWidgetProps {
@@ -45,57 +47,125 @@ interface StaffMember {
   rating: number;
 }
 
+interface PrepaymentConfig {
+  enabled: boolean;
+  type: 'full' | 'fixed' | 'percentage';
+  amount: number;
+  requireForHighRisk: boolean;
+  requireForNewClients: boolean;
+}
+
+interface SalonSettings {
+  booking?: {
+    prepayment?: PrepaymentConfig;
+  };
+  integrations?: {
+    przelewy24?: {
+      enabled: boolean;
+    };
+  };
+}
+
 // Recommendations mapping
 const serviceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
-  "1": [ // Peeling kawitacyjny
+  "1": [
     { id: "2", name: "Mezoterapia igłowa", price: 350, duration: 60 },
     { id: "3", name: "Mikrodermabrazja", price: 180, duration: 50 },
   ],
-  "2": [ // Mezoterapia
+  "2": [
     { id: "1", name: "Peeling kawitacyjny", price: 150, duration: 45 },
   ],
-  "4": [ // Masaż relaksacyjny
+  "4": [
     { id: "5", name: "Masaż gorącymi kamieniami", price: 280, duration: 75 },
   ],
-  "6": [ // Depilacja woskowa
+  "6": [
     { id: "7", name: "Depilacja laserowa bikini", price: 250, duration: 30 },
   ],
-  "8": [ // Stylizacja brwi
+  "8": [
     { id: "9", name: "Przedłużanie rzęs 1:1", price: 350, duration: 120 },
   ],
 };
 
 export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
+  const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
+  const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
+  
+  // Fetch salon settings for prepayment config
+  const salonId = (widgetConfig as any)?.salonId || "00000000-0000-0000-0000-000000000001";
+  
+  useEffect(() => {
+    const fetchSalonSettings = async () => {
+      const { data } = await supabase
+        .from("salons")
+        .select("settings")
+        .eq("id", salonId)
+        .maybeSingle();
+      
+      if (data?.settings) {
+        setSalonSettings(data.settings as unknown as SalonSettings);
+      }
+    };
+    fetchSalonSettings();
+  }, [salonId]);
+
+  // Check if payment step should be enabled
+  const isPaymentEnabled = useMemo(() => {
+    const prepayment = salonSettings?.booking?.prepayment;
+    const p24 = salonSettings?.integrations?.przelewy24;
+    return prepayment?.enabled && p24?.enabled;
+  }, [salonSettings]);
+
+  const prepaymentConfig = salonSettings?.booking?.prepayment || {
+    enabled: false,
+    type: 'fixed' as const,
+    amount: 50,
+    requireForHighRisk: false,
+    requireForNewClients: false,
+  };
+
   // Build dynamic steps from widget configuration
   const { steps, stepMapping } = useMemo(() => {
     if (!widgetConfig?.steps) {
-      return { 
-        steps: defaultSteps, 
-        stepMapping: ["intro", "services", "staff", "datetime", "form"] 
-      };
+      const baseMapping = ["intro", "services", "staff", "datetime", "form"];
+      const baseSteps = defaultSteps;
+      
+      // Add payment step if enabled
+      if (isPaymentEnabled) {
+        return {
+          steps: [...baseSteps, "Płatność"],
+          stepMapping: [...baseMapping, "payment"],
+        };
+      }
+      
+      return { steps: baseSteps, stepMapping: baseMapping };
     }
     
     const enabledSteps = widgetConfig.steps
-      .filter(s => s.enabled && s.id !== "summary") // Exclude summary step
+      .filter(s => s.enabled && s.id !== "summary")
       .sort((a, b) => a.order - b.order);
     
-    // Build step names array (excluding intro which is step 0)
     const stepNames = enabledSteps
       .filter(s => s.id !== "intro")
       .map(s => stepIdToName[s.id] || s.name);
     
-    // Build step ID mapping for navigation
     const mapping = enabledSteps.map(s => s.id);
     
+    // Add payment step if enabled and not already in steps
+    if (isPaymentEnabled && !mapping.includes("payment")) {
+      return {
+        steps: [...stepNames, "Płatność"],
+        stepMapping: [...mapping, "payment"],
+      };
+    }
+    
     return { steps: stepNames, stepMapping: mapping };
-  }, [widgetConfig?.steps]);
+  }, [widgetConfig?.steps, isPaymentEnabled]);
 
   const hasIntro = stepMapping.includes("intro");
   const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
   const [previousStep, setPreviousStep] = useState(hasIntro ? 0 : 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Get current step ID based on currentStep index
   const getCurrentStepId = (stepIndex: number): string => {
     if (hasIntro) {
       return stepMapping[stepIndex] || "intro";
@@ -138,7 +208,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
       case "services":
         return selectedService !== null;
       case "staff":
-        return true; // Staff can be null (any)
+        return true;
       case "datetime":
         return selectedDate !== null && selectedTime !== null;
       case "form":
@@ -149,6 +219,8 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
           clientData.email.trim() !== "" &&
           clientData.acceptRodo
         );
+      case "payment":
+        return true;
       default:
         return false;
     }
@@ -164,11 +236,14 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     return currentIndex > 0 ? currentIndex - 1 : 0;
   };
 
-  const isLastStep = currentStepId === "form";
+  // Determine last step based on payment enabled
+  const lastStepId = isPaymentEnabled ? "payment" : "form";
+  const isLastStep = currentStepId === lastStepId;
+  const isFormStep = currentStepId === "form";
+  const isPaymentStep = currentStepId === "payment";
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
-    // Show recommendations if available
     if (serviceRecommendations[service.id]) {
       setShowRecommendations(true);
     }
@@ -191,19 +266,16 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     }
   };
 
-  const handleConfirm = async () => {
+  // Create appointment and proceed to payment or confirm
+  const handleFormSubmit = async () => {
     if (!selectedService || !selectedDate || !selectedTime) return;
     
     setIsSubmitting(true);
     try {
-      // Parse time and create start/end timestamps
       const [hours, minutes] = selectedTime.split(":").map(Number);
       const startTime = new Date(selectedDate);
       startTime.setHours(hours, minutes, 0, 0);
       const endTime = new Date(startTime.getTime() + selectedService.duration * 60 * 1000);
-
-      // Get salon_id from widget config or use demo
-      const salonId = (widgetConfig as any)?.salonId || "00000000-0000-0000-0000-000000000001";
 
       // Create or find client
       const { data: existingClient } = await supabase
@@ -232,44 +304,45 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
         clientId = newClient.id;
       }
 
-      // Create appointment
+      // Create appointment with pending payment status if payment enabled
+      const appointmentData: any = {
+        salon_id: salonId,
+        client_id: clientId,
+        service_id: selectedService.id,
+        staff_id: selectedStaff?.id || "00000000-0000-0000-0000-000000000001",
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+        price: selectedService.price,
+        notes: clientData.notes,
+        status: isPaymentEnabled ? "booked" : "booked",
+      };
+
+      if (isPaymentEnabled) {
+        appointmentData.payment_status = "pending";
+      }
+
       const { data: appointment, error: appointmentError } = await supabase
         .from("appointments")
-        .insert({
-          salon_id: salonId,
-          client_id: clientId,
-          service_id: selectedService.id,
-          staff_id: selectedStaff?.id || "00000000-0000-0000-0000-000000000001",
-          start_time: startTime.toISOString(),
-          end_time: endTime.toISOString(),
-          price: selectedService.price,
-          notes: clientData.notes,
-          status: "booked",
-        })
+        .insert(appointmentData)
         .select("id")
         .single();
 
       if (appointmentError) throw appointmentError;
 
-      // Send confirmation notifications via edge functions
-      try {
-        // Send email confirmation
-        await supabase.functions.invoke("send-booking-confirmation", {
-          body: { appointmentId: appointment.id },
-        });
-        // Send SMS confirmation (if SMSAPI configured)
-        await supabase.functions.invoke("send-sms-smsapi", {
-          body: { appointmentId: appointment.id, type: "confirmation" },
-        });
-      } catch (notificationError) {
-        console.error("Notification sending failed:", notificationError);
-      }
+      setCreatedAppointmentId(appointment.id);
 
-      setIsConfirmed(true);
-      toast({
-        title: "Rezerwacja potwierdzona!",
-        description: "Otrzymasz wkrótce email z potwierdzeniem wizyty.",
-      });
+      if (isPaymentEnabled) {
+        // Move to payment step
+        handleNext();
+      } else {
+        // No payment - confirm directly
+        await sendConfirmationNotifications(appointment.id);
+        setIsConfirmed(true);
+        toast({
+          title: "Rezerwacja potwierdzona!",
+          description: "Otrzymasz wkrótce email z potwierdzeniem wizyty.",
+        });
+      }
     } catch (error: any) {
       console.error("Booking error:", error);
       toast({
@@ -280,6 +353,44 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const sendConfirmationNotifications = async (appointmentId: string) => {
+    try {
+      await supabase.functions.invoke("send-booking-confirmation", {
+        body: { appointmentId },
+      });
+      await supabase.functions.invoke("send-sms-smsapi", {
+        body: { appointmentId, type: "confirmation" },
+      });
+    } catch (notificationError) {
+      console.error("Notification sending failed:", notificationError);
+    }
+  };
+
+  const handlePaymentComplete = () => {
+    setIsConfirmed(true);
+    toast({
+      title: "Płatność przyjęta!",
+      description: "Twoja rezerwacja została potwierdzona.",
+    });
+  };
+
+  const handleSkipPayment = async () => {
+    if (createdAppointmentId) {
+      // Update appointment to not require payment
+      await supabase
+        .from("appointments")
+        .update({ payment_status: "not_required" })
+        .eq("id", createdAppointmentId);
+      
+      await sendConfirmationNotifications(createdAppointmentId);
+    }
+    setIsConfirmed(true);
+    toast({
+      title: "Rezerwacja potwierdzona!",
+      description: "Zapłacisz na miejscu w salonie.",
+    });
   };
 
   const handleDateTimeSelect = (date: Date, time: string) => {
@@ -311,14 +422,10 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
   if (currentStepId === "intro") {
     return (
       <div className="relative min-h-[100dvh] w-full overflow-hidden">
-        {/* Animated Sakura Background */}
         <SakuraBackground />
         
-        {/* Content */}
         <div className="relative z-20 min-h-[100dvh] flex flex-col items-center justify-center px-4 py-8">
-          {/* Main Card */}
           <div className="w-full max-w-md mx-auto">
-            {/* Floating badge */}
             <div 
               className="flex justify-center mb-6 animate-fade-in"
               style={{ animationDelay: '0.2s' }}
@@ -332,7 +439,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               </Badge>
             </div>
 
-            {/* Logo/Icon with glow */}
             <div 
               className="flex justify-center mb-8 animate-fade-in"
               style={{ animationDelay: '0.4s' }}
@@ -345,7 +451,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               </div>
             </div>
 
-            {/* Headline */}
             <div 
               className="text-center mb-8 animate-fade-in"
               style={{ animationDelay: '0.6s' }}
@@ -358,7 +463,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               </p>
             </div>
 
-            {/* Steps - elegant minimal version */}
             <div 
               className="flex justify-center gap-8 mb-10 animate-fade-in"
               style={{ animationDelay: '0.8s' }}
@@ -377,26 +481,20 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               ))}
             </div>
 
-            {/* CTA Button - Hero Style */}
             <div 
               className="flex flex-col items-center gap-6 animate-fade-in"
               style={{ animationDelay: '1s' }}
             >
-              {/* Outer glow container */}
               <div className="relative group">
-                {/* Animated glow rings */}
                 <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 rounded-3xl opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-500 animate-pulse" />
                 <div className="absolute -inset-2 bg-gradient-to-r from-violet-500 via-pink-500 to-rose-500 rounded-3xl opacity-20 blur-xl group-hover:opacity-40 transition-all duration-500 animate-pulse" style={{ animationDelay: '0.5s' }} />
                 
-                {/* Button with shimmer effect */}
                 <Button 
                   onClick={handleStartBooking}
                   className="relative overflow-hidden px-16 py-10 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
                 >
-                  {/* Shimmer overlay */}
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                   
-                  {/* Sparkle decorations */}
                   <div className="absolute top-3 left-4 w-2 h-2 bg-white/60 rounded-full animate-pulse" />
                   <div className="absolute bottom-4 right-5 w-1.5 h-1.5 bg-white/50 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }} />
                   <div className="absolute top-5 right-8 w-1 h-1 bg-white/40 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }} />
@@ -415,7 +513,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               </p>
             </div>
 
-            {/* Trust indicators */}
             <div 
               className="mt-12 flex justify-center gap-6 text-xs text-muted-foreground/60 animate-fade-in"
               style={{ animationDelay: '1.2s' }}
@@ -440,8 +537,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
   }
 
   const recommendations = selectedService ? serviceRecommendations[selectedService.id] : [];
-
-  // Calculate progress step index for BookingProgress
   const progressStepIndex = stepMapping.indexOf(currentStepId);
 
   return (
@@ -462,7 +557,6 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
               onProceed={handleNext}
             />
             
-            {/* Recommendations */}
             {showRecommendations && recommendations && recommendations.length > 0 && (
               <div className="mt-6 p-4 bg-secondary/5 border border-secondary/20 rounded-xl animate-fade-in">
                 <p className="text-sm font-medium mb-3 flex items-center gap-2">
@@ -513,10 +607,23 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
         {currentStepId === "form" && (
           <ClientForm onUpdate={setClientData} data={clientData} />
         )}
+        {currentStepId === "payment" && createdAppointmentId && selectedService && (
+          <PaymentStep
+            appointmentId={createdAppointmentId}
+            servicePrice={selectedService.price}
+            serviceName={selectedService.name}
+            clientEmail={clientData.email}
+            clientName={`${clientData.firstName} ${clientData.lastName}`}
+            salonId={salonId}
+            prepaymentConfig={prepaymentConfig}
+            onPaymentComplete={handlePaymentComplete}
+            onSkip={handleSkipPayment}
+          />
+        )}
       </div>
 
       {/* Selected service summary - sticky on mobile */}
-      {selectedService && currentStepId !== "services" && (
+      {selectedService && currentStepId !== "services" && currentStepId !== "payment" && (
         <div className="fixed bottom-20 left-4 right-4 sm:static sm:mt-4 z-10">
           <div className="bg-card/95 backdrop-blur-sm border border-border rounded-xl p-3 shadow-lg sm:shadow-none flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -541,54 +648,56 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
         </div>
       )}
 
-      {/* Navigation */}
-      <div className={cn(
-        "flex items-center justify-between mt-8 pt-6 border-t border-border",
-        selectedService && currentStepId !== "services" && "mb-24 sm:mb-0"
-      )}>
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          className="gap-2"
-          disabled={stepMapping.indexOf(currentStepId) === 0}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Wstecz
-        </Button>
+      {/* Navigation - hide on payment step (payment has its own buttons) */}
+      {currentStepId !== "payment" && (
+        <div className={cn(
+          "flex items-center justify-between mt-8 pt-6 border-t border-border",
+          selectedService && currentStepId !== "services" && "mb-24 sm:mb-0"
+        )}>
+          <Button
+            variant="ghost"
+            onClick={handleBack}
+            className="gap-2"
+            disabled={stepMapping.indexOf(currentStepId) === 0}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Wstecz
+          </Button>
 
-        {!isLastStep ? (
-          <Button
-            variant="luxury"
-            size="lg"
-            onClick={handleNext}
-            disabled={!canProceed()}
-            className="gap-2"
-          >
-            Dalej
-            <ArrowRight className="w-4 h-4" />
-          </Button>
-        ) : (
-          <Button
-            variant="luxury"
-            size="lg"
-            onClick={handleConfirm}
-            disabled={isSubmitting}
-            className="gap-2"
-          >
-            {isSubmitting ? (
-              <>
-                <Sparkles className="w-4 h-4 animate-spin" />
-                Potwierdzanie...
-              </>
-            ) : (
-              <>
-                <Check className="w-4 h-4" />
-                Potwierdź rezerwację
-              </>
-            )}
-          </Button>
-        )}
-      </div>
+          {!isFormStep ? (
+            <Button
+              variant="luxury"
+              size="lg"
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="gap-2"
+            >
+              Dalej
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          ) : (
+            <Button
+              variant="luxury"
+              size="lg"
+              onClick={handleFormSubmit}
+              disabled={!canProceed() || isSubmitting}
+              className="gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <Sparkles className="w-4 h-4 animate-spin" />
+                  {isPaymentEnabled ? "Przechodzę do płatności..." : "Potwierdzanie..."}
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4" />
+                  {isPaymentEnabled ? "Przejdź do płatności" : "Potwierdź rezerwację"}
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
