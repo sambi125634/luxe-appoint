@@ -14,25 +14,25 @@ const CalendarMockup = () => {
   ];
 
   return (
-    <div className="p-4 h-full bg-background">
+    <div className="p-3 sm:p-4 h-full bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-semibold text-foreground">Grudzień 2024</h3>
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <h3 className="text-xs sm:text-sm font-semibold text-foreground">Grudzień 2024</h3>
         <div className="flex gap-1">
-          <div className="w-6 h-6 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">‹</div>
-          <div className="w-6 h-6 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">›</div>
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-muted flex items-center justify-center text-[10px] sm:text-xs text-muted-foreground">‹</div>
+          <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-muted flex items-center justify-center text-[10px] sm:text-xs text-muted-foreground">›</div>
         </div>
       </div>
 
       {/* Calendar Grid */}
-      <div className="glass-card rounded-xl p-2 overflow-hidden">
+      <div className="glass-card rounded-lg sm:rounded-xl p-1.5 sm:p-2 overflow-hidden">
         {/* Days Header */}
-        <div className="grid grid-cols-7 gap-1 mb-1">
-          <div className="w-10" />
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1">
+          <div className="w-7 sm:w-10" />
           {days.map((day, i) => (
             <div 
               key={day} 
-              className="text-center text-xs font-medium text-muted-foreground py-1 animate-fade-in"
+              className="text-center text-[9px] sm:text-xs font-medium text-muted-foreground py-0.5 sm:py-1 animate-fade-in"
               style={{ animationDelay: `${i * 50}ms` }}
             >
               {day}
@@ -43,8 +43,8 @@ const CalendarMockup = () => {
         {/* Time Grid */}
         <div className="relative">
           {hours.map((hour, hourIndex) => (
-            <div key={hour} className="grid grid-cols-7 gap-1 h-8">
-              <div className="text-xs text-muted-foreground flex items-center justify-end pr-1 w-10">
+            <div key={hour} className="grid grid-cols-7 gap-0.5 sm:gap-1 h-6 sm:h-8">
+              <div className="text-[8px] sm:text-xs text-muted-foreground flex items-center justify-end pr-0.5 sm:pr-1 w-7 sm:w-10">
                 {hour}
               </div>
               {days.map((_, dayIndex) => (
@@ -57,20 +57,21 @@ const CalendarMockup = () => {
           ))}
 
           {/* Appointments Overlay */}
-          <div className="absolute inset-0 pointer-events-none" style={{ left: '44px' }}>
+          <div className="absolute inset-0 pointer-events-none" style={{ left: '32px' }}>
             {appointments.map((apt, i) => (
               <div
                 key={i}
-                className={`absolute ${apt.color} rounded-md px-1 py-0.5 text-[10px] text-white font-medium shadow-lg animate-scale-in overflow-hidden`}
+                className={`absolute ${apt.color} rounded px-0.5 sm:px-1 py-0.5 text-[8px] sm:text-[10px] text-white font-medium shadow-lg animate-scale-in overflow-hidden`}
                 style={{
-                  left: `calc(${apt.day} * (100% / 6) + 2px)`,
-                  top: `${apt.hour * 32 + 2}px`,
-                  width: `calc(100% / 6 - 4px)`,
-                  height: `${apt.duration * 32 - 4}px`,
+                  left: `calc(${apt.day} * (100% / 6) + 1px)`,
+                  top: `${apt.hour * 24 + 1}px`,
+                  width: `calc(100% / 6 - 3px)`,
+                  height: `${apt.duration * 24 - 2}px`,
                   animationDelay: `${(i + 6) * 100}ms`,
                 }}
               >
-                {apt.name}
+                <span className="hidden sm:inline">{apt.name}</span>
+                <span className="sm:hidden">{apt.name.split(' ')[0]}</span>
               </div>
             ))}
           </div>

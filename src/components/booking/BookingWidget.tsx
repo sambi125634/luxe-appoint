@@ -90,10 +90,34 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
+  // Check if this is demo mode (demo-salon slug or no real salon)
+  const isDemo = widgetConfig?.slug === 'demo-salon' || widgetConfig?.slug === 'main' || !widgetConfig;
+  
   // Fetch salon settings for prepayment config
-  const salonId = (widgetConfig as any)?.salonId || "00000000-0000-0000-0000-000000000001";
+  const salonId = "00000000-0000-0000-0000-000000000001";
   
   useEffect(() => {
+    // In demo mode, use mock settings with prepayment enabled for demonstration
+    if (isDemo) {
+      setSalonSettings({
+        booking: {
+          prepayment: {
+            enabled: true,
+            type: 'percentage',
+            amount: 30,
+            requireForHighRisk: true,
+            requireForNewClients: false,
+          }
+        },
+        integrations: {
+          przelewy24: {
+            enabled: true,
+          }
+        }
+      });
+      return;
+    }
+    
     const fetchSalonSettings = async () => {
       const { data } = await supabase
         .from("salons")
@@ -106,7 +130,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
       }
     };
     fetchSalonSettings();
-  }, [salonId]);
+  }, [salonId, isDemo]);
 
   // Check if payment step should be enabled
   const isPaymentEnabled = useMemo(() => {
@@ -607,9 +631,9 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
         {currentStepId === "form" && (
           <ClientForm onUpdate={setClientData} data={clientData} />
         )}
-        {currentStepId === "payment" && createdAppointmentId && selectedService && (
+        {currentStepId === "payment" && selectedService && (
           <PaymentStep
-            appointmentId={createdAppointmentId}
+            appointmentId={createdAppointmentId || "demo-appointment"}
             servicePrice={selectedService.price}
             serviceName={selectedService.name}
             clientEmail={clientData.email}
@@ -618,6 +642,7 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
             prepaymentConfig={prepaymentConfig}
             onPaymentComplete={handlePaymentComplete}
             onSkip={handleSkipPayment}
+            isDemo={isDemo}
           />
         )}
       </div>
