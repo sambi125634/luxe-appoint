@@ -171,6 +171,8 @@
       "conversations": "All client messages in one place. SMS, email, chat – no switching between apps.",
       "pipeline": "Track client journey from first visit to regular. Pipeline shows who returns and who needs attention.",
       "accounting": "Daily cash reports, staff commissions, VAT – everything ready to send to your accountant.",
+      "products": "Control stock levels, get low stock alerts, track best-selling products. Supplier orders have never been easier.",
+      "support": "AI Assistant knows the entire Beauty Calendar platform. Ask any question about configuration, services, payments or integrations – I'll answer instantly 24/7!",
       "features": {
         "home": {
           "todayAppointments": "Today's appointments",

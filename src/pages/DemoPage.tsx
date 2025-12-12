@@ -17,6 +17,7 @@ import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
+import { SupportModule } from "@/components/admin/support";
 import { DemoBenefitBanner } from "@/components/demo/DemoBenefitBanner";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 
@@ -96,6 +97,8 @@ export default function DemoPage() {
           return <AccountingModule />;
         case "products":
           return <ProductsModule />;
+        case "support":
+          return <SupportModule />;
         default:
           return null;
       }
