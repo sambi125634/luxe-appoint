@@ -1,16 +1,19 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Warehouse, AlertTriangle, Package, TrendingDown, Plus, Search, Filter, Loader2 } from "lucide-react";
+import { Warehouse, AlertTriangle, Package, TrendingDown, Plus, Search, Filter, Loader2, ScanLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { StockCorrectionModal } from "./modals/StockCorrectionModal";
+import BarcodeScanner from "./BarcodeScanner";
+import ScanResultModal from "./ScanResultModal";
 import { type Product } from "./types";
 import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
 import { useStockMovements } from "@/hooks/useStockMovements";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type StockFilter = "all" | "low" | "out" | "ok";
 
@@ -52,6 +55,9 @@ export function StockManagement({ salonId }: StockManagementProps) {
   const [stockFilter, setStockFilter] = useState<StockFilter>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isCorrectionModalOpen, setIsCorrectionModalOpen] = useState(false);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState<Product | null>(null);
+  const [isScanResultOpen, setIsScanResultOpen] = useState(false);
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -100,6 +106,41 @@ export function StockManagement({ salonId }: StockManagementProps) {
     }
     setIsCorrectionModalOpen(false);
     setSelectedProduct(null);
+  };
+
+  const handleScan = (code: string, format: string) => {
+    console.log('Scanned:', code, format);
+    
+    let foundProduct: Product | null = null;
+    
+    // Check if it's our QR code format
+    if (code.startsWith('BC:PRODUCT:')) {
+      const productId = code.replace('BC:PRODUCT:', '');
+      foundProduct = products.find(p => p.id === productId) || null;
+    } else {
+      // Try to find by EAN or SKU
+      foundProduct = products.find(p => 
+        p.ean === code || p.sku === code
+      ) || null;
+    }
+    
+    if (foundProduct) {
+      setScannedProduct(foundProduct);
+      setIsScanResultOpen(true);
+    } else {
+      toast.error(t('products.productNotFound', 'Nie znaleziono produktu o tym kodzie'));
+    }
+  };
+
+  const handleUpdateStock = async (productId: string, quantity: number, type: string, note?: string) => {
+    if (!salonId) return;
+    
+    createCorrection.mutate({
+      salon_id: salonId,
+      product_id: productId,
+      quantity,
+      note: note || `${type}: ${quantity > 0 ? '+' : ''}${quantity}`,
+    });
   };
 
   if (isLoading) {
@@ -188,6 +229,10 @@ export function StockManagement({ salonId }: StockManagementProps) {
               <Warehouse className="w-5 h-5" />
               {t("products.stock")}
             </CardTitle>
+            <Button onClick={() => setIsScannerOpen(true)} className="gap-2">
+              <ScanLine className="w-4 h-4" />
+              {t("products.scanProduct", "Skanuj produkt")}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -303,6 +348,27 @@ export function StockManagement({ salonId }: StockManagementProps) {
         }}
         product={selectedProduct}
         onSave={handleStockCorrection}
+      />
+
+      <BarcodeScanner
+        open={isScannerOpen}
+        onOpenChange={setIsScannerOpen}
+        onScan={handleScan}
+      />
+
+      <ScanResultModal
+        product={scannedProduct}
+        open={isScanResultOpen}
+        onOpenChange={(open) => {
+          setIsScanResultOpen(open);
+          if (!open) setScannedProduct(null);
+        }}
+        onUpdateStock={handleUpdateStock}
+        onScanAgain={() => {
+          setIsScanResultOpen(false);
+          setScannedProduct(null);
+          setIsScannerOpen(true);
+        }}
       />
     </div>
   );
