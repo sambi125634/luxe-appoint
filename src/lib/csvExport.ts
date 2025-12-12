@@ -133,3 +133,123 @@ export function exportFullReport(
     ]
   });
 }
+
+// Product sales export
+export interface ProductExportData {
+  date: string;
+  productName: string;
+  category: string;
+  brand: string;
+  sku: string;
+  quantity: number;
+  unitPriceGross: number;
+  totalGross: number;
+  vatRate: number;
+  vatAmount: number;
+  profit: number;
+  staffName: string;
+  clientName: string;
+  paymentMethod: string;
+}
+
+export function exportProductSales(data: ProductExportData[]): void {
+  exportToCSV({
+    filename: 'sprzedaz_produktow',
+    headers: [
+      'Data', 
+      'Produkt', 
+      'Kategoria', 
+      'Marka', 
+      'SKU', 
+      'Ilość', 
+      'Cena jedn. brutto (zł)', 
+      'Razem brutto (zł)', 
+      'Stawka VAT (%)', 
+      'VAT (zł)', 
+      'Zysk (zł)', 
+      'Pracownik', 
+      'Klient',
+      'Metoda płatności'
+    ],
+    rows: data.map(d => [
+      d.date, 
+      d.productName, 
+      d.category, 
+      d.brand, 
+      d.sku, 
+      d.quantity, 
+      d.unitPriceGross, 
+      d.totalGross, 
+      d.vatRate, 
+      d.vatAmount, 
+      d.profit, 
+      d.staffName,
+      d.clientName,
+      d.paymentMethod
+    ])
+  });
+}
+
+// Employee commissions export
+export interface CommissionExportData {
+  staffName: string;
+  servicesGross: number;
+  productsGross: number;
+  tipsTotal: number;
+  commissionServices: number;
+  commissionProducts: number;
+  totalCommission: number;
+  totalPayout: number;
+}
+
+export function exportEmployeeCommissions(data: CommissionExportData[]): void {
+  const totals = data.reduce(
+    (acc, d) => ({
+      servicesGross: acc.servicesGross + d.servicesGross,
+      productsGross: acc.productsGross + d.productsGross,
+      tipsTotal: acc.tipsTotal + d.tipsTotal,
+      commissionServices: acc.commissionServices + d.commissionServices,
+      commissionProducts: acc.commissionProducts + d.commissionProducts,
+      totalCommission: acc.totalCommission + d.totalCommission,
+      totalPayout: acc.totalPayout + d.totalPayout,
+    }),
+    { servicesGross: 0, productsGross: 0, tipsTotal: 0, commissionServices: 0, commissionProducts: 0, totalCommission: 0, totalPayout: 0 }
+  );
+
+  exportToCSV({
+    filename: 'prowizje_pracownikow',
+    headers: [
+      'Pracownik',
+      'Usługi brutto (zł)',
+      'Produkty brutto (zł)',
+      'Napiwki (zł)',
+      'Prowizja od usług (zł)',
+      'Prowizja od produktów (zł)',
+      'Prowizja łącznie (zł)',
+      'Do wypłaty (zł)'
+    ],
+    rows: [
+      ...data.map(d => [
+        d.staffName,
+        d.servicesGross,
+        d.productsGross,
+        d.tipsTotal,
+        d.commissionServices,
+        d.commissionProducts,
+        d.totalCommission,
+        d.totalPayout
+      ]),
+      ['', '', '', '', '', '', '', ''],
+      [
+        'SUMA',
+        totals.servicesGross,
+        totals.productsGross,
+        totals.tipsTotal,
+        totals.commissionServices,
+        totals.commissionProducts,
+        totals.totalCommission,
+        totals.totalPayout
+      ]
+    ]
+  });
+}

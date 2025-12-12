@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { startOfMonth, endOfMonth } from "date-fns";
-import { Calculator, Receipt, Users, Ticket, Download, BarChart3 } from "lucide-react";
+import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountingFiltersBar } from "./AccountingFilters";
 import { AccountingCharts } from "./AccountingCharts";
@@ -9,6 +9,7 @@ import { SalesVatReport } from "./SalesVatReport";
 import { EmployeeCommissions } from "./EmployeeCommissions";
 import { VouchersReport } from "./VouchersReport";
 import { ExportSection } from "./ExportSection";
+import { ProductSalesAccountingReport } from "./ProductSalesAccountingReport";
 import { ManualEntryModal, ManualTransaction } from "./ManualEntryModal";
 import { AccountingFilters, Transaction } from "./types";
 import { mockTransactions } from "./mockData";
@@ -89,7 +90,7 @@ export function AccountingModule() {
 
       {/* Main Content with Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
+        <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-flex">
           <TabsTrigger value="charts" className="gap-2">
             <BarChart3 className="w-4 h-4 hidden sm:inline" />
             <span className="hidden sm:inline">{t('accounting.charts')}</span>
@@ -104,6 +105,11 @@ export function AccountingModule() {
             <Receipt className="w-4 h-4 hidden sm:inline" />
             <span className="hidden sm:inline">{t('accounting.salesVat')}</span>
             <span className="sm:hidden">{t('accounting.salesVat')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="products" className="gap-2">
+            <Package className="w-4 h-4 hidden sm:inline" />
+            <span className="hidden sm:inline">{t('accounting.productSales.title')}</span>
+            <span className="sm:hidden">{t('accounting.productSales.title')}</span>
           </TabsTrigger>
           <TabsTrigger value="commissions" className="gap-2">
             <Users className="w-4 h-4 hidden sm:inline" />
@@ -132,6 +138,10 @@ export function AccountingModule() {
 
         <TabsContent value="sales" className="mt-6">
           <SalesVatReport dateRange={filters.dateRange} />
+        </TabsContent>
+
+        <TabsContent value="products" className="mt-6">
+          <ProductSalesAccountingReport dateRange={filters.dateRange} />
         </TabsContent>
 
         <TabsContent value="commissions" className="mt-6">

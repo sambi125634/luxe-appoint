@@ -10,3 +10,4 @@ export { EmployeeCommissions } from "./EmployeeCommissions";
 export { VouchersReport } from "./VouchersReport";
 export { ExportSection } from "./ExportSection";
 export { ManualEntryModal } from "./ManualEntryModal";
+export { ProductSalesAccountingReport } from "./ProductSalesAccountingReport";

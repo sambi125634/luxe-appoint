@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Download, ChevronDown, ChevronUp, User } from "lucide-react";
+import { Download, ChevronDown, ChevronUp, User, Package, Scissors } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -20,6 +21,7 @@ import {
 import { EmployeeCommission, Transaction } from "./types";
 import { mockEmployeeCommissions, mockTransactions } from "./mockData";
 import { useTranslation } from "react-i18next";
+import { exportEmployeeCommissions, CommissionExportData } from "@/lib/csvExport";
 
 interface EmployeeCommissionsProps {
   dateRange: { from: Date; to: Date };
@@ -92,7 +94,23 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
 
       {/* Export Button */}
       <div className="flex justify-end">
-        <Button variant="outline" className="gap-2">
+        <Button 
+          variant="outline" 
+          className="gap-2"
+          onClick={() => {
+            const exportData: CommissionExportData[] = commissions.map(c => ({
+              staffName: c.staffName,
+              servicesGross: c.servicesGross,
+              productsGross: c.productsGross,
+              tipsTotal: c.tipsTotal,
+              commissionServices: c.commissionServices,
+              commissionProducts: c.commissionProducts,
+              totalCommission: c.totalCommission,
+              totalPayout: c.totalPayout,
+            }));
+            exportEmployeeCommissions(exportData);
+          }}
+        >
           <Download className="w-4 h-4" />
           {t('accounting.exportCsvCommissions')}
         </Button>

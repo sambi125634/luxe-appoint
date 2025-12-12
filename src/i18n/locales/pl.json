@@ -836,7 +836,28 @@
     "addTransaction": "Dodaj transakcję",
     "validationError": "Błąd walidacji",
     "fillNameAndPrice": "Uzupełnij nazwę i cenę pozycji.",
-    "transactionAdded": "Dodano transakcję"
+    "transactionAdded": "Dodano transakcję",
+    "productSales": {
+      "title": "Produkty",
+      "totalRevenue": "Przychód ze sprzedaży",
+      "soldItems": "Sprzedanych sztuk",
+      "profit": "Zysk",
+      "avgMargin": "Średnia marża",
+      "vatAmount": "Kwota VAT",
+      "viewTransactions": "Transakcje",
+      "viewByProduct": "Wg produktu",
+      "viewByStaff": "Wg pracownika",
+      "allCategories": "Wszystkie kategorie",
+      "product": "Produkt",
+      "category": "Kategoria",
+      "qty": "Szt.",
+      "unitPrice": "Cena jedn.",
+      "vat": "VAT",
+      "margin": "Marża",
+      "share": "Udział",
+      "soldQty": "Sprzedano",
+      "transactions": "Transakcje"
+    }
   },
   "pipeline": {
     "board": "Tablica",
