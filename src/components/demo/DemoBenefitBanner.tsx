@@ -85,6 +85,11 @@ const benefitConfigs: Record<string, BenefitConfig> = {
     color: "from-red-500 to-red-600",
     features: ["dailyReports", "commissions", "vatReady"],
   },
+  products: {
+    icon: Scissors,
+    color: "from-teal-500 to-teal-600",
+    features: ["stockAlerts", "suppliers", "salesReports"],
+  },
 };
 
 interface DemoBenefitBannerProps {

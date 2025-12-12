@@ -6,4 +6,5 @@ export { ProductSalesReport } from './ProductSalesReport';
 export { SuppliersManagement } from './SuppliersManagement';
 export { ProductSaleSection } from './ProductSaleSection';
 export { QuickProductSale } from './QuickProductSale';
+export { StockAlertsCard } from './StockAlertsCard';
 export * from './types';
