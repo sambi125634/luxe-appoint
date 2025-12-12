@@ -24,11 +24,22 @@ export interface BookingWidget {
   // Promotion settings
   promotion?: WidgetPromotion;
   
+  // Prepayment settings per widget
+  prepayment?: WidgetPrepayment;
+  
   // Tracking
   createdAt: Date;
   updatedAt: Date;
   viewCount: number;
   bookingCount: number;
+}
+
+export interface WidgetPrepayment {
+  enabled: boolean;
+  type: 'full' | 'fixed' | 'percentage';
+  amount: number; // Value in PLN or percentage
+  requireForHighRisk: boolean;
+  requireForNewClients: boolean;
 }
 
 export interface WidgetTheme {

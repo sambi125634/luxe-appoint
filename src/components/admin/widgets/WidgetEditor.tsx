@@ -11,7 +11,8 @@ import {
   ChevronRight,
   GripVertical,
   Plus,
-  Trash2
+  Trash2,
+  CreditCard
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,6 +40,7 @@ import {
   BookingWidget, 
   WidgetStep, 
   FormFieldConfig,
+  WidgetPrepayment,
   defaultWidgetTheme,
   defaultFormFields,
   defaultWidgetSteps 
@@ -80,6 +82,13 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
       theme: { ...defaultWidgetTheme },
       formFields: [...defaultFormFields],
       steps: [...defaultWidgetSteps],
+      prepayment: {
+        enabled: false,
+        type: 'percentage',
+        amount: 30,
+        requireForHighRisk: false,
+        requireForNewClients: false,
+      },
       viewCount: 0,
       bookingCount: 0,
       createdAt: new Date(),
@@ -104,6 +113,13 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
     setFormData(prev => ({
       ...prev,
       theme: { ...prev.theme!, [field]: value }
+    }));
+  };
+
+  const updatePrepayment = (field: keyof WidgetPrepayment, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      prepayment: { ...prev.prepayment!, [field]: value }
     }));
   };
 
@@ -195,6 +211,7 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                 { id: "steps", icon: ChevronRight, label: "Kroki" },
                 { id: "form", icon: FormInput, label: "Formularz" },
                 { id: "theme", icon: Palette, label: "Wygląd" },
+                { id: "payment", icon: CreditCard, label: "Płatności" },
                 { id: "promo", icon: Tag, label: "Promocja" },
               ].map(tab => (
                 <button
@@ -574,6 +591,117 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     </div>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Payment / Prepayment Settings */}
+            {activeTab === "payment" && (
+              <div className="space-y-6">
+                <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg border border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-full bg-primary/20">
+                      <CreditCard className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <Label className="text-base font-semibold">Wymagaj zaliczki</Label>
+                      <p className="text-sm text-muted-foreground">
+                        Klient musi wpłacić zaliczkę przy rezerwacji
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.prepayment?.enabled || false}
+                    onCheckedChange={(v) => updatePrepayment('enabled', v)}
+                  />
+                </div>
+
+                {formData.prepayment?.enabled && (
+                  <div className="space-y-6 p-4 border border-border rounded-lg">
+                    <div className="space-y-2">
+                      <Label>Typ zaliczki</Label>
+                      <Select
+                        value={formData.prepayment?.type || 'percentage'}
+                        onValueChange={(v) => updatePrepayment('type', v as 'full' | 'fixed' | 'percentage')}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="full">Pełna cena usługi</SelectItem>
+                          <SelectItem value="fixed">Stała kwota (PLN)</SelectItem>
+                          <SelectItem value="percentage">Procent ceny</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {formData.prepayment?.type !== 'full' && (
+                      <div className="space-y-2">
+                        <Label>
+                          {formData.prepayment?.type === 'fixed' ? 'Kwota zaliczki (PLN)' : 'Procent ceny (%)'}
+                        </Label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="number"
+                            min={1}
+                            max={formData.prepayment?.type === 'percentage' ? 100 : undefined}
+                            value={formData.prepayment?.amount || 30}
+                            onChange={(e) => updatePrepayment('amount', parseInt(e.target.value) || 0)}
+                            className="flex-1"
+                          />
+                          <span className="px-3 py-2 bg-muted rounded-md text-sm font-medium">
+                            {formData.prepayment?.type === 'percentage' ? '%' : 'PLN'}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="border-t border-border pt-4 space-y-4">
+                      <p className="text-sm font-medium text-muted-foreground">Warunki zaliczki (opcjonalne)</p>
+                      
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <Label>Tylko dla klientów high-risk</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Wymagaj tylko gdy AI Risk Score = HIGH
+                          </p>
+                        </div>
+                        <Switch
+                          checked={formData.prepayment?.requireForHighRisk || false}
+                          onCheckedChange={(v) => updatePrepayment('requireForHighRisk', v)}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <Label>Tylko dla nowych klientów</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Wymagaj przy pierwszej wizycie
+                          </p>
+                        </div>
+                        <Switch
+                          checked={formData.prepayment?.requireForNewClients || false}
+                          onCheckedChange={(v) => updatePrepayment('requireForNewClients', v)}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                      <p className="text-xs text-amber-700 dark:text-amber-300">
+                        <strong>Uwaga:</strong> Aby pobierać zaliczki, salon musi mieć skonfigurowaną integrację z Przelewy24 w ustawieniach salonu.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {!formData.prepayment?.enabled && (
+                  <div className="p-4 border border-dashed border-border rounded-lg text-center">
+                    <CreditCard className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Zaliczki są wyłączone dla tego widgetu.<br />
+                      Włącz powyżej, aby wymagać płatności przed rezerwacją.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </ScrollArea>
