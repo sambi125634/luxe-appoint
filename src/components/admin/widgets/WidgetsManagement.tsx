@@ -13,7 +13,8 @@ import {
   Eye,
   MoreVertical,
   Check,
-  Megaphone
+  Megaphone,
+  Instagram
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,6 +32,7 @@ import { BookingWidget, mockWidgets, mockPromotions, WidgetPromotion } from "./t
 import { EmbedCodeModal } from "./EmbedCodeModal";
 import { WidgetEditor } from "./WidgetEditor";
 import { PromotionsManager } from "./PromotionsManager";
+import { InstagramLinkGenerator } from "./InstagramLinkGenerator";
 
 export function WidgetsManagement() {
   const [widgets, setWidgets] = useState<BookingWidget[]>(mockWidgets);
@@ -130,6 +132,10 @@ export function WidgetsManagement() {
           <TabsTrigger value="promotions" className="gap-2">
             <Tag className="w-4 h-4" />
             Promocje
+          </TabsTrigger>
+          <TabsTrigger value="instagram" className="gap-2">
+            <Instagram className="w-4 h-4" />
+            Instagram
           </TabsTrigger>
         </TabsList>
 
@@ -303,6 +309,10 @@ export function WidgetsManagement() {
             promotions={promotions}
             onUpdate={setPromotions}
           />
+        </TabsContent>
+
+        <TabsContent value="instagram" className="mt-6">
+          <InstagramLinkGenerator salonSlug="demo-salon" salonName="Demo Salon Beauty" />
         </TabsContent>
       </Tabs>
 
