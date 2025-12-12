@@ -1,1 +1,13 @@
 project_id = "kklogqnrwhlklrsdqfwb"
+
+[functions.ai-slot-scoring]
+verify_jwt = false
+
+[functions.ai-client-risk-score]
+verify_jwt = false
+
+[functions.ai-revenue-predictor]
+verify_jwt = false
+
+[functions.ai-pricing-optimizer]
+verify_jwt = false
