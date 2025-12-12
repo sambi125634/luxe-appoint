@@ -172,6 +172,7 @@
       "pipeline": "Śledź ścieżkę klientki od pierwszej wizyty po stałą klientkę. Pipeline pokazuje kto wraca, a kto wymaga uwagi.",
       "accounting": "Dzienne raporty kasowe, prowizje pracowników, VAT – wszystko gotowe do wysłania księgowej.",
       "products": "Kontroluj stany magazynowe, otrzymuj alerty o niskim stanie, śledź najlepiej sprzedające się produkty. Zamówienia do dostawców nigdy nie były prostsze.",
+      "support": "AI Asystent zna całą platformę Beauty Calendar. Zadaj dowolne pytanie o konfigurację, usługi, płatności czy integracje – odpowiem natychmiast 24/7!",
       "features": {
         "home": {
           "todayAppointments": "Dzisiejsze wizyty",
