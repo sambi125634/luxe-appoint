@@ -17,13 +17,19 @@ export type Database = {
       appointments: {
         Row: {
           client_id: string | null
+          confirmation_email_sent: boolean
+          confirmation_email_sent_at: string | null
           created_at: string
           end_time: string
+          followup_email_sent: boolean
+          followup_email_sent_at: string | null
           google_event_id: string | null
           id: string
           internal_notes: string | null
           notes: string | null
           price: number | null
+          reminder_email_sent: boolean
+          reminder_email_sent_at: string | null
           salon_id: string
           service_id: string
           staff_id: string
@@ -33,13 +39,19 @@ export type Database = {
         }
         Insert: {
           client_id?: string | null
+          confirmation_email_sent?: boolean
+          confirmation_email_sent_at?: string | null
           created_at?: string
           end_time: string
+          followup_email_sent?: boolean
+          followup_email_sent_at?: string | null
           google_event_id?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
           price?: number | null
+          reminder_email_sent?: boolean
+          reminder_email_sent_at?: string | null
           salon_id: string
           service_id: string
           staff_id: string
@@ -49,13 +61,19 @@ export type Database = {
         }
         Update: {
           client_id?: string | null
+          confirmation_email_sent?: boolean
+          confirmation_email_sent_at?: string | null
           created_at?: string
           end_time?: string
+          followup_email_sent?: boolean
+          followup_email_sent_at?: string | null
           google_event_id?: string | null
           id?: string
           internal_notes?: string | null
           notes?: string | null
           price?: number | null
+          reminder_email_sent?: boolean
+          reminder_email_sent_at?: string | null
           salon_id?: string
           service_id?: string
           staff_id?: string

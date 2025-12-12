@@ -11,7 +11,8 @@ import { BookingConfirmation } from "./BookingConfirmation";
 import { SakuraBackground } from "./SakuraBackground";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { BookingWidget as WidgetConfig, WidgetStep, defaultWidgetSteps, defaultWidgetTheme } from "@/components/admin/widgets/types";
+import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types";
+import { supabase } from "@/integrations/supabase/client";
 
 const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane"];
 
@@ -191,14 +192,89 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
   };
 
   const handleConfirm = async () => {
+    if (!selectedService || !selectedDate || !selectedTime) return;
+    
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSubmitting(false);
-    setIsConfirmed(true);
-    toast({
-      title: "Rezerwacja potwierdzona!",
-      description: "Otrzymasz wkrótce SMS z potwierdzeniem wizyty.",
-    });
+    try {
+      // Parse time and create start/end timestamps
+      const [hours, minutes] = selectedTime.split(":").map(Number);
+      const startTime = new Date(selectedDate);
+      startTime.setHours(hours, minutes, 0, 0);
+      const endTime = new Date(startTime.getTime() + selectedService.duration * 60 * 1000);
+
+      // Get salon_id from widget config or use demo
+      const salonId = (widgetConfig as any)?.salonId || "00000000-0000-0000-0000-000000000001";
+
+      // Create or find client
+      const { data: existingClient } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("salon_id", salonId)
+        .eq("phone", clientData.phone)
+        .maybeSingle();
+
+      let clientId = existingClient?.id;
+      if (!clientId) {
+        const { data: newClient, error: clientError } = await supabase
+          .from("clients")
+          .insert({
+            salon_id: salonId,
+            first_name: clientData.firstName,
+            last_name: clientData.lastName,
+            phone: clientData.phone,
+            email: clientData.email,
+            rodo_consent: clientData.acceptRodo,
+            marketing_consent: clientData.acceptMarketing,
+          })
+          .select("id")
+          .single();
+        if (clientError) throw clientError;
+        clientId = newClient.id;
+      }
+
+      // Create appointment
+      const { data: appointment, error: appointmentError } = await supabase
+        .from("appointments")
+        .insert({
+          salon_id: salonId,
+          client_id: clientId,
+          service_id: selectedService.id,
+          staff_id: selectedStaff?.id || "00000000-0000-0000-0000-000000000001",
+          start_time: startTime.toISOString(),
+          end_time: endTime.toISOString(),
+          price: selectedService.price,
+          notes: clientData.notes,
+          status: "booked",
+        })
+        .select("id")
+        .single();
+
+      if (appointmentError) throw appointmentError;
+
+      // Send confirmation email via edge function
+      try {
+        await supabase.functions.invoke("send-booking-confirmation", {
+          body: { appointmentId: appointment.id },
+        });
+      } catch (emailError) {
+        console.error("Email sending failed:", emailError);
+      }
+
+      setIsConfirmed(true);
+      toast({
+        title: "Rezerwacja potwierdzona!",
+        description: "Otrzymasz wkrótce email z potwierdzeniem wizyty.",
+      });
+    } catch (error: any) {
+      console.error("Booking error:", error);
+      toast({
+        title: "Błąd rezerwacji",
+        description: "Nie udało się utworzyć rezerwacji. Spróbuj ponownie.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleDateTimeSelect = (date: Date, time: string) => {
