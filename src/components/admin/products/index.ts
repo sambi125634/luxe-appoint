@@ -7,4 +7,7 @@ export { SuppliersManagement } from './SuppliersManagement';
 export { ProductSaleSection } from './ProductSaleSection';
 export { QuickProductSale } from './QuickProductSale';
 export { StockAlertsCard } from './StockAlertsCard';
+export { default as BarcodeScanner } from './BarcodeScanner';
+export { default as QRCodeDisplay } from './QRCodeDisplay';
+export { default as ScanResultModal } from './ScanResultModal';
 export * from './types';
