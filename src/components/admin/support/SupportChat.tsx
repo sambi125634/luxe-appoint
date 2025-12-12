@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Bot, Send, Trash2, Loader2 } from "lucide-react";
+import { Bot, Send, Trash2, Loader2, Sparkles } from "lucide-react";
 import { SupportMessage } from "./SupportMessage";
 import { toast } from "sonner";
 
@@ -21,12 +20,20 @@ interface SupportChatProps {
 export function SupportChat({ initialMessage, onMessageSent }: SupportChatProps) {
   const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: t("support.welcome") }
+    { role: "assistant", content: "Cześć! 👋 Jestem AI Asystentem Beauty Calendar. Pomogę Ci skonfigurować platformę i odpowiem na każde pytanie. Jak mogę Ci pomóc?" }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   // Handle initial message from quick actions
   useEffect(() => {
@@ -35,13 +42,6 @@ export function SupportChat({ initialMessage, onMessageSent }: SupportChatProps)
       onMessageSent();
     }
   }, [initialMessage]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
 
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
@@ -140,59 +140,77 @@ export function SupportChat({ initialMessage, onMessageSent }: SupportChatProps)
   };
 
   const clearHistory = () => {
-    setMessages([{ role: "assistant", content: t("support.welcome") }]);
+    setMessages([{ role: "assistant", content: "Cześć! 👋 Jestem AI Asystentem Beauty Calendar. Pomogę Ci skonfigurować platformę i odpowiem na każde pytanie. Jak mogę Ci pomóc?" }]);
   };
 
   return (
-    <Card className="h-[600px] flex flex-col">
-      <CardHeader className="pb-3 border-b">
+    <Card className="h-[600px] flex flex-col shadow-lg">
+      <CardHeader className="pb-3 border-b bg-gradient-to-r from-primary/5 to-secondary/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
-              <Bot className="w-5 h-5 text-primary-foreground" />
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center shadow-md">
+              <Sparkles className="w-6 h-6 text-primary-foreground" />
             </div>
             <div>
-              <CardTitle className="text-base">AI Asystent Beauty Calendar</CardTitle>
-              <CardDescription className="text-xs">
-                {isLoading ? t("support.thinking") : t("support.online")}
+              <CardTitle className="text-lg font-semibold">AI Asystent Beauty Calendar</CardTitle>
+              <CardDescription className="text-sm flex items-center gap-2">
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span>AI pisze...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span>Online - gotowy do pomocy</span>
+                  </>
+                )}
               </CardDescription>
             </div>
           </div>
-          <Button variant="ghost" size="icon" onClick={clearHistory} title={t("support.clearHistory")}>
+          <Button variant="ghost" size="icon" onClick={clearHistory} title="Wyczyść historię">
             <Trash2 className="w-4 h-4" />
           </Button>
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full p-4" ref={scrollRef}>
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <SupportMessage key={index} message={message} />
-            ))}
-            {isLoading && messages[messages.length - 1]?.role === "user" && (
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                {t("support.thinking")}
+      <CardContent className="flex-1 overflow-y-auto p-4">
+        <div className="space-y-4">
+          {messages.map((message, index) => (
+            <SupportMessage key={index} message={message} />
+          ))}
+          {isLoading && messages[messages.length - 1]?.role === "user" && (
+            <div className="flex items-center gap-3 text-muted-foreground text-sm p-3 bg-muted/50 rounded-lg">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+                <Bot className="w-4 h-4 text-primary-foreground" />
               </div>
-            )}
-          </div>
-        </ScrollArea>
+              <div className="flex items-center gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>AI Asystent pisze odpowiedź...</span>
+              </div>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </CardContent>
 
-      <CardFooter className="border-t p-4">
-        <form onSubmit={handleSubmit} className="flex gap-2 w-full">
+      <CardFooter className="border-t p-4 bg-muted/30">
+        <form onSubmit={handleSubmit} className="flex gap-3 w-full">
           <Textarea
-            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={t("support.placeholder")}
-            className="min-h-[44px] max-h-[120px] resize-none"
+            placeholder="Zadaj pytanie... (Enter aby wysłać)"
+            className="min-h-[48px] max-h-[120px] resize-none flex-1"
             disabled={isLoading}
           />
-          <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
-            <Send className="w-4 h-4" />
+          <Button 
+            type="submit" 
+            size="icon" 
+            className="h-12 w-12 shrink-0"
+            disabled={isLoading || !input.trim()}
+          >
+            <Send className="w-5 h-5" />
           </Button>
         </form>
       </CardFooter>
