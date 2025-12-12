@@ -295,6 +295,25 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
     if (!selectedService || !selectedDate || !selectedTime) return;
     
     setIsSubmitting(true);
+    
+    // In demo mode, skip database operations and go directly to payment/confirmation
+    if (isDemo) {
+      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate brief delay
+      setCreatedAppointmentId("demo-appointment-" + Date.now());
+      
+      if (isPaymentEnabled) {
+        handleNext();
+      } else {
+        setIsConfirmed(true);
+        toast({
+          title: "Rezerwacja potwierdzona! (Demo)",
+          description: "W prawdziwym systemie otrzymasz email z potwierdzeniem.",
+        });
+      }
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
       const [hours, minutes] = selectedTime.split(":").map(Number);
       const startTime = new Date(selectedDate);
@@ -333,12 +352,12 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
         salon_id: salonId,
         client_id: clientId,
         service_id: selectedService.id,
-        staff_id: selectedStaff?.id || "00000000-0000-0000-0000-000000000001",
+        staff_id: selectedStaff?.id || "00000000-0000-0000-0000-000000000020",
         start_time: startTime.toISOString(),
         end_time: endTime.toISOString(),
         price: selectedService.price,
         notes: clientData.notes,
-        status: isPaymentEnabled ? "booked" : "booked",
+        status: "booked",
       };
 
       if (isPaymentEnabled) {
