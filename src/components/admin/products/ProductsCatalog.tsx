@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, AlertTriangle, Package, Loader2 } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, AlertTriangle, Package, Loader2, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ProductFormModal } from "./modals/ProductFormModal";
+import QRCodeDisplay from "./QRCodeDisplay";
 import { productCategories, type Product } from "./types";
 import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,7 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [qrProduct, setQrProduct] = useState<Product | null>(null);
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -295,6 +297,10 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
                                 <Edit className="w-4 h-4 mr-2" />
                                 {t("common.edit")}
                               </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => setQrProduct(product)}>
+                                <QrCode className="w-4 h-4 mr-2" />
+                                {t("products.showQRCode")}
+                              </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleDeleteProduct(product.id)}
                                 className="text-destructive"
@@ -323,6 +329,12 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
         }}
         product={editingProduct}
         onSave={handleSaveProduct}
+      />
+
+      <QRCodeDisplay
+        product={qrProduct}
+        open={!!qrProduct}
+        onOpenChange={(open) => !open && setQrProduct(null)}
       />
     </div>
   );
