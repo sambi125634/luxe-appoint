@@ -1,22 +1,53 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Warehouse, AlertTriangle, Package, TrendingDown, Plus, Search, Filter } from "lucide-react";
+import { Warehouse, AlertTriangle, Package, TrendingDown, Plus, Search, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Progress } from "@/components/ui/progress";
 import { StockCorrectionModal } from "./modals/StockCorrectionModal";
-import { mockProducts, type Product } from "./types";
+import { type Product } from "./types";
+import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
+import { useStockMovements } from "@/hooks/useStockMovements";
 import { cn } from "@/lib/utils";
 
 type StockFilter = "all" | "low" | "out" | "ok";
 
-export function StockManagement() {
+interface StockManagementProps {
+  salonId?: string;
+}
+
+// Helper to convert DB product to component Product type
+const toProduct = (p: DBProduct): Product => ({
+  id: p.id,
+  salon_id: p.salon_id,
+  supplier_id: p.supplier_id ?? undefined,
+  name: p.name,
+  brand: p.brand ?? undefined,
+  category: p.category,
+  sku: p.sku ?? undefined,
+  ean: p.ean ?? undefined,
+  variant: p.variant ?? undefined,
+  sale_price_gross: p.sale_price_gross,
+  purchase_price_net: p.purchase_price_net ?? undefined,
+  vat_rate: p.vat_rate,
+  min_stock: p.min_stock,
+  current_stock: p.current_stock,
+  is_active: p.is_active,
+  is_for_internal_use: p.is_for_internal_use,
+  image_url: p.image_url ?? undefined,
+  description: p.description ?? undefined,
+  created_at: p.created_at,
+  updated_at: p.updated_at,
+});
+
+export function StockManagement({ salonId }: StockManagementProps) {
   const { t } = useTranslation();
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const { products: dbProducts, isLoading } = useProducts(salonId);
+  const { createCorrection } = useStockMovements(salonId);
+  const products = dbProducts.map(toProduct);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [stockFilter, setStockFilter] = useState<StockFilter>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -59,15 +90,25 @@ export function StockManagement() {
   };
 
   const handleStockCorrection = (productId: string, quantity: number, note: string) => {
-    setProducts(products.map((p) => {
-      if (p.id === productId) {
-        return { ...p, current_stock: p.current_stock + quantity };
-      }
-      return p;
-    }));
+    if (salonId) {
+      createCorrection.mutate({
+        salon_id: salonId,
+        product_id: productId,
+        quantity,
+        note,
+      });
+    }
     setIsCorrectionModalOpen(false);
     setSelectedProduct(null);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

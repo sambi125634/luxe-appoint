@@ -7,10 +7,12 @@ import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
 import { ProductSalesReport } from "./ProductSalesReport";
 import { SuppliersManagement } from "./SuppliersManagement";
+import { useSalonId } from "@/hooks/useSalonId";
 import type { ProductTab } from "./types";
 
 export function ProductsModule() {
   const { t } = useTranslation();
+  const { salonId } = useSalonId();
   const [activeTab, setActiveTab] = useState<ProductTab>("catalog");
 
   const tabs = [
@@ -38,15 +40,15 @@ export function ProductsModule() {
         </TabsList>
 
         <TabsContent value="catalog" className="mt-6">
-          <ProductsCatalog />
+          <ProductsCatalog salonId={salonId ?? undefined} />
         </TabsContent>
 
         <TabsContent value="stock" className="mt-6">
-          <StockManagement />
+          <StockManagement salonId={salonId ?? undefined} />
         </TabsContent>
 
         <TabsContent value="deliveries" className="mt-6">
-          <DeliveriesManagement />
+          <DeliveriesManagement salonId={salonId ?? undefined} />
         </TabsContent>
 
         <TabsContent value="sales-report" className="mt-6">
@@ -54,7 +56,7 @@ export function ProductsModule() {
         </TabsContent>
 
         <TabsContent value="suppliers" className="mt-6">
-          <SuppliersManagement />
+          <SuppliersManagement salonId={salonId ?? undefined} />
         </TabsContent>
       </Tabs>
     </div>

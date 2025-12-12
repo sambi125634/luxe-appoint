@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ShoppingBag, User, Search, CreditCard, Banknote, Receipt } from "lucide-react";
+import { ShoppingBag, User, Search, CreditCard, Banknote, Receipt, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,9 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { ProductSaleSection, type CartItem } from "./ProductSaleSection";
+import { useSalonId } from "@/hooks/useSalonId";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 interface Client {
@@ -16,12 +19,6 @@ interface Client {
   phone: string;
   email: string;
 }
-
-const mockClients: Client[] = [
-  { id: "1", name: "Anna Kowalska", phone: "+48 500 100 200", email: "anna@example.com" },
-  { id: "2", name: "Joanna Nowak", phone: "+48 500 100 201", email: "joanna@example.com" },
-  { id: "3", name: "Magdalena Wiśniewska", phone: "+48 500 100 202", email: "magda@example.com" },
-];
 
 interface QuickProductSaleProps {
   open: boolean;
@@ -36,13 +33,35 @@ interface QuickProductSaleProps {
 
 export function QuickProductSale({ open, onOpenChange, onComplete }: QuickProductSaleProps) {
   const { t } = useTranslation();
+  const { salonId } = useSalonId();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [clientSearch, setClientSearch] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
 
-  const filteredClients = mockClients.filter(
+  // Fetch clients from database
+  const { data: clients = [], isLoading: clientsLoading } = useQuery({
+    queryKey: ["clients", salonId],
+    queryFn: async () => {
+      if (!salonId) return [];
+      const { data, error } = await supabase
+        .from("clients")
+        .select("id, first_name, last_name, phone, email")
+        .eq("salon_id", salonId)
+        .order("first_name");
+      if (error) throw error;
+      return data.map((c) => ({
+        id: c.id,
+        name: `${c.first_name} ${c.last_name}`,
+        phone: c.phone,
+        email: c.email || "",
+      }));
+    },
+    enabled: !!salonId,
+  });
+
+  const filteredClients = clients.filter(
     (client) =>
       client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
       client.phone.includes(clientSearch)
@@ -126,7 +145,11 @@ export function QuickProductSale({ open, onOpenChange, onComplete }: QuickProduc
               />
               {showClientDropdown && clientSearch && !selectedClient && (
                 <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                  {filteredClients.length === 0 ? (
+                  {clientsLoading ? (
+                    <div className="px-4 py-3 flex items-center justify-center">
+                      <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                    </div>
+                  ) : filteredClients.length === 0 ? (
                     <div className="px-4 py-3 text-sm text-muted-foreground text-center">
                       {t("products.noClientsFound")}
                     </div>
@@ -165,7 +188,7 @@ export function QuickProductSale({ open, onOpenChange, onComplete }: QuickProduc
           <Separator />
 
           {/* Product Selection */}
-          <ProductSaleSection cart={cart} onCartChange={setCart} />
+          <ProductSaleSection cart={cart} onCartChange={setCart} salonId={salonId ?? undefined} />
 
           {cart.length > 0 && (
             <>
