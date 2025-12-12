@@ -10,10 +10,16 @@ import { SuppliersManagement } from "./SuppliersManagement";
 import { useSalonId } from "@/hooks/useSalonId";
 import type { ProductTab } from "./types";
 
+// Demo salon ID for mock data
+const DEMO_SALON_ID = "demo-salon-id";
+
 export function ProductsModule() {
   const { t } = useTranslation();
-  const { salonId } = useSalonId();
+  const { salonId, isLoading } = useSalonId();
   const [activeTab, setActiveTab] = useState<ProductTab>("catalog");
+
+  // Use demo salon ID if no real salon found (for demo mode)
+  const effectiveSalonId = salonId || DEMO_SALON_ID;
 
   const tabs = [
     { id: "catalog" as ProductTab, label: t("products.catalog"), icon: Package },
@@ -40,15 +46,15 @@ export function ProductsModule() {
         </TabsList>
 
         <TabsContent value="catalog" className="mt-6">
-          <ProductsCatalog salonId={salonId ?? undefined} />
+          <ProductsCatalog salonId={effectiveSalonId} />
         </TabsContent>
 
         <TabsContent value="stock" className="mt-6">
-          <StockManagement salonId={salonId ?? undefined} />
+          <StockManagement salonId={effectiveSalonId} />
         </TabsContent>
 
         <TabsContent value="deliveries" className="mt-6">
-          <DeliveriesManagement salonId={salonId ?? undefined} />
+          <DeliveriesManagement salonId={effectiveSalonId} />
         </TabsContent>
 
         <TabsContent value="sales-report" className="mt-6">
@@ -56,7 +62,7 @@ export function ProductsModule() {
         </TabsContent>
 
         <TabsContent value="suppliers" className="mt-6">
-          <SuppliersManagement salonId={salonId ?? undefined} />
+          <SuppliersManagement salonId={effectiveSalonId} />
         </TabsContent>
       </Tabs>
     </div>

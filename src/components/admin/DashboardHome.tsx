@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
-  Phone, CheckCircle2, XCircle, ShoppingBag
+  Phone, CheckCircle2, XCircle, ShoppingBag, Package
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
+import { StockAlertsCard } from "./products/StockAlertsCard";
+import { useSalonId } from "@/hooks/useSalonId";
+import { useStockAlerts } from "@/hooks/useStockAlerts";
 
 // Mock data - w przyszłości z bazy danych
 const todayAppointments = [
@@ -51,12 +54,26 @@ const topStaff = [
 export function DashboardHome() {
   const { t, i18n } = useTranslation();
   const [quickSaleOpen, setQuickSaleOpen] = useState(false);
+  const { salonId } = useSalonId();
+  const { alerts: stockAlerts, topSelling } = useStockAlerts(salonId ?? undefined);
   
   const alerts = [
     { type: "warning", message: i18n.language === 'pl' ? "2 klientki nie potwierdziły wizyty" : "2 clients haven't confirmed", count: 2 },
     { type: "error", message: i18n.language === 'pl' ? "1 wizyta została anulowana" : "1 appointment cancelled", count: 1 },
     { type: "info", message: i18n.language === 'pl' ? "3 nowe rezerwacje z ostatniej godziny" : "3 new bookings in the last hour", count: 3 },
   ];
+
+  // Add stock alerts to the alerts array
+  const criticalStockCount = stockAlerts.filter(a => a.status === "critical").length;
+  if (criticalStockCount > 0) {
+    alerts.unshift({
+      type: "error",
+      message: i18n.language === 'pl' 
+        ? `${criticalStockCount} produktów wymaga uzupełnienia` 
+        : `${criticalStockCount} products need restocking`,
+      count: criticalStockCount
+    });
+  }
 
   const todayRevenue = todayAppointments
     .filter(a => a.status !== "cancelled")
@@ -291,8 +308,14 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        {/* TOP usługi i personel */}
+        {/* TOP usługi, personel i alerty magazynowe */}
         <div className="space-y-6">
+          {/* Stock Alerts */}
+          <StockAlertsCard 
+            alerts={stockAlerts} 
+            topSelling={topSelling}
+          />
+
           {/* TOP 3 usługi */}
           <Card>
             <CardHeader>

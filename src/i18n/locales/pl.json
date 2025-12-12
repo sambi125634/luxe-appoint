@@ -171,6 +171,7 @@
       "conversations": "Wszystkie wiadomości od klientek w jednym miejscu. SMS, email, chat – bez przeskakiwania między aplikacjami.",
       "pipeline": "Śledź ścieżkę klientki od pierwszej wizyty po stałą klientkę. Pipeline pokazuje kto wraca, a kto wymaga uwagi.",
       "accounting": "Dzienne raporty kasowe, prowizje pracowników, VAT – wszystko gotowe do wysłania księgowej.",
+      "products": "Kontroluj stany magazynowe, otrzymuj alerty o niskim stanie, śledź najlepiej sprzedające się produkty. Zamówienia do dostawców nigdy nie były prostsze.",
       "features": {
         "home": {
           "todayAppointments": "Dzisiejsze wizyty",
@@ -231,6 +232,11 @@
           "dailyReports": "Raporty dzienne",
           "commissions": "Prowizje",
           "vatReady": "VAT gotowy"
+        },
+        "products": {
+          "stockAlerts": "Alerty magazynowe",
+          "suppliers": "Dostawcy",
+          "salesReports": "Raporty sprzedaży"
         }
       }
     }

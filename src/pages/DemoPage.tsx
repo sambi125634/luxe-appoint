@@ -16,6 +16,7 @@ import { SettingsModule } from "@/components/admin/settings";
 import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
+import { ProductsModule } from "@/components/admin/products";
 import { DemoBenefitBanner } from "@/components/demo/DemoBenefitBanner";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 
@@ -34,6 +35,7 @@ export default function DemoPage() {
       case "conversations": return t("admin.conversations");
       case "pipeline": return t("admin.pipeline");
       case "accounting": return t("accounting.charts");
+      case "products": return t("admin.products");
       case "staff": return t("admin.staff");
       case "services": return t("admin.services");
       case "time-off": return t("timeOff.title");
@@ -91,6 +93,8 @@ export default function DemoPage() {
           return <PipelineModule />;
         case "accounting":
           return <AccountingModule />;
+        case "products":
+          return <ProductsModule />;
         default:
           return null;
       }
