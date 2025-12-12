@@ -3,13 +3,14 @@ import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
-  Phone, CheckCircle2, XCircle
+  Phone, CheckCircle2, XCircle, ShoppingBag
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { QuickProductSale } from "./products/QuickProductSale";
 
 // Mock data - w przyszłości z bazy danych
 const todayAppointments = [
@@ -49,6 +50,7 @@ const topStaff = [
 
 export function DashboardHome() {
   const { t, i18n } = useTranslation();
+  const [quickSaleOpen, setQuickSaleOpen] = useState(false);
   
   const alerts = [
     { type: "warning", message: i18n.language === 'pl' ? "2 klientki nie potwierdziły wizyty" : "2 clients haven't confirmed", count: 2 },
@@ -75,12 +77,24 @@ export function DashboardHome() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => setQuickSaleOpen(true)}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            <span className="hidden sm:inline">{t('products.quickSale')}</span>
+          </Button>
           <Badge variant="outline" className="gap-1">
             <Calendar className="w-3 h-3" />
             {new Date().toLocaleDateString(i18n.language === 'pl' ? 'pl-PL' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
           </Badge>
         </div>
       </div>
+
+      {/* Quick Product Sale Modal */}
+      <QuickProductSale open={quickSaleOpen} onOpenChange={setQuickSaleOpen} />
 
       {/* Alerty - co wymaga uwagi */}
       {alerts.length > 0 && (

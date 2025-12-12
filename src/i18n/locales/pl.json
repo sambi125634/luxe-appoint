@@ -417,7 +417,29 @@
     "description": "Opis",
     "active": "Aktywny",
     "internalUseOnly": "Tylko do użytku wewnętrznego",
-    "variant": "Wariant"
+    "variant": "Wariant",
+    "addProducts": "Dodaj produkty",
+    "addProductsToSale": "Dodaj produkty do sprzedaży",
+    "items": "szt.",
+    "searchToAdd": "Szukaj produktu do dodania...",
+    "noProductsFound": "Nie znaleziono produktów",
+    "only": "Tylko",
+    "left": "szt.",
+    "productsTotal": "Produkty razem",
+    "quickSale": "Szybka sprzedaż",
+    "client": "Klient",
+    "searchClient": "Szukaj klienta...",
+    "noClientsFound": "Nie znaleziono klientów",
+    "paymentMethod": "Metoda płatności",
+    "cash": "Gotówka",
+    "card": "Karta",
+    "transfer": "Przelew",
+    "totalToPay": "Do zapłaty",
+    "completeSale": "Zakończ sprzedaż",
+    "emptyCart": "Koszyk jest pusty",
+    "addProductsFirst": "Dodaj produkty przed zakończeniem sprzedaży",
+    "saleCompleted": "Sprzedaż zakończona",
+    "total": "Suma"
   },
   "settings": {
     "salonProfile": "Profil salonu",
@@ -457,7 +479,10 @@
     "success": "Sukces",
     "saved": "Zapisano",
     "deleted": "Usunięto",
-    "added": "Dodano"
+    "added": "Dodano",
+    "optional": "opcjonalne",
+    "change": "Zmień",
+    "total": "Razem"
   },
   "dashboard": {
     "welcome": "Witaj!",
@@ -634,6 +659,8 @@
     "summary": "Podsumowanie",
     "duration": "Czas trwania",
     "price": "Cena",
+    "servicePrice": "Cena usługi",
+    "total": "Razem",
     "saveChanges": "Zapisz zmiany",
     "createAppointment": "Utwórz wizytę"
   },
