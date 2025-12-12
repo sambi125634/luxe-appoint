@@ -1,5 +1,14 @@
 project_id = "kklogqnrwhlklrsdqfwb"
 
+[functions.create-payment-p24]
+verify_jwt = false
+
+[functions.webhook-p24-payment]
+verify_jwt = false
+
+[functions.verify-payment-p24]
+verify_jwt = false
+
 [functions.ai-slot-scoring]
 verify_jwt = false
 

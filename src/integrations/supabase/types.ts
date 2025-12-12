@@ -27,6 +27,11 @@ export type Database = {
           id: string
           internal_notes: string | null
           notes: string | null
+          payment_amount: number | null
+          payment_method: string | null
+          payment_paid_at: string | null
+          payment_session_id: string | null
+          payment_status: string | null
           price: number | null
           reminder_email_sent: boolean
           reminder_email_sent_at: string | null
@@ -49,6 +54,11 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           notes?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_paid_at?: string | null
+          payment_session_id?: string | null
+          payment_status?: string | null
           price?: number | null
           reminder_email_sent?: boolean
           reminder_email_sent_at?: string | null
@@ -71,6 +81,11 @@ export type Database = {
           id?: string
           internal_notes?: string | null
           notes?: string | null
+          payment_amount?: number | null
+          payment_method?: string | null
+          payment_paid_at?: string | null
+          payment_session_id?: string | null
+          payment_status?: string | null
           price?: number | null
           reminder_email_sent?: boolean
           reminder_email_sent_at?: string | null
