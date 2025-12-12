@@ -1,17 +1,41 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Plus, Search, MoreHorizontal, Edit, Trash2, Phone, Mail } from "lucide-react";
+import { Building2, Plus, Search, MoreHorizontal, Edit, Trash2, Phone, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { SupplierFormModal } from "./modals/SupplierFormModal";
-import { mockSuppliers, type Supplier } from "./types";
+import { type Supplier } from "./types";
+import { useSuppliers, type Supplier as DBSupplier } from "@/hooks/useSuppliers";
 
-export function SuppliersManagement() {
+interface SuppliersManagementProps {
+  salonId?: string;
+}
+
+// Helper to convert DB supplier to component Supplier type
+const toSupplier = (s: DBSupplier): Supplier => ({
+  id: s.id,
+  salon_id: s.salon_id,
+  name: s.name,
+  contact_person: s.contact_person ?? undefined,
+  email: s.email ?? undefined,
+  phone: s.phone ?? undefined,
+  address: s.address ?? undefined,
+  payment_terms: s.payment_terms ?? undefined,
+  discount_info: s.discount_info ?? undefined,
+  notes: s.notes ?? undefined,
+  is_active: s.is_active,
+  created_at: s.created_at,
+  updated_at: s.updated_at,
+});
+
+export function SuppliersManagement({ salonId }: SuppliersManagementProps) {
   const { t } = useTranslation();
-  const [suppliers, setSuppliers] = useState<Supplier[]>(mockSuppliers);
+  const { suppliers: dbSuppliers, isLoading, createSupplier, updateSupplier, deleteSupplier } = useSuppliers(salonId);
+  const suppliers = dbSuppliers.map(toSupplier);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
@@ -23,17 +47,47 @@ export function SuppliersManagement() {
 
   const handleSaveSupplier = (supplier: Supplier) => {
     if (editingSupplier) {
-      setSuppliers(suppliers.map((s) => (s.id === supplier.id ? supplier : s)));
-    } else {
-      setSuppliers([...suppliers, { ...supplier, id: Date.now().toString() }]);
+      updateSupplier.mutate({
+        id: supplier.id,
+        name: supplier.name,
+        contact_person: supplier.contact_person,
+        email: supplier.email,
+        phone: supplier.phone,
+        address: supplier.address,
+        payment_terms: supplier.payment_terms,
+        discount_info: supplier.discount_info,
+        notes: supplier.notes,
+        is_active: supplier.is_active,
+      });
+    } else if (salonId) {
+      createSupplier.mutate({
+        salon_id: salonId,
+        name: supplier.name,
+        contact_person: supplier.contact_person,
+        email: supplier.email,
+        phone: supplier.phone,
+        address: supplier.address,
+        payment_terms: supplier.payment_terms,
+        discount_info: supplier.discount_info,
+        notes: supplier.notes,
+        is_active: supplier.is_active ?? true,
+      });
     }
     setIsModalOpen(false);
     setEditingSupplier(null);
   };
 
   const handleDeleteSupplier = (id: string) => {
-    setSuppliers(suppliers.filter((s) => s.id !== id));
+    deleteSupplier.mutate(id);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

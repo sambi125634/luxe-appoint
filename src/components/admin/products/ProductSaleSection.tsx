@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Package, Plus, Minus, X, Search, ShoppingBag } from "lucide-react";
+import { Package, Plus, Minus, X, Search, ShoppingBag, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { mockProducts, type Product } from "./types";
+import { type Product } from "./types";
+import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 
 export interface CartItem {
@@ -16,15 +17,43 @@ export interface CartItem {
 interface ProductSaleSectionProps {
   cart: CartItem[];
   onCartChange: (cart: CartItem[]) => void;
+  salonId?: string;
   className?: string;
 }
 
-export function ProductSaleSection({ cart, onCartChange, className }: ProductSaleSectionProps) {
+// Helper to convert DB product to component Product type
+const toProduct = (p: DBProduct): Product => ({
+  id: p.id,
+  salon_id: p.salon_id,
+  supplier_id: p.supplier_id ?? undefined,
+  name: p.name,
+  brand: p.brand ?? undefined,
+  category: p.category,
+  sku: p.sku ?? undefined,
+  ean: p.ean ?? undefined,
+  variant: p.variant ?? undefined,
+  sale_price_gross: p.sale_price_gross,
+  purchase_price_net: p.purchase_price_net ?? undefined,
+  vat_rate: p.vat_rate,
+  min_stock: p.min_stock,
+  current_stock: p.current_stock,
+  is_active: p.is_active,
+  is_for_internal_use: p.is_for_internal_use,
+  image_url: p.image_url ?? undefined,
+  description: p.description ?? undefined,
+  created_at: p.created_at,
+  updated_at: p.updated_at,
+});
+
+export function ProductSaleSection({ cart, onCartChange, salonId, className }: ProductSaleSectionProps) {
   const { t } = useTranslation();
+  const { products: dbProducts, isLoading } = useProducts(salonId);
   const [searchQuery, setSearchQuery] = useState("");
   const [showProductPicker, setShowProductPicker] = useState(false);
 
-  const activeProducts = mockProducts.filter((p) => p.is_active && !p.is_for_internal_use && p.current_stock > 0);
+  const activeProducts = dbProducts
+    .map(toProduct)
+    .filter((p) => p.is_active && !p.is_for_internal_use && p.current_stock > 0);
 
   const filteredProducts = activeProducts.filter(
     (product) =>
@@ -101,7 +130,11 @@ export function ProductSaleSection({ cart, onCartChange, className }: ProductSal
         {showProductPicker && searchQuery && (
           <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
             <ScrollArea className="max-h-48">
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="px-4 py-3 flex items-center justify-center">
+                  <Loader2 className="w-4 h-4 animate-spin text-primary" />
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="px-4 py-3 text-sm text-muted-foreground text-center">
                   {t("products.noProductsFound")}
                 </div>

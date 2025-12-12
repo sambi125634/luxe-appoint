@@ -1,47 +1,115 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Truck, Plus, Search, Calendar, FileText, Package } from "lucide-react";
+import { Truck, Plus, Search, Calendar, FileText, Package, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DeliveryFormModal } from "./modals/DeliveryFormModal";
-import { mockStockMovements, mockProducts, mockSuppliers, stockMovementTypes, type StockMovement } from "./types";
+import { stockMovementTypes, type StockMovement, type Product, type Supplier } from "./types";
+import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
+import { useSuppliers, type Supplier as DBSupplier } from "@/hooks/useSuppliers";
+import { useStockMovements } from "@/hooks/useStockMovements";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
-export function DeliveriesManagement() {
+interface DeliveriesManagementProps {
+  salonId?: string;
+}
+
+// Helper to convert DB product to component Product type
+const toProduct = (p: DBProduct): Product => ({
+  id: p.id,
+  salon_id: p.salon_id,
+  supplier_id: p.supplier_id ?? undefined,
+  name: p.name,
+  brand: p.brand ?? undefined,
+  category: p.category,
+  sku: p.sku ?? undefined,
+  ean: p.ean ?? undefined,
+  variant: p.variant ?? undefined,
+  sale_price_gross: p.sale_price_gross,
+  purchase_price_net: p.purchase_price_net ?? undefined,
+  vat_rate: p.vat_rate,
+  min_stock: p.min_stock,
+  current_stock: p.current_stock,
+  is_active: p.is_active,
+  is_for_internal_use: p.is_for_internal_use,
+  image_url: p.image_url ?? undefined,
+  description: p.description ?? undefined,
+  created_at: p.created_at,
+  updated_at: p.updated_at,
+});
+
+// Helper to convert DB supplier to component Supplier type
+const toSupplier = (s: DBSupplier): Supplier => ({
+  id: s.id,
+  salon_id: s.salon_id,
+  name: s.name,
+  contact_person: s.contact_person ?? undefined,
+  email: s.email ?? undefined,
+  phone: s.phone ?? undefined,
+  address: s.address ?? undefined,
+  payment_terms: s.payment_terms ?? undefined,
+  discount_info: s.discount_info ?? undefined,
+  notes: s.notes ?? undefined,
+  is_active: s.is_active,
+  created_at: s.created_at,
+  updated_at: s.updated_at,
+});
+
+export function DeliveriesManagement({ salonId }: DeliveriesManagementProps) {
   const { t } = useTranslation();
-  const [movements, setMovements] = useState<StockMovement[]>(
-    mockStockMovements.filter((m) => m.type === "delivery")
-  );
+  const { products: dbProducts, isLoading: productsLoading } = useProducts(salonId);
+  const { suppliers: dbSuppliers, isLoading: suppliersLoading } = useSuppliers(salonId);
+  const { movements: dbMovements, isLoading: movementsLoading, createDelivery } = useStockMovements(salonId, "delivery");
+  
+  const products = dbProducts.map(toProduct);
+  const suppliers = dbSuppliers.map(toSupplier);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const filteredMovements = movements.filter((movement) => {
-    const product = mockProducts.find((p) => p.id === movement.product_id);
-    const supplier = movement.supplier_id ? mockSuppliers.find((s) => s.id === movement.supplier_id) : null;
+  const isLoading = productsLoading || suppliersLoading || movementsLoading;
+
+  const filteredMovements = dbMovements.filter((movement) => {
+    const product = movement.products;
+    const supplier = movement.suppliers;
     return (
-      product?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      supplier?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      supplier?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       movement.invoice_number?.toLowerCase().includes(searchQuery.toLowerCase())
     );
   });
 
-  const totalDeliveryValue = movements.reduce((sum, m) => sum + (m.total_value || 0), 0);
-  const totalItems = movements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
+  const totalDeliveryValue = dbMovements.reduce((sum, m) => sum + (m.total_value || 0), 0);
+  const totalItems = dbMovements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
 
   const handleAddDelivery = (delivery: Omit<StockMovement, "id" | "created_at">) => {
-    const newMovement: StockMovement = {
-      ...delivery,
-      id: Date.now().toString(),
-      created_at: new Date().toISOString(),
-    };
-    setMovements([newMovement, ...movements]);
+    if (salonId) {
+      createDelivery.mutate({
+        salon_id: salonId,
+        product_id: delivery.product_id,
+        quantity: delivery.quantity,
+        unit_price: delivery.unit_price,
+        supplier_id: delivery.supplier_id,
+        invoice_number: delivery.invoice_number,
+        expiry_date: delivery.expiry_date,
+        note: delivery.note,
+      });
+    }
     setIsModalOpen(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -54,7 +122,7 @@ export function DeliveriesManagement() {
                 <Truck className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{movements.length}</p>
+                <p className="text-2xl font-bold">{dbMovements.length}</p>
                 <p className="text-sm text-muted-foreground">{t("products.totalDeliveries")}</p>
               </div>
             </div>
@@ -133,10 +201,8 @@ export function DeliveriesManagement() {
                   </TableRow>
                 ) : (
                   filteredMovements.map((movement) => {
-                    const product = mockProducts.find((p) => p.id === movement.product_id);
-                    const supplier = movement.supplier_id
-                      ? mockSuppliers.find((s) => s.id === movement.supplier_id)
-                      : null;
+                    const product = movement.products;
+                    const supplier = movement.suppliers;
 
                     return (
                       <TableRow key={movement.id} className="hover:bg-muted/30">
@@ -190,8 +256,8 @@ export function DeliveriesManagement() {
       <DeliveryFormModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        products={mockProducts}
-        suppliers={mockSuppliers}
+        products={products}
+        suppliers={suppliers}
         onSave={handleAddDelivery}
       />
     </div>

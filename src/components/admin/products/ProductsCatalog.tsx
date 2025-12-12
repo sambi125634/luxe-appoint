@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, AlertTriangle, Package } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, AlertTriangle, Package, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,12 +9,43 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ProductFormModal } from "./modals/ProductFormModal";
-import { mockProducts, productCategories, type Product } from "./types";
+import { productCategories, type Product } from "./types";
+import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
 
-export function ProductsCatalog() {
+interface ProductsCatalogProps {
+  salonId?: string;
+}
+
+// Helper to convert DB product to component Product type
+const toProduct = (p: DBProduct): Product => ({
+  id: p.id,
+  salon_id: p.salon_id,
+  supplier_id: p.supplier_id ?? undefined,
+  name: p.name,
+  brand: p.brand ?? undefined,
+  category: p.category,
+  sku: p.sku ?? undefined,
+  ean: p.ean ?? undefined,
+  variant: p.variant ?? undefined,
+  sale_price_gross: p.sale_price_gross,
+  purchase_price_net: p.purchase_price_net ?? undefined,
+  vat_rate: p.vat_rate,
+  min_stock: p.min_stock,
+  current_stock: p.current_stock,
+  is_active: p.is_active,
+  is_for_internal_use: p.is_for_internal_use,
+  image_url: p.image_url ?? undefined,
+  description: p.description ?? undefined,
+  created_at: p.created_at,
+  updated_at: p.updated_at,
+});
+
+export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
   const { t } = useTranslation();
-  const [products, setProducts] = useState<Product[]>(mockProducts);
+  const { products: dbProducts, isLoading, createProduct, updateProduct, deleteProduct } = useProducts(salonId);
+  const products = dbProducts.map(toProduct);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,16 +66,52 @@ export function ProductsCatalog() {
 
   const handleSaveProduct = (product: Product) => {
     if (editingProduct) {
-      setProducts(products.map((p) => (p.id === product.id ? product : p)));
-    } else {
-      setProducts([...products, { ...product, id: Date.now().toString() }]);
+      updateProduct.mutate({
+        id: product.id,
+        name: product.name,
+        brand: product.brand,
+        category: product.category,
+        sku: product.sku,
+        ean: product.ean,
+        variant: product.variant,
+        sale_price_gross: product.sale_price_gross,
+        purchase_price_net: product.purchase_price_net,
+        vat_rate: product.vat_rate,
+        min_stock: product.min_stock,
+        current_stock: product.current_stock,
+        is_active: product.is_active,
+        is_for_internal_use: product.is_for_internal_use,
+        image_url: product.image_url,
+        description: product.description,
+        supplier_id: product.supplier_id,
+      });
+    } else if (salonId) {
+      createProduct.mutate({
+        salon_id: salonId,
+        name: product.name,
+        brand: product.brand,
+        category: product.category,
+        sku: product.sku,
+        ean: product.ean,
+        variant: product.variant,
+        sale_price_gross: product.sale_price_gross,
+        purchase_price_net: product.purchase_price_net,
+        vat_rate: product.vat_rate,
+        min_stock: product.min_stock,
+        current_stock: product.current_stock,
+        is_active: product.is_active,
+        is_for_internal_use: product.is_for_internal_use,
+        image_url: product.image_url,
+        description: product.description,
+        supplier_id: product.supplier_id,
+      });
     }
     setIsModalOpen(false);
     setEditingProduct(null);
   };
 
   const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter((p) => p.id !== id));
+    deleteProduct.mutate(id);
   };
 
   const getStockStatus = (product: Product) => {
@@ -56,6 +123,14 @@ export function ProductsCatalog() {
     }
     return { label: "OK", color: "bg-green-100 text-green-800" };
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
