@@ -16,6 +16,14 @@ export interface SalonProfile {
   themeSecondaryColor: string;
 }
 
+export interface PrepaymentSettings {
+  enabled: boolean;
+  type: 'full' | 'fixed' | 'percentage';
+  amount: number;
+  requireForHighRisk: boolean;
+  requireForNewClients: boolean;
+}
+
 export interface BookingSettings {
   advanceBookingDays: number;
   minAdvanceHours: number;
@@ -27,6 +35,7 @@ export interface BookingSettings {
   defaultWorkingHoursEnd: string;
   slotInterval: number;
   bufferBetweenAppointments: number;
+  prepayment: PrepaymentSettings;
 }
 
 export interface NotificationSettings {
@@ -60,6 +69,14 @@ export interface IntegrationSettings {
     apiKey: string;
     senderName: string;
   };
+  przelewy24: {
+    enabled: boolean;
+    merchantId: string;
+    posId: string;
+    apiKey: string;
+    crcKey: string;
+    sandbox: boolean;
+  };
 }
 
 export interface SalonSettings {
@@ -67,6 +84,14 @@ export interface SalonSettings {
   notifications: NotificationSettings;
   integrations: IntegrationSettings;
 }
+
+const defaultPrepaymentSettings: PrepaymentSettings = {
+  enabled: false,
+  type: 'fixed',
+  amount: 50,
+  requireForHighRisk: true,
+  requireForNewClients: false,
+};
 
 const defaultBookingSettings: BookingSettings = {
   advanceBookingDays: 30,
@@ -79,6 +104,7 @@ const defaultBookingSettings: BookingSettings = {
   defaultWorkingHoursEnd: "18:00",
   slotInterval: 15,
   bufferBetweenAppointments: 0,
+  prepayment: defaultPrepaymentSettings,
 };
 
 const defaultNotificationSettings: NotificationSettings = {
@@ -133,6 +159,14 @@ const defaultIntegrationSettings: IntegrationSettings = {
     enabled: false,
     apiKey: "",
     senderName: "",
+  },
+  przelewy24: {
+    enabled: false,
+    merchantId: "",
+    posId: "",
+    apiKey: "",
+    crcKey: "",
+    sandbox: true,
   },
 };
 
