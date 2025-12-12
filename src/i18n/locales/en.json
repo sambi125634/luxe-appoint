@@ -725,7 +725,28 @@
     "addTransaction": "Add transaction",
     "validationError": "Validation error",
     "fillNameAndPrice": "Fill in name and price.",
-    "transactionAdded": "Transaction added"
+    "transactionAdded": "Transaction added",
+    "productSales": {
+      "title": "Products",
+      "totalRevenue": "Sales revenue",
+      "soldItems": "Items sold",
+      "profit": "Profit",
+      "avgMargin": "Avg. margin",
+      "vatAmount": "VAT amount",
+      "viewTransactions": "Transactions",
+      "viewByProduct": "By product",
+      "viewByStaff": "By staff",
+      "allCategories": "All categories",
+      "product": "Product",
+      "category": "Category",
+      "qty": "Qty",
+      "unitPrice": "Unit price",
+      "vat": "VAT",
+      "margin": "Margin",
+      "share": "Share",
+      "soldQty": "Sold",
+      "transactions": "Transactions"
+    }
   },
   "pipeline": {
     "board": "Board",
