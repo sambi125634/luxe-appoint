@@ -55,6 +55,11 @@ export interface IntegrationSettings {
     pipelineId: string;
     defaultStageId: string;
   };
+  smsapi: {
+    enabled: boolean;
+    apiKey: string;
+    senderName: string;
+  };
 }
 
 export interface SalonSettings {
@@ -123,6 +128,11 @@ const defaultIntegrationSettings: IntegrationSettings = {
     locationId: "",
     pipelineId: "",
     defaultStageId: "",
+  },
+  smsapi: {
+    enabled: false,
+    apiKey: "",
+    senderName: "",
   },
 };
 

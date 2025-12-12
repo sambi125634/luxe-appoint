@@ -251,13 +251,18 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
 
       if (appointmentError) throw appointmentError;
 
-      // Send confirmation email via edge function
+      // Send confirmation notifications via edge functions
       try {
+        // Send email confirmation
         await supabase.functions.invoke("send-booking-confirmation", {
           body: { appointmentId: appointment.id },
         });
-      } catch (emailError) {
-        console.error("Email sending failed:", emailError);
+        // Send SMS confirmation (if SMSAPI configured)
+        await supabase.functions.invoke("send-sms-smsapi", {
+          body: { appointmentId: appointment.id, type: "confirmation" },
+        });
+      } catch (notificationError) {
+        console.error("Notification sending failed:", notificationError);
       }
 
       setIsConfirmed(true);

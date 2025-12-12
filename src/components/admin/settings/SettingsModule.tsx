@@ -55,9 +55,11 @@ export function SettingsModule() {
           <TabsContent value="notifications" className="m-0">
             <NotificationSettings
               settings={settings.notifications}
+              integrationSettings={settings.integrations}
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={(updates) => updateSettings("notifications", updates)}
+              onSaveIntegration={(updates) => updateSettings("integrations", updates)}
             />
           </TabsContent>
           <TabsContent value="integrations" className="m-0">

@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.send-followup-emails]
 verify_jwt = false
+
+[functions.send-sms-smsapi]
+verify_jwt = false
