@@ -57,6 +57,7 @@ export default function DemoPage() {
       conversations: "conversations",
       pipeline: "pipeline",
       accounting: "accounting",
+      products: "products",
     };
     return benefitMap[tab] || tab;
   };
