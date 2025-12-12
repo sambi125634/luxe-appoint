@@ -93,8 +93,8 @@ export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
   // Check if this is demo mode (demo-salon slug or no real salon)
   const isDemo = widgetConfig?.slug === 'demo-salon' || widgetConfig?.slug === 'main' || !widgetConfig;
   
-  // Fetch salon settings for prepayment config
-  const salonId = "00000000-0000-0000-0000-000000000001";
+  // Fetch salon settings for prepayment config - use real demo salon ID
+  const salonId = "583de420-3642-460c-9349-b3a5d8737db8";
   
   useEffect(() => {
     // In demo mode, use mock settings with prepayment enabled for demonstration
