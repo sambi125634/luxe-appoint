@@ -331,6 +331,8 @@
     "pipeline": "Pipeline",
     "widgets": "Widgets",
     "settings": "Settings",
+    "products": "Products",
+    "support": "Support",
     "logout": "Logout",
     "profile": "Salon profile",
     "loading": "Loading..."
@@ -1146,5 +1148,29 @@
     "cancellationPolicyFull": "Unattended appointments without notice may require a deposit for future bookings.",
     "moreInfo": "More info",
     "greatChoice": "Great choice!"
+  },
+  "support": {
+    "title": "Help & AI Assistant",
+    "subtitle": "Ask anything about Beauty Calendar",
+    "placeholder": "Ask a question...",
+    "send": "Send",
+    "clearHistory": "Clear history",
+    "thinking": "AI is thinking...",
+    "online": "Online",
+    "quickActions": "Quick questions",
+    "welcome": "Hi! 👋 I'm the Beauty Calendar AI Assistant. I'll help you configure the platform and answer any questions. How can I help?",
+    "needHuman": "Need human help?",
+    "humanDescription": "Contact our support team",
+    "documentation": "Documentation",
+    "quick": {
+      "payments": "How to configure payments?",
+      "service": "How to add a new service?",
+      "staff": "How to set staff schedule?",
+      "embed": "How to embed widget on my site?",
+      "sms": "How to enable SMS reminders?",
+      "products": "How to add products?",
+      "settings": "How to change salon logo?",
+      "reports": "How to generate a report?"
+    }
   }
 }

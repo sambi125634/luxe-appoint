@@ -2,13 +2,13 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "stats" | "settings";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "stats" | "settings" | "support";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -33,6 +33,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
     { icon: BarChart3, labelKey: "admin.reports", tab: "stats" },
     { icon: Settings, labelKey: "admin.settings", tab: "settings" },
+    { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
   ];
 
   return (

@@ -60,6 +60,7 @@ export default function DemoPage() {
       pipeline: "pipeline",
       accounting: "accounting",
       products: "products",
+      support: "support",
     };
     return benefitMap[tab] || tab;
   };
