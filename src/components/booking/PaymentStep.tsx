@@ -24,6 +24,7 @@ interface PaymentStepProps {
   prepaymentConfig: PrepaymentConfig;
   onPaymentComplete: () => void;
   onSkip?: () => void;
+  isDemo?: boolean;
 }
 
 export function PaymentStep({
@@ -36,6 +37,7 @@ export function PaymentStep({
   prepaymentConfig,
   onPaymentComplete,
   onSkip,
+  isDemo = false,
 }: PaymentStepProps) {
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -56,6 +58,18 @@ export function PaymentStep({
 
   const handlePayment = async () => {
     setIsProcessing(true);
+    
+    // In demo mode, simulate payment success after short delay
+    if (isDemo) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast({
+        title: "To jest demo!",
+        description: "W prawdziwym systemie zostałbyś przekierowany do Przelewy24.",
+      });
+      setIsProcessing(false);
+      onPaymentComplete();
+      return;
+    }
     
     try {
       const { data, error } = await supabase.functions.invoke("create-payment-p24", {
@@ -93,6 +107,13 @@ export function PaymentStep({
 
   return (
     <div className="space-y-6">
+      {isDemo && (
+        <div className="p-3 rounded-lg bg-gradient-to-r from-violet-500/10 to-pink-500/10 border border-primary/20 text-sm text-center">
+          <span className="font-medium text-primary">🎭 Tryb demo</span>
+          <span className="text-muted-foreground ml-2">- płatności są symulowane</span>
+        </div>
+      )}
+      
       <div className="text-center mb-6">
         <h2 className="text-2xl font-serif font-bold mb-2">Zaliczka</h2>
         <p className="text-muted-foreground">

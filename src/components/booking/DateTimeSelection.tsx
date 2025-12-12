@@ -234,42 +234,42 @@ export function DateTimeSelection({
       </div>
 
       {/* Monthly Calendar */}
-      <div className="bg-card rounded-2xl border border-border p-4 shadow-sm">
+      <div className="bg-card rounded-xl sm:rounded-2xl border border-border p-3 sm:p-4 shadow-sm">
         {/* Calendar Header */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3 sm:mb-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={goToPreviousMonth}
             disabled={!canGoPrevious}
-            className="h-8 w-8"
+            className="h-7 w-7 sm:h-8 sm:w-8"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3 h-3 sm:w-4 sm:h-4" />
           </Button>
-          <h3 className="font-semibold text-lg capitalize">
+          <h3 className="font-semibold text-base sm:text-lg capitalize">
             {format(currentMonth, 'LLLL yyyy', { locale })}
           </h3>
           <Button
             variant="ghost"
             size="icon"
             onClick={goToNextMonth}
-            className="h-8 w-8"
+            className="h-7 w-7 sm:h-8 sm:w-8"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
           </Button>
         </div>
 
         {/* Week day headers */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1 sm:mb-2">
           {weekDays.map((day) => (
-            <div key={day} className="text-center text-xs font-medium text-muted-foreground py-2">
+            <div key={day} className="text-center text-[10px] sm:text-xs font-medium text-muted-foreground py-1 sm:py-2">
               {day}
             </div>
           ))}
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1">
+        <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
           {calendarDays.map((day, index) => {
             if (!day) {
               return <div key={`empty-${index}`} className="aspect-square" />;
@@ -288,17 +288,17 @@ export function DateTimeSelection({
                 onClick={() => hasAvailability && handleDaySelect(day)}
                 disabled={!hasAvailability}
                 className={cn(
-                  "aspect-square rounded-xl flex flex-col items-center justify-center transition-all duration-200 relative",
+                  "aspect-square rounded-lg sm:rounded-xl flex flex-col items-center justify-center transition-all duration-200 relative p-0.5",
                   isSelected
                     ? "bg-primary text-primary-foreground shadow-lg scale-105 z-10"
                     : hasAvailability
                     ? "hover:bg-muted hover:scale-105 cursor-pointer"
                     : "text-muted-foreground/40 cursor-not-allowed",
-                  isToday && !isSelected && "ring-2 ring-primary/30"
+                  isToday && !isSelected && "ring-1 sm:ring-2 ring-primary/30"
                 )}
               >
                 <span className={cn(
-                  "text-sm font-medium",
+                  "text-xs sm:text-sm font-medium",
                   isSelected && "font-bold"
                 )}>
                   {format(day, 'd')}
@@ -317,7 +317,7 @@ export function DateTimeSelection({
                 )}
                 
                 {isSelected && (
-                  <span className="text-[10px] opacity-80">{availableSlots.length} {t('booking.slots')}</span>
+                  <span className="text-[8px] sm:text-[10px] opacity-80">{availableSlots.length} {t('booking.slots')}</span>
                 )}
               </button>
             );
@@ -325,17 +325,17 @@ export function DateTimeSelection({
         </div>
 
         {/* Legend */}
-        <div className="flex justify-center gap-4 mt-4 pt-3 border-t border-border text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4 mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-border text-[10px] sm:text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-500" />
             <span>{t('booking.availability.high')}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-amber-500" />
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-500" />
             <span>{t('booking.availability.medium')}</span>
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-rose-400" />
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-rose-400" />
             <span>{t('booking.availability.low')}</span>
           </div>
         </div>
@@ -385,7 +385,7 @@ export function DateTimeSelection({
                 </div>
 
                 {/* Time slots grid */}
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 pl-1">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-2.5 pl-1">
                   {slots.map((time, index) => (
                     <TimeSlotCard
                       key={time}
