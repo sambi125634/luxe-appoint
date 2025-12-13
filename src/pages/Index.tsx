@@ -1,17 +1,19 @@
 import { useRef } from "react";
-import {
-  HeroSection,
-  PainPointsSection,
-  SolutionSection,
-  HowItWorksSection,
-  DemoPreviewSection,
-  TargetAudienceSection,
-  LeadFormSection,
-  FAQSection,
-  FinalCTASection,
-  LandingNavbar,
-  LandingFooter,
-} from "@/components/landing";
+import { LandingNavbar, LeadFormSection } from "@/components/landing";
+import { NewHeroSection } from "@/components/landing/NewHeroSection";
+import { SocialProofBar } from "@/components/landing/SocialProofBar";
+import { ProblemSection } from "@/components/landing/ProblemSection";
+import { TransformationSection } from "@/components/landing/TransformationSection";
+import { AIGameChangersSection } from "@/components/landing/AIGameChangersSection";
+import { ComparisonSection } from "@/components/landing/ComparisonSection";
+import { FeaturesSection } from "@/components/landing/FeaturesSection";
+import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
+import { AudienceSection } from "@/components/landing/AudienceSection";
+import { PricingSection } from "@/components/landing/PricingSection";
+import { NewFAQSection } from "@/components/landing/NewFAQSection";
+import { NewFinalCTASection } from "@/components/landing/NewFinalCTASection";
+import { NewLandingFooter } from "@/components/landing/NewLandingFooter";
 
 const Index = () => {
   const formRef = useRef<HTMLDivElement>(null);
@@ -25,35 +27,27 @@ const Index = () => {
       <LandingNavbar onScrollToForm={scrollToForm} />
       
       <main>
-        <HeroSection onScrollToForm={scrollToForm} />
-        
-        <section id="features">
-          <PainPointsSection />
-          <SolutionSection />
-        </section>
-        
-        <section id="how-it-works">
-          <HowItWorksSection />
-        </section>
-        
-        <section id="demo-preview">
-          <DemoPreviewSection />
-        </section>
-        
-        <TargetAudienceSection />
+        <NewHeroSection onScrollToForm={scrollToForm} />
+        <SocialProofBar />
+        <ProblemSection />
+        <TransformationSection />
+        <AIGameChangersSection />
+        <ComparisonSection />
+        <FeaturesSection />
+        <InteractiveDemoSection />
+        <TestimonialsSection />
+        <AudienceSection />
+        <PricingSection onScrollToForm={scrollToForm} />
         
         <div ref={formRef}>
           <LeadFormSection />
         </div>
         
-        <section id="faq">
-          <FAQSection />
-        </section>
-        
-        <FinalCTASection onScrollToForm={scrollToForm} />
+        <NewFAQSection />
+        <NewFinalCTASection onScrollToForm={scrollToForm} />
       </main>
       
-      <LandingFooter />
+      <NewLandingFooter />
     </div>
   );
 };
