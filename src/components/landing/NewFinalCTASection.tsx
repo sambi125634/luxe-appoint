@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, CreditCard, Headphones, Sparkles } from "lucide-react";
+import { ArrowRight, Shield, CreditCard, Headphones, Sparkles, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface NewFinalCTASectionProps {
@@ -20,6 +20,14 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
 
       <div className="container relative z-10">
         <div className="max-w-4xl mx-auto text-center">
+          {/* Urgency Bar */}
+          <div className="mb-8 animate-pulse">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-rose-500 to-orange-500 rounded-full text-white font-bold shadow-lg">
+              <Clock className="w-5 h-5" />
+              <span>Zostało tylko 7 darmowych kont z pełnym dostępem do AI. Zarezerwuj swoje miejsce teraz.</span>
+            </div>
+          </div>
+
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/10 rounded-full text-accent mb-6">
             <Sparkles className="w-4 h-4" />
@@ -60,7 +68,13 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
               className="group px-8 py-6 text-lg border-2"
             >
               <Link to="/demo">
-                Umów się na demo z ekspertem
+                <div className="flex flex-col items-start text-left">
+                  <span className="text-xs text-muted-foreground">Nie jesteś pewna?</span>
+                  <span className="flex items-center gap-1">
+                    Zobacz, jak AI wypełni Twój kalendarz w 15 minut
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </div>
               </Link>
             </Button>
           </div>
