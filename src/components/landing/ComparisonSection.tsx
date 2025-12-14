@@ -3,19 +3,16 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const comparisonData = [
-  { feature: "AI Smart Scheduling", bc: true, booksy: false, fresha: false, versum: false },
-  { feature: "Scoring ryzyka klientów", bc: true, booksy: false, fresha: false, versum: false },
-  { feature: "Prognoza przychodów", bc: true, booksy: false, fresha: "partial", versum: "partial" },
-  { feature: "Prowizja od rezerwacji", bc: "0 zł", booksy: "2-5 zł", fresha: "2-3 zł", versum: "1-2 zł" },
-  { feature: "Przedpłaty online (BLIK)", bc: true, booksy: "partial", fresha: true, versum: "partial" },
-  { feature: "Sprzedaż produktów", bc: true, booksy: "partial", fresha: "partial", versum: true },
-  { feature: "Pipeline sprzedażowy", bc: true, booksy: false, fresha: false, versum: false },
-  { feature: "Raporty księgowe + VAT", bc: true, booksy: "partial", fresha: "partial", versum: true },
-  { feature: "Support po polsku 24/7", bc: true, booksy: "partial", fresha: "partial", versum: true },
-  { feature: "Cena miesięczna", bc: "od 49 zł", booksy: "od 99 zł", fresha: "od 79 zł", versum: "od 149 zł" },
+  { feature: "AI Smart Scheduling", bc: true, booksy: false, fresha: false, versum: false, highlight: false },
+  { feature: "Scoring ryzyka klientów", bc: true, booksy: false, fresha: false, versum: false, highlight: false },
+  { feature: "Prognoza przychodów", bc: true, booksy: false, fresha: "partial", versum: "partial", highlight: false },
+  { feature: "Prowizja od rezerwacji", bc: "0 zł", booksy: "2-5 zł", fresha: "2-3 zł", versum: "1-2 zł", highlight: true },
+  { feature: "Przedpłaty online (BLIK)", bc: true, booksy: "partial", fresha: true, versum: "partial", highlight: false },
+  { feature: "Support po polsku 24/7", bc: true, booksy: "partial", fresha: "partial", versum: true, highlight: false },
+  { feature: "Cena miesięczna", bc: "od 49 zł", booksy: "od 99 zł", fresha: "od 79 zł", versum: "od 149 zł", highlight: false },
 ];
 
-const StatusIcon = ({ status }: { status: boolean | string }) => {
+const StatusIcon = ({ status, isHighlight }: { status: boolean | string; isHighlight?: boolean }) => {
   if (status === true) {
     return (
       <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
@@ -37,7 +34,14 @@ const StatusIcon = ({ status }: { status: boolean | string }) => {
       </div>
     );
   }
-  return <span className="text-sm font-medium">{status}</span>;
+  return (
+    <span className={cn(
+      "text-sm font-medium",
+      isHighlight && "text-rose-600 font-bold"
+    )}>
+      {status}
+    </span>
+  );
 };
 
 export const ComparisonSection = () => {
@@ -80,28 +84,34 @@ export const ComparisonSection = () => {
                   key={index}
                   className={cn(
                     "border-b border-border/50 transition-colors hover:bg-muted/30",
-                    index % 2 === 0 && "bg-muted/10"
+                    index % 2 === 0 && "bg-muted/10",
+                    row.highlight && "bg-rose-500/5 hover:bg-rose-500/10 border-rose-500/20"
                   )}
                 >
-                  <td className="py-4 px-4 font-medium">{row.feature}</td>
+                  <td className={cn(
+                    "py-4 px-4 font-medium",
+                    row.highlight && "text-rose-600 font-bold"
+                  )}>
+                    {row.feature}
+                  </td>
                   <td className="py-4 px-4">
                     <div className="flex justify-center">
-                      <StatusIcon status={row.bc} />
+                      <StatusIcon status={row.bc} isHighlight={row.highlight} />
                     </div>
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex justify-center">
-                      <StatusIcon status={row.booksy} />
+                      <StatusIcon status={row.booksy} isHighlight={row.highlight} />
                     </div>
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex justify-center">
-                      <StatusIcon status={row.fresha} />
+                      <StatusIcon status={row.fresha} isHighlight={row.highlight} />
                     </div>
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex justify-center">
-                      <StatusIcon status={row.versum} />
+                      <StatusIcon status={row.versum} isHighlight={row.highlight} />
                     </div>
                   </td>
                 </tr>
@@ -133,9 +143,9 @@ export const ComparisonSection = () => {
         </div>
 
         {/* Bottom CTA */}
-        <div className="text-center mt-12 p-6 bg-primary/5 rounded-2xl border border-primary/20">
-          <p className="text-xl font-semibold text-primary">
-            💡 Zaoszczędź nawet 1200 zł rocznie i zyskaj funkcje AI w cenie
+        <div className="text-center mt-12 p-6 bg-gradient-to-r from-emerald-500/10 via-primary/10 to-emerald-500/10 rounded-2xl border border-primary/20">
+          <p className="text-xl font-semibold">
+            💡 <span className="text-primary font-bold">Oszczędź nawet 15,000 zł rocznie</span> (na prowizjach i no-show) i zyskaj funkcje AI w cenie
           </p>
         </div>
       </div>

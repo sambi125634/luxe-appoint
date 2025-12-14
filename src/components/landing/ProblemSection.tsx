@@ -12,7 +12,11 @@ const problems = [
   {
     icon: UserX,
     title: "Kolejny no-show bez uprzedzenia",
-    description: "Przygotowałaś stanowisko, kupiłaś materiały, zarezerwowałaś 2 godziny. Klientka nie przyszła. Nie zadzwoniła. 300 zł w błoto.",
+    description: (
+      <>
+        Kolejny no-show bez uprzedzenia. <strong className="text-orange-600">300 zł w błoto</strong> i 2 godziny straconego czasu. <strong className="text-orange-600">Rocznie to nawet 15,000 zł straty.</strong>
+      </>
+    ),
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
   },
@@ -26,7 +30,11 @@ const problems = [
   {
     icon: Wrench,
     title: "System jak z lat 90-tych",
-    description: "Booksy, Fresha, Versum... Skomplikowane menu, ukryte funkcje, support który odpowiada po tygodniu. I te prowizje od każdej rezerwacji!",
+    description: (
+      <>
+        System jak z lat 90-tych. <strong className="text-red-600">Płacisz 45% prowizji</strong> za klienta, którego sama pozyskałaś. Koniec z tym.
+      </>
+    ),
     color: "text-red-500",
     bgColor: "bg-red-500/10",
   },

@@ -105,6 +105,19 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               </Button>
             </div>
 
+            {/* Social Proof Bar */}
+            <div 
+              className="animate-fade-in"
+              style={{ animationDelay: '0.45s' }}
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                <span className="text-emerald-600 font-bold text-sm">
+                  Zaufało nam już ponad 150+ salonów w całej Polsce
+                </span>
+              </div>
+            </div>
+
             {/* Trust indicators */}
             <div 
               className="flex flex-wrap gap-6 justify-center lg:justify-start text-sm text-muted-foreground animate-fade-in"
