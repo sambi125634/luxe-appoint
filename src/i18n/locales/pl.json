@@ -590,6 +590,33 @@
       "completed": "Zrealizowana",
       "cancelled": "Anulowana",
       "noShow": "No-show"
+    },
+    "listView": "Lista klientów",
+    "needsAttention": "wymaga uwagi",
+    "daysAgo": "dni temu",
+    "purchaseGroups": {
+      "title": "Grupy zakupowe",
+      "noGroups": "Brak grup zakupowych",
+      "noGroupsHint": "Grupy pojawią się po pierwszych wizytach klientów",
+      "clients": "Klientów",
+      "revenue": "Przychód",
+      "avgVisits": "Śr. wizyt",
+      "topClients": "Top klientki",
+      "viewAll": "Zobacz wszystkie ({{count}})"
+    },
+    "filters": {
+      "title": "Filtry",
+      "clear": "Wyczyść",
+      "byTags": "Według tagów",
+      "byCategory": "Według kategorii zakupowej",
+      "byInactivity": "Według nieaktywności",
+      "allClients": "Wszyscy klienci",
+      "inactive30": "Nieaktywni >30 dni",
+      "inactive60": "Nieaktywni >60 dni",
+      "inactive90": "Nieaktywni >90 dni",
+      "needsFollowup": "Wymaga follow-up",
+      "needsFollowupShort": "Follow-up",
+      "inactiveDays": ">{{days}} dni"
     }
   },
   "services": {
