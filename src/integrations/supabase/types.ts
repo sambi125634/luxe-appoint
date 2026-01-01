@@ -181,6 +181,47 @@ export type Database = {
           },
         ]
       }
+      client_tags: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          is_system: boolean
+          name: string
+          salon_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          name: string
+          salon_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          name?: string
+          salon_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_tags_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           created_at: string
@@ -190,9 +231,11 @@ export type Database = {
           is_problematic: boolean | null
           is_vip: boolean | null
           last_name: string
+          last_visit_at: string | null
           marketing_consent: boolean | null
           notes: string | null
           phone: string
+          purchase_categories: string[] | null
           rodo_consent: boolean
           salon_id: string
           source: string | null
@@ -207,9 +250,11 @@ export type Database = {
           is_problematic?: boolean | null
           is_vip?: boolean | null
           last_name: string
+          last_visit_at?: string | null
           marketing_consent?: boolean | null
           notes?: string | null
           phone: string
+          purchase_categories?: string[] | null
           rodo_consent?: boolean
           salon_id: string
           source?: string | null
@@ -224,9 +269,11 @@ export type Database = {
           is_problematic?: boolean | null
           is_vip?: boolean | null
           last_name?: string
+          last_visit_at?: string | null
           marketing_consent?: boolean | null
           notes?: string | null
           phone?: string
+          purchase_categories?: string[] | null
           rodo_consent?: boolean
           salon_id?: string
           source?: string | null
@@ -236,6 +283,179 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "clients_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followup_queue: {
+        Row: {
+          channel: string
+          client_id: string
+          created_at: string
+          error_message: string | null
+          id: string
+          rule_id: string | null
+          salon_id: string
+          scheduled_at: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          channel: string
+          client_id: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          rule_id?: string | null
+          salon_id: string
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          channel?: string
+          client_id?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          rule_id?: string | null
+          salon_id?: string
+          scheduled_at?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_queue_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_queue_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "followup_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_queue_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followup_rules: {
+        Row: {
+          category_id: string | null
+          created_at: string
+          days_since_last_visit: number
+          email_template_id: string | null
+          id: string
+          is_active: boolean
+          name: string
+          salon_id: string
+          updated_at: string
+          whatsapp_template_id: string | null
+        }
+        Insert: {
+          category_id?: string | null
+          created_at?: string
+          days_since_last_visit?: number
+          email_template_id?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          salon_id: string
+          updated_at?: string
+          whatsapp_template_id?: string | null
+        }
+        Update: {
+          category_id?: string | null
+          created_at?: string
+          days_since_last_visit?: number
+          email_template_id?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          salon_id?: string
+          updated_at?: string
+          whatsapp_template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_rules_email_template_id_fkey"
+            columns: ["email_template_id"]
+            isOneToOne: false
+            referencedRelation: "followup_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_rules_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "followup_rules_whatsapp_template_id_fkey"
+            columns: ["whatsapp_template_id"]
+            isOneToOne: false
+            referencedRelation: "followup_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      followup_templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          salon_id: string
+          subject: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+          salon_id: string
+          subject?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          salon_id?: string
+          subject?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_templates_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
