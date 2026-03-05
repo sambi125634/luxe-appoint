@@ -4,6 +4,7 @@ import { Menu, X, ChevronRight, Bell, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
 import { DashboardHome } from "@/components/admin/DashboardHome";
 import { ScheduleManagement } from "@/components/admin/ScheduleManagement";
@@ -26,6 +27,7 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+  const { role, salonName, isLoading: roleLoading } = useUserRole();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -73,40 +75,25 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "home":
-        return <DashboardHome />;
-      case "calendar":
-        return <ScheduleManagement />;
-      case "widgets":
-        return <WidgetsManagement />;
-      case "clients":
-        return <ClientsManagement />;
-      case "conversations":
-        return <ConversationsModule />;
-      case "pipeline":
-        return <PipelineModule />;
-      case "accounting":
-        return <AccountingModule />;
-      case "products":
-        return <ProductsModule />;
-      case "services":
-        return <ServicesManagement />;
-      case "staff":
-        return <StaffManagement />;
-      case "time-off":
-        return <TimeOffManagement />;
-      case "stats":
-        return <StatsModule />;
-      case "settings":
-        return <SettingsModule />;
-      case "support":
-        return <SupportModule />;
-      default:
-        return null;
+      case "home": return <DashboardHome />;
+      case "calendar": return <ScheduleManagement />;
+      case "widgets": return <WidgetsManagement />;
+      case "clients": return <ClientsManagement />;
+      case "conversations": return <ConversationsModule />;
+      case "pipeline": return <PipelineModule />;
+      case "accounting": return <AccountingModule />;
+      case "products": return <ProductsModule />;
+      case "services": return <ServicesManagement />;
+      case "staff": return <StaffManagement />;
+      case "time-off": return <TimeOffManagement />;
+      case "stats": return <StatsModule />;
+      case "settings": return <SettingsModule />;
+      case "support": return <SupportModule />;
+      default: return null;
     }
   };
 
-  if (isLoading) {
+  if (isLoading || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -114,13 +101,10 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!isAuthenticated) {
-    return null;
-  }
+  if (!isAuthenticated) return null;
 
   return (
     <div className="min-h-screen bg-background flex">
-      {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden"
@@ -128,7 +112,6 @@ export default function AdminDashboard() {
         />
       )}
 
-      {/* Sidebar */}
       <aside className={cn(
         "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transition-transform duration-300 lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -137,20 +120,15 @@ export default function AdminDashboard() {
           activeTab={activeTab} 
           onTabChange={setActiveTab}
           onClose={() => setSidebarOpen(false)}
+          userRole={role}
+          salonName={salonName}
         />
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar */}
         <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
           <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-            >
+            <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(!sidebarOpen)}>
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </Button>
             <div>
@@ -175,7 +153,6 @@ export default function AdminDashboard() {
           </div>
         </header>
 
-        {/* Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {renderContent()}
         </main>

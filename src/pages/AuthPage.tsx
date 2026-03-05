@@ -12,17 +12,43 @@ import { Loader2, Sparkles } from "lucide-react";
 import { z } from "zod";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
+async function resolveRedirect(userId: string): Promise<string> {
+  // Check role
+  const { data: roleData } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  const role = roleData?.role;
+
+  if (role === "super_admin") return "/super-admin";
+
+  if (role === "salon_owner") {
+    const { data: salon } = await supabase
+      .from("salons")
+      .select("id, onboarding_completed")
+      .eq("owner_id", userId)
+      .maybeSingle();
+
+    if (!salon || !salon.onboarding_completed) return "/onboarding";
+    return "/admin";
+  }
+
+  if (role === "staff") return "/admin";
+
+  // No role assigned yet — default to admin (will show empty state)
+  return "/admin";
+}
+
 export default function AuthPage() {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [checkingSession, setCheckingSession] = useState(true);
   const navigate = useNavigate();
 
-  // Login form
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
-
-  // Signup form
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -42,17 +68,19 @@ export default function AuthPage() {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (session) {
-          navigate("/admin");
+          const redirect = await resolveRedirect(session.user.id);
+          navigate(redirect);
         }
         setCheckingSession(false);
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session) {
-        navigate("/admin");
+        const redirect = await resolveRedirect(session.user.id);
+        navigate(redirect);
       }
       setCheckingSession(false);
     });
@@ -62,66 +90,46 @@ export default function AuthPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     const validation = loginSchema.safeParse({ email: loginEmail, password: loginPassword });
     if (!validation.success) {
       toast.error(validation.error.errors[0].message);
       return;
     }
-
     setIsLoading(true);
-    
     const { error } = await supabase.auth.signInWithPassword({
       email: loginEmail.trim(),
       password: loginPassword,
     });
-
     if (error) {
       toast.error(t("auth.loginError"));
     } else {
       toast.success(t("auth.loginSuccess"));
     }
-    
     setIsLoading(false);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const validation = signupSchema.safeParse({ 
-      email: signupEmail, 
-      password: signupPassword,
-      firstName,
-      lastName 
-    });
-    
+    const validation = signupSchema.safeParse({ email: signupEmail, password: signupPassword, firstName, lastName });
     if (!validation.success) {
       toast.error(validation.error.errors[0].message);
       return;
     }
-
     setIsLoading(true);
-    
-    const redirectUrl = `${window.location.origin}/admin`;
-    
+    const redirectUrl = `${window.location.origin}/auth`;
     const { error } = await supabase.auth.signUp({
       email: signupEmail.trim(),
       password: signupPassword,
       options: {
         emailRedirectTo: redirectUrl,
-        data: {
-          first_name: firstName.trim(),
-          last_name: lastName.trim(),
-        }
-      }
+        data: { first_name: firstName.trim(), last_name: lastName.trim() },
+      },
     });
-
     if (error) {
       toast.error(t("auth.signupError"));
     } else {
       toast.success(t("auth.signupSuccess"));
     }
-    
     setIsLoading(false);
   };
 
@@ -153,105 +161,43 @@ export default function AuthPage() {
               <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
               <TabsTrigger value="signup">{t("auth.signup")}</TabsTrigger>
             </TabsList>
-            
             <TabsContent value="login">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="login-email">{t("auth.email")}</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    placeholder="twoj@email.pl"
-                    value={loginEmail}
-                    onChange={(e) => setLoginEmail(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
+                  <Input id="login-email" type="email" placeholder="twoj@email.pl" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} required disabled={isLoading} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="login-password">{t("auth.password")}</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
+                  <Input id="login-password" type="password" placeholder="••••••••" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} required disabled={isLoading} />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t("auth.loggingIn")}
-                    </>
-                  ) : (
-                    t("auth.loginButton")
-                  )}
+                  {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("auth.loggingIn")}</>) : t("auth.loginButton")}
                 </Button>
               </form>
             </TabsContent>
-            
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">{t("auth.firstName")}</Label>
-                    <Input
-                      id="first-name"
-                      placeholder="Anna"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
+                    <Input id="first-name" placeholder="Anna" value={firstName} onChange={(e) => setFirstName(e.target.value)} required disabled={isLoading} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="last-name">{t("auth.lastName")}</Label>
-                    <Input
-                      id="last-name"
-                      placeholder="Kowalska"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
+                    <Input id="last-name" placeholder="Kowalska" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">{t("auth.email")}</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="twoj@email.pl"
-                    value={signupEmail}
-                    onChange={(e) => setSignupEmail(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
+                  <Input id="signup-email" type="email" placeholder="twoj@email.pl" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required disabled={isLoading} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">{t("auth.password")}</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    required
-                    disabled={isLoading}
-                  />
+                  <Input id="signup-password" type="password" placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required disabled={isLoading} />
                 </div>
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      {t("auth.signingUp")}
-                    </>
-                  ) : (
-                    t("auth.signupButton")
-                  )}
+                  {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("auth.signingUp")}</>) : t("auth.signupButton")}
                 </Button>
               </form>
             </TabsContent>

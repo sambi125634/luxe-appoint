@@ -10,6 +10,8 @@ import SuperAdminDashboard from "./pages/SuperAdminDashboard";
 import AuthPage from "./pages/AuthPage";
 import DemoPage from "./pages/DemoPage";
 import InstagramLanding from "./pages/InstagramLanding";
+import OnboardingPage from "./pages/OnboardingPage";
+import InstallPage from "./pages/InstallPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -27,6 +29,8 @@ const App = () => (
           <Route path="/i/:slug" element={<InstagramLanding />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/super-admin" element={<SuperAdminDashboard />} />
+          <Route path="/onboarding" element={<OnboardingPage />} />
+          <Route path="/install" element={<InstallPage />} />
           <Route path="/demo" element={<DemoPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
