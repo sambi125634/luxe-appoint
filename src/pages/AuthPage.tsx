@@ -13,31 +13,33 @@ import { z } from "zod";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 async function resolveRedirect(userId: string): Promise<string> {
-  // Check role
-  const { data: roleData } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  const role = roleData?.role;
-
-  if (role === "super_admin") return "/super-admin";
-
-  if (role === "salon_owner") {
-    const { data: salon } = await supabase
-      .from("salons")
-      .select("id, onboarding_completed")
-      .eq("owner_id", userId)
+  try {
+    const { data: roleData } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
       .maybeSingle();
 
-    if (!salon || !salon.onboarding_completed) return "/onboarding";
-    return "/admin";
+    const role = roleData?.role;
+
+    if (role === "super_admin") return "/super-admin";
+
+    if (role === "salon_owner") {
+      const { data: salon } = await supabase
+        .from("salons")
+        .select("id, onboarding_completed")
+        .eq("owner_id", userId)
+        .maybeSingle();
+
+      if (!salon || !salon.onboarding_completed) return "/onboarding";
+      return "/admin";
+    }
+
+    if (role === "staff") return "/admin";
+  } catch (err) {
+    console.error("Error resolving redirect:", err);
   }
 
-  if (role === "staff") return "/admin";
-
-  // No role assigned yet — default to admin (will show empty state)
   return "/admin";
 }
 
@@ -67,25 +69,30 @@ export default function AuthPage() {
   });
 
   useEffect(() => {
+    let mounted = true;
+
+    const handleSession = async (session: { user: { id: string } } | null) => {
+      if (session && mounted) {
+        const redirect = await resolveRedirect(session.user.id);
+        if (mounted) navigate(redirect);
+      }
+      if (mounted) setCheckingSession(false);
+    };
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session) {
-          const redirect = await resolveRedirect(session.user.id);
-          navigate(redirect);
-        }
-        setCheckingSession(false);
+      (_event, session) => {
+        handleSession(session);
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session) {
-        const redirect = await resolveRedirect(session.user.id);
-        navigate(redirect);
-      }
-      setCheckingSession(false);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      handleSession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
