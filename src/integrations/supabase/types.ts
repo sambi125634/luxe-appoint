@@ -648,6 +648,8 @@ export type Database = {
           is_active: boolean
           logo_url: string | null
           name: string
+          onboarding_completed: boolean
+          onboarding_step: number
           owner_id: string | null
           phone: string | null
           settings: Json | null
@@ -666,6 +668,8 @@ export type Database = {
           is_active?: boolean
           logo_url?: string | null
           name: string
+          onboarding_completed?: boolean
+          onboarding_step?: number
           owner_id?: string | null
           phone?: string | null
           settings?: Json | null
@@ -684,6 +688,8 @@ export type Database = {
           is_active?: boolean
           logo_url?: string | null
           name?: string
+          onboarding_completed?: boolean
+          onboarding_step?: number
           owner_id?: string | null
           phone?: string | null
           settings?: Json | null

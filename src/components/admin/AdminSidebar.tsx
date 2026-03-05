@@ -7,6 +7,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "stats" | "settings" | "support";
 
@@ -14,12 +17,18 @@ interface AdminSidebarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
   onClose?: () => void;
+  userRole?: string | null;
+  salonName?: string | null;
 }
 
-export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarProps) {
-  const { t } = useTranslation();
+// Tabs restricted from staff
+const OWNER_ONLY_TABS: TabType[] = ["accounting", "pipeline", "settings", "widgets", "stats"];
 
-  const navItems: { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number }[] = [
+export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+
+  const allNavItems: { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number }[] = [
     { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
     { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
     { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
@@ -36,6 +45,19 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
     { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
   ];
 
+  const navItems = userRole === "staff"
+    ? allNavItems.filter(item => !OWNER_ONLY_TABS.includes(item.tab))
+    : allNavItems;
+
+  const displayName = salonName || "Beauty Calendar";
+  const initials = displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Wylogowano pomyślnie");
+    navigate("/auth");
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Logo */}
@@ -45,14 +67,16 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
             <Sparkles className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <p className="font-serif font-semibold">Beauty Calendar</p>
-            <p className="text-xs text-muted-foreground">{t("admin.profile")}</p>
+            <p className="font-serif font-semibold truncate">{displayName}</p>
+            <p className="text-xs text-muted-foreground">
+              {userRole === "staff" ? "Pracownik" : userRole === "salon_owner" ? "Właścicielka" : t("admin.profile")}
+            </p>
           </div>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 overflow-y-auto">
         <ul className="space-y-1">
           {navItems.map((item) => (
             <li key={item.tab}>
@@ -94,15 +118,17 @@ export function AdminSidebar({ activeTab, onTabChange, onClose }: AdminSidebarPr
       {/* User section */}
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-serif text-primary-foreground">
-            LS
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center font-serif text-primary-foreground text-sm">
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">Luxury Beauty Spa</p>
-            <p className="text-xs text-muted-foreground truncate">admin@luxuryspa.pl</p>
+            <p className="font-medium truncate text-sm">{displayName}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {userRole === "staff" ? "Pracownik" : "Administrator"}
+            </p>
           </div>
         </div>
-        <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground">
+        <Button variant="ghost" className="w-full justify-start gap-2 text-muted-foreground" onClick={handleLogout}>
           <LogOut className="w-4 h-4" />
           {t("admin.logout")}
         </Button>
