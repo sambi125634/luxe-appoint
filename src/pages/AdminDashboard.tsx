@@ -84,7 +84,7 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "home": return <DashboardHome />;
+      case "home": return <DashboardHome onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "calendar": return <ScheduleManagement />;
       case "widgets": return <WidgetsManagement />;
       case "clients": return <ClientsManagement />;
@@ -149,6 +149,10 @@ export default function AdminDashboard() {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground" onClick={restartTour}>
+              <GraduationCap className="w-4 h-4" />
+              <span className="hidden sm:inline">Samouczek</span>
+            </Button>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full" />
