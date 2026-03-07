@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useStockAlerts } from "@/hooks/useStockAlerts";
 
