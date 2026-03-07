@@ -7,6 +7,7 @@ import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
+import { VideoTutorialCard } from "../VideoTutorialCard";
 
 export function SettingsModule() {
   const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
@@ -21,6 +22,10 @@ export function SettingsModule() {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak skonfigurować ustawienia salonu"
+        voiceText="W ustawieniach konfigurujesz profil salonu — logo, kolory brandingowe, dane kontaktowe. Ustawiasz też powiadomienia SMS i email dla klientek, reguły rezerwacji oraz integracje z innymi narzędziami jak Google Calendar."
+      />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (
