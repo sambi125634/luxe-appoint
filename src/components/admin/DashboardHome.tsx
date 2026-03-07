@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useStockAlerts } from "@/hooks/useStockAlerts";
 
@@ -86,6 +87,11 @@ export function DashboardHome() {
 
   return (
     <div className="space-y-6">
+      {/* Tutorial */}
+      <VideoTutorialCard 
+        title="Jak korzystać z panelu — szybki przegląd" 
+        voiceText="Witaj w panelu Beauty Calendar! Tutaj widzisz podsumowanie dnia — nadchodzące wizyty, alerty, statystyki i szybkie akcje. Z bocznego menu możesz przejść do kalendarza, listy klientów, usług, produktów i wielu innych modułów. Każda sekcja ma instrukcje, które pomogą Ci w konfiguracji."
+      />
       {/* Nagłówek z datą */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
