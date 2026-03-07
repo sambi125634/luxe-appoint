@@ -170,6 +170,13 @@ export default function AdminDashboard() {
           {renderContent()}
         </main>
       </div>
+
+      {showTour && (
+        <GuidedTour
+          onTabChange={setActiveTab}
+          onComplete={() => setShowTour(false)}
+        />
+      )}
     </div>
   );
 }
