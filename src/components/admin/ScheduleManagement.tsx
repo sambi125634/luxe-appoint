@@ -22,7 +22,11 @@ import {
 import { useTranslation } from "react-i18next";
 import { VideoTutorialCard } from "./VideoTutorialCard";
 
-export function ScheduleManagement() {
+interface ScheduleManagementProps {
+  isDemo?: boolean;
+}
+
+export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) {
   const { t } = useTranslation();
   const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart">("calendar");
   const [isQuickBlockOpen, setIsQuickBlockOpen] = useState(false);
