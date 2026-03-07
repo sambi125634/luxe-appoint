@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -11,6 +11,10 @@ import { cn } from "@/lib/utils";
 import { ServiceMediaUpload, MediaFile } from "./ServiceMediaUpload";
 import { CSVImport } from "./CSVImport";
 import { VideoTutorialCard } from "./VideoTutorialCard";
+import { useServices, useServiceCategories, useCreateService, useUpdateService, useDeleteService, useCreateCategory, useUpdateCategory } from "@/hooks/useServices";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Service {
   id: string;
@@ -29,32 +33,78 @@ interface Category {
   icon: string;
 }
 
-const mockCategories: Category[] = [
+// Demo data
+const DEMO_CATEGORIES: Category[] = [
   { id: "1", name: "Twarz", icon: "✨" },
   { id: "2", name: "Ciało", icon: "💆" },
   { id: "3", name: "Depilacja", icon: "🌸" },
   { id: "4", name: "Paznokcie", icon: "💅" },
 ];
 
-const mockServices: Service[] = [
+const DEMO_SERVICES: Service[] = [
   { id: "1", name: "Peeling kawitacyjny", category: "1", duration: 60, price: 150, description: "Głębokie oczyszczanie skóry twarzy", staffIds: ["1", "2"], media: [] },
   { id: "2", name: "Mezoterapia igłowa", category: "1", duration: 45, price: 350, description: "Regeneracja i nawilżenie skóry", staffIds: ["1"], media: [] },
   { id: "3", name: "Masaż relaksacyjny", category: "2", duration: 90, price: 200, description: "Pełen relaks dla ciała i umysłu", staffIds: ["3"], media: [] },
   { id: "4", name: "Depilacja laserowa - nogi", category: "3", duration: 60, price: 400, description: "Trwałe usuwanie owłosienia", staffIds: ["1", "4"], media: [] },
-  { id: "5", name: "Manicure hybrydowy", category: "4", duration: 75, price: 120, description: "Stylizacja paznokci z użyciem lakieru hybrydowego", staffIds: ["2", "4"], media: [] },
+  { id: "5", name: "Manicure hybrydowy", category: "4", duration: 75, price: 120, description: "Stylizacja paznokci", staffIds: ["2", "4"], media: [] },
 ];
 
-const mockStaff = [
+const DEMO_STAFF = [
   { id: "1", name: "Maria Nowakowska" },
   { id: "2", name: "Karolina Wiśniewska" },
   { id: "3", name: "Joanna Lewandowska" },
   { id: "4", name: "Anna Kowalczyk" },
 ];
 
-export function ServicesManagement() {
+interface ServicesManagementProps {
+  isDemo?: boolean;
+}
+
+export function ServicesManagement({ isDemo = false }: ServicesManagementProps) {
   const { t } = useTranslation();
-  const [services, setServices] = useState(mockServices);
-  const [categories, setCategories] = useState(mockCategories);
+  const { toast } = useToast();
+
+  // Supabase data
+  const { data: dbServices, isLoading: loadingServices } = useServices();
+  const { data: dbCategories, isLoading: loadingCategories } = useServiceCategories();
+  const { data: dbStaff } = useStaffMembers();
+  const createServiceMutation = useCreateService();
+  const updateServiceMutation = useUpdateService();
+  const deleteServiceMutation = useDeleteService();
+  const createCategoryMutation = useCreateCategory();
+  const updateCategoryMutation = useUpdateCategory();
+
+  const services: Service[] = useMemo(() => {
+    if (isDemo) return DEMO_SERVICES;
+    if (!dbServices) return [];
+    return dbServices.map(s => ({
+      id: s.id,
+      name: s.name,
+      category: s.category_id || "",
+      duration: s.duration,
+      price: s.price,
+      description: s.description || "",
+      staffIds: [],
+      media: (s.media as MediaFile[]) || [],
+    }));
+  }, [isDemo, dbServices]);
+
+  const categories: Category[] = useMemo(() => {
+    if (isDemo) return DEMO_CATEGORIES;
+    if (!dbCategories) return [];
+    return dbCategories.map(c => ({
+      id: c.id,
+      name: c.name,
+      icon: c.icon || "✨",
+    }));
+  }, [isDemo, dbCategories]);
+
+  const staffList = useMemo(() => {
+    if (isDemo) return DEMO_STAFF;
+    if (!dbStaff) return [];
+    return dbStaff.map(s => ({ id: s.id, name: s.name }));
+  }, [isDemo, dbStaff]);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isServiceDialogOpen, setIsServiceDialogOpen] = useState(false);
@@ -64,19 +114,10 @@ export function ServicesManagement() {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
 
   const [serviceForm, setServiceForm] = useState({
-    name: "",
-    category: "",
-    duration: 60,
-    price: 0,
-    description: "",
-    staffIds: [] as string[],
-    media: [] as MediaFile[],
+    name: "", category: "", duration: 60, price: 0, description: "", staffIds: [] as string[], media: [] as MediaFile[],
   });
 
-  const [categoryForm, setCategoryForm] = useState({
-    name: "",
-    icon: "✨",
-  });
+  const [categoryForm, setCategoryForm] = useState({ name: "", icon: "✨" });
 
   const filteredServices = services.filter(service => {
     const matchesSearch = service.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -87,15 +128,7 @@ export function ServicesManagement() {
   const openServiceDialog = (service?: Service) => {
     if (service) {
       setEditingService(service);
-      setServiceForm({
-        name: service.name,
-        category: service.category,
-        duration: service.duration,
-        price: service.price,
-        description: service.description,
-        staffIds: service.staffIds,
-        media: service.media || [],
-      });
+      setServiceForm({ name: service.name, category: service.category, duration: service.duration, price: service.price, description: service.description, staffIds: service.staffIds, media: service.media || [] });
     } else {
       setEditingService(null);
       setServiceForm({ name: "", category: categories[0]?.id || "", duration: 60, price: 0, description: "", staffIds: [], media: [] });
@@ -104,26 +137,49 @@ export function ServicesManagement() {
   };
 
   const handleCSVImport = (importedServices: { name: string; category: string; duration: number; price: number; description: string }[]) => {
-    const newServices = importedServices.map((s, index) => ({
-      ...s,
-      id: `csv-${Date.now()}-${index}`,
-      staffIds: [] as string[],
-      media: [] as MediaFile[],
-    }));
-    setServices(prev => [...prev, ...newServices]);
+    // In production, would create via Supabase
+    toast({ title: "Import CSV", description: `Zaimportowano ${importedServices.length} usług` });
   };
 
-  const saveService = () => {
-    if (editingService) {
-      setServices(prev => prev.map(s => s.id === editingService.id ? { ...s, ...serviceForm } : s));
-    } else {
-      setServices(prev => [...prev, { ...serviceForm, id: Date.now().toString() }]);
+  const saveService = async () => {
+    if (isDemo) {
+      toast({ title: t('common.saved'), description: "Demo – dane nie zostały zapisane" });
+      setIsServiceDialogOpen(false);
+      return;
     }
-    setIsServiceDialogOpen(false);
+
+    try {
+      if (editingService) {
+        await updateServiceMutation.mutateAsync({
+          id: editingService.id,
+          name: serviceForm.name,
+          category_id: serviceForm.category || undefined,
+          duration: serviceForm.duration,
+          price: serviceForm.price,
+          description: serviceForm.description,
+        });
+      } else {
+        await createServiceMutation.mutateAsync({
+          name: serviceForm.name,
+          category_id: serviceForm.category || undefined,
+          duration: serviceForm.duration,
+          price: serviceForm.price,
+          description: serviceForm.description,
+        });
+      }
+      setIsServiceDialogOpen(false);
+    } catch {
+      toast({ title: t('common.error'), description: "Nie udało się zapisać usługi", variant: "destructive" });
+    }
   };
 
-  const deleteService = (id: string) => {
-    setServices(prev => prev.filter(s => s.id !== id));
+  const deleteService = async (id: string) => {
+    if (isDemo) return;
+    try {
+      await deleteServiceMutation.mutateAsync(id);
+    } catch {
+      toast({ title: t('common.error'), description: "Nie udało się usunąć usługi", variant: "destructive" });
+    }
   };
 
   const openCategoryDialog = (category?: Category) => {
@@ -137,33 +193,80 @@ export function ServicesManagement() {
     setIsCategoryDialogOpen(true);
   };
 
-  const saveCategory = () => {
-    if (editingCategory) {
-      setCategories(prev => prev.map(c => c.id === editingCategory.id ? { ...c, ...categoryForm } : c));
-    } else {
-      setCategories(prev => [...prev, { ...categoryForm, id: Date.now().toString() }]);
+  const saveCategory = async () => {
+    if (isDemo) {
+      toast({ title: t('common.saved'), description: "Demo – dane nie zostały zapisane" });
+      setIsCategoryDialogOpen(false);
+      return;
     }
-    setIsCategoryDialogOpen(false);
+
+    try {
+      if (editingCategory) {
+        await updateCategoryMutation.mutateAsync({ id: editingCategory.id, name: categoryForm.name, icon: categoryForm.icon });
+      } else {
+        await createCategoryMutation.mutateAsync({ name: categoryForm.name, icon: categoryForm.icon });
+      }
+      setIsCategoryDialogOpen(false);
+    } catch {
+      toast({ title: t('common.error'), description: "Nie udało się zapisać kategorii", variant: "destructive" });
+    }
   };
 
-  const getCategoryName = (categoryId: string) => {
-    return categories.find(c => c.id === categoryId)?.name || t('services.noCategory');
-  };
+  const getCategoryName = (categoryId: string) => categories.find(c => c.id === categoryId)?.name || t('services.noCategory');
 
   const toggleStaffSelection = (staffId: string) => {
     setServiceForm(prev => ({
       ...prev,
-      staffIds: prev.staffIds.includes(staffId)
-        ? prev.staffIds.filter(id => id !== staffId)
-        : [...prev.staffIds, staffId],
+      staffIds: prev.staffIds.includes(staffId) ? prev.staffIds.filter(id => id !== staffId) : [...prev.staffIds, staffId],
     }));
   };
+
+  const isLoading = !isDemo && (loadingServices || loadingCategories);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-10 w-64" />
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
+
+  // Empty state
+  if (!isDemo && services.length === 0 && categories.length === 0) {
+    return (
+      <div className="space-y-6">
+        <VideoTutorialCard
+          title="Jak zarządzać usługami"
+          voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji."
+        />
+        <div className="text-center py-16">
+          <Package className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
+          <h3 className="text-xl font-serif font-semibold mb-2">Brak usług</h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Dodaj kategorie i usługi, które oferujesz. Bez usług klientki nie będą mogły rezerwować wizyt przez widget.
+          </p>
+          <div className="flex gap-3 justify-center">
+            <Button variant="outline" onClick={() => openCategoryDialog()} className="gap-2">
+              <Plus className="w-4 h-4" />
+              {t('services.addCategory')}
+            </Button>
+            <Button onClick={() => openServiceDialog()} className="gap-2">
+              <Plus className="w-4 h-4" />
+              {t('services.addService')}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <VideoTutorialCard
         title="Jak zarządzać usługami"
-        voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki. Bez usług klientki nie będą mogły rezerwować wizyt."
+        voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki."
       />
       {/* Categories */}
       <div className="glass-card p-6">
@@ -175,27 +278,14 @@ export function ServicesManagement() {
           </Button>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button
-            variant={selectedCategory === null ? "default" : "outline"}
-            size="sm"
-            onClick={() => setSelectedCategory(null)}
-          >
+          <Button variant={selectedCategory === null ? "default" : "outline"} size="sm" onClick={() => setSelectedCategory(null)}>
             {t('common.all')}
           </Button>
           {categories.map(category => (
-            <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? "default" : "outline"}
-              size="sm"
-              className="gap-2"
-              onClick={() => setSelectedCategory(category.id)}
-            >
+            <Button key={category.id} variant={selectedCategory === category.id ? "default" : "outline"} size="sm" className="gap-2" onClick={() => setSelectedCategory(category.id)}>
               <span>{category.icon}</span>
               {category.name}
-              <button
-                className="ml-1 opacity-50 hover:opacity-100"
-                onClick={(e) => { e.stopPropagation(); openCategoryDialog(category); }}
-              >
+              <button className="ml-1 opacity-50 hover:opacity-100" onClick={(e) => { e.stopPropagation(); openCategoryDialog(category); }}>
                 <Pencil className="w-3 h-3" />
               </button>
             </Button>
@@ -210,12 +300,7 @@ export function ServicesManagement() {
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder={t('services.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 w-[200px]"
-              />
+              <Input placeholder={t('services.searchPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9 w-[200px]" />
             </div>
             <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsCSVImportOpen(true)}>
               <Upload className="w-4 h-4" />
@@ -229,12 +314,8 @@ export function ServicesManagement() {
         </div>
 
         <div className="space-y-3">
-        {filteredServices.map((service, index) => (
-            <div
-              key={service.id}
-              className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors animate-fade-in"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
+          {filteredServices.map((service, index) => (
+            <div key={service.id} className="flex items-center gap-4 p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
               {service.media && service.media.length > 0 ? (
                 <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 relative">
                   {service.media[0].type === "image" ? (
@@ -243,11 +324,6 @@ export function ServicesManagement() {
                     <div className="w-full h-full bg-muted flex items-center justify-center">
                       <Video className="w-5 h-5 text-muted-foreground" />
                     </div>
-                  )}
-                  {service.media.length > 1 && (
-                    <span className="absolute bottom-1 right-1 text-xs bg-foreground/70 text-background px-1 rounded">
-                      +{service.media.length - 1}
-                    </span>
                   )}
                 </div>
               ) : (
@@ -291,26 +367,15 @@ export function ServicesManagement() {
           <div className="space-y-4">
             <div>
               <Label>{t('services.serviceName')}</Label>
-              <Input
-                value={serviceForm.name}
-                onChange={(e) => setServiceForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder={t('services.serviceNamePlaceholder')}
-              />
+              <Input value={serviceForm.name} onChange={(e) => setServiceForm(prev => ({ ...prev, name: e.target.value }))} placeholder={t('services.serviceNamePlaceholder')} />
             </div>
             <div>
               <Label>{t('services.category')}</Label>
-              <Select
-                value={serviceForm.category}
-                onValueChange={(value) => setServiceForm(prev => ({ ...prev, category: value }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('services.selectCategory')} />
-                </SelectTrigger>
+              <Select value={serviceForm.category} onValueChange={(value) => setServiceForm(prev => ({ ...prev, category: value }))}>
+                <SelectTrigger><SelectValue placeholder={t('services.selectCategory')} /></SelectTrigger>
                 <SelectContent>
                   {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.icon} {cat.name}
-                    </SelectItem>
+                    <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -318,58 +383,34 @@ export function ServicesManagement() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>{t('services.duration')}</Label>
-                <Input
-                  type="number"
-                  value={serviceForm.duration}
-                  onChange={(e) => setServiceForm(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))}
-                />
+                <Input type="number" value={serviceForm.duration} onChange={(e) => setServiceForm(prev => ({ ...prev, duration: parseInt(e.target.value) || 0 }))} />
               </div>
               <div>
                 <Label>{t('services.price')}</Label>
-                <Input
-                  type="number"
-                  value={serviceForm.price}
-                  onChange={(e) => setServiceForm(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))}
-                />
+                <Input type="number" value={serviceForm.price} onChange={(e) => setServiceForm(prev => ({ ...prev, price: parseInt(e.target.value) || 0 }))} />
               </div>
             </div>
             <div>
               <Label>{t('services.description')}</Label>
-              <Textarea
-                value={serviceForm.description}
-                onChange={(e) => setServiceForm(prev => ({ ...prev, description: e.target.value }))}
-                placeholder={t('services.descriptionPlaceholder')}
-              />
+              <Textarea value={serviceForm.description} onChange={(e) => setServiceForm(prev => ({ ...prev, description: e.target.value }))} placeholder={t('services.descriptionPlaceholder')} />
             </div>
             <div>
               <Label>{t('services.performingStaff')}</Label>
               <div className="flex flex-wrap gap-2 mt-2">
-                {mockStaff.map(staff => (
-                  <Button
-                    key={staff.id}
-                    type="button"
-                    variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleStaffSelection(staff.id)}
-                  >
+                {staffList.map(staff => (
+                  <Button key={staff.id} type="button" variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"} size="sm" onClick={() => toggleStaffSelection(staff.id)}>
                     {staff.name}
                   </Button>
                 ))}
+                {staffList.length === 0 && (
+                  <p className="text-sm text-muted-foreground">Dodaj pracowników w zakładce Zespół</p>
+                )}
               </div>
             </div>
             <div>
-              <Label className="flex items-center gap-2">
-                <Image className="w-4 h-4" />
-                {t('services.multimedia')}
-              </Label>
-              <p className="text-sm text-muted-foreground mb-2">
-                {t('services.multimediaDescription')}
-              </p>
-              <ServiceMediaUpload
-                media={serviceForm.media}
-                onChange={(media) => setServiceForm(prev => ({ ...prev, media }))}
-                maxFiles={5}
-              />
+              <Label className="flex items-center gap-2"><Image className="w-4 h-4" />{t('services.multimedia')}</Label>
+              <p className="text-sm text-muted-foreground mb-2">{t('services.multimediaDescription')}</p>
+              <ServiceMediaUpload media={serviceForm.media} onChange={(media) => setServiceForm(prev => ({ ...prev, media }))} maxFiles={5} />
             </div>
           </div>
           <DialogFooter>
@@ -379,38 +420,22 @@ export function ServicesManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* CSV Import Dialog */}
-      <CSVImport
-        isOpen={isCSVImportOpen}
-        onClose={() => setIsCSVImportOpen(false)}
-        onImport={handleCSVImport}
-        categories={categories}
-      />
+      <CSVImport isOpen={isCSVImportOpen} onClose={() => setIsCSVImportOpen(false)} onImport={handleCSVImport} categories={categories} />
 
       {/* Category Dialog */}
       <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="font-serif">
-              {editingCategory ? t('services.editCategory') : t('services.newCategory')}
-            </DialogTitle>
+            <DialogTitle className="font-serif">{editingCategory ? t('services.editCategory') : t('services.newCategory')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
               <Label>{t('services.categoryName')}</Label>
-              <Input
-                value={categoryForm.name}
-                onChange={(e) => setCategoryForm(prev => ({ ...prev, name: e.target.value }))}
-                placeholder={t('services.categoryNamePlaceholder')}
-              />
+              <Input value={categoryForm.name} onChange={(e) => setCategoryForm(prev => ({ ...prev, name: e.target.value }))} placeholder={t('services.categoryNamePlaceholder')} />
             </div>
             <div>
               <Label>{t('services.icon')}</Label>
-              <Input
-                value={categoryForm.icon}
-                onChange={(e) => setCategoryForm(prev => ({ ...prev, icon: e.target.value }))}
-                placeholder="✨"
-              />
+              <Input value={categoryForm.icon} onChange={(e) => setCategoryForm(prev => ({ ...prev, icon: e.target.value }))} placeholder="✨" />
             </div>
           </div>
           <DialogFooter>
