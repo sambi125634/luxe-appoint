@@ -85,7 +85,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
       price: s.price,
       description: s.description || "",
       staffIds: [],
-      media: (s.media as MediaFile[]) || [],
+      media: (s.media as unknown as MediaFile[]) || [],
     }));
   }, [isDemo, dbServices]);
 
