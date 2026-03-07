@@ -1,74 +1,101 @@
 
 
-## Problem
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-Trzy powiązane problemy:
+### Co już mamy
 
-1. **Onboarding odpala się przy każdym logowaniu** — `OnboardingPage` nie sprawdza czy salon już istnieje dla zalogowanego użytkownika. Każde logowanie → redirect na `/onboarding` → próba utworzenia nowego salonu (lub duplikatu).
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-2. **Demo page (`/demo`) współdzieli komponenty z admin panelem** — `DemoPage` importuje te same `DashboardHome`, `ClientsManagement` itd., które teraz pobierają dane z Supabase przez `salonId`. Demo powinno mieć swoje własne konto demo z danymi demo, a nie wyświetlać dane zalogowanego użytkownika.
+### Problem do rozwiązania
 
-3. **Izolacja danych między kontami** — RLS już jest skonfigurowane poprawnie (filtrowanie po `salon_id`), ale trzeba upewnić się, że demo i prawdziwe konta nie mieszają danych.
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-## Plan
+---
 
-### 1. Fix onboarding — sprawdzanie istniejącego salonu
+### Plan implementacji
 
-W `OnboardingPage.tsx`, po pobraniu sesji użytkownika:
-- Sprawdź czy użytkownik ma już salon w bazie (`salons` WHERE `owner_id = user.id`)
-- Jeśli salon istnieje I `onboarding_completed = true` → redirect na `/admin`
-- Jeśli salon istnieje I `onboarding_completed = false` → wznów onboarding od zapisanego `onboarding_step`, załaduj istniejące dane salonu do formularza
-- Jeśli salon nie istnieje → pokaż pusty formularz (jak teraz)
+#### FAZA 1: Role-based routing po loginie
 
-Kluczowa zmiana: dodać `useEffect` po załadowaniu `userId` który:
-```
-const { data: existingSalon } = await supabase
-  .from("salons")
-  .select("id, slug, name, address, city, phone, email, onboarding_completed, onboarding_step")
-  .eq("owner_id", userId)
-  .maybeSingle();
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-if (existingSalon?.onboarding_completed) {
-  navigate("/admin");
-} else if (existingSalon) {
-  // Resume onboarding
-  setCreatedSalonId(existingSalon.id);
-  setCreatedSlug(existingSalon.slug);
-  setSalonName(existingSalon.name);
-  // ... fill other fields
-  setStep(existingSalon.onboarding_step);
-}
-```
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-### 2. Izolacja demo od prawdziwych kont
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-Demo page (`/demo`) musi działać BEZ sesji Supabase — czysto lokalnie z mockowymi danymi.
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-Podejście: przekazać prop `isDemo={true}` do komponentów w `DemoPage`. Komponenty które pobierają dane z Supabase (DashboardHome, ClientsManagement itd.) powinny:
-- Gdy `isDemo=true` → wyświetlać hardcoded dane demo (jak było wcześniej)
-- Gdy `isDemo=false` (lub brak propa) → pobierać z bazy filtrując po `salon_id`
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-Alternatywnie (prostsze): stworzyć osobne lekkie komponenty demo (`DemoDashboardHome`, `DemoClientsManagement`) z mockowymi danymi, i użyć ich w `DemoPage`. Prawdziwe komponenty pozostają czyste — tylko dane z bazy.
+#### FAZA 3: Indywidualne kokpity
 
-**Rekomendacja:** Prop `isDemo` — mniej duplikacji kodu, łatwiejsze utrzymanie.
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-### 3. Upewnienie się o izolacji danych
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-RLS jest już poprawnie skonfigurowane — każda tabela filtruje po `salon_id`. Wystarczy upewnić się, że:
-- DemoPage NIE tworzy sesji Supabase (nie loguje żadnego użytkownika)
-- Prawdziwe komponenty zawsze filtrują po `salonId` z hooka `useSalonId()`
-- Brak jest hardcoded `salon_id` ani danych testowych w komponentach admin
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-### Zmiany w plikach
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-1. **`src/pages/OnboardingPage.tsx`** — dodać sprawdzanie istniejącego salonu, wznowienie onboardingu, redirect jeśli ukończony
-2. **`src/components/admin/DashboardHome.tsx`** — dodać prop `isDemo?: boolean`, gdy true → mockowe dane
-3. **Pozostałe moduły admin** (ClientsManagement, ServicesManagement, StaffManagement, ScheduleManagement itd.) — dodać prop `isDemo?: boolean` z lokalnym mockiem
-4. **`src/pages/DemoPage.tsx`** — przekazać `isDemo={true}` do wszystkich komponentów
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-### Kolejność
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
 
-1. Fix onboarding (sprawdzanie salonu + wznowienie)
-2. Dodanie `isDemo` prop do komponentów admin
-3. Aktualizacja DemoPage
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

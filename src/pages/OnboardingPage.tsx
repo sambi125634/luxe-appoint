@@ -136,13 +136,41 @@ export default function OnboardingPage() {
   const [newStaffEmail, setNewStaffEmail] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
-      } else {
-        setUserId(session.user.id);
-        setSalonEmail(session.user.email ?? "");
+        setCheckingAuth(false);
+        return;
       }
+
+      const uid = session.user.id;
+      setUserId(uid);
+      setSalonEmail(session.user.email ?? "");
+
+      // Check if user already has a salon
+      const { data: existingSalon } = await supabase
+        .from("salons")
+        .select("id, slug, name, address, city, phone, email, onboarding_completed, onboarding_step")
+        .eq("owner_id", uid)
+        .maybeSingle();
+
+      if (existingSalon?.onboarding_completed) {
+        navigate("/admin");
+        return;
+      }
+
+      if (existingSalon) {
+        // Resume onboarding from saved step
+        setCreatedSalonId(existingSalon.id);
+        setCreatedSlug(existingSalon.slug);
+        setSalonName(existingSalon.name ?? "");
+        setSalonAddress(existingSalon.address ?? "");
+        setSalonCity(existingSalon.city ?? "");
+        setSalonPhone(existingSalon.phone ?? "");
+        setSalonEmail(existingSalon.email ?? session.user.email ?? "");
+        setStep(existingSalon.onboarding_step ?? 0);
+      }
+
       setCheckingAuth(false);
     });
   }, [navigate]);
@@ -159,6 +187,31 @@ export default function OnboardingPage() {
     }
     if (!userId) return;
     setSaving(true);
+
+    // If we already have a salon (resuming), update it
+    if (createdSalonId) {
+      const { error } = await supabase
+        .from("salons")
+        .update({
+          name: salonName.trim(),
+          address: salonAddress.trim() || null,
+          city: salonCity.trim() || null,
+          phone: salonPhone.trim() || null,
+          email: salonEmail.trim() || null,
+          onboarding_step: 1,
+        })
+        .eq("id", createdSalonId);
+
+      if (error) {
+        toast.error("Nie udało się zaktualizować salonu: " + error.message);
+        setSaving(false);
+        return;
+      }
+      setSaving(false);
+      setStep(1);
+      return;
+    }
+
     const slug = generateSlug(salonName) + "-" + Date.now().toString(36);
 
     const { data: salon, error } = await supabase

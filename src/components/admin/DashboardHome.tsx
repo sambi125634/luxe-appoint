@@ -25,13 +25,31 @@ import { pl } from "date-fns/locale";
 
 interface DashboardHomeProps {
   onNavigate?: (tab: string) => void;
+  isDemo?: boolean;
 }
 
-export function DashboardHome({ onNavigate }: DashboardHomeProps) {
+// Mock data for demo mode
+const DEMO_APPOINTMENTS = [
+  { id: "d1", start_time: new Date().toISOString(), end_time: new Date().toISOString(), status: "confirmed" as const, price: 150, notes: null, clients: { first_name: "Anna", last_name: "Kowalska", phone: "+48 123 456 789" }, services: { name: "Manicure hybrydowy" }, staff_members: { name: "Maria Nowakowska" } },
+  { id: "d2", start_time: new Date().toISOString(), end_time: new Date().toISOString(), status: "booked" as const, price: 350, notes: null, clients: { first_name: "Katarzyna", last_name: "Nowak", phone: "+48 987 654 321" }, services: { name: "Mezoterapia igłowa" }, staff_members: { name: "Joanna Lewandowska" } },
+  { id: "d3", start_time: new Date().toISOString(), end_time: new Date().toISOString(), status: "confirmed" as const, price: 200, notes: null, clients: { first_name: "Magdalena", last_name: "Wiśniewska", phone: "+48 555 123 456" }, services: { name: "Masaż relaksacyjny" }, staff_members: { name: "Karolina Wiśniewska" } },
+];
+const DEMO_TOP_SERVICES = [
+  { name: "Manicure hybrydowy", count: 48, revenue: 5760 },
+  { name: "Mezoterapia igłowa", count: 32, revenue: 11200 },
+  { name: "Masaż relaksacyjny", count: 24, revenue: 4800 },
+];
+const DEMO_TOP_STAFF = [
+  { name: "Maria Nowakowska", appointments: 56, revenue: 14200 },
+  { name: "Karolina Wiśniewska", appointments: 42, revenue: 8400 },
+  { name: "Joanna Lewandowska", appointments: 38, revenue: 7600 },
+];
+
+export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps) {
   const { t, i18n } = useTranslation();
   const [quickSaleOpen, setQuickSaleOpen] = useState(false);
   const { salonId, isLoading: salonLoading } = useSalonId();
-  const { alerts: stockAlerts, topSelling } = useStockAlerts(salonId ?? undefined);
+  const { alerts: stockAlerts, topSelling } = useStockAlerts(isDemo ? undefined : (salonId ?? undefined));
 
   const today = new Date();
   const todayStart = startOfDay(today).toISOString();
@@ -43,8 +61,9 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
 
   // Today's appointments
   const { data: todayAppointments = [], isLoading: apptLoading } = useQuery({
-    queryKey: ["dashboard-today-appointments", salonId],
+    queryKey: ["dashboard-today-appointments", salonId, isDemo],
     queryFn: async () => {
+      if (isDemo) return DEMO_APPOINTMENTS;
       const { data, error } = await supabase
         .from("appointments")
         .select("id, start_time, end_time, status, price, notes, clients(first_name, last_name, phone), services(name), staff_members(name)")
@@ -55,13 +74,14 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
       if (error) throw error;
       return data ?? [];
     },
-    enabled: !!salonId,
+    enabled: isDemo || !!salonId,
   });
 
   // Today's revenue from transactions
   const { data: todayRevenue = 0 } = useQuery({
-    queryKey: ["dashboard-today-revenue", salonId],
+    queryKey: ["dashboard-today-revenue", salonId, isDemo],
     queryFn: async () => {
+      if (isDemo) return 2450;
       const { data, error } = await supabase
         .from("transactions")
         .select("amount")
@@ -72,13 +92,14 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
       if (error) throw error;
       return (data ?? []).reduce((s, t) => s + Number(t.amount), 0);
     },
-    enabled: !!salonId,
+    enabled: isDemo || !!salonId,
   });
 
   // Weekly occupancy
   const { data: weeklyStats } = useQuery({
-    queryKey: ["dashboard-weekly-occupancy", salonId],
+    queryKey: ["dashboard-weekly-occupancy", salonId, isDemo],
     queryFn: async () => {
+      if (isDemo) return { current: 34, previous: 28 };
       const { count: bookedThis } = await supabase
         .from("appointments")
         .select("*", { count: "exact", head: true })
@@ -99,13 +120,14 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
 
       return { current: bookedThis ?? 0, previous: bookedPrev ?? 0 };
     },
-    enabled: !!salonId,
+    enabled: isDemo || !!salonId,
   });
 
   // Monthly no-shows
   const { data: monthlyNoShows } = useQuery({
-    queryKey: ["dashboard-monthly-noshows", salonId],
+    queryKey: ["dashboard-monthly-noshows", salonId, isDemo],
     queryFn: async () => {
+      if (isDemo) return { current: 2, previous: 4 };
       const { count: noShows } = await supabase
         .from("appointments")
         .select("*", { count: "exact", head: true })
@@ -126,13 +148,14 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
 
       return { current: noShows ?? 0, previous: prevNoShows ?? 0 };
     },
-    enabled: !!salonId,
+    enabled: isDemo || !!salonId,
   });
 
   // Top services this month
   const { data: topServices = [] } = useQuery({
-    queryKey: ["dashboard-top-services", salonId],
+    queryKey: ["dashboard-top-services", salonId, isDemo],
     queryFn: async () => {
+      if (isDemo) return DEMO_TOP_SERVICES;
       const { data, error } = await supabase
         .from("appointments")
         .select("service_id, price, services(name)")
@@ -151,13 +174,14 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
       }
       return Object.values(grouped).sort((a, b) => b.count - a.count).slice(0, 3);
     },
-    enabled: !!salonId,
+    enabled: isDemo || !!salonId,
   });
 
   // Top staff this month
   const { data: topStaff = [] } = useQuery({
-    queryKey: ["dashboard-top-staff", salonId],
+    queryKey: ["dashboard-top-staff", salonId, isDemo],
     queryFn: async () => {
+      if (isDemo) return DEMO_TOP_STAFF;
       const { data, error } = await supabase
         .from("appointments")
         .select("staff_id, price, staff_members(name)")
@@ -176,7 +200,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
       }
       return Object.values(grouped).sort((a, b) => b.appointments - a.appointments).slice(0, 3);
     },
-    enabled: !!salonId,
+    enabled: isDemo || !!salonId,
   });
 
   const confirmedCount = todayAppointments.filter((a) => a.status === "confirmed" || a.status === "completed").length;
@@ -185,7 +209,7 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
     .filter((a) => a.status !== "cancelled")
     .reduce((s, a) => s + Number(a.price ?? 0), 0);
 
-  const isEmpty = !apptLoading && todayAppointments.length === 0 && topServices.length === 0;
+  const isEmpty = !isDemo && !apptLoading && todayAppointments.length === 0 && topServices.length === 0;
 
   const handleNavigate = (tab: string) => {
     onNavigate?.(tab);
@@ -194,13 +218,15 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
   return (
     <div className="space-y-6">
       {/* Tutorial */}
-      <VideoTutorialCard 
-        title="Jak korzystać z panelu — szybki przegląd" 
-        voiceText="Witaj w panelu Beauty Calendar! Tutaj widzisz podsumowanie dnia — nadchodzące wizyty, alerty, statystyki i szybkie akcje. Z bocznego menu możesz przejść do kalendarza, listy klientów, usług, produktów i wielu innych modułów. Każda sekcja ma instrukcje, które pomogą Ci w konfiguracji."
-      />
+      {!isDemo && (
+        <VideoTutorialCard 
+          title="Jak korzystać z panelu — szybki przegląd" 
+          voiceText="Witaj w panelu Beauty Calendar! Tutaj widzisz podsumowanie dnia — nadchodzące wizyty, alerty, statystyki i szybkie akcje. Z bocznego menu możesz przejść do kalendarza, listy klientów, usług, produktów i wielu innych modułów. Każda sekcja ma instrukcje, które pomogą Ci w konfiguracji."
+        />
+      )}
 
       {/* Setup Checklist */}
-      {salonId && <SetupChecklist salonId={salonId} onNavigate={handleNavigate} />}
+      {!isDemo && salonId && <SetupChecklist salonId={salonId} onNavigate={handleNavigate} />}
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
