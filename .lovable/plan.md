@@ -1,101 +1,79 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+## Problem
 
-### Co już mamy
+Tylko `DashboardHome` ma logikę `isDemo` — reszta komponentów (Klienci, Usługi, Pracownicy, Kalendarz, Urlopy, Grafik, Pipeline, Konwersacje, Księgowość itp.) **zawsze wyświetla hardcoded mockowe dane** niezależnie od tego czy użytkownik jest w demo czy w panelu admin. Nowy salon po rejestracji widzi dane "Anna Kowalska", "Maria Nowakowska" itd.
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+## Zakres zmian
 
-### Problem do rozwiązania
+Trzeba zamienić mockowe dane na zapytania Supabase w **10 komponentach**, dodając jednocześnie prop `isDemo` żeby demo page dalej działało z mockami.
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### Priorytet 1 — Kluczowe moduły CRUD
 
----
+1. **`ClientsManagement.tsx`** — Usunąć `mockClients`, pobierać z tabeli `clients` WHERE `salon_id`. Empty state: "Dodaj pierwszego klienta". Demo: zachować obecne mocki.
 
-### Plan implementacji
+2. **`ServicesManagement.tsx`** — Usunąć `mockServices`, `mockCategories`, `mockStaff`. Pobierać z `services`, `service_categories`, `staff_members` WHERE `salon_id`. CRUD operacje przez Supabase. Empty state: "Dodaj pierwszą usługę".
 
-#### FAZA 1: Role-based routing po loginie
+3. **`StaffManagement.tsx`** — Usunąć `mockStaff`, `mockServices`. Pobierać z `staff_members`, `working_hours`, `staff_services` WHERE `salon_id`. CRUD przez Supabase. Empty state: "Dodaj pierwszego pracownika".
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+4. **`WeeklyCalendar.tsx`** — Usunąć `mockAppointments` i `staff`. Pobierać z `appointments` + `staff_members` WHERE `salon_id` i zakres dat. Empty state: pusty kalendarz z komunikatem.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+5. **`TimeOffManagement.tsx`** — Usunąć `mockStaff`, `mockTimeOffs`. Pobierać z `time_off` JOIN `staff_members` WHERE `salon_id`.
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### Priorytet 2 — Moduły harmonogramu
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+6. **`schedule/types.ts`** — Usunąć `mockStaffMembers` export. Stworzyć hook `useStaffMembers(salonId)`.
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+7. **`schedule/ScheduleGridView.tsx`** — Użyć hooka zamiast `mockStaffMembers`.
 
-#### FAZA 3: Indywidualne kokpity
+8. **`schedule/SmartScheduleHelpers.tsx`** — Użyć hooka zamiast `mockStaffMembers`.
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+9. **`schedule/ScheduleTemplates.tsx`** — Użyć hooka zamiast `mockStaffMembers`.
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+10. **`schedule/QuickBlockModal.tsx`** + **`schedule/WeekDuplication.tsx`** — Użyć hooka zamiast `mockStaffMembers`.
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+### Priorytet 3 — Aktualizacja DemoPage
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+11. **`DemoPage.tsx`** — Przekazać `isDemo={true}` do WSZYSTKICH komponentów: `ScheduleManagement`, `ClientsManagement`, `ServicesManagement`, `StaffManagement`, `TimeOffManagement`, `WidgetsManagement`.
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+### Nowe pliki
 
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
+- **`src/hooks/useStaffMembers.ts`** — Hook do pobierania pracowników salonu z Supabase (używany w 6+ komponentach schedule).
+- **`src/hooks/useClients.ts`** — Hook do pobierania klientów salonu.
+- **`src/hooks/useServices.ts`** — Hook do pobierania usług i kategorii salonu.
 
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+### Wzorzec dla każdego komponentu
 
----
+```text
+interface ComponentProps {
+  isDemo?: boolean;
+}
 
-### Wymagane zmiany w bazie danych
+function Component({ isDemo = false }: ComponentProps) {
+  const { salonId } = useSalonId();
+  
+  // Dane z bazy LUB mocki demo
+  const { data, isLoading } = useQuery({
+    queryKey: ["table", salonId, isDemo],
+    queryFn: async () => {
+      if (isDemo) return DEMO_DATA;
+      // Supabase query filtered by salon_id
+    },
+    enabled: isDemo || !!salonId,
+  });
 
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+  // Empty state gdy brak danych (nie demo)
+  if (!isDemo && !isLoading && data?.length === 0) {
+    return <EmptyState />;
+  }
+}
+```
 
 ### Kolejność implementacji
 
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+1. Hooki (`useStaffMembers`, `useClients`, `useServices`)
+2. `ClientsManagement` + `ServicesManagement` + `StaffManagement` (główne CRUD)
+3. `WeeklyCalendar` + `TimeOffManagement`
+4. Moduły schedule (`ScheduleGridView`, `SmartScheduleHelpers`, `ScheduleTemplates`, `QuickBlockModal`, `WeekDuplication`)
+5. `DemoPage` — dodanie `isDemo` do wszystkich komponentów
 
