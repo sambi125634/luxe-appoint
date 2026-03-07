@@ -67,7 +67,11 @@ const mockTimeOffs: TimeOff[] = [
   },
 ];
 
-export function TimeOffManagement() {
+interface TimeOffManagementProps {
+  isDemo?: boolean;
+}
+
+export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
   const { t, i18n } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [timeOffs, setTimeOffs] = useState<TimeOff[]>(mockTimeOffs);

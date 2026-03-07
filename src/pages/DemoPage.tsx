@@ -74,17 +74,17 @@ export default function DemoPage() {
         case "home":
           return <DashboardHome isDemo={true} />;
         case "calendar":
-          return <ScheduleManagement />;
+          return <ScheduleManagement isDemo={true} />;
         case "widgets":
           return <WidgetsManagement />;
         case "clients":
-          return <ClientsManagement />;
+          return <ClientsManagement isDemo={true} />;
         case "services":
-          return <ServicesManagement />;
+          return <ServicesManagement isDemo={true} />;
         case "staff":
-          return <StaffManagement />;
+          return <StaffManagement isDemo={true} />;
         case "time-off":
-          return <TimeOffManagement />;
+          return <TimeOffManagement isDemo={true} />;
         case "stats":
           return <StatsModule />;
         case "settings":

@@ -34,10 +34,11 @@ const staff = [
 const hours = Array.from({ length: 12 }, (_, i) => `${(8 + i).toString().padStart(2, "0")}:00`);
 
 interface WeeklyCalendarProps {
+  isDemo?: boolean;
   onNewAppointment?: () => void;
 }
 
-export function WeeklyCalendar({ onNewAppointment }: WeeklyCalendarProps) {
+export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalendarProps) {
   const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(mockAppointments);
