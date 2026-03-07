@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronRight, Bell, Loader2 } from "lucide-react";
+import { Menu, X, ChevronRight, Bell, Loader2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ import { WidgetsManagement } from "@/components/admin/widgets";
 import { SettingsModule } from "@/components/admin/settings";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
+import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
