@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, ChevronRight, Bell, Loader2 } from "lucide-react";
+import { Menu, X, ChevronRight, Bell, Loader2, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ import { WidgetsManagement } from "@/components/admin/widgets";
 import { SettingsModule } from "@/components/admin/settings";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
+import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -28,6 +29,7 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const { role, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
+  const { showTour, setShowTour, restartTour } = useAdminTourState();
 
   // Guard: redirect to onboarding if not completed
   useEffect(() => {
@@ -82,7 +84,7 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "home": return <DashboardHome />;
+      case "home": return <DashboardHome onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "calendar": return <ScheduleManagement />;
       case "widgets": return <WidgetsManagement />;
       case "clients": return <ClientsManagement />;
@@ -147,6 +149,10 @@ export default function AdminDashboard() {
           </div>
           
           <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground" onClick={restartTour}>
+              <GraduationCap className="w-4 h-4" />
+              <span className="hidden sm:inline">Samouczek</span>
+            </Button>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full" />
@@ -164,6 +170,13 @@ export default function AdminDashboard() {
           {renderContent()}
         </main>
       </div>
+
+      {showTour && (
+        <GuidedTour
+          onTabChange={setActiveTab}
+          onComplete={() => setShowTour(false)}
+        />
+      )}
     </div>
   );
 }

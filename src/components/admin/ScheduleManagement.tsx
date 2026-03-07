@@ -20,6 +20,7 @@ import {
   SmartScheduleHelpers 
 } from "./schedule";
 import { useTranslation } from "react-i18next";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 
 export function ScheduleManagement() {
   const { t } = useTranslation();
@@ -33,6 +34,10 @@ export function ScheduleManagement() {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak zarządzać kalendarzem"
+        voiceText="Tutaj zarządzasz wizytami. Kliknij w wolny slot, aby dodać wizytę. Widzisz grafik wszystkich pracowników na jednym ekranie. Klientki mogą też rezerwować same przez widget na Twojej stronie. Żeby widzieć wolne sloty, musisz najpierw dodać pracowników i ustawić ich godziny pracy."
+      />
       {/* Top Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Tabs value={activeView} onValueChange={(v) => setActiveView(v as any)} className="w-full sm:w-auto">

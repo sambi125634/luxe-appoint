@@ -33,6 +33,7 @@ import { EmbedCodeModal } from "./EmbedCodeModal";
 import { WidgetEditor } from "./WidgetEditor";
 import { PromotionsManager } from "./PromotionsManager";
 import { InstagramLinkGenerator } from "./InstagramLinkGenerator";
+import { VideoTutorialCard } from "../VideoTutorialCard";
 
 export function WidgetsManagement() {
   const [widgets, setWidgets] = useState<BookingWidget[]>(mockWidgets);
@@ -108,6 +109,10 @@ export function WidgetsManagement() {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak osadzić widget rezerwacji"
+        voiceText="Skopiuj kod widgetu i wklej na swoją stronę www lub udostępnij bezpośredni link w mediach społecznościowych. Klientki rezerwują 24 na 7 — nawet o 23 w nocy. Widget wymaga skonfigurowanych usług i pracowników, żeby pokazywać wolne terminy."
+      />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

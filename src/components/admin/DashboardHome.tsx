@@ -3,87 +3,193 @@ import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
-  Phone, CheckCircle2, XCircle, ShoppingBag, Package
+  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
 import { VideoTutorialCard } from "./VideoTutorialCard";
+import { SetupChecklist } from "./SetupChecklist";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useStockAlerts } from "@/hooks/useStockAlerts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
+import { pl } from "date-fns/locale";
 
-// Mock data - w przyszłości z bazy danych
-const todayAppointments = [
-  { id: "1", time: "09:00", client: "Anna Kowalska", service: "Manicure hybrydowy", staff: "Maria", status: "confirmed", phone: "+48 123 456 789" },
-  { id: "2", time: "10:30", client: "Katarzyna Nowak", service: "Mezoterapia twarzy", staff: "Joanna", status: "pending", phone: "+48 987 654 321" },
-  { id: "3", time: "12:00", client: "Magdalena Wiśniewska", service: "Depilacja laserowa", staff: "Maria", status: "confirmed", phone: "+48 555 123 456" },
-  { id: "4", time: "14:00", client: "Ewa Dąbrowska", service: "Pedicure klasyczny", staff: "Anna", status: "pending", phone: "+48 111 222 333" },
-  { id: "5", time: "15:30", client: "Zofia Lewandowska", service: "Makijaż permanentny", staff: "Joanna", status: "confirmed", phone: "+48 444 555 666" },
-  { id: "6", time: "17:00", client: "Aleksandra Wójcik", service: "Lifting twarzy", staff: "Maria", status: "cancelled", phone: "+48 777 888 999" },
-];
+interface DashboardHomeProps {
+  onNavigate?: (tab: string) => void;
+}
 
-const weeklyStats = {
-  totalSlots: 168,
-  bookedSlots: 89,
-  occupancyRate: 53,
-  previousWeekRate: 48,
-};
-
-const monthlyStats = {
-  noShows: 4,
-  totalAppointments: 156,
-  noShowRate: 2.6,
-  previousMonthRate: 3.1,
-};
-
-const topServices = [
-  { name: "Manicure hybrydowy", count: 45, revenue: 4500, trend: "up" },
-  { name: "Mezoterapia twarzy", count: 28, revenue: 8400, trend: "up" },
-  { name: "Depilacja laserowa", count: 22, revenue: 6600, trend: "down" },
-];
-
-const topStaff = [
-  { name: "Maria Kowalczyk", appointments: 52, revenue: 7800 },
-  { name: "Joanna Nowak", appointments: 48, revenue: 9600 },
-  { name: "Anna Wiśniewska", appointments: 35, revenue: 5250 },
-];
-
-export function DashboardHome() {
+export function DashboardHome({ onNavigate }: DashboardHomeProps) {
   const { t, i18n } = useTranslation();
   const [quickSaleOpen, setQuickSaleOpen] = useState(false);
-  const { salonId } = useSalonId();
+  const { salonId, isLoading: salonLoading } = useSalonId();
   const { alerts: stockAlerts, topSelling } = useStockAlerts(salonId ?? undefined);
-  
-  const alerts = [
-    { type: "warning", message: i18n.language === 'pl' ? "2 klientki nie potwierdziły wizyty" : "2 clients haven't confirmed", count: 2 },
-    { type: "error", message: i18n.language === 'pl' ? "1 wizyta została anulowana" : "1 appointment cancelled", count: 1 },
-    { type: "info", message: i18n.language === 'pl' ? "3 nowe rezerwacje z ostatniej godziny" : "3 new bookings in the last hour", count: 3 },
-  ];
 
-  // Add stock alerts to the alerts array
-  const criticalStockCount = stockAlerts.filter(a => a.status === "critical").length;
-  if (criticalStockCount > 0) {
-    alerts.unshift({
-      type: "error",
-      message: i18n.language === 'pl' 
-        ? `${criticalStockCount} produktów wymaga uzupełnienia` 
-        : `${criticalStockCount} products need restocking`,
-      count: criticalStockCount
-    });
-  }
+  const today = new Date();
+  const todayStart = startOfDay(today).toISOString();
+  const todayEnd = endOfDay(today).toISOString();
+  const weekStart = startOfWeek(today, { weekStartsOn: 1 }).toISOString();
+  const weekEnd = endOfWeek(today, { weekStartsOn: 1 }).toISOString();
+  const monthStart = startOfMonth(today).toISOString();
+  const monthEnd = endOfMonth(today).toISOString();
 
-  const todayRevenue = todayAppointments
-    .filter(a => a.status !== "cancelled")
-    .reduce((sum) => sum + 150, 0);
+  // Today's appointments
+  const { data: todayAppointments = [], isLoading: apptLoading } = useQuery({
+    queryKey: ["dashboard-today-appointments", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("id, start_time, end_time, status, price, notes, clients(first_name, last_name, phone), services(name), staff_members(name)")
+        .eq("salon_id", salonId!)
+        .gte("start_time", todayStart)
+        .lte("start_time", todayEnd)
+        .order("start_time", { ascending: true });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!salonId,
+  });
 
-  const confirmedCount = todayAppointments.filter(a => a.status === "confirmed").length;
-  const pendingCount = todayAppointments.filter(a => a.status === "pending").length;
-  const cancelledCount = todayAppointments.filter(a => a.status === "cancelled").length;
+  // Today's revenue from transactions
+  const { data: todayRevenue = 0 } = useQuery({
+    queryKey: ["dashboard-today-revenue", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("amount")
+        .eq("salon_id", salonId!)
+        .eq("type", "income")
+        .gte("transaction_date", todayStart)
+        .lte("transaction_date", todayEnd);
+      if (error) throw error;
+      return (data ?? []).reduce((s, t) => s + Number(t.amount), 0);
+    },
+    enabled: !!salonId,
+  });
+
+  // Weekly occupancy
+  const { data: weeklyStats } = useQuery({
+    queryKey: ["dashboard-weekly-occupancy", salonId],
+    queryFn: async () => {
+      const { count: bookedThis } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("salon_id", salonId!)
+        .gte("start_time", weekStart)
+        .lte("start_time", weekEnd)
+        .neq("status", "cancelled");
+      
+      const prevWeekStart = subWeeks(new Date(weekStart), 1).toISOString();
+      const prevWeekEnd = subWeeks(new Date(weekEnd), 1).toISOString();
+      const { count: bookedPrev } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("salon_id", salonId!)
+        .gte("start_time", prevWeekStart)
+        .lte("start_time", prevWeekEnd)
+        .neq("status", "cancelled");
+
+      return { current: bookedThis ?? 0, previous: bookedPrev ?? 0 };
+    },
+    enabled: !!salonId,
+  });
+
+  // Monthly no-shows
+  const { data: monthlyNoShows } = useQuery({
+    queryKey: ["dashboard-monthly-noshows", salonId],
+    queryFn: async () => {
+      const { count: noShows } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("salon_id", salonId!)
+        .eq("status", "no_show")
+        .gte("start_time", monthStart)
+        .lte("start_time", monthEnd);
+
+      const prevMonthStart = startOfMonth(subMonths(today, 1)).toISOString();
+      const prevMonthEnd = endOfMonth(subMonths(today, 1)).toISOString();
+      const { count: prevNoShows } = await supabase
+        .from("appointments")
+        .select("*", { count: "exact", head: true })
+        .eq("salon_id", salonId!)
+        .eq("status", "no_show")
+        .gte("start_time", prevMonthStart)
+        .lte("start_time", prevMonthEnd);
+
+      return { current: noShows ?? 0, previous: prevNoShows ?? 0 };
+    },
+    enabled: !!salonId,
+  });
+
+  // Top services this month
+  const { data: topServices = [] } = useQuery({
+    queryKey: ["dashboard-top-services", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("service_id, price, services(name)")
+        .eq("salon_id", salonId!)
+        .gte("start_time", monthStart)
+        .lte("start_time", monthEnd)
+        .in("status", ["booked", "confirmed", "completed"]);
+      if (error) throw error;
+
+      const grouped: Record<string, { name: string; count: number; revenue: number }> = {};
+      for (const a of data ?? []) {
+        const name = (a.services as { name: string } | null)?.name ?? "Nieznana";
+        if (!grouped[a.service_id]) grouped[a.service_id] = { name, count: 0, revenue: 0 };
+        grouped[a.service_id].count++;
+        grouped[a.service_id].revenue += Number(a.price ?? 0);
+      }
+      return Object.values(grouped).sort((a, b) => b.count - a.count).slice(0, 3);
+    },
+    enabled: !!salonId,
+  });
+
+  // Top staff this month
+  const { data: topStaff = [] } = useQuery({
+    queryKey: ["dashboard-top-staff", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("staff_id, price, staff_members(name)")
+        .eq("salon_id", salonId!)
+        .gte("start_time", monthStart)
+        .lte("start_time", monthEnd)
+        .in("status", ["booked", "confirmed", "completed"]);
+      if (error) throw error;
+
+      const grouped: Record<string, { name: string; appointments: number; revenue: number }> = {};
+      for (const a of data ?? []) {
+        const name = (a.staff_members as { name: string } | null)?.name ?? "Nieznany";
+        if (!grouped[a.staff_id]) grouped[a.staff_id] = { name, appointments: 0, revenue: 0 };
+        grouped[a.staff_id].appointments++;
+        grouped[a.staff_id].revenue += Number(a.price ?? 0);
+      }
+      return Object.values(grouped).sort((a, b) => b.appointments - a.appointments).slice(0, 3);
+    },
+    enabled: !!salonId,
+  });
+
+  const confirmedCount = todayAppointments.filter((a) => a.status === "confirmed" || a.status === "completed").length;
+  const pendingCount = todayAppointments.filter((a) => a.status === "booked").length;
+  const estimatedRevenue = todayAppointments
+    .filter((a) => a.status !== "cancelled")
+    .reduce((s, a) => s + Number(a.price ?? 0), 0);
+
+  const isEmpty = !apptLoading && todayAppointments.length === 0 && topServices.length === 0;
+
+  const handleNavigate = (tab: string) => {
+    onNavigate?.(tab);
+  };
 
   return (
     <div className="space-y-6">
@@ -92,160 +198,108 @@ export function DashboardHome() {
         title="Jak korzystać z panelu — szybki przegląd" 
         voiceText="Witaj w panelu Beauty Calendar! Tutaj widzisz podsumowanie dnia — nadchodzące wizyty, alerty, statystyki i szybkie akcje. Z bocznego menu możesz przejść do kalendarza, listy klientów, usług, produktów i wielu innych modułów. Każda sekcja ma instrukcje, które pomogą Ci w konfiguracji."
       />
-      {/* Nagłówek z datą */}
+
+      {/* Setup Checklist */}
+      {salonId && <SetupChecklist salonId={salonId} onNavigate={handleNavigate} />}
+
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-serif font-bold">{t('dashboard.welcome')} 👋</h2>
-          <p className="text-muted-foreground">
-            {t('dashboard.summary')}
-          </p>
+          <p className="text-muted-foreground">{t('dashboard.summary')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="gap-2"
-            onClick={() => setQuickSaleOpen(true)}
-          >
+          <Button variant="outline" size="sm" className="gap-2" onClick={() => setQuickSaleOpen(true)}>
             <ShoppingBag className="w-4 h-4" />
             <span className="hidden sm:inline">{t('products.quickSale')}</span>
           </Button>
           <Badge variant="outline" className="gap-1">
             <Calendar className="w-3 h-3" />
-            {new Date().toLocaleDateString(i18n.language === 'pl' ? 'pl-PL' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })}
+            {format(today, "EEEE, d MMMM", { locale: pl })}
           </Badge>
         </div>
       </div>
 
-      {/* Quick Product Sale Modal */}
       <QuickProductSale open={quickSaleOpen} onOpenChange={setQuickSaleOpen} />
 
-      {/* Alerty - co wymaga uwagi */}
-      {alerts.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-600" />
-              {t('dashboard.attentionRequired')}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex flex-wrap gap-2">
-              {alerts.map((alert, i) => (
-                <Badge 
-                  key={i}
-                  variant="secondary"
-                  className={cn(
-                    "gap-1",
-                    alert.type === "warning" && "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
-                    alert.type === "error" && "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
-                    alert.type === "info" && "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200"
-                  )}
-                >
-                  {alert.message}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Główne KPI */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Dzisiejsze wizyty */}
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.todayAppointments')}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.todayAppointments')}</CardTitle>
             <Calendar className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold font-serif">{todayAppointments.length}</div>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-muted-foreground">
-                {confirmedCount} {t('dashboard.confirmed')}
-              </span>
-              {pendingCount > 0 && (
-                <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50">
-                  {pendingCount} {t('dashboard.pending')}
-                </Badge>
-              )}
-            </div>
+            {apptLoading ? <Skeleton className="h-9 w-16" /> : (
+              <>
+                <div className="text-3xl font-bold font-serif">{todayAppointments.length}</div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-xs text-muted-foreground">{confirmedCount} {t('dashboard.confirmed')}</span>
+                  {pendingCount > 0 && (
+                    <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/50">
+                      {pendingCount} {t('dashboard.pending')}
+                    </Badge>
+                  )}
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
 
-        {/* Przychód dzienny */}
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.estimatedRevenue')}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.estimatedRevenue')}</CardTitle>
             <DollarSign className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold font-serif">{todayRevenue} zł</div>
+            <div className="text-3xl font-bold font-serif">{estimatedRevenue || todayRevenue} zł</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {t('dashboard.fromVisits', { count: todayAppointments.length - cancelledCount })}
+              {t('dashboard.fromVisits', { count: todayAppointments.filter(a => a.status !== "cancelled").length })}
             </p>
           </CardContent>
         </Card>
 
-        {/* Obłożenie tygodnia */}
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.weeklyOccupancy')}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.weeklyOccupancy')}</CardTitle>
             <TrendingUp className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold font-serif">{weeklyStats.occupancyRate}%</div>
+            <div className="text-3xl font-bold font-serif">{weeklyStats?.current ?? 0}</div>
             <div className="flex items-center gap-1 mt-1">
-              {weeklyStats.occupancyRate > weeklyStats.previousWeekRate ? (
-                <>
-                  <ArrowUpRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs text-green-600">
-                    +{weeklyStats.occupancyRate - weeklyStats.previousWeekRate}% {t('dashboard.vsPreviousWeek')}
-                  </span>
-                </>
+              {(weeklyStats?.current ?? 0) >= (weeklyStats?.previous ?? 0) ? (
+                <span className="text-xs text-green-600 flex items-center gap-1">
+                  <ArrowUpRight className="w-3 h-3" />
+                  +{(weeklyStats?.current ?? 0) - (weeklyStats?.previous ?? 0)} {t('dashboard.vsPreviousWeek')}
+                </span>
               ) : (
-                <>
-                  <ArrowDownRight className="w-3 h-3 text-red-600" />
-                  <span className="text-xs text-red-600">
-                    {weeklyStats.occupancyRate - weeklyStats.previousWeekRate}% {t('dashboard.vsPreviousWeek')}
-                  </span>
-                </>
+                <span className="text-xs text-red-600 flex items-center gap-1">
+                  <ArrowDownRight className="w-3 h-3" />
+                  {(weeklyStats?.current ?? 0) - (weeklyStats?.previous ?? 0)} {t('dashboard.vsPreviousWeek')}
+                </span>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* No-shows */}
         <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.monthlyNoShows')}
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.monthlyNoShows')}</CardTitle>
             <UserX className="w-4 h-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold font-serif">{monthlyStats.noShows}</div>
+            <div className="text-3xl font-bold font-serif">{monthlyNoShows?.current ?? 0}</div>
             <div className="flex items-center gap-1 mt-1">
-              {monthlyStats.noShowRate < monthlyStats.previousMonthRate ? (
-                <>
-                  <ArrowDownRight className="w-3 h-3 text-green-600" />
-                  <span className="text-xs text-green-600">
-                    {monthlyStats.noShowRate}% ({t('dashboard.was')} {monthlyStats.previousMonthRate}%)
-                  </span>
-                </>
+              {(monthlyNoShows?.current ?? 0) <= (monthlyNoShows?.previous ?? 0) ? (
+                <span className="text-xs text-green-600 flex items-center gap-1">
+                  <ArrowDownRight className="w-3 h-3" />
+                  Lepiej niż poprzedni miesiąc
+                </span>
               ) : (
-                <>
-                  <ArrowUpRight className="w-3 h-3 text-red-600" />
-                  <span className="text-xs text-red-600">
-                    {monthlyStats.noShowRate}% ({t('dashboard.was')} {monthlyStats.previousMonthRate}%)
-                  </span>
-                </>
+                <span className="text-xs text-red-600 flex items-center gap-1">
+                  <ArrowUpRight className="w-3 h-3" />
+                  Więcej niż poprzedni miesiąc
+                </span>
               )}
             </div>
           </CardContent>
@@ -255,78 +309,99 @@ export function DashboardHome() {
       {/* AI Revenue Prediction */}
       <RevenuePredictionCard salonId={salonId ?? undefined} />
 
-      {/* Sekcja dolna - 3 kolumny */}
+      {/* Bottom section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Dzisiejsze wizyty - lista */}
+        {/* Today's appointments list */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-serif">{t('dashboard.todayAppointments')}</CardTitle>
-            <Button variant="ghost" size="sm" className="text-primary">
+            <Button variant="ghost" size="sm" className="text-primary" onClick={() => handleNavigate("calendar")}>
               {t('dashboard.viewAll')}
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {todayAppointments.slice(0, 5).map((appointment) => (
-                <div 
-                  key={appointment.id}
-                  className={cn(
-                    "flex items-center justify-between p-3 rounded-xl border transition-colors",
-                    appointment.status === "cancelled" && "bg-muted/50 opacity-60",
-                    appointment.status === "pending" && "border-amber-200 bg-amber-50/30 dark:border-amber-900/50 dark:bg-amber-950/10",
-                    appointment.status === "confirmed" && "border-border hover:bg-muted/50"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="text-center min-w-[50px]">
-                      <div className="text-sm font-semibold">{appointment.time}</div>
-                    </div>
-                    <div className="h-10 w-px bg-border" />
-                    <div>
-                      <div className="font-medium">{appointment.client}</div>
-                      <div className="text-sm text-muted-foreground">
-                        {appointment.service} • {appointment.staff}
+            {apptLoading ? (
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-xl" />)}
+              </div>
+            ) : todayAppointments.length === 0 ? (
+              <div className="text-center py-12">
+                <Calendar className="w-12 h-12 mx-auto text-muted-foreground/40 mb-3" />
+                <p className="text-muted-foreground font-medium">Brak wizyt na dziś</p>
+                <p className="text-sm text-muted-foreground mt-1">Dodaj wizytę w kalendarzu lub poczekaj na rezerwację online</p>
+                <Button variant="outline" size="sm" className="mt-4 gap-2" onClick={() => handleNavigate("calendar")}>
+                  <Plus className="w-4 h-4" />
+                  Otwórz kalendarz
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {todayAppointments.slice(0, 6).map((appointment) => {
+                  const client = appointment.clients as { first_name: string; last_name: string; phone: string } | null;
+                  const service = appointment.services as { name: string } | null;
+                  const staff = appointment.staff_members as { name: string } | null;
+                  const time = format(new Date(appointment.start_time), "HH:mm");
+
+                  return (
+                    <div
+                      key={appointment.id}
+                      className={cn(
+                        "flex items-center justify-between p-3 rounded-xl border transition-colors",
+                        appointment.status === "cancelled" && "bg-muted/50 opacity-60",
+                        appointment.status === "booked" && "border-amber-200 bg-amber-50/30 dark:border-amber-900/50 dark:bg-amber-950/10",
+                        (appointment.status === "confirmed" || appointment.status === "completed") && "border-border hover:bg-muted/50"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="text-center min-w-[50px]">
+                          <div className="text-sm font-semibold">{time}</div>
+                        </div>
+                        <div className="h-10 w-px bg-border" />
+                        <div>
+                          <div className="font-medium">{client ? `${client.first_name} ${client.last_name}` : "Klient"}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {service?.name ?? "Usługa"} • {staff?.name ?? "Pracownik"}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {(appointment.status === "confirmed" || appointment.status === "completed") && (
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
+                            <CheckCircle2 className="w-3 h-3 mr-1" />
+                            {t('dashboard.appointmentStatus.confirmed')}
+                          </Badge>
+                        )}
+                        {appointment.status === "booked" && (
+                          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {t('dashboard.appointmentStatus.pending')}
+                          </Badge>
+                        )}
+                        {appointment.status === "cancelled" && (
+                          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            {t('dashboard.appointmentStatus.cancelled')}
+                          </Badge>
+                        )}
+                        {client?.phone && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                            <a href={`tel:${client.phone}`}><Phone className="w-4 h-4" /></a>
+                          </Button>
+                        )}
                       </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {appointment.status === "confirmed" && (
-                      <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
-                        <CheckCircle2 className="w-3 h-3 mr-1" />
-                        {t('dashboard.appointmentStatus.confirmed')}
-                      </Badge>
-                    )}
-                    {appointment.status === "pending" && (
-                      <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
-                        <Clock className="w-3 h-3 mr-1" />
-                        {t('dashboard.appointmentStatus.pending')}
-                      </Badge>
-                    )}
-                    {appointment.status === "cancelled" && (
-                      <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200">
-                        <XCircle className="w-3 h-3 mr-1" />
-                        {t('dashboard.appointmentStatus.cancelled')}
-                      </Badge>
-                    )}
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <Phone className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* TOP usługi, personel i alerty magazynowe */}
+        {/* Right column */}
         <div className="space-y-6">
-          {/* Stock Alerts */}
-          <StockAlertsCard 
-            alerts={stockAlerts} 
-            topSelling={topSelling}
-          />
+          <StockAlertsCard alerts={stockAlerts} topSelling={topSelling} />
 
-          {/* TOP 3 usługi */}
+          {/* Top services */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-serif flex items-center gap-2">
@@ -335,37 +410,39 @@ export function DashboardHome() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {topServices.map((service, i) => (
-                <div key={service.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                        i === 0 && "bg-amber-100 text-amber-800",
-                        i === 1 && "bg-gray-100 text-gray-800",
-                        i === 2 && "bg-orange-100 text-orange-800"
-                      )}>
-                        {i + 1}
-                      </span>
-                      <span className="font-medium text-sm">{service.name}</span>
-                    </div>
-                    {service.trend === "up" ? (
-                      <ArrowUpRight className="w-4 h-4 text-green-600" />
-                    ) : (
-                      <ArrowDownRight className="w-4 h-4 text-red-600" />
-                    )}
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>{service.count} {t('dashboard.reservations')}</span>
-                    <span>{service.revenue} zł</span>
-                  </div>
-                  <Progress value={(service.count / topServices[0].count) * 100} className="h-1.5" />
+              {topServices.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground">Brak danych — dodaj usługi i zacznij przyjmować wizyty</p>
+                  <Button variant="ghost" size="sm" className="mt-2" onClick={() => handleNavigate("services")}>
+                    Dodaj usługi
+                  </Button>
                 </div>
-              ))}
+              ) : (
+                topServices.map((service, i) => (
+                  <div key={service.name} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
+                          i === 0 && "bg-amber-100 text-amber-800",
+                          i === 1 && "bg-gray-100 text-gray-800",
+                          i === 2 && "bg-orange-100 text-orange-800"
+                        )}>{i + 1}</span>
+                        <span className="font-medium text-sm">{service.name}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
+                      <span>{service.count} {t('dashboard.reservations')}</span>
+                      <span>{service.revenue} zł</span>
+                    </div>
+                    <Progress value={topServices[0] ? (service.count / topServices[0].count) * 100 : 0} className="h-1.5" />
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
 
-          {/* TOP personel */}
+          {/* Top staff */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg font-serif flex items-center gap-2">
@@ -374,25 +451,33 @@ export function DashboardHome() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {topStaff.map((staff, i) => (
-                <div key={staff.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold",
-                      i === 0 && "bg-gradient-to-r from-primary to-secondary text-primary-foreground",
-                      i === 1 && "bg-muted text-muted-foreground",
-                      i === 2 && "bg-muted text-muted-foreground"
-                    )}>
-                      {staff.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div>
-                      <div className="text-sm font-medium">{staff.name}</div>
-                      <div className="text-xs text-muted-foreground">{staff.appointments} {t('dashboard.visits')}</div>
-                    </div>
-                  </div>
-                  <div className="text-sm font-semibold text-primary">{staff.revenue} zł</div>
+              {topStaff.length === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-sm text-muted-foreground">Brak danych — dodaj pracowników i zacznij przyjmować wizyty</p>
+                  <Button variant="ghost" size="sm" className="mt-2" onClick={() => handleNavigate("staff")}>
+                    Dodaj pracowników
+                  </Button>
                 </div>
-              ))}
+              ) : (
+                topStaff.map((staff, i) => (
+                  <div key={staff.name} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold",
+                        i === 0 && "bg-gradient-to-r from-primary to-secondary text-primary-foreground",
+                        i !== 0 && "bg-muted text-muted-foreground"
+                      )}>
+                        {staff.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div>
+                        <div className="text-sm font-medium">{staff.name}</div>
+                        <div className="text-xs text-muted-foreground">{staff.appointments} {t('dashboard.visits')}</div>
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold text-primary">{staff.revenue} zł</div>
+                  </div>
+                ))
+              )}
             </CardContent>
           </Card>
         </div>

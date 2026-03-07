@@ -1,70 +1,101 @@
 
 
-## Problem
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-Panel admin po onboardingu wyświetla **mockowe dane** (hardcoded wizyty, przychody, statystyki) — identycznie jak demo. Nowy użytkownik widzi fałszywe dane zamiast czystego panelu ze wskazówkami. Brak auto-tutoriala prowadzącego przez sekcje panelu i wyjaśniającego co uzupełnić.
+### Co już mamy
 
-## Rozwiązanie
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-### 1. Guided Tour w panelu admin (nie tylko demo)
+### Problem do rozwiązania
 
-Przenieść i rozbudować istniejący `GuidedTour` z demo do panelu admin:
-- Po zakończeniu onboardingu (pierwszy raz w `/admin`) — automatycznie uruchomić **Guided Tour** prowadzący przez każdą sekcję
-- Każdy krok touru przełącza zakładkę w sidebarze i wyświetla modal z:
-  - Opisem sekcji po polsku (co tu robisz, jakie dane wpisujesz)
-  - Przycisk voice guidance (ElevenLabs) z wyjaśnieniem
-  - Info o ograniczeniach gdy sekcja nie jest uzupełniona
-  - Placeholder na wideo tutorial
-- Tour obejmuje: Dashboard → Kalendarz → Klienci → Usługi → Pracownicy → Widgety → Ustawienia
-- Przycisk "Uruchom samouczek" zawsze dostępny w sidebarze/headerze
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-### 2. Czyste dane zamiast mocków w DashboardHome
+---
 
-Zastąpić hardcoded mock data w `DashboardHome.tsx` rzeczywistymi zapytaniami do bazy:
-- Wizyty dzisiejsze: `appointments` filtrowane po `salon_id` i dzisiejszej dacie
-- KPI (przychód, obłożenie, no-show): z `appointments` + `transactions`
-- Top usługi / top pracownicy: z `appointments` + `services` + `staff_members`
-- Gdy brak danych — pokazać **empty state** z CTA: "Dodaj pierwszą wizytę", "Skonfiguruj usługi" itp.
+### Plan implementacji
 
-### 3. Setup Checklist na dashboardzie
+#### FAZA 1: Role-based routing po loginie
 
-Widget "Konfiguracja salonu" widoczny dopóki wszystko nie jest uzupełnione:
-- [ ] Dane salonu ✅ (po onboardingu)
-- [ ] Godziny pracy ✅ (po onboardingu)  
-- [ ] Usługi ✅ (po onboardingu)
-- [ ] Pierwszy klient
-- [ ] Pierwsza wizyta
-- [ ] Widget rezerwacji osadzony
-- Każdy item prowadzi do odpowiedniej sekcji
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### 4. VideoTutorialCard + Voice w każdej kluczowej sekcji
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-Dodać `VideoTutorialCard` z polskim voice guidance w:
-- Kalendarz: "Tutaj zarządzasz wizytami. Kliknij w wolny slot, aby dodać wizytę..."
-- Klienci: "Lista wszystkich klientów Twojego salonu. Dodaj klientów ręcznie lub..."
-- Usługi: "Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami..."
-- Pracownicy: "Dodaj członków zespołu, przypisz im usługi i godziny pracy..."
-- Ustawienia: "Skonfiguruj branding salonu, powiadomienia i integracje..."
-- Widgety: "Skopiuj widget rezerwacji i osadź na swojej stronie..."
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-## Zmiany w plikach
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-1. **`src/components/admin/GuidedTour.tsx`** — nowy komponent (rozbudowana wersja demo GuidedTour), z pełnymi polskimi opisami, voice guidance, info o ograniczeniach per sekcja
-2. **`src/components/admin/SetupChecklist.tsx`** — nowy widget z postępem konfiguracji, query do bazy
-3. **`src/components/admin/DashboardHome.tsx`** — usunąć wszystkie mock data, zastąpić zapytaniami Supabase po `salon_id`, dodać empty states + checklist
-4. **`src/pages/AdminDashboard.tsx`** — zintegrować GuidedTour (auto-start po onboardingu + przycisk re-start w headerze)
-5. **`src/components/admin/ScheduleManagement.tsx`** — dodać VideoTutorialCard na górze
-6. **`src/components/admin/ClientsManagement.tsx`** — dodać VideoTutorialCard
-7. **`src/components/admin/ServicesManagement.tsx`** — dodać VideoTutorialCard
-8. **`src/components/admin/StaffManagement.tsx`** — dodać VideoTutorialCard
-9. **`src/components/admin/settings/SettingsModule.tsx`** — dodać VideoTutorialCard
-10. **`src/components/admin/widgets/WidgetsManagement.tsx`** — dodać VideoTutorialCard
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-## Kolejność implementacji
+#### FAZA 3: Indywidualne kokpity
 
-1. Czyste dane w DashboardHome (usunięcie mocków → real queries + empty states)
-2. Setup Checklist widget
-3. Guided Tour w admin panelu z voice guidance
-4. VideoTutorialCard w każdej sekcji
-5. Przycisk "Uruchom samouczek" w sidebarze
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
