@@ -72,7 +72,7 @@ export default function DemoPage() {
     const content = (() => {
       switch (activeTab) {
         case "home":
-          return <DashboardHome />;
+          return <DashboardHome isDemo={true} />;
         case "calendar":
           return <ScheduleManagement />;
         case "widgets":
