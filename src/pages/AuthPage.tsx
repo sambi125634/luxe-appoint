@@ -40,7 +40,8 @@ async function resolveRedirect(userId: string): Promise<string> {
     console.error("Error resolving redirect:", err);
   }
 
-  return "/admin";
+  // No role found = new user, send to onboarding
+  return "/onboarding";
 }
 
 export default function AuthPage() {

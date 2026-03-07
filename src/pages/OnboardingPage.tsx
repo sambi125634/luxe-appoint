@@ -9,6 +9,8 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2, Building2, Clock, Scissors, Users, CheckCircle2, ArrowRight, ArrowLeft, Copy, ExternalLink } from "lucide-react";
+import { VoiceGuidanceButton } from "@/components/admin/VoiceGuidanceButton";
+import { VideoTutorialPlaceholder } from "@/components/admin/VideoTutorialPlaceholder";
 
 const STEPS = [
   { title: "Dane salonu", icon: Building2 },
@@ -17,6 +19,14 @@ const STEPS = [
   { title: "Pracownicy", icon: Users },
   { title: "Podsumowanie", icon: CheckCircle2 },
 ];
+
+const VOICE_SCRIPTS: Record<number, string> = {
+  0: "Witaj w Beauty Calendar! Zacznijmy od podstaw. Wpisz nazwę swojego salonu, adres, miasto i dane kontaktowe. Te informacje będą widoczne dla Twoich klientów na stronie rezerwacji. Nazwa salonu jest wymagana — reszta jest opcjonalna, ale warto uzupełnić wszystko od razu.",
+  1: "Teraz ustawmy Twoje godziny pracy. Domyślnie ustawiliśmy standardowe godziny od poniedziałku do soboty. Możesz je dowolnie zmienić — wystarczy kliknąć checkbox przy danym dniu, aby go włączyć lub wyłączyć, oraz ustawić godziny otwarcia i zamknięcia.",
+  2: "Wybierz branżę najbliższą Twojemu salonowi — kosmetyka, fryzjerstwo lub medycyna estetyczna. System automatycznie zaproponuje listę popularnych usług z cenami i czasem trwania. Możesz wybrać kategorie, które Cię interesują. Ceny i nazwy usług będziesz mogła edytować później w panelu.",
+  3: "Jeśli masz zespół, dodaj pracowników. Wpisz imię i nazwisko oraz opcjonalnie email. Jeśli pracujesz sama — po prostu pomiń ten krok. Pracowników możesz dodać lub edytować w dowolnym momencie w panelu administracyjnym.",
+  4: "Gratulacje! Twój salon jest gotowy do przyjmowania rezerwacji. Skopiuj link do rezerwacji i udostępnij go swoim klientom — na Instagramie, Facebooku, w Google Maps lub na swojej stronie internetowej. Możesz też skopiować kod embed, aby osadzić widget rezerwacji bezpośrednio na swojej stronie.",
+};
 
 const DEFAULT_HOURS = [
   { day: 1, label: "Poniedziałek", start: "09:00", end: "18:00", working: true },
@@ -89,6 +99,14 @@ function generateSlug(name: string): string {
     .slice(0, 50) || "salon";
 }
 
+const STEP_DESCRIPTIONS = [
+  "Podstawowe informacje o Twoim salonie — to zobaczy każdy klient.",
+  "Ustaw typowe godziny pracy — możesz je zmienić w dowolnym momencie.",
+  "Wybierz szablon usług lub dodaj własne — ceny i czas edytujesz później.",
+  "Dodaj pracowników (opcjonalne — możesz pominąć i dodać później).",
+  "Twój salon jest gotowy! Udostępnij link swoim klientom.",
+];
+
 export default function OnboardingPage() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
@@ -129,7 +147,6 @@ export default function OnboardingPage() {
     });
   }, [navigate]);
 
-  // Initialize selected categories when template changes
   useEffect(() => {
     const cats = SERVICE_TEMPLATES[selectedTemplate]?.map(c => c.category) ?? [];
     setSelectedCategories(cats);
@@ -141,7 +158,6 @@ export default function OnboardingPage() {
       return;
     }
     if (!userId) return;
-
     setSaving(true);
     const slug = generateSlug(salonName) + "-" + Date.now().toString(36);
 
@@ -177,7 +193,6 @@ export default function OnboardingPage() {
     if (!createdSalonId || !userId) return;
     setSaving(true);
 
-    // Create a default staff member (owner as stylist)
     const { data: staffMember, error: staffErr } = await supabase
       .from("staff_members")
       .insert({
@@ -196,7 +211,6 @@ export default function OnboardingPage() {
       return;
     }
 
-    // Insert working hours
     const hoursInsert = hours.map(h => ({
       staff_id: staffMember.id,
       day_of_week: h.day,
@@ -212,9 +226,7 @@ export default function OnboardingPage() {
       return;
     }
 
-    // Update onboarding step
     await supabase.from("salons").update({ onboarding_step: 2 }).eq("id", createdSalonId);
-
     setSaving(false);
     setStep(2);
   };
@@ -248,7 +260,6 @@ export default function OnboardingPage() {
     }
 
     await supabase.from("salons").update({ onboarding_step: 3 }).eq("id", createdSalonId);
-
     setSaving(false);
     setStep(3);
   };
@@ -266,7 +277,6 @@ export default function OnboardingPage() {
     }
 
     await supabase.from("salons").update({ onboarding_step: 4 }).eq("id", createdSalonId);
-
     setSaving(false);
     setStep(4);
   };
@@ -333,17 +343,26 @@ export default function OnboardingPage() {
           })}
         </div>
 
+        {/* Voice guidance + Video placeholder */}
+        <div className="mb-6 space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-card border border-border/50 rounded-xl">
+            <div className="flex-1">
+              <p className="text-sm font-medium text-foreground mb-1">💡 {STEP_DESCRIPTIONS[step]}</p>
+              <p className="text-xs text-muted-foreground">Kliknij przycisk, aby odsłuchać szczegółowe wyjaśnienie.</p>
+            </div>
+            <VoiceGuidanceButton text={VOICE_SCRIPTS[step]} label="Posłuchaj" />
+          </div>
+          <VideoTutorialPlaceholder
+            title={`Tutorial: ${STEPS[step].title}`}
+            description="Wkrótce pojawi się tu wideo z instrukcją krok po kroku."
+          />
+        </div>
+
         {/* Step content */}
         <Card className="border-border/50 shadow-lg">
           <CardHeader>
             <CardTitle className="font-serif">{STEPS[step].title}</CardTitle>
-            <CardDescription>
-              {step === 0 && "Podstawowe informacje o Twoim salonie"}
-              {step === 1 && "Ustaw typowe godziny pracy"}
-              {step === 2 && "Wybierz szablon usług lub dodaj własne"}
-              {step === 3 && "Dodaj pracowników (opcjonalne — możesz pominąć)"}
-              {step === 4 && "Twój salon jest gotowy!"}
-            </CardDescription>
+            <CardDescription>{STEP_DESCRIPTIONS[step]}</CardDescription>
           </CardHeader>
           <CardContent>
             {/* Step 0: Salon data */}

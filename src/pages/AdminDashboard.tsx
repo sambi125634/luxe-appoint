@@ -27,7 +27,14 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const { role, salonName, isLoading: roleLoading } = useUserRole();
+  const { role, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
+
+  // Guard: redirect to onboarding if not completed
+  useEffect(() => {
+    if (!roleLoading && role === "salon_owner" && !onboardingCompleted) {
+      navigate("/onboarding");
+    }
+  }, [roleLoading, role, onboardingCompleted, navigate]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
