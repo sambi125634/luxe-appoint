@@ -51,7 +51,6 @@ export function useCreateService() {
       duration: number;
       price: number;
       description?: string;
-      media?: unknown;
     }) => {
       const { data, error } = await supabase
         .from("services")
@@ -80,7 +79,6 @@ export function useUpdateService() {
       duration?: number;
       price?: number;
       description?: string;
-      media?: unknown;
     }) => {
       const { data, error } = await supabase
         .from("services")
