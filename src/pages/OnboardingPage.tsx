@@ -187,6 +187,31 @@ export default function OnboardingPage() {
     }
     if (!userId) return;
     setSaving(true);
+
+    // If we already have a salon (resuming), update it
+    if (createdSalonId) {
+      const { error } = await supabase
+        .from("salons")
+        .update({
+          name: salonName.trim(),
+          address: salonAddress.trim() || null,
+          city: salonCity.trim() || null,
+          phone: salonPhone.trim() || null,
+          email: salonEmail.trim() || null,
+          onboarding_step: 1,
+        })
+        .eq("id", createdSalonId);
+
+      if (error) {
+        toast.error("Nie udało się zaktualizować salonu: " + error.message);
+        setSaving(false);
+        return;
+      }
+      setSaving(false);
+      setStep(1);
+      return;
+    }
+
     const slug = generateSlug(salonName) + "-" + Date.now().toString(36);
 
     const { data: salon, error } = await supabase
