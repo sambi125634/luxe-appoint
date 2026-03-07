@@ -1,101 +1,68 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+## Problem
 
-### Co już mamy
+Po rejestracji nowego użytkownika na `/auth`, brakuje mu roli w `user_roles` → `resolveRedirect()` kieruje go na `/admin` (fallback, linia 43) → widzi panel demo z mockowymi danymi zamiast czystego konta z onboardingiem.
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+## Plan implementacji
 
-### Problem do rozwiązania
+### Etap 1: Naprawić flow po rejestracji — czyste konto
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+**Baza danych (migracja):**
+- Trigger na `auth.users` INSERT → automatycznie dodaje `salon_owner` do `user_roles` dla nowych użytkowników
 
----
+**Uwaga:** Aktualnie `handle_new_user()` tworzy profil, ale NIE dodaje roli. Dodamy osobny trigger lub rozszerzymy istniejący, aby nowy user automatycznie dostał rolę `salon_owner` i był kierowany na `/onboarding`.
 
-### Plan implementacji
+**Alternatywnie (bezpieczniej):** Zmienić `resolveRedirect()` w AuthPage — jeśli brak roli, traktować jak nowego salon_owner → redirect na `/onboarding`.
 
-#### FAZA 1: Role-based routing po loginie
+**AdminDashboard.tsx:**
+- Sprawdzić `onboardingCompleted` z `useUserRole()` — jeśli false, redirect na `/onboarding`
+- Upewnić się, że panel wyświetla TYLKO dane z Supabase (filtrowane przez `salon_id`), a nie mockowe
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### Etap 2: Voice-guided onboarding z ElevenLabs
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+**Connector ElevenLabs:**
+- Połączymy ElevenLabs connector dla generowania voice tutorials w języku polskim
+- Edge function `elevenlabs-tts` do generowania audio z tekstu PL
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+**Zmodyfikowany OnboardingPage (`/onboarding`):**
+- Każdy z 5 kroków dostaje:
+  1. **Przycisk "Odtwórz wyjaśnienie"** — generuje/odtwarza voice tutorial (ElevenLabs TTS, polski)
+  2. **Placeholder na wideo** — pusty komponent `VideoTutorialPlaceholder` z ikoną Play i tekstem "Wkrótce wideo tutorial" — do późniejszego uzupełnienia
+  3. **Tekst pomocniczy** — krótkie, zrozumiałe instrukcje po polsku
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+**Treści voice tutorials (po polsku, per krok):**
+1. Dane salonu — "Witaj w Beauty Calendar! Zacznijmy od podstaw..."
+2. Godziny pracy — "Teraz ustawmy Twoje godziny pracy..."
+3. Usługi — "Wybierz branżę najbliższą Twojemu salonowi..."
+4. Pracownicy — "Jeśli masz zespół, dodaj pracowników..."
+5. Podsumowanie — "Gratulacje! Twój salon jest gotowy..."
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### Etap 3: Video tutorial placeholdery w panelu admin
 
-#### FAZA 3: Indywidualne kokpity
+- W kluczowych sekcjach panelu (Dashboard, Kalendarz, Klienci, Usługi, Pracownicy, Ustawienia) dodać komponent `VideoTutorialCard` — placeholder z przyciskiem "Obejrzyj tutorial" (disabled/coming soon)
+- Każda sekcja będzie mieć również przycisk voice tutoriala (ElevenLabs)
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+### Etap 4: Czysty stan panelu po onboardingu
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+- Po przejściu onboardingu → redirect na `/admin`
+- Panel wyświetla dane z bazy (które user właśnie wprowadził w onboardingu)
+- Brak mockowych danych — tylko realne dane z RLS-filtrowanego zapytania
+- Widoczne: nazwa salonu w sidebarze, "Twój link do rezerwacji", progress/checklista co jeszcze warto skonfigurować
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+## Wymagania techniczne
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+1. **ElevenLabs connector** — wymaga połączenia (klucz API)
+2. **Edge function** `elevenlabs-tts` — generuje audio po polsku
+3. **Nowy komponent** `VideoTutorialPlaceholder` — reużywalny w onboardingu i panelu
+4. **Nowy komponent** `VoiceGuidanceButton` — przycisk z ikoną głośnika, odtwarza TTS
+5. **Modyfikacja** `resolveRedirect()` — brak roli = nowy user → `/onboarding`
+6. **Modyfikacja** `AdminDashboard` — guard na `onboardingCompleted`
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+## Kolejność
 
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+1. Fix routing (brak roli → onboarding) + guard w AdminDashboard
+2. Połączenie ElevenLabs + edge function TTS
+3. Rozbudowa OnboardingPage o voice guidance + video placeholdery
+4. Dodanie video/voice placeholderów w sekcjach panelu admin
 
