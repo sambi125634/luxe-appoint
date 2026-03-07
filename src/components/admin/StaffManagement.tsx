@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 
 interface StaffMember {
   id: string;
@@ -188,6 +189,10 @@ export function StaffManagement() {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak zarządzać zespołem"
+        voiceText="Dodaj członków zespołu, przypisz im usługi i ustaw godziny pracy. Każdy pracownik ma swój kolor w kalendarzu. Jeśli pracujesz sama, dodaj siebie jako jedynego pracownika — to konieczne, żeby kalendarz działał."
+      />
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-serif font-semibold">{t('staff.title')} ({staff.length})</h3>

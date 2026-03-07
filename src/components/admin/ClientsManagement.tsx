@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ClientRiskBadge } from "./ClientRiskBadge";
 import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup } from "./clients";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 
 interface Visit {
   id: string;
@@ -394,6 +395,10 @@ export function ClientsManagement() {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak zarządzać bazą klientów"
+        voiceText="Tu zarządzasz bazą klientów. Możesz dodać klientów ręcznie, importować z pliku CSV, lub poczekać — system automatycznie tworzy profil klienta przy pierwszej rezerwacji online. Widzisz historię wizyt, notatki, tagi i ocenę ryzyka odejścia."
+      />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

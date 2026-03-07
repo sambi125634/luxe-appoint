@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { ServiceMediaUpload, MediaFile } from "./ServiceMediaUpload";
 import { CSVImport } from "./CSVImport";
+import { VideoTutorialCard } from "./VideoTutorialCard";
 
 interface Service {
   id: string;
@@ -160,6 +161,10 @@ export function ServicesManagement() {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak zarządzać usługami"
+        voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki. Bez usług klientki nie będą mogły rezerwować wizyt."
+      />
       {/* Categories */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
