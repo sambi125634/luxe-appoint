@@ -87,8 +87,8 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
         .lte("start_time", weekEnd)
         .neq("status", "cancelled");
       
-      const prevWeekStart = subWeek(new Date(weekStart), 1).toISOString();
-      const prevWeekEnd = subWeek(new Date(weekEnd), 1).toISOString();
+      const prevWeekStart = subWeeks(new Date(weekStart), 1).toISOString();
+      const prevWeekEnd = subWeeks(new Date(weekEnd), 1).toISOString();
       const { count: bookedPrev } = await supabase
         .from("appointments")
         .select("*", { count: "exact", head: true })
@@ -114,8 +114,8 @@ export function DashboardHome({ onNavigate }: DashboardHomeProps) {
         .gte("start_time", monthStart)
         .lte("start_time", monthEnd);
 
-      const prevMonthStart = startOfMonth(subMonth(today, 1)).toISOString();
-      const prevMonthEnd = endOfMonth(subMonth(today, 1)).toISOString();
+      const prevMonthStart = startOfMonth(subMonths(today, 1)).toISOString();
+      const prevMonthEnd = endOfMonth(subMonths(today, 1)).toISOString();
       const { count: prevNoShows } = await supabase
         .from("appointments")
         .select("*", { count: "exact", head: true })
