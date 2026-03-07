@@ -76,6 +76,12 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
           {/* CTA + Language Switcher */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
+            <a
+              href="https://admin.beauty-funnels.com/auth"
+              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+            >
+              Panel klienta
+            </a>
             <Button 
               onClick={onScrollToForm}
               className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white"
@@ -124,6 +130,12 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               >
                 {t("nav.faq")}
               </button>
+              <a
+                href="https://admin.beauty-funnels.com/auth"
+                className="text-left text-muted-foreground hover:text-foreground py-2 font-medium"
+              >
+                Panel klienta
+              </a>
               <Button 
                 onClick={() => {
                   onScrollToForm();
