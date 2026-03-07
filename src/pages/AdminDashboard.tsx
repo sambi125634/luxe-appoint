@@ -29,6 +29,7 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
   const { role, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
+  const { showTour, setShowTour, restartTour } = useAdminTourState();
 
   // Guard: redirect to onboarding if not completed
   useEffect(() => {
