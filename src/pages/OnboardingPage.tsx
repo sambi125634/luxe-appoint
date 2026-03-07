@@ -136,13 +136,41 @@ export default function OnboardingPage() {
   const [newStaffEmail, setNewStaffEmail] = useState("");
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         navigate("/auth");
-      } else {
-        setUserId(session.user.id);
-        setSalonEmail(session.user.email ?? "");
+        setCheckingAuth(false);
+        return;
       }
+
+      const uid = session.user.id;
+      setUserId(uid);
+      setSalonEmail(session.user.email ?? "");
+
+      // Check if user already has a salon
+      const { data: existingSalon } = await supabase
+        .from("salons")
+        .select("id, slug, name, address, city, phone, email, onboarding_completed, onboarding_step")
+        .eq("owner_id", uid)
+        .maybeSingle();
+
+      if (existingSalon?.onboarding_completed) {
+        navigate("/admin");
+        return;
+      }
+
+      if (existingSalon) {
+        // Resume onboarding from saved step
+        setCreatedSalonId(existingSalon.id);
+        setCreatedSlug(existingSalon.slug);
+        setSalonName(existingSalon.name ?? "");
+        setSalonAddress(existingSalon.address ?? "");
+        setSalonCity(existingSalon.city ?? "");
+        setSalonPhone(existingSalon.phone ?? "");
+        setSalonEmail(existingSalon.email ?? session.user.email ?? "");
+        setStep(existingSalon.onboarding_step ?? 0);
+      }
+
       setCheckingAuth(false);
     });
   }, [navigate]);
