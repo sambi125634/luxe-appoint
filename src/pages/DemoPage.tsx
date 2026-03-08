@@ -76,7 +76,7 @@ export default function DemoPage() {
         case "calendar":
           return <ScheduleManagement isDemo={true} />;
         case "widgets":
-          return <WidgetsManagement />;
+          return <WidgetsManagement isDemo={true} />;
         case "clients":
           return <ClientsManagement isDemo={true} />;
         case "services":
