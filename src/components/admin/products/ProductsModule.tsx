@@ -8,6 +8,7 @@ import { DeliveriesManagement } from "./DeliveriesManagement";
 import { ProductSalesReport } from "./ProductSalesReport";
 import { SuppliersManagement } from "./SuppliersManagement";
 import { useSalonId } from "@/hooks/useSalonId";
+import { VideoTutorialCard } from "../VideoTutorialCard";
 import type { ProductTab } from "./types";
 
 // Demo salon ID for mock data
