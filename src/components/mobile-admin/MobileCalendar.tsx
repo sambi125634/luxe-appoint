@@ -233,8 +233,8 @@ export function MobileCalendar() {
                             </p>
                             <p className="text-xs text-muted-foreground truncate">{service?.name}</p>
                             <div className="flex items-center gap-3 mt-1.5">
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <User className="w-3 h-3" /> {staff?.name}
+                              <span className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                                <User className="w-3 h-3 shrink-0" /> <span className="truncate">{staff?.name}</span>
                               </span>
                               {appt.price && (
                                 <span className="text-xs font-bold">{appt.price} zł</span>

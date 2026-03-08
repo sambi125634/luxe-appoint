@@ -169,7 +169,7 @@ export function MobileNotifications() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className={cn("text-sm font-semibold", !isRead && "text-primary")}>
+                      <p className={cn("text-sm font-semibold truncate", !isRead && "text-primary")}>
                         {n.title}
                       </p>
                       {!isRead && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}

@@ -350,7 +350,7 @@ export function MobileDashboard() {
                 <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", action.color)}>
                   <action.icon className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-medium">{action.label}</span>
+                <span className="text-sm font-medium truncate">{action.label}</span>
               </CardContent>
             </Card>
           ))}
