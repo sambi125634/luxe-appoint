@@ -32,6 +32,11 @@ export function ProductsModule() {
 
   return (
     <div className="space-y-6">
+    <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak zarządzać produktami"
+        voiceText="Moduł produktów pozwala zarządzać katalogiem produktów do sprzedaży w salonie, kontrolować stany magazynowe, rejestrować dostawy od dostawców i śledzić raporty sprzedaży. Zacznij od dodania produktów w zakładce Katalog."
+      />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ProductTab)}>
         <TabsList className="bg-muted/50 p-1 h-auto flex-wrap">
           {tabs.map((tab) => (
