@@ -196,17 +196,17 @@ export function MobileDashboard() {
             color: (noShows ?? 0) > 0 ? "text-destructive" : "text-muted-foreground",
           },
         ].map((kpi, i) => (
-          <Card key={i} className="min-w-[140px] flex-shrink-0 active:scale-[0.97] transition-transform">
-            <CardContent className="p-3">
+          <Card key={i} className="min-w-[130px] flex-shrink-0 active:scale-[0.97] transition-transform">
+            <CardContent className="p-3 overflow-hidden">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-muted-foreground font-medium">{kpi.label}</span>
-                <kpi.icon className={cn("w-3.5 h-3.5", kpi.color)} />
+                <span className="text-[11px] text-muted-foreground font-medium truncate">{kpi.label}</span>
+                <kpi.icon className={cn("w-3.5 h-3.5 shrink-0", kpi.color)} />
               </div>
-              <p className="text-xl font-bold font-serif">{kpi.value}</p>
-              <div className="flex items-center gap-1 mt-0.5">
-                {kpi.trend === "up" && <ArrowUpRight className="w-3 h-3 text-emerald-500" />}
-                {kpi.trend === "down" && <ArrowDownRight className="w-3 h-3 text-destructive" />}
-                <span className="text-[10px] text-muted-foreground">{kpi.sub}</span>
+              <p className="text-xl font-bold font-serif truncate">{kpi.value}</p>
+              <div className="flex items-center gap-1 mt-0.5 min-w-0">
+                {kpi.trend === "up" && <ArrowUpRight className="w-3 h-3 text-emerald-500 shrink-0" />}
+                {kpi.trend === "down" && <ArrowDownRight className="w-3 h-3 text-destructive shrink-0" />}
+                <span className="text-[10px] text-muted-foreground truncate">{kpi.sub}</span>
               </div>
             </CardContent>
           </Card>
