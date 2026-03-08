@@ -450,6 +450,7 @@ export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
           )}
         </div>
       </div>
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
