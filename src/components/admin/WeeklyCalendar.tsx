@@ -25,7 +25,7 @@ const mockAppointments: Appointment[] = [
   { id: "5", time: "16:00", duration: 45, client: "Agnieszka Lewandowska", service: "Depilacja laserowa", staff: "Maria N.", staffId: "1", status: "confirmed" },
 ];
 
-const staff = [
+const mockStaff = [
   { id: "1", name: "Maria N.", color: "bg-primary" },
   { id: "2", name: "Karolina W.", color: "bg-secondary" },
   { id: "3", name: "Joanna L.", color: "bg-accent" },
