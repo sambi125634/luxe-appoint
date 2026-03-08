@@ -123,7 +123,11 @@ const serviceCategories = [
 
 type TimePeriod = "daily" | "weekly" | "monthly";
 
-export function StatsModule() {
+interface StatsModuleProps {
+  isDemo?: boolean;
+}
+
+export function StatsModule({ isDemo = false }: StatsModuleProps) {
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("weekly");
 
   const currentRevenue = revenueData[timePeriod];
