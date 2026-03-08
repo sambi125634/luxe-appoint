@@ -314,7 +314,7 @@ export function AppointmentModal({
                 <SelectValue placeholder={t('appointment.selectService')} />
               </SelectTrigger>
               <SelectContent>
-                {mockServices.map(service => (
+                {services.map(service => (
                   <SelectItem key={service.id} value={service.id}>
                     <div className="flex items-center justify-between w-full gap-4">
                       <span>{service.name}</span>
