@@ -58,12 +58,14 @@ const roleLabels: Record<AppRole, string> = {
   super_admin: "Super Admin",
   salon_owner: "Właściciel salonu",
   staff: "Pracownik",
+  client: "Klient",
 };
 
 const roleColors: Record<AppRole, string> = {
   super_admin: "bg-destructive/10 text-destructive border-destructive/20",
   salon_owner: "bg-purple-500/10 text-purple-500 border-purple-500/20",
   staff: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+  client: "bg-green-500/10 text-green-500 border-green-500/20",
 };
 
 export function UsersManagement() {

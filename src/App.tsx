@@ -13,6 +13,8 @@ import DemoPage from "./pages/DemoPage";
 import InstagramLanding from "./pages/InstagramLanding";
 import OnboardingPage from "./pages/OnboardingPage";
 import InstallPage from "./pages/InstallPage";
+import ClientApp from "./pages/ClientApp";
+import JoinSalonPage from "./pages/JoinSalonPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -60,10 +62,14 @@ const App = () => {
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             
+            {/* Client app routes */}
+            <Route path="/app/*" element={<ClientApp />} />
+            
             {/* Booking routes (marketing domain) */}
             <Route path="/book/:slug" element={<BookingPage />} />
             <Route path="/s/:slug" element={<BookingPage />} />
             <Route path="/i/:slug" element={<InstagramLanding />} />
+            <Route path="/join/:slug" element={<JoinSalonPage />} />
             <Route path="/install" element={<InstallPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
