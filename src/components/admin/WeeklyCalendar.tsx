@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, Plus, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Clock, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AppointmentModal } from "./AppointmentModal";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface Appointment {
   id: string;
@@ -24,7 +25,7 @@ const mockAppointments: Appointment[] = [
   { id: "5", time: "16:00", duration: 45, client: "Agnieszka Lewandowska", service: "Depilacja laserowa", staff: "Maria N.", staffId: "1", status: "confirmed" },
 ];
 
-const staff = [
+const mockStaff = [
   { id: "1", name: "Maria N.", color: "bg-primary" },
   { id: "2", name: "Karolina W.", color: "bg-secondary" },
   { id: "3", name: "Joanna L.", color: "bg-accent" },
@@ -40,12 +41,23 @@ interface WeeklyCalendarProps {
 
 export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalendarProps) {
   const { t, i18n } = useTranslation();
+  const { data: dbStaff } = useStaffMembers();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(isDemo ? mockAppointments : []);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ date: Date; time: string } | null>(null);
+
+  // Use real staff from DB in production, mock in demo
+  const staffColors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1", "bg-chart-2", "bg-chart-3"];
+  const staff = isDemo
+    ? mockStaff
+    : (dbStaff || []).map((s, i) => ({
+        id: s.id,
+        name: s.name.split(" ").map(n => n[0] + ".").join(" ").replace(/\.\.$/, s.name.split(" ").pop()?.charAt(0) + ".") || s.name,
+        color: staffColors[i % staffColors.length],
+      }));
 
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
@@ -148,6 +160,23 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     const today = new Date();
     return date.toDateString() === today.toDateString();
   };
+
+  // Empty state for production with no staff
+  if (!isDemo && staff.length === 0) {
+    return (
+      <div className="glass-card p-12 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <CalendarDays className="w-8 h-8 text-primary" />
+          </div>
+          <h3 className="font-serif text-xl font-semibold mb-2">Kalendarz jest pusty</h3>
+          <p className="text-muted-foreground text-sm">
+            Aby korzystać z kalendarza, najpierw dodaj pracowników i ustaw ich godziny pracy w sekcji Pracownicy.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="glass-card p-6">
@@ -262,6 +291,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveAppointment}
+        isDemo={isDemo}
         appointment={editingAppointment ? {
           id: editingAppointment.id,
           clientId: "",

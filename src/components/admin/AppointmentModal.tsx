@@ -11,6 +11,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { ProductSaleSection, type CartItem } from "./products/ProductSaleSection";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useClients } from "@/hooks/useClients";
+import { useServices } from "@/hooks/useServices";
 
 interface Client {
   id: string;
@@ -54,6 +57,7 @@ interface AppointmentModalProps {
   appointment?: Appointment | null;
   selectedDate?: Date;
   selectedTime?: string;
+  isDemo?: boolean;
 }
 
 const mockClients: Client[] = [
@@ -92,9 +96,43 @@ export function AppointmentModal({
   onSave, 
   appointment,
   selectedDate,
-  selectedTime 
+  selectedTime,
+  isDemo = false
 }: AppointmentModalProps) {
   const { t } = useTranslation();
+
+  // Real data from DB for production mode
+  const { data: dbStaff } = useStaffMembers();
+  const { data: dbClients } = useClients();
+  const { data: dbServices } = useServices();
+
+  // Use real or mock data
+  const staffColors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1"];
+  const clients: Client[] = isDemo
+    ? mockClients
+    : (dbClients || []).map((c) => ({
+        id: c.id,
+        name: `${c.first_name} ${c.last_name}`,
+        phone: c.phone,
+        email: c.email || "",
+      }));
+
+  const services: Service[] = isDemo
+    ? mockServices
+    : (dbServices || []).map((s) => ({
+        id: s.id,
+        name: s.name,
+        duration: s.duration,
+        price: Number(s.price),
+      }));
+
+  const staffMembers: Staff[] = isDemo
+    ? mockStaff
+    : (dbStaff || []).map((s, i) => ({
+        id: s.id,
+        name: s.name,
+        color: staffColors[i % staffColors.length],
+      }));
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
@@ -146,7 +184,7 @@ export function AppointmentModal({
     setShowProducts(false);
   }, [appointment, selectedDate, selectedTime, isOpen]);
 
-  const filteredClients = mockClients.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
     client.phone.includes(clientSearch) ||
     client.email.toLowerCase().includes(clientSearch.toLowerCase())
@@ -175,15 +213,15 @@ export function AppointmentModal({
     setShowClientDropdown(false);
   };
 
-  const selectedService = mockServices.find(s => s.id === form.serviceId);
-  const selectedStaff = mockStaff.find(s => s.id === form.staffId);
+  const selectedService = services.find(s => s.id === form.serviceId);
+  const selectedStaff = staffMembers.find(s => s.id === form.staffId);
 
   const handleSave = () => {
     if (!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)) return;
     
     onSave({
       clientId: form.clientId || "new",
-      clientName: isNewClient ? form.clientName : mockClients.find(c => c.id === form.clientId)?.name || "",
+      clientName: isNewClient ? form.clientName : clients.find(c => c.id === form.clientId)?.name || "",
       serviceId: form.serviceId,
       serviceName: selectedService?.name || "",
       staffId: form.staffId,
@@ -276,7 +314,7 @@ export function AppointmentModal({
                 <SelectValue placeholder={t('appointment.selectService')} />
               </SelectTrigger>
               <SelectContent>
-                {mockServices.map(service => (
+                {services.map(service => (
                   <SelectItem key={service.id} value={service.id}>
                     <div className="flex items-center justify-between w-full gap-4">
                       <span>{service.name}</span>
@@ -297,7 +335,7 @@ export function AppointmentModal({
               {t('appointment.specialist')}
             </Label>
             <div className="grid grid-cols-2 gap-2">
-              {mockStaff.map(staff => (
+              {staffMembers.map(staff => (
                 <button
                   key={staff.id}
                   type="button"

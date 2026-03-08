@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   Kanban,
   BarChart3,
-  GitBranch
+  GitBranch,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PipelineColumn } from "./PipelineColumn";
 import { ContactDetailModal } from "./ContactDetailModal";
 import { PipelineReports } from "./PipelineReports";
+import { VideoTutorialCard } from "../VideoTutorialCard";
 import {
   PipelineContact,
   defaultPipelineStages,
@@ -165,15 +167,25 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   // Empty state for production mode
   if (!isDemo && contacts.length === 0) {
     return (
-      <div className="glass-card p-12 flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-            <GitBranch className="w-8 h-8 text-primary" />
+      <div className="space-y-6">
+        <VideoTutorialCard
+          title="Jak działa pipeline sprzedażowy"
+          voiceText="Pipeline to narzędzie do śledzenia ścieżki klientki od pierwszej rezerwacji do zakończenia pakietu zabiegów. Klientki automatycznie przechodzą przez etapy: rezerwacja, pierwsza wizyta, kolejne wizyty, zakończenie. Wymaga integracji z platformą CRM."
+        />
+        <div className="glass-card p-12 flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <GitBranch className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="font-serif text-xl font-semibold mb-2">Pipeline wymaga konfiguracji</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Pipeline sprzedażowy automatycznie śledzi postęp klientek przez etapy zabiegów. Skonfiguruj integrację CRM w ustawieniach, aby aktywować ten moduł.
+            </p>
+            <Button variant="outline" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Przejdź do Ustawień → Integracje
+            </Button>
           </div>
-          <h3 className="font-serif text-xl font-semibold mb-2">Brak kontaktów w pipeline</h3>
-          <p className="text-muted-foreground text-sm">
-            Pipeline sprzedażowy będzie automatycznie wypełniany danymi klientów, którzy zarezerwują pakiety zabiegów w Twoim salonie.
-          </p>
         </div>
       </div>
     );
