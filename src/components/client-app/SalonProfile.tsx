@@ -88,7 +88,7 @@ export function SalonProfile() {
             <ArrowLeft className="h-4 w-4 mr-2" /> Wróć do profilu
           </Button>
         </div>
-        <BookingWidget salonId={salon.id} salonSlug={salon.slug} />
+        <BookingWidget />
       </div>
     );
   }
