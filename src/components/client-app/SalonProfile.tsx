@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, MapPin, Phone, Mail, Clock, Heart } from "lucide-react";
@@ -10,10 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { useState } from "react";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function SalonProfile() {
   const { salonId } = useParams<{ salonId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [showBooking, setShowBooking] = useState(false);
 
   const { data: salon, isLoading } = useQuery({
@@ -62,6 +65,40 @@ export function SalonProfile() {
     enabled: !!salonId,
   });
 
+  const { data: favoriteLink } = useQuery({
+    queryKey: ["client-salon-fav", salonId],
+    queryFn: async () => {
+      if (!salonId) return null;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data } = await supabase
+        .from("client_salon_links")
+        .select("id, is_favorite")
+        .eq("user_id", user.id)
+        .eq("salon_id", salonId)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!salonId,
+  });
+
+  const toggleFavorite = useMutation({
+    mutationFn: async () => {
+      if (!favoriteLink) return;
+      const { error } = await supabase
+        .from("client_salon_links")
+        .update({ is_favorite: !favoriteLink.is_favorite })
+        .eq("id", favoriteLink.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client-salon-fav", salonId] });
+      queryClient.invalidateQueries({ queryKey: ["client-favorites"] });
+      queryClient.invalidateQueries({ queryKey: ["client-salons"] });
+      toast.success(favoriteLink?.is_favorite ? "Usunięto z ulubionych" : "Dodano do ulubionych");
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="px-4 pt-6 pb-24 space-y-4">
@@ -93,6 +130,8 @@ export function SalonProfile() {
     );
   }
 
+  const isFav = favoriteLink?.is_favorite ?? false;
+
   return (
     <div className="pb-24">
       {/* Header */}
@@ -110,6 +149,19 @@ export function SalonProfile() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
+
+        {/* Favorite button */}
+        {favoriteLink && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 bg-background/30 backdrop-blur-sm text-white hover:bg-background/50"
+            onClick={() => toggleFavorite.mutate()}
+          >
+            <Heart className={cn("h-5 w-5 transition-all", isFav && "fill-red-500 text-red-500")} />
+          </Button>
+        )}
+
         <div className="flex items-end gap-4">
           <Avatar className="h-16 w-16 rounded-xl border-2 border-background shadow-lg">
             <AvatarImage src={salon.logo_url ?? undefined} />
@@ -130,7 +182,10 @@ export function SalonProfile() {
 
       <div className="px-4 mt-4 space-y-4">
         {/* CTA */}
-        <Button className="w-full h-12 text-base font-semibold" onClick={() => setShowBooking(true)}>
+        <Button
+          className="w-full h-12 text-base font-semibold active:scale-[0.98] transition-transform"
+          onClick={() => setShowBooking(true)}
+        >
           Zarezerwuj wizytę
         </Button>
 
@@ -144,16 +199,16 @@ export function SalonProfile() {
               </p>
             )}
             {salon.phone && (
-              <p className="flex items-center gap-2 text-muted-foreground">
+              <a href={`tel:${salon.phone}`} className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
                 <Phone className="h-4 w-4 shrink-0" />
                 {salon.phone}
-              </p>
+              </a>
             )}
             {salon.email && (
-              <p className="flex items-center gap-2 text-muted-foreground">
+              <a href={`mailto:${salon.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-foreground">
                 <Mail className="h-4 w-4 shrink-0" />
                 {salon.email}
-              </p>
+              </a>
             )}
           </CardContent>
         </Card>
@@ -162,7 +217,7 @@ export function SalonProfile() {
         {staff && staff.length > 0 && (
           <div>
             <h2 className="text-lg font-semibold text-foreground mb-3">Nasz zespół</h2>
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <div className="flex gap-4 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
               {staff.map((member) => (
                 <div key={member.id} className="flex flex-col items-center min-w-[72px]">
                   <Avatar className="h-14 w-14 mb-1.5">
@@ -192,7 +247,7 @@ export function SalonProfile() {
               {services.map((service) => {
                 const category = service.service_categories as unknown as { name: string } | null;
                 return (
-                  <Card key={service.id} className="border-border/50">
+                  <Card key={service.id} className="border-border/50 active:scale-[0.98] transition-all duration-150">
                     <CardContent className="flex items-center justify-between p-3">
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-foreground text-sm truncate">

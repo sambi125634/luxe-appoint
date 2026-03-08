@@ -1,107 +1,101 @@
 
 
-# Plan: Podgląd aplikacji mobilnej + Przewodnik publikacji w App Store / Google Play
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Co mamy teraz
+### Co już mamy
 
-Aplikacja kliencka (`/app/*`) jest już zbudowana z 5 ekranami:
-- **Moje Salony** — lista przypisanych salonów
-- **Moje Wizyty** — nadchodzące + historia (tabs)
-- **Ulubione** — salony oznaczone jako ulubione
-- **Profil** — dane użytkownika, wylogowanie
-- **Profil Salonu** — szczegóły salonu z usługami, zespołem i przyciskiem rezerwacji
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-Dolna nawigacja (BottomTabBar) w stylu Booksy jest gotowa. Capacitor jest skonfigurowany (`capacitor.config.ts`).
+### Problem do rozwiązania
 
----
-
-## Co zrobimy
-
-### 1. Podgląd aplikacji mobilnej w przeglądarce
-
-Aby zobaczyć jak aplikacja wygląda na telefonie, wystarczy wejść na:
-
-**`/app`** w podglądzie (po zalogowaniu jako klient)
-
-Możesz to przetestować teraz — otwórz preview w nowym oknie, zmniejsz szerokość do ~390px (szerokość iPhone'a), zaloguj się i przejdź na `/app`.
-
-### 2. Przewodnik krok po kroku: Od kodu do App Store
-
-Oto dokładny plan co musisz zrobić, aby aplikacja trafiła na telefon:
-
-#### Krok 1: Export do GitHub (5 min)
-- W edytorze Lovable → Settings → GitHub → **Connect project**
-- Autoryzuj aplikację GitHub
-- Kliknij **Create Repository** — cały kod trafi na GitHub
-
-#### Krok 2: Konfiguracja lokalna (15 min)
-- Zainstaluj [Node.js](https://nodejs.org) na komputerze
-- Sklonuj repo: `git clone https://github.com/TWOJ-USER/REPO.git`
-- `cd REPO && npm install`
-
-#### Krok 3: Dodaj platformy natywne (5 min)
-```bash
-npx cap add ios        # dla iPhone (wymaga Mac + Xcode)
-npx cap add android    # dla Android (wymaga Android Studio)
-npm run build
-npx cap sync
-```
-
-#### Krok 4: Testuj na swoim telefonie (10 min)
-```bash
-npx cap run ios        # otwiera w Xcode → Run na symulatorze lub telefonie
-npx cap run android    # otwiera w Android Studio → Run
-```
-
-Dzięki konfiguracji `server.url` w `capacitor.config.ts`, aplikacja ładuje się z live preview — zmiany w Lovable są widoczne natychmiast na telefonie (hot reload).
-
-#### Krok 5: Publikacja w sklepach
-
-**Google Play Store:**
-1. Konto Google Play Developer — jednorazowa opłata $25
-2. W Android Studio: Build → Generate Signed Bundle (AAB)
-3. Google Play Console → Create App → Upload AAB → Fill listing → Submit for review
-4. Review trwa 1-3 dni
-
-**Apple App Store:**
-1. Konto Apple Developer — $99/rok
-2. Wymaga Mac z Xcode
-3. Xcode → Product → Archive → Upload to App Store Connect
-4. App Store Connect → Fill listing, screenshots → Submit for review
-5. Review trwa 1-7 dni
-
-### 3. Ulepszenia UI aplikacji klienckiej
-
-Przed publikacją warto dodać kilka elementów, które sprawią że aplikacja będzie bardziej "native-feel":
-
-- **Pull-to-refresh** na listach (MySalons, MyBookings)
-- **Splash screen** z logo Beauty Funnels przy starcie
-- **Haptic feedback** przy interakcjach (Capacitor Haptics plugin)
-- **Status bar** styling (ciemny/jasny w zależności od ekranu)
-- **Przycisk "Dodaj do ulubionych"** na profilu salonu (serduszko w headerze)
-- **Powiadomienia push** — przypomnienia o wizytach (Capacitor Push Notifications)
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
 ---
 
-## Podsumowanie kosztów
+### Plan implementacji
 
-| Pozycja | Koszt |
-|---|---|
-| Google Play Developer | $25 (jednorazowo) |
-| Apple Developer Program | $99/rok |
-| Mac (wymagany dla iOS) | Jeśli nie masz — alternatywnie: MacInCloud ~$30/mo |
-| **Łącznie na start** | **~$125** |
+#### FAZA 1: Role-based routing po loginie
+
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+
+#### FAZA 2: Onboarding wizard (`/onboarding`)
+
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+
+#### FAZA 3: Indywidualne kokpity
+
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
 
 ---
 
-## Kolejność działań
+### Wymagane zmiany w bazie danych
 
-1. **Teraz** — otwórz `/app` w preview, żeby zobaczyć jak wygląda aplikacja kliencka
-2. **Opcjonalnie** — ulepsz UI (pull-to-refresh, splash, ulubione)
-3. **Export** — połącz z GitHub
-4. **Build** — `npx cap add ios/android && npx cap sync`
-5. **Test** — `npx cap run` na swoim telefonie
-6. **Publish** — upload do Google Play / App Store
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
 
-Więcej szczegółów znajdziesz w oficjalnym poradniku: [Building a Mobile App with Lovable + Capacitor](https://lovable.dev/blog/lovable-mobile-app)
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
