@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MessageSquarePlus } from "lucide-react";
+import { MessageSquarePlus, Settings, ExternalLink } from "lucide-react";
 import { ContactsList } from "./ContactsList";
 import { ConversationView } from "./ConversationView";
 import { Contact, Conversation, Message } from "./types";
+import { VideoTutorialCard } from "../VideoTutorialCard";
+import { Button } from "@/components/ui/button";
 
 // Demo data - only shown in demo mode
 const DEMO_CONTACTS: Contact[] = [
