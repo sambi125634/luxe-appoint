@@ -213,8 +213,8 @@ export function AppointmentModal({
     setShowClientDropdown(false);
   };
 
-  const selectedService = mockServices.find(s => s.id === form.serviceId);
-  const selectedStaff = mockStaff.find(s => s.id === form.staffId);
+  const selectedService = services.find(s => s.id === form.serviceId);
+  const selectedStaff = staffMembers.find(s => s.id === form.staffId);
 
   const handleSave = () => {
     if (!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)) return;
