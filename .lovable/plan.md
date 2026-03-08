@@ -1,101 +1,136 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Strategia aplikacji mobilnej Beauty Funnels
 
-### Co już mamy
+## Rekomendacja: DWIE osobne aplikacje
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Booksy robi dokładnie to samo — ma **Booksy** (dla klientów) i **Booksy Biz** (dla właścicieli). To nie przypadek. Oto dlaczego dwie aplikacje są lepsze:
 
-### Problem do rozwiązania
+### Dlaczego NIE jedna aplikacja
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+| Problem jednej aplikacji | Wpływ |
+|---|---|
+| Mylący onboarding — "Jesteś klientem czy właścicielem?" | Wyższy bounce rate |
+| App Store listing — nie możesz targetować dwóch grup jednocześnie | Gorsze ASO (App Store Optimization) |
+| Recenzje mieszane — klienci oceniają UX rezerwacji, właściciele panel zarządzania | Niższa średnia ocena |
+| Rozmiar aplikacji — ładujesz moduły których 90% użytkowników nie potrzebuje | Wolniejsze ładowanie |
 
----
+### Dlaczego TAK dwie aplikacje
 
-### Plan implementacji
+- **Beauty Funnels** (klient) — lekka, szybka, focus na rezerwacji i relacji z salonem
+- **Beauty Funnels Business** (właściciel/staff) — pełny panel admin, kalendarz, księgowość
 
-#### FAZA 1: Role-based routing po loginie
-
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
-
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
-
-#### FAZA 2: Onboarding wizard (`/onboarding`)
-
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
-
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
-
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+Obie aplikacje korzystają z **tego samego backendu** i **tej samej bazy danych** — różnią się tylko frontendem.
 
 ---
 
-### Wymagane zmiany w bazie danych
+## Architektura techniczna
 
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+Obie aplikacje budujemy z **Capacitor** — wrapper natywny na istniejący React kod.
 
-### Nowe komponenty
+```text
+┌─────────────────────────────────────────────┐
+│              Shared Backend (Cloud)          │
+│  Auth · Database · Edge Functions · Storage  │
+└──────────────┬──────────────┬───────────────┘
+               │              │
+    ┌──────────▼──────┐  ┌───▼──────────────┐
+    │  Beauty Funnels  │  │  BF Business     │
+    │  (Client App)    │  │  (Owner App)     │
+    ├──────────────────┤  ├──────────────────┤
+    │ Capacitor + React│  │ Capacitor + React│
+    │                  │  │                  │
+    │ • Moje salony    │  │ • Dashboard      │
+    │ • Rezerwacja     │  │ • Kalendarz      │
+    │ • Historia wizyt │  │ • Klienci        │
+    │ • Ulubione       │  │ • Usługi         │
+    │ • Powiadomienia  │  │ • Księgowość     │
+    │ • Profil         │  │ • Widgety        │
+    │ • Rekomendacje   │  │ • Ustawienia     │
+    └──────────────────┘  └──────────────────┘
+```
 
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+---
 
-### Kolejność implementacji
+## Aplikacja kliencka — Beauty Funnels
 
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+### Jak klient trafia do aplikacji (NIE marketplace)
+
+1. **Kod referencyjny / link zaproszenia** — salon wysyła klientowi link `beautyfunnels.app/join/SALON_SLUG`
+2. **QR kod w salonie** — skanuje i automatycznie się przypisuje
+3. **Po rezerwacji online** — klient który zarezerwował przez widget dostaje zaproszenie do pobrania aplikacji
+
+Klient po zalogowaniu widzi TYLKO salony, do których został przypisany (przez tabelę `clients` z `salon_id`).
+
+### Ekrany aplikacji klienckiej
+
+1. **Moje Salony** — lista przypisanych salonów z logo, adresem, oceną
+2. **Profil salonu** — usługi z cenami, zdjęcia/wideo, opinie, pracownicy
+3. **Rezerwacja** — wybór usługi → pracownik → termin → potwierdzenie (reuse `BookingWidget`)
+4. **Moje wizyty** — nadchodzące + historia z opcją ponownej rezerwacji
+5. **Powiadomienia** — przypomnienia, promocje, follow-upy
+6. **Profil** — dane osobowe, preferencje, ulubione usługi
+
+### Inspiracja Booksy ale lepiej
+
+- Brak marketplace = brak konkurencji między salonami w jednej aplikacji
+- Salon ma 100% kontroli nad swoimi klientami (zero prowizji, zero "polecanych")
+- Klient widzi rekomendacje od SWOJEGO salonu, nie od platformy
+
+---
+
+## Aplikacja biznesowa — Beauty Funnels Business
+
+To w zasadzie **wrapper natywny na istniejący `/admin` panel** z kilkoma usprawnieniami:
+
+- Push notifications (Capacitor Push Notifications plugin)
+- Dostęp do kamery (skanowanie kodów, zdjęcia produktów)
+- Offline mode (cache ostatnich wizyt)
+- Biometric login (Face ID / Touch ID)
+
+Ponieważ panel admin jest już **w pełni responsywny**, wrapper Capacitor potrzebuje minimalnych zmian.
+
+---
+
+## Plan implementacji
+
+### Faza 1: Fundament kliencki (nowe ekrany w React)
+- Nowa rola `client` w `user_roles` (klient końcowy, nie salon owner)
+- Tabela `client_salon_links` — relacja klient↔salon (wiele salonów per klient)
+- Nowe strony React: `/app/salons`, `/app/salon/:id`, `/app/bookings`, `/app/profile`
+- Dedykowana nawigacja dolna (bottom tabs) w stylu Booksy
+- Reuse istniejącego `BookingWidget` jako komponentu rezerwacji
+
+### Faza 2: Capacitor setup dla obu aplikacji
+- Konfiguracja dwóch Capacitor projektów (client + business)
+- Routing: client app → `/app/*`, business app → `/admin/*`
+- Native plugins: Push Notifications, Camera, Biometrics
+- Build pipeline dla iOS + Android
+
+### Faza 3: App Store deployment
+- Ikony, splash screeny, opisy w PL i EN
+- Apple Developer Account + Google Play Console
+- Review process i submission
+
+---
+
+## Wymagane zmiany w bazie danych
+
+1. **Nowa rola** `client` w enum `app_role`
+2. **Nowa tabela** `client_salon_links` (client_user_id, salon_id, joined_at, invite_code)
+3. **Nowa tabela** `client_favorites` (client_user_id, salon_id, service_id)
+4. **Nowa tabela** `push_tokens` (user_id, device_token, platform, created_at)
+
+---
+
+## Podsumowanie decyzji
+
+| Aspekt | Decyzja |
+|---|---|
+| Ile aplikacji? | 2 (Client + Business) |
+| Technologia | Capacitor (React wrapper) |
+| Wspólny backend | Tak, ten sam Cloud |
+| Model dostępu klienta | Invite-only (nie marketplace) |
+| App Store | Apple + Google Play |
+| Istniejący kod reuse | ~70% (BookingWidget, hooks, UI components) |
 
