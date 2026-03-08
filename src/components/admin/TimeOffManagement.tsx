@@ -231,31 +231,40 @@ export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
   };
 
   const saveTimeOff = () => {
-    const staff = mockStaff.find((s) => s.id === formData.staffId);
+    const staff = staffList.find((s) => s.id === formData.staffId);
     if (!staff) return;
 
-    const newTimeOff: TimeOff = {
-      id: editingTimeOff?.id || Date.now().toString(),
-      staffId: formData.staffId,
-      staffName: staff.name,
-      staffColor: staff.color,
-      type: formData.type,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      note: formData.note || undefined,
-    };
+    if (isDemo) {
+      // Demo mode - no persistence
+      setIsDialogOpen(false);
+      return;
+    }
 
     if (editingTimeOff) {
-      setTimeOffs(timeOffs.map((t) => (t.id === editingTimeOff.id ? newTimeOff : t)));
+      updateTimeOff.mutate({
+        id: editingTimeOff.id,
+        staffId: formData.staffId,
+        type: formData.type,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        note: formData.note || undefined,
+      });
     } else {
-      setTimeOffs([...timeOffs, newTimeOff]);
+      createTimeOff.mutate({
+        staffId: formData.staffId,
+        type: formData.type,
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        note: formData.note || undefined,
+      });
     }
 
     setIsDialogOpen(false);
   };
 
   const deleteTimeOff = (id: string) => {
-    setTimeOffs(timeOffs.filter((t) => t.id !== id));
+    if (isDemo) return;
+    deleteTimeOffMutation.mutate(id);
   };
 
   return (
