@@ -14,6 +14,7 @@ import InstagramLanding from "./pages/InstagramLanding";
 import OnboardingPage from "./pages/OnboardingPage";
 import InstallPage from "./pages/InstallPage";
 import ClientApp from "./pages/ClientApp";
+import MobileAdminApp from "./pages/MobileAdminApp";
 import JoinSalonPage from "./pages/JoinSalonPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
@@ -64,6 +65,9 @@ const App = () => {
             
             {/* Client app routes */}
             <Route path="/app/*" element={<ClientApp />} />
+            
+            {/* Mobile admin app */}
+            <Route path="/m/*" element={<MobileAdminApp />} />
             
             {/* Booking routes (marketing domain) */}
             <Route path="/book/:slug" element={<BookingPage />} />
