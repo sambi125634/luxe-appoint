@@ -291,6 +291,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveAppointment}
+        isDemo={isDemo}
         appointment={editingAppointment ? {
           id: editingAppointment.id,
           clientId: "",
