@@ -15,6 +15,7 @@ import { AccountingFilters, Transaction } from "./types";
 import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
+import { VideoTutorialCard } from "../VideoTutorialCard";
 
 interface AccountingModuleProps {
   isDemo?: boolean;
