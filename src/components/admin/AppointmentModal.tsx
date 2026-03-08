@@ -221,7 +221,7 @@ export function AppointmentModal({
     
     onSave({
       clientId: form.clientId || "new",
-      clientName: isNewClient ? form.clientName : mockClients.find(c => c.id === form.clientId)?.name || "",
+      clientName: isNewClient ? form.clientName : clients.find(c => c.id === form.clientId)?.name || "",
       serviceId: form.serviceId,
       serviceName: selectedService?.name || "",
       staffId: form.staffId,
