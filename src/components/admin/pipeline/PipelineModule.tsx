@@ -9,7 +9,8 @@ import {
   CheckCircle2,
   Kanban,
   BarChart3,
-  GitBranch
+  GitBranch,
+  Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PipelineColumn } from "./PipelineColumn";
 import { ContactDetailModal } from "./ContactDetailModal";
 import { PipelineReports } from "./PipelineReports";
+import { VideoTutorialCard } from "../VideoTutorialCard";
 import {
   PipelineContact,
   defaultPipelineStages,
