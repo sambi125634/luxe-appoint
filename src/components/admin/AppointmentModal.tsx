@@ -11,6 +11,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { ProductSaleSection, type CartItem } from "./products/ProductSaleSection";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useClients } from "@/hooks/useClients";
+import { useServices } from "@/hooks/useServices";
 
 interface Client {
   id: string;
