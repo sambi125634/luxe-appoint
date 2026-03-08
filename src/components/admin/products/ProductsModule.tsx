@@ -32,7 +32,6 @@ export function ProductsModule() {
 
   return (
     <div className="space-y-6">
-    <div className="space-y-6">
       <VideoTutorialCard
         title="Jak zarządzać produktami"
         voiceText="Moduł produktów pozwala zarządzać katalogiem produktów do sprzedaży w salonie, kontrolować stany magazynowe, rejestrować dostawy od dostawców i śledzić raporty sprzedaży. Zacznij od dodania produktów w zakładce Katalog."
@@ -70,7 +69,6 @@ export function ProductsModule() {
         <TabsContent value="suppliers" className="mt-6">
           <SuppliersManagement salonId={effectiveSalonId} />
         </TabsContent>
-      </Tabs>
       </Tabs>
     </div>
   );
