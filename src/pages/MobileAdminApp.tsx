@@ -12,17 +12,17 @@ import { MobileMoreMenu } from "@/components/mobile-admin/MobileMoreMenu";
 import { MobileModuleWrapper } from "@/components/mobile-admin/MobileModuleWrapper";
 
 // Lazy load desktop components for mobile reuse
-const ServicesManagement = lazy(() => import("@/components/admin/ServicesManagement").then(m => ({ default: m.default || m.ServicesManagement })));
-const StaffManagement = lazy(() => import("@/components/admin/StaffManagement").then(m => ({ default: m.default || m.StaffManagement })));
-const TimeOffManagement = lazy(() => import("@/components/admin/TimeOffManagement").then(m => ({ default: m.default || m.TimeOffManagement })));
-const ProductsModule = lazy(() => import("@/components/admin/products/ProductsModule").then(m => ({ default: m.default || m.ProductsModule })));
-const PipelineModule = lazy(() => import("@/components/admin/pipeline/PipelineModule").then(m => ({ default: m.default || m.PipelineModule })));
-const ConversationsModule = lazy(() => import("@/components/admin/conversations/ConversationsModule").then(m => ({ default: m.default || m.ConversationsModule })));
-const WidgetsManagement = lazy(() => import("@/components/admin/widgets/WidgetsManagement").then(m => ({ default: m.default || m.WidgetsManagement })));
-const AccountingModule = lazy(() => import("@/components/admin/accounting/AccountingModule").then(m => ({ default: m.default || m.AccountingModule })));
-const StatsModule = lazy(() => import("@/components/admin/StatsModule").then(m => ({ default: m.default || m.StatsModule })));
-const SettingsModule = lazy(() => import("@/components/admin/settings/SettingsModule").then(m => ({ default: m.default || m.SettingsModule })));
-const SupportModule = lazy(() => import("@/components/admin/support/SupportModule").then(m => ({ default: m.default || m.SupportModule })));
+const ServicesManagement = lazy(() => import("@/components/admin/ServicesManagement").then(m => ({ default: m.ServicesManagement })));
+const StaffManagement = lazy(() => import("@/components/admin/StaffManagement").then(m => ({ default: m.StaffManagement })));
+const TimeOffManagement = lazy(() => import("@/components/admin/TimeOffManagement").then(m => ({ default: m.TimeOffManagement })));
+const ProductsModule = lazy(() => import("@/components/admin/products/ProductsModule").then(m => ({ default: m.ProductsModule })));
+const PipelineModule = lazy(() => import("@/components/admin/pipeline/PipelineModule").then(m => ({ default: m.PipelineModule })));
+const ConversationsModule = lazy(() => import("@/components/admin/conversations/ConversationsModule").then(m => ({ default: m.ConversationsModule })));
+const WidgetsManagement = lazy(() => import("@/components/admin/widgets/WidgetsManagement").then(m => ({ default: m.WidgetsManagement })));
+const AccountingModule = lazy(() => import("@/components/admin/accounting/AccountingModule").then(m => ({ default: m.AccountingModule })));
+const StatsModule = lazy(() => import("@/components/admin/StatsModule").then(m => ({ default: m.StatsModule })));
+const SettingsModule = lazy(() => import("@/components/admin/settings/SettingsModule").then(m => ({ default: m.SettingsModule })));
+const SupportModule = lazy(() => import("@/components/admin/support/SupportModule").then(m => ({ default: m.SupportModule })));
 
 const moduleConfig: Record<string, { title: string }> = {
   services: { title: "Usługi" },
