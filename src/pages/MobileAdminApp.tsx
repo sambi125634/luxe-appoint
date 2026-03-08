@@ -1,6 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Routes, Route, useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
 import { MobileAdminBottomBar } from "@/components/mobile-admin/MobileAdminBottomBar";
