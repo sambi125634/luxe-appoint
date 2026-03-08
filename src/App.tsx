@@ -61,6 +61,9 @@ const App = () => {
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
             
+            {/* Client app routes */}
+            <Route path="/app/*" element={<ClientApp />} />
+            
             {/* Booking routes (marketing domain) */}
             <Route path="/book/:slug" element={<BookingPage />} />
             <Route path="/s/:slug" element={<BookingPage />} />
