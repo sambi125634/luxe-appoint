@@ -188,6 +188,22 @@ export function StatsModule({ isDemo = false }: StatsModuleProps) {
     exportFullReport(appointments, services, staff, { from: "2024-01-01", to: "2024-01-31" });
   };
 
+  if (!isDemo) {
+    return (
+      <div className="glass-card h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <BarChart3 className="w-8 h-8 text-primary" />
+          </div>
+          <h3 className="font-serif text-xl font-semibold mb-2">Brak danych statystycznych</h3>
+          <p className="text-muted-foreground text-sm">
+            Statystyki pojawią się automatycznie, gdy zaczniesz obsługiwać wizyty i rejestrować transakcje.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header with period selector and export */}
