@@ -14,6 +14,7 @@ import InstagramLanding from "./pages/InstagramLanding";
 import OnboardingPage from "./pages/OnboardingPage";
 import InstallPage from "./pages/InstallPage";
 import ClientApp from "./pages/ClientApp";
+import JoinSalonPage from "./pages/JoinSalonPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
