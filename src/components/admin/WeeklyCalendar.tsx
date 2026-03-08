@@ -41,7 +41,7 @@ interface WeeklyCalendarProps {
 export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalendarProps) {
   const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [appointments, setAppointments] = useState(mockAppointments);
+  const [appointments, setAppointments] = useState(isDemo ? mockAppointments : []);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
