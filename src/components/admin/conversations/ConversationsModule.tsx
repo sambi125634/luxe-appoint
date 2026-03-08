@@ -181,15 +181,25 @@ export function ConversationsModule({ isDemo = false }: ConversationsModuleProps
   // Empty state for production mode
   if (!isDemo && contacts.length === 0) {
     return (
-      <div className="glass-card h-[calc(100vh-8rem)] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-8">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-            <MessageSquarePlus className="w-8 h-8 text-primary" />
+      <div className="space-y-6">
+        <VideoTutorialCard
+          title="Jak działają konwersacje z klientami"
+          voiceText="Moduł konwersacji pozwala komunikować się z klientkami przez SMS, e-mail i WhatsApp z jednego miejsca. Aby go aktywować, potrzebujesz integracji z platformą komunikacyjną. Przejdź do Ustawień i skonfiguruj integrację."
+        />
+        <div className="glass-card h-[calc(100vh-14rem)] flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto p-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <MessageSquarePlus className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="font-serif text-xl font-semibold mb-2">Konwersacje wymagają integracji</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Aby wysyłać wiadomości SMS, e-mail i WhatsApp do klientek, skonfiguruj integrację komunikacyjną w ustawieniach.
+            </p>
+            <Button variant="outline" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Przejdź do Ustawień → Integracje
+            </Button>
           </div>
-          <h3 className="font-serif text-xl font-semibold mb-2">Brak konwersacji</h3>
-          <p className="text-muted-foreground text-sm">
-            Konwersacje z klientami pojawią się tutaj po podłączeniu integracji komunikacyjnych (SMS, WhatsApp, e-mail).
-          </p>
         </div>
       </div>
     );

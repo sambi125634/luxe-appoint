@@ -71,6 +71,7 @@ export function ProductsModule() {
           <SuppliersManagement salonId={effectiveSalonId} />
         </TabsContent>
       </Tabs>
+      </Tabs>
     </div>
   );
 }
