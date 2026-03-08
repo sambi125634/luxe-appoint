@@ -90,11 +90,11 @@ export default function DemoPage() {
         case "settings":
           return <SettingsModule />;
         case "conversations":
-          return <ConversationsModule />;
+          return <ConversationsModule isDemo={true} />;
         case "pipeline":
-          return <PipelineModule />;
+          return <PipelineModule isDemo={true} />;
         case "accounting":
-          return <AccountingModule />;
+          return <AccountingModule isDemo={true} />;
         case "products":
           return <ProductsModule />;
         case "support":
