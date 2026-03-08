@@ -96,9 +96,43 @@ export function AppointmentModal({
   onSave, 
   appointment,
   selectedDate,
-  selectedTime 
+  selectedTime,
+  isDemo = false
 }: AppointmentModalProps) {
   const { t } = useTranslation();
+
+  // Real data from DB for production mode
+  const { data: dbStaff } = useStaffMembers();
+  const { data: dbClients } = useClients();
+  const { data: dbServices } = useServices();
+
+  // Use real or mock data
+  const staffColors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1"];
+  const clients: Client[] = isDemo
+    ? mockClients
+    : (dbClients || []).map((c) => ({
+        id: c.id,
+        name: `${c.first_name} ${c.last_name}`,
+        phone: c.phone,
+        email: c.email || "",
+      }));
+
+  const services: Service[] = isDemo
+    ? mockServices
+    : (dbServices || []).map((s) => ({
+        id: s.id,
+        name: s.name,
+        duration: s.duration,
+        price: Number(s.price),
+      }));
+
+  const staffMembers: Staff[] = isDemo
+    ? mockStaff
+    : (dbStaff || []).map((s, i) => ({
+        id: s.id,
+        name: s.name,
+        color: staffColors[i % staffColors.length],
+      }));
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
