@@ -66,6 +66,9 @@ const App = () => {
             {/* Client app routes */}
             <Route path="/app/*" element={<ClientApp />} />
             
+            {/* Mobile admin app */}
+            <Route path="/m/*" element={<MobileAdminApp />} />
+            
             {/* Booking routes (marketing domain) */}
             <Route path="/book/:slug" element={<BookingPage />} />
             <Route path="/s/:slug" element={<BookingPage />} />
