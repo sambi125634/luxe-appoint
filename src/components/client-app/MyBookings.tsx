@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isPast, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePullToRefresh } from "@/hooks/usePullToRefresh";
+import { PullToRefreshIndicator } from "./PullToRefreshIndicator";
 
 const statusLabels: Record<string, string> = {
   booked: "Zarezerwowana",
@@ -25,13 +27,14 @@ const statusVariant: Record<string, "default" | "secondary" | "destructive" | "o
 };
 
 export function MyBookings() {
+  const queryClient = useQueryClient();
+
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["client-bookings"],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return [];
 
-      // Get client records linked to this user's email
       const { data: profile } = await supabase
         .from("profiles")
         .select("email")
@@ -40,7 +43,6 @@ export function MyBookings() {
 
       if (!profile?.email) return [];
 
-      // Find client records by email across salons
       const { data: clients } = await supabase
         .from("clients")
         .select("id, salon_id")
@@ -62,6 +64,12 @@ export function MyBookings() {
     },
   });
 
+  const { containerRef, pullDistance, refreshing, handlers } = usePullToRefresh({
+    onRefresh: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["client-bookings"] });
+    },
+  });
+
   const upcoming = bookings?.filter(
     (b) => !isPast(parseISO(b.start_time)) && b.status !== "cancelled"
   ) ?? [];
@@ -69,13 +77,13 @@ export function MyBookings() {
     (b) => isPast(parseISO(b.start_time)) || b.status === "cancelled"
   ) ?? [];
 
-  const BookingCard = ({ booking }: { booking: (typeof bookings)[0] }) => {
+  const BookingCard = ({ booking }: { booking: NonNullable<typeof bookings>[0] }) => {
     const service = booking.services as unknown as { name: string; duration: number; price: number } | null;
     const staff = booking.staff_members as unknown as { name: string } | null;
     const salon = booking.salons as unknown as { name: string; address: string | null; city: string | null } | null;
 
     return (
-      <Card className="border-border/50">
+      <Card className="border-border/50 active:scale-[0.98] transition-all duration-150">
         <CardContent className="p-4">
           <div className="flex items-start justify-between mb-2">
             <h3 className="font-semibold text-foreground">
@@ -105,9 +113,9 @@ export function MyBookings() {
               <p className="text-xs">Specjalista: {staff.name}</p>
             )}
           </div>
-          {service?.price && (
+          {service?.price != null && (
             <p className="mt-2 font-semibold text-foreground">
-              {service.price.toFixed(2)} zł
+              {Number(service.price).toFixed(2)} zł
             </p>
           )}
         </CardContent>
@@ -116,50 +124,58 @@ export function MyBookings() {
   };
 
   return (
-    <div className="px-4 pt-6 pb-24">
-      <h1 className="text-2xl font-bold text-foreground mb-6">Moje wizyty</h1>
+    <div
+      ref={containerRef}
+      className="h-[calc(100vh-4rem)] overflow-y-auto"
+      {...handlers}
+    >
+      <PullToRefreshIndicator pullDistance={pullDistance} refreshing={refreshing} />
 
-      {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
-        </div>
-      ) : (
-        <Tabs defaultValue="upcoming">
-          <TabsList className="w-full mb-4">
-            <TabsTrigger value="upcoming" className="flex-1">
-              Nadchodzące ({upcoming.length})
-            </TabsTrigger>
-            <TabsTrigger value="past" className="flex-1">
-              Historia ({past.length})
-            </TabsTrigger>
-          </TabsList>
+      <div className="px-4 pt-6 pb-24">
+        <h1 className="text-2xl font-bold text-foreground mb-6">Moje wizyty</h1>
 
-          <TabsContent value="upcoming" className="space-y-3">
-            {!upcoming.length ? (
-              <div className="text-center py-12">
-                <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-1">Brak nadchodzących wizyt</h3>
-                <p className="text-sm text-muted-foreground">
-                  Zarezerwuj wizytę w jednym ze swoich salonów
-                </p>
-              </div>
-            ) : (
-              upcoming.map((b) => <BookingCard key={b.id} booking={b} />)
-            )}
-          </TabsContent>
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-32 rounded-xl" />)}
+          </div>
+        ) : (
+          <Tabs defaultValue="upcoming">
+            <TabsList className="w-full mb-4">
+              <TabsTrigger value="upcoming" className="flex-1">
+                Nadchodzące ({upcoming.length})
+              </TabsTrigger>
+              <TabsTrigger value="past" className="flex-1">
+                Historia ({past.length})
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="past" className="space-y-3">
-            {!past.length ? (
-              <div className="text-center py-12">
-                <RefreshCw className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <h3 className="font-semibold text-foreground mb-1">Brak historii wizyt</h3>
-              </div>
-            ) : (
-              past.map((b) => <BookingCard key={b.id} booking={b} />)
-            )}
-          </TabsContent>
-        </Tabs>
-      )}
+            <TabsContent value="upcoming" className="space-y-3">
+              {!upcoming.length ? (
+                <div className="text-center py-12">
+                  <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <h3 className="font-semibold text-foreground mb-1">Brak nadchodzących wizyt</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Zarezerwuj wizytę w jednym ze swoich salonów
+                  </p>
+                </div>
+              ) : (
+                upcoming.map((b) => <BookingCard key={b.id} booking={b} />)
+              )}
+            </TabsContent>
+
+            <TabsContent value="past" className="space-y-3">
+              {!past.length ? (
+                <div className="text-center py-12">
+                  <RefreshCw className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                  <h3 className="font-semibold text-foreground mb-1">Brak historii wizyt</h3>
+                </div>
+              ) : (
+                past.map((b) => <BookingCard key={b.id} booking={b} />)
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
+      </div>
     </div>
   );
 }
