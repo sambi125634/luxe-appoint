@@ -58,7 +58,7 @@ export function useUserRole() {
           salonName = salonData?.name ?? null;
           onboardingCompleted = true;
         }
-      } else if (role === "super_admin") {
+      } else if (role === "super_admin" || role === "client") {
         onboardingCompleted = true;
       }
 
