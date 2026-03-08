@@ -161,6 +161,23 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     return date.toDateString() === today.toDateString();
   };
 
+  // Empty state for production with no staff
+  if (!isDemo && staff.length === 0) {
+    return (
+      <div className="glass-card p-12 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <CalendarDays className="w-8 h-8 text-primary" />
+          </div>
+          <h3 className="font-serif text-xl font-semibold mb-2">Kalendarz jest pusty</h3>
+          <p className="text-muted-foreground text-sm">
+            Aby korzystać z kalendarza, najpierw dodaj pracowników i ustaw ich godziny pracy w sekcji Pracownicy.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="glass-card p-6">
       {/* Header */}

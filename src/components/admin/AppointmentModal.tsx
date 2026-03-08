@@ -335,7 +335,7 @@ export function AppointmentModal({
               {t('appointment.specialist')}
             </Label>
             <div className="grid grid-cols-2 gap-2">
-              {mockStaff.map(staff => (
+              {staffMembers.map(staff => (
                 <button
                   key={staff.id}
                   type="button"
