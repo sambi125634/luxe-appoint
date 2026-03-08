@@ -181,6 +181,47 @@ export type Database = {
           },
         ]
       }
+      client_salon_links: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string | null
+          is_favorite: boolean
+          joined_at: string
+          salon_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code?: string | null
+          is_favorite?: boolean
+          joined_at?: string
+          salon_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string | null
+          is_favorite?: boolean
+          joined_at?: string
+          salon_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_salon_links_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_tags: {
         Row: {
           color: string
@@ -634,6 +675,33 @@ export type Database = {
           last_name?: string | null
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      push_tokens: {
+        Row: {
+          created_at: string
+          device_token: string
+          id: string
+          platform: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          device_token: string
+          id?: string
+          platform?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          device_token?: string
+          id?: string
+          platform?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -1299,7 +1367,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "super_admin" | "salon_owner" | "staff"
+      app_role: "super_admin" | "salon_owner" | "staff" | "client"
       appointment_status:
         | "booked"
         | "confirmed"
@@ -1433,7 +1501,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "salon_owner", "staff"],
+      app_role: ["super_admin", "salon_owner", "staff", "client"],
       appointment_status: [
         "booked",
         "confirmed",
