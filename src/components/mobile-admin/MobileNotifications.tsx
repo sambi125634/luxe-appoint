@@ -174,7 +174,7 @@ export function MobileNotifications() {
                       </p>
                       {!isRead && <span className="w-2 h-2 rounded-full bg-primary shrink-0" />}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{n.description}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{n.description}</p>
                   </div>
                 </CardContent>
               </Card>
