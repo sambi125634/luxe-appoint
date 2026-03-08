@@ -35,9 +35,13 @@ import { PromotionsManager } from "./PromotionsManager";
 import { InstagramLinkGenerator } from "./InstagramLinkGenerator";
 import { VideoTutorialCard } from "../VideoTutorialCard";
 
-export function WidgetsManagement() {
-  const [widgets, setWidgets] = useState<BookingWidget[]>(mockWidgets);
-  const [promotions, setPromotions] = useState<WidgetPromotion[]>(mockPromotions);
+interface WidgetsManagementProps {
+  isDemo?: boolean;
+}
+
+export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
+  const [widgets, setWidgets] = useState<BookingWidget[]>(isDemo ? mockWidgets : []);
+  const [promotions, setPromotions] = useState<WidgetPromotion[]>(isDemo ? mockPromotions : []);
   const [activeTab, setActiveTab] = useState("widgets");
   const [selectedWidget, setSelectedWidget] = useState<BookingWidget | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
