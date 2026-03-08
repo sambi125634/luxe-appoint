@@ -79,8 +79,10 @@ interface TimeOffManagementProps {
 
 export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
+  const { salonId } = useSalonId();
+  const { data: dbStaff } = useStaffMembers();
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [timeOffs, setTimeOffs] = useState<TimeOff[]>(mockTimeOffs);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTimeOff, setEditingTimeOff] = useState<TimeOff | null>(null);
   const [formData, setFormData] = useState({
@@ -89,6 +91,86 @@ export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
     startDate: "",
     endDate: "",
     note: "",
+  });
+
+  // Real data from DB for production mode
+  const { data: dbTimeOffs } = useQuery({
+    queryKey: ["time-off", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("time_off")
+        .select("*, staff_members(name, color)")
+        .order("start_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map((item: any) => ({
+        id: item.id,
+        staffId: item.staff_id,
+        staffName: item.staff_members?.name || "—",
+        staffColor: item.staff_members?.color || "#7c3aed",
+        type: item.type as TimeOff["type"],
+        startDate: item.start_date,
+        endDate: item.end_date,
+        note: item.note || undefined,
+      }));
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  // Use demo data or real data
+  const timeOffs: TimeOff[] = isDemo ? mockTimeOffs : (dbTimeOffs || []);
+
+  // Staff list: demo mock or real from DB
+  const staffList: StaffMember[] = isDemo
+    ? mockStaff
+    : (dbStaff || []).map((s) => ({ id: s.id, name: s.name, color: s.color || "#7c3aed" }));
+
+  // Mutations for production mode
+  const createTimeOff = useMutation({
+    mutationFn: async (data: { staffId: string; type: string; startDate: string; endDate: string; note?: string }) => {
+      const { error } = await supabase.from("time_off").insert({
+        staff_id: data.staffId,
+        type: data.type,
+        start_date: data.startDate,
+        end_date: data.endDate,
+        note: data.note || null,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["time-off"] });
+      toast.success("Nieobecność została dodana");
+    },
+    onError: () => toast.error("Nie udało się dodać nieobecności"),
+  });
+
+  const updateTimeOff = useMutation({
+    mutationFn: async (data: { id: string; staffId: string; type: string; startDate: string; endDate: string; note?: string }) => {
+      const { error } = await supabase.from("time_off").update({
+        staff_id: data.staffId,
+        type: data.type,
+        start_date: data.startDate,
+        end_date: data.endDate,
+        note: data.note || null,
+      }).eq("id", data.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["time-off"] });
+      toast.success("Nieobecność została zaktualizowana");
+    },
+    onError: () => toast.error("Nie udało się zaktualizować nieobecności"),
+  });
+
+  const deleteTimeOffMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("time_off").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["time-off"] });
+      toast.success("Nieobecność została usunięta");
+    },
+    onError: () => toast.error("Nie udało się usunąć nieobecności"),
   });
 
   const locale = i18n.language === 'pl' ? pl : enUS;
