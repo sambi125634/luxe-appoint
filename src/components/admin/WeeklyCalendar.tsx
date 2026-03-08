@@ -41,12 +41,23 @@ interface WeeklyCalendarProps {
 
 export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalendarProps) {
   const { t, i18n } = useTranslation();
+  const { data: dbStaff } = useStaffMembers();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(isDemo ? mockAppointments : []);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<{ date: Date; time: string } | null>(null);
+
+  // Use real staff from DB in production, mock in demo
+  const staffColors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1", "bg-chart-2", "bg-chart-3"];
+  const staff = isDemo
+    ? mockStaff
+    : (dbStaff || []).map((s, i) => ({
+        id: s.id,
+        name: s.name.split(" ").map(n => n[0] + ".").join(" ").replace(/\.\.$/, s.name.split(" ").pop()?.charAt(0) + ".") || s.name,
+        color: staffColors[i % staffColors.length],
+      }));
 
   const getWeekDays = (date: Date) => {
     const start = new Date(date);
