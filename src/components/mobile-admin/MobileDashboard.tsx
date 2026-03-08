@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Calendar, DollarSign, TrendingUp, UserX, Plus, ChevronRight,
+  Calendar, DollarSign, TrendingUp, UserX, Users, Plus, ChevronRight,
   Clock, Phone, CheckCircle2, AlertCircle, Sparkles, ArrowUpRight, ArrowDownRight
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";

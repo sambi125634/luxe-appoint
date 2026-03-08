@@ -54,7 +54,7 @@ export function MobileCalendar() {
 
   // Status update mutation
   const statusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+    mutationFn: async ({ id, status }: { id: string; status: "booked" | "confirmed" | "cancelled" | "completed" | "no_show" }) => {
       const { error } = await supabase
         .from("appointments")
         .update({ status })
