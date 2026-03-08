@@ -465,7 +465,7 @@ export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
                   <SelectValue placeholder={t('timeOff.selectEmployee')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockStaff.map((staff) => (
+                  {staffList.map((staff) => (
                     <SelectItem key={staff.id} value={staff.id}>
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: staff.color }} />
