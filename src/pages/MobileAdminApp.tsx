@@ -76,8 +76,7 @@ function MobileModule({ tab }: { tab: string }) {
 }
 
 function MobileModuleRoute() {
-  // Extract tab from URL
-  const tab = window.location.pathname.split("/m/module/")[1] || "";
+  const { tab = "" } = useParams<{ tab: string }>();
   return <MobileModule tab={tab} />;
 }
 
