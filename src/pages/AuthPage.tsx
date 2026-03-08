@@ -36,6 +36,7 @@ async function resolveRedirect(userId: string): Promise<string> {
     }
 
     if (role === "staff") return "/admin";
+    if (role === "client") return "/app";
   } catch (err) {
     console.error("Error resolving redirect:", err);
   }
