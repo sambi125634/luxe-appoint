@@ -69,6 +69,7 @@ const App = () => {
             <Route path="/book/:slug" element={<BookingPage />} />
             <Route path="/s/:slug" element={<BookingPage />} />
             <Route path="/i/:slug" element={<InstagramLanding />} />
+            <Route path="/join/:slug" element={<JoinSalonPage />} />
             <Route path="/install" element={<InstallPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
