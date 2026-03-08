@@ -66,8 +66,7 @@ export function MobileMoreMenu() {
   };
 
   const handleTap = (tab: string) => {
-    // Navigate to admin desktop version with specific tab
-    navigate(`/admin?tab=${tab}`);
+    navigate(`/m/module/${tab}`);
   };
 
   return (
