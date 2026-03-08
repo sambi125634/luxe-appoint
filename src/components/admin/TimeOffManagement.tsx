@@ -269,7 +269,28 @@ export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
 
   return (
     <div className="space-y-6">
+      <VideoTutorialCard
+        title="Jak zarządzać nieobecnościami"
+        voiceText="Tutaj zarządzasz urlopami i nieobecnościami pracowników. Kliknij 'Dodaj nieobecność', wybierz pracownika, typ (urlop, chorobowe, szkolenie) i daty. Nieobecności automatycznie blokują sloty w kalendarzu rezerwacji."
+      />
+
+      {/* Empty state for production with no staff */}
+      {!isDemo && staffList.length === 0 && (
+        <div className="glass-card p-12 flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+              <CalendarOff className="w-8 h-8 text-primary" />
+            </div>
+            <h3 className="font-serif text-xl font-semibold mb-2">Brak pracowników</h3>
+            <p className="text-muted-foreground text-sm mb-4">
+              Aby zarządzać nieobecnościami, najpierw dodaj pracowników w sekcji Pracownicy.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
+      {(isDemo || staffList.length > 0) && (
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">{t('timeOff.title')}</h2>
