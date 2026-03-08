@@ -184,7 +184,7 @@ export function AppointmentModal({
     setShowProducts(false);
   }, [appointment, selectedDate, selectedTime, isOpen]);
 
-  const filteredClients = mockClients.filter(client =>
+  const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
     client.phone.includes(clientSearch) ||
     client.email.toLowerCase().includes(clientSearch.toLowerCase())
