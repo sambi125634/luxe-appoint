@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { MessageSquarePlus } from "lucide-react";
 import { ContactsList } from "./ContactsList";
 import { ConversationView } from "./ConversationView";
 import { Contact, Conversation, Message } from "./types";
 
-// Mock data for demo
-const mockContacts: Contact[] = [
+// Demo data - only shown in demo mode
+const DEMO_CONTACTS: Contact[] = [
   {
     id: "1",
     ghlContactId: "ghl_001",
@@ -68,7 +69,7 @@ const mockContacts: Contact[] = [
   },
 ];
 
-const mockMessages: Record<string, Message[]> = {
+const DEMO_MESSAGES: Record<string, Message[]> = {
   "1": [
     {
       id: "m1",
@@ -149,12 +150,19 @@ const mockMessages: Record<string, Message[]> = {
   ],
 };
 
-export function ConversationsModule() {
+interface ConversationsModuleProps {
+  isDemo?: boolean;
+}
+
+export function ConversationsModule({ isDemo = false }: ConversationsModuleProps) {
   const { t } = useTranslation();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredContacts = mockContacts.filter((contact) => {
+  const contacts = isDemo ? DEMO_CONTACTS : [];
+  const messages = isDemo ? DEMO_MESSAGES : {};
+
+  const filteredContacts = contacts.filter((contact) => {
     const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
     const query = searchQuery.toLowerCase();
     return (
@@ -166,12 +174,27 @@ export function ConversationsModule() {
 
   const handleSendMessage = (message: string, type: "SMS" | "Email" | "WhatsApp") => {
     console.log("Sending message:", { message, type, to: selectedContact });
-    // In real implementation, this would call the edge function
   };
+
+  // Empty state for production mode
+  if (!isDemo && contacts.length === 0) {
+    return (
+      <div className="glass-card h-[calc(100vh-8rem)] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-8">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <MessageSquarePlus className="w-8 h-8 text-primary" />
+          </div>
+          <h3 className="font-serif text-xl font-semibold mb-2">Brak konwersacji</h3>
+          <p className="text-muted-foreground text-sm">
+            Konwersacje z klientami pojawią się tutaj po podłączeniu integracji komunikacyjnych (SMS, WhatsApp, e-mail).
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="glass-card h-[calc(100vh-8rem)] flex overflow-hidden">
-      {/* Contacts List */}
       <div className={`w-full md:w-80 lg:w-96 border-r border-border flex-shrink-0 ${selectedContact ? 'hidden md:flex' : 'flex'} flex-col`}>
         <ContactsList
           contacts={filteredContacts}
@@ -182,12 +205,11 @@ export function ConversationsModule() {
         />
       </div>
 
-      {/* Conversation View */}
       <div className={`flex-1 ${selectedContact ? 'flex' : 'hidden md:flex'} flex-col`}>
         {selectedContact ? (
           <ConversationView
             contact={selectedContact}
-            messages={mockMessages[selectedContact.id] || []}
+            messages={messages[selectedContact.id] || []}
             onSendMessage={handleSendMessage}
             onBack={() => setSelectedContact(null)}
           />
