@@ -132,13 +132,13 @@ export function MobileDashboard() {
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">Następna wizyta</span>
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-serif font-bold text-lg">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-serif font-bold text-lg truncate">
                   {(nextAppt.clients as { first_name: string; last_name: string } | null)?.first_name}{" "}
                   {(nextAppt.clients as { first_name: string; last_name: string } | null)?.last_name}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground truncate">
                   {(nextAppt.services as { name: string } | null)?.name}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
@@ -196,17 +196,17 @@ export function MobileDashboard() {
             color: (noShows ?? 0) > 0 ? "text-destructive" : "text-muted-foreground",
           },
         ].map((kpi, i) => (
-          <Card key={i} className="min-w-[140px] flex-shrink-0 active:scale-[0.97] transition-transform">
-            <CardContent className="p-3">
+          <Card key={i} className="min-w-[130px] flex-shrink-0 active:scale-[0.97] transition-transform">
+            <CardContent className="p-3 overflow-hidden">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-muted-foreground font-medium">{kpi.label}</span>
-                <kpi.icon className={cn("w-3.5 h-3.5", kpi.color)} />
+                <span className="text-[11px] text-muted-foreground font-medium truncate">{kpi.label}</span>
+                <kpi.icon className={cn("w-3.5 h-3.5 shrink-0", kpi.color)} />
               </div>
-              <p className="text-xl font-bold font-serif">{kpi.value}</p>
-              <div className="flex items-center gap-1 mt-0.5">
-                {kpi.trend === "up" && <ArrowUpRight className="w-3 h-3 text-emerald-500" />}
-                {kpi.trend === "down" && <ArrowDownRight className="w-3 h-3 text-destructive" />}
-                <span className="text-[10px] text-muted-foreground">{kpi.sub}</span>
+              <p className="text-xl font-bold font-serif truncate">{kpi.value}</p>
+              <div className="flex items-center gap-1 mt-0.5 min-w-0">
+                {kpi.trend === "up" && <ArrowUpRight className="w-3 h-3 text-emerald-500 shrink-0" />}
+                {kpi.trend === "down" && <ArrowDownRight className="w-3 h-3 text-destructive shrink-0" />}
+                <span className="text-[10px] text-muted-foreground truncate">{kpi.sub}</span>
               </div>
             </CardContent>
           </Card>
@@ -350,7 +350,7 @@ export function MobileDashboard() {
                 <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center", action.color)}>
                   <action.icon className="w-5 h-5" />
                 </div>
-                <span className="text-sm font-medium">{action.label}</span>
+                <span className="text-sm font-medium truncate">{action.label}</span>
               </CardContent>
             </Card>
           ))}
