@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { startOfMonth, endOfMonth } from "date-fns";
-import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package } from "lucide-react";
+import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountingFiltersBar } from "./AccountingFilters";
 import { AccountingCharts } from "./AccountingCharts";
@@ -16,11 +16,15 @@ import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 
-export function AccountingModule() {
+interface AccountingModuleProps {
+  isDemo?: boolean;
+}
+
+export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("charts");
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>(isDemo ? mockTransactions : []);
   const [filters, setFilters] = useState<AccountingFilters>({
     dateRange: {
       from: startOfMonth(new Date()),
@@ -72,6 +76,23 @@ export function AccountingModule() {
     };
     setTransactions((prev) => [newTransaction, ...prev]);
   };
+
+  // Empty state for production mode
+  if (!isDemo && transactions.length === 0) {
+    return (
+      <div className="glass-card p-12 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <FileText className="w-8 h-8 text-primary" />
+          </div>
+          <h3 className="font-serif text-xl font-semibold mb-2">Brak danych księgowych</h3>
+          <p className="text-muted-foreground text-sm">
+            Raporty i statystyki finansowe pojawią się automatycznie po zrealizowaniu pierwszych wizyt i transakcji w Twoim salonie.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

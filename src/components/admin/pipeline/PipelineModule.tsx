@@ -8,11 +8,11 @@ import {
   AlertTriangle,
   CheckCircle2,
   Kanban,
-  BarChart3
+  BarChart3,
+  GitBranch
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PipelineColumn } from "./PipelineColumn";
@@ -24,9 +24,13 @@ import {
   mockPipelineContacts
 } from "./types";
 
-export function PipelineModule() {
+interface PipelineModuleProps {
+  isDemo?: boolean;
+}
+
+export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   const { t } = useTranslation();
-  const [contacts, setContacts] = useState<PipelineContact[]>(mockPipelineContacts);
+  const [contacts, setContacts] = useState<PipelineContact[]>(isDemo ? mockPipelineContacts : []);
   const [searchQuery, setSearchQuery] = useState("");
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<PipelineContact | null>(null);
@@ -127,7 +131,6 @@ export function PipelineModule() {
       return contact;
     }));
     
-    // Update selected contact
     setSelectedContact(prev => prev ? {
       ...prev,
       stageId: newStageId
@@ -149,7 +152,6 @@ export function PipelineModule() {
       return contact;
     }));
     
-    // Update selected contact
     setSelectedContact(prev => prev ? {
       ...prev,
       surveys: prev.surveys.map(s => 
@@ -159,6 +161,23 @@ export function PipelineModule() {
       )
     } : null);
   };
+
+  // Empty state for production mode
+  if (!isDemo && contacts.length === 0) {
+    return (
+      <div className="glass-card p-12 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <GitBranch className="w-8 h-8 text-primary" />
+          </div>
+          <h3 className="font-serif text-xl font-semibold mb-2">Brak kontaktów w pipeline</h3>
+          <p className="text-muted-foreground text-sm">
+            Pipeline sprzedażowy będzie automatycznie wypełniany danymi klientów, którzy zarezerwują pakiety zabiegów w Twoim salonie.
+          </p>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <Tabs defaultValue="board" className="space-y-4">
@@ -242,12 +261,14 @@ export function PipelineModule() {
           </Button>
         </div>
         
-        {/* Info Banner */}
-        <div className="glass-card p-3 bg-primary/5 border-primary/20">
-          <p className="text-sm text-center">
-            <span className="font-medium">{t('pipeline.demoMode')}</span> – {t('pipeline.demoDescription')}
-          </p>
-        </div>
+        {/* Info Banner - only in demo */}
+        {isDemo && (
+          <div className="glass-card p-3 bg-primary/5 border-primary/20">
+            <p className="text-sm text-center">
+              <span className="font-medium">{t('pipeline.demoMode')}</span> – {t('pipeline.demoDescription')}
+            </p>
+          </div>
+        )}
         
         {/* Pipeline Board */}
         <ScrollArea className="w-full">
