@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isWithinInterval, parseISO } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Calendar, Palmtree, GraduationCap, Stethoscope } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Pencil, Trash2, Calendar, Palmtree, GraduationCap, Stethoscope, CalendarOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { VideoTutorialCard } from "./VideoTutorialCard";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useSalonId } from "@/hooks/useSalonId";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 interface TimeOff {
   id: string;
