@@ -13,6 +13,7 @@ import DemoPage from "./pages/DemoPage";
 import InstagramLanding from "./pages/InstagramLanding";
 import OnboardingPage from "./pages/OnboardingPage";
 import InstallPage from "./pages/InstallPage";
+import ClientApp from "./pages/ClientApp";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
