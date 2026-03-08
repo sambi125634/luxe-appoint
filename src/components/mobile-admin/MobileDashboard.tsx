@@ -132,13 +132,13 @@ export function MobileDashboard() {
               <Sparkles className="w-4 h-4 text-primary" />
               <span className="text-xs font-semibold text-primary uppercase tracking-wider">Następna wizyta</span>
             </div>
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-serif font-bold text-lg">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-serif font-bold text-lg truncate">
                   {(nextAppt.clients as { first_name: string; last_name: string } | null)?.first_name}{" "}
                   {(nextAppt.clients as { first_name: string; last_name: string } | null)?.last_name}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground truncate">
                   {(nextAppt.services as { name: string } | null)?.name}
                 </p>
                 <div className="flex items-center gap-2 mt-1">
