@@ -290,7 +290,7 @@ export function TimeOffManagement({ isDemo = false }: TimeOffManagementProps) {
       )}
 
       {/* Header */}
-      {(isDemo || staffList.length > 0) && (
+      {(isDemo || staffList.length > 0) && (<>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">{t('timeOff.title')}</h2>
