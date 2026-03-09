@@ -378,10 +378,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
 
   return (
     <div className="space-y-6">
-      <VideoTutorialCard
-        title="Jak zarządzać bazą klientów"
-        voiceText="Tu zarządzasz bazą klientów. Możesz dodać klientów ręcznie, importować z pliku CSV, lub poczekać — system automatycznie tworzy profil klienta przy pierwszej rezerwacji online. Widzisz historię wizyt, notatki, tagi i ocenę ryzyka odejścia."
-      />
+      <SectionGuide sectionKey="clients" />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

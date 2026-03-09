@@ -244,10 +244,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
 
   return (
     <div className="space-y-6">
-      <VideoTutorialCard
-        title="Jak zarządzać zespołem"
-        voiceText="Dodaj członków zespołu, przypisz im usługi i ustaw godziny pracy. Każdy pracownik ma swój kolor w kalendarzu. Jeśli pracujesz sama, dodaj siebie jako jedynego pracownika — to konieczne, żeby kalendarz działał."
-      />
+      <SectionGuide sectionKey="staff" />
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-serif font-semibold">{t('staff.title')} ({staff.length})</h3>

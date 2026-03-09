@@ -168,10 +168,7 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   if (!isDemo && contacts.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak działa pipeline sprzedażowy"
-          voiceText="Pipeline to narzędzie do śledzenia ścieżki klientki od pierwszej rezerwacji do zakończenia pakietu zabiegów. Klientki automatycznie przechodzą przez etapy: rezerwacja, pierwsza wizyta, kolejne wizyty, zakończenie. Wymaga integracji z platformą CRM."
-        />
+        <SectionGuide sectionKey="pipeline" />
         <div className="glass-card p-12 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">

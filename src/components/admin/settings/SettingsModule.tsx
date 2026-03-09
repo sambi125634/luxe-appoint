@@ -22,10 +22,7 @@ export function SettingsModule() {
 
   return (
     <div className="space-y-6">
-      <VideoTutorialCard
-        title="Jak skonfigurować ustawienia salonu"
-        voiceText="W ustawieniach konfigurujesz profil salonu — logo, kolory brandingowe, dane kontaktowe. Ustawiasz też powiadomienia SMS i email dla klientek, reguły rezerwacji oraz integracje z innymi narzędziami jak Google Calendar."
-      />
+      <SectionGuide sectionKey="settings" />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (

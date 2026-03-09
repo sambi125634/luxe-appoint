@@ -263,10 +263,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
 
   return (
     <div className="space-y-6">
-      <VideoTutorialCard
-        title="Jak zarządzać usługami"
-        voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki."
-      />
+      <SectionGuide sectionKey="services" />
       {/* Categories */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
