@@ -46,6 +46,9 @@ interface WeeklyCalendarProps {
 export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalendarProps) {
   const { t, i18n } = useTranslation();
   const { data: dbStaff } = useStaffMembers();
+  const { salonId } = useSalonId();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState(isDemo ? mockAppointments : []);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
