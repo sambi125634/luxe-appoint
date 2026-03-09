@@ -124,25 +124,104 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     setIsModalOpen(true);
   };
 
-  const handleSaveAppointment = (appointmentData: any) => {
-    if (editingAppointment) {
-      setAppointments(prev => prev.map(apt => 
-        apt.id === editingAppointment.id 
-          ? { ...apt, ...appointmentData, client: appointmentData.clientName, service: appointmentData.serviceName, staff: appointmentData.staffName }
-          : apt
-      ));
-    } else {
-      const newAppointment: Appointment = {
-        id: Date.now().toString(),
-        time: appointmentData.time,
-        duration: appointmentData.duration,
-        client: appointmentData.clientName,
-        service: appointmentData.serviceName,
-        staff: appointmentData.staffName,
-        staffId: appointmentData.staffId,
-        status: appointmentData.status,
-      };
-      setAppointments(prev => [...prev, newAppointment]);
+  const handleSaveAppointment = async (appointmentData: any) => {
+    // Demo mode — only update local state
+    if (isDemo) {
+      if (editingAppointment) {
+        setAppointments(prev => prev.map(apt =>
+          apt.id === editingAppointment.id
+            ? { ...apt, ...appointmentData, client: appointmentData.clientName, service: appointmentData.serviceName, staff: appointmentData.staffName }
+            : apt
+        ));
+      } else {
+        setAppointments(prev => [...prev, {
+          id: Date.now().toString(),
+          time: appointmentData.time,
+          duration: appointmentData.duration,
+          client: appointmentData.clientName,
+          service: appointmentData.serviceName,
+          staff: appointmentData.staffName,
+          staffId: appointmentData.staffId,
+          status: appointmentData.status,
+        }]);
+      }
+      setIsModalOpen(false);
+      return;
+    }
+
+    // Production — persist to Supabase
+    try {
+      const [hours, minutes] = appointmentData.time.split(":").map(Number);
+      const dateStr = appointmentData.date || new Date().toISOString().split('T')[0];
+      const startTime = new Date(`${dateStr}T${appointmentData.time}:00`);
+      const endTime = new Date(startTime.getTime() + appointmentData.duration * 60 * 1000);
+
+      if (editingAppointment && editingAppointment.id !== Date.now().toString()) {
+        // Update existing appointment
+        const { error } = await supabase
+          .from("appointments")
+          .update({
+            staff_id: appointmentData.staffId,
+            service_id: appointmentData.serviceId,
+            start_time: startTime.toISOString(),
+            end_time: endTime.toISOString(),
+            notes: appointmentData.notes || null,
+            status: appointmentData.status,
+          })
+          .eq("id", editingAppointment.id);
+        if (error) throw error;
+      } else {
+        // Create new appointment — find or create client first
+        let clientId: string | null = null;
+        if (appointmentData.clientId && appointmentData.clientId !== "new") {
+          clientId = appointmentData.clientId;
+        } else if (appointmentData.clientName && salonId) {
+          const nameParts = appointmentData.clientName.trim().split(" ");
+          const firstName = nameParts[0] || appointmentData.clientName;
+          const lastName = nameParts.slice(1).join(" ") || "-";
+          const { data: newClient, error: clientError } = await supabase
+            .from("clients")
+            .insert({ salon_id: salonId, first_name: firstName, last_name: lastName, phone: appointmentData.clientPhone || "000000000", rodo_consent: true })
+            .select("id")
+            .single();
+          if (!clientError && newClient) clientId = newClient.id;
+        }
+
+        const { data: newAppt, error } = await supabase
+          .from("appointments")
+          .insert({
+            salon_id: salonId!,
+            client_id: clientId,
+            service_id: appointmentData.serviceId,
+            staff_id: appointmentData.staffId,
+            start_time: startTime.toISOString(),
+            end_time: endTime.toISOString(),
+            price: appointmentData.price || 0,
+            notes: appointmentData.notes || null,
+            status: "booked",
+          })
+          .select("id")
+          .single();
+        if (error) throw error;
+        
+        // Add to local state with new ID
+        setAppointments(prev => [...prev, {
+          id: newAppt.id,
+          time: appointmentData.time,
+          duration: appointmentData.duration,
+          client: appointmentData.clientName,
+          service: appointmentData.serviceName,
+          staff: appointmentData.staffName,
+          staffId: appointmentData.staffId,
+          status: "confirmed",
+        }]);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["appointments", salonId] });
+      toast({ title: "Wizyta zapisana" });
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Błąd", description: "Nie udało się zapisać wizyty", variant: "destructive" });
     }
     setIsModalOpen(false);
   };
