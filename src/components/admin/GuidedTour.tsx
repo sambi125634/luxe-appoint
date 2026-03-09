@@ -57,7 +57,6 @@ const tourSteps: TourStep[] = [
     icon: <Scissors className="w-6 h-6" />,
     title: "Usługi — Twój cennik",
     description: "Zarządzaj usługami: nazwy, ceny, czas trwania, kategorie. Te dane wyświetlają się w widgecie rezerwacji. Jeśli korzystałaś z szablonów w onboardingu, Twoje usługi już tu są.",
-    voiceText: "Sekcja usług to Twój cennik. Zarządzasz tu nazwami, cenami, czasem trwania i kategoriami zabiegów. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki. Jeśli korzystałaś z szablonów w onboardingu, Twoje usługi już tu są.",
     limitations: "Bez usług klientki nie będą mogły rezerwować wizyt.",
     position: "content",
   },
