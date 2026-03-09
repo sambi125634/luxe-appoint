@@ -496,23 +496,17 @@ export default function OnboardingPage() {
           })}
         </div>
 
-        {/* Voice guidance + Video placeholder */}
+        {/* Step description */}
         <StepTransition stepKey={step}>
-          <div className="mb-6 space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-card border border-border/50 rounded-xl">
+          <div className="mb-6">
+            <div className="flex items-start gap-3 p-4 bg-card border border-border/50 rounded-xl">
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground mb-1">
                   <span className="mr-1.5">{STEPS[step].emoji}</span>
                   {STEP_DESCRIPTIONS[step]}
                 </p>
-                <p className="text-xs text-muted-foreground">Kliknij przycisk, aby odsłuchać szczegółowe wyjaśnienie.</p>
               </div>
-              <VoiceGuidanceButton text={VOICE_SCRIPTS[step]} label="Posłuchaj" />
             </div>
-            <VideoTutorialPlaceholder
-              title={`Tutorial: ${STEPS[step].title}`}
-              description="Wkrótce pojawi się tu wideo z instrukcją krok po kroku."
-            />
           </div>
         </StepTransition>
 
