@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { ServiceMediaUpload, MediaFile } from "./ServiceMediaUpload";
 import { CSVImport } from "./CSVImport";
-import { VideoTutorialCard } from "./VideoTutorialCard";
+import { SectionGuide } from "./SectionGuide";
 import { useServices, useServiceCategories, useCreateService, useUpdateService, useDeleteService, useCreateCategory, useUpdateCategory } from "@/hooks/useServices";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { useToast } from "@/hooks/use-toast";
