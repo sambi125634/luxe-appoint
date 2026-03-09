@@ -19,7 +19,6 @@ import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
-import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 
 export default function DemoPage() {
   const { t } = useTranslation();
