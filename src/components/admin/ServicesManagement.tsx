@@ -239,10 +239,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   if (!isDemo && services.length === 0 && categories.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak zarządzać usługami"
-          voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji."
-        />
+        <SectionGuide sectionKey="services" />
         <div className="text-center py-16">
           <Package className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
           <h3 className="text-xl font-serif font-semibold mb-2">Brak usług</h3>
