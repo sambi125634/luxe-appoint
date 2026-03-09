@@ -15,7 +15,7 @@ import { AccountingFilters, Transaction } from "./types";
 import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
-import { VideoTutorialCard } from "../VideoTutorialCard";
+import { SectionGuide } from "../SectionGuide";
 
 interface AccountingModuleProps {
   isDemo?: boolean;
@@ -82,10 +82,7 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
   if (!isDemo && transactions.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak działają raporty finansowe"
-          voiceText="Moduł księgowy automatycznie generuje raporty z Twoich transakcji: dzienny raport kasowy, sprzedaż z VAT, prowizje pracowników i eksport danych dla księgowej. Dane pojawią się po zrealizowaniu pierwszych wizyt."
-        />
+        <SectionGuide sectionKey="accounting" />
         <div className="glass-card p-12 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">

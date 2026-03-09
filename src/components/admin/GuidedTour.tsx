@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutDashboard, Code, Settings, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { VoiceGuidanceButton } from "./VoiceGuidanceButton";
 import { TabType } from "./AdminSidebar";
 
 interface TourStep {
@@ -11,7 +10,6 @@ interface TourStep {
   icon: React.ReactNode;
   title: string;
   description: string;
-  voiceText: string;
   limitations?: string;
   position: "center" | "content";
 }
@@ -23,7 +21,6 @@ const tourSteps: TourStep[] = [
     icon: <Sparkles className="w-6 h-6" />,
     title: "Witaj w Beauty Calendar! 🎉",
     description: "Przeprowadzimy Cię przez każdą sekcję panelu, żebyś wiedziała dokładnie co tu robisz, jakie dane wpisać i dlaczego to ważne. Zajmie to 2 minuty.",
-    voiceText: "Witaj w Beauty Calendar! Przeprowadzimy Cię przez każdą sekcję panelu, żebyś wiedziała dokładnie co tu robisz, jakie dane wpisać i dlaczego to ważne. Zajmie to 2 minuty.",
     position: "center",
   },
   {
@@ -32,7 +29,6 @@ const tourSteps: TourStep[] = [
     icon: <LayoutDashboard className="w-6 h-6" />,
     title: "Dashboard — centrum dowodzenia",
     description: "Tutaj widzisz podsumowanie dnia: nadchodzące wizyty, przychody, alerty i statystyki. Im więcej danych dodasz, tym więcej informacji tutaj zobaczysz.",
-    voiceText: "Dashboard to Twoje centrum dowodzenia. Widzisz tu podsumowanie dnia — nadchodzące wizyty, przychody, alerty i statystyki. Na początek będzie pusto, ale gdy zaczniesz przyjmować rezerwacje, wszystko się wypełni.",
     limitations: "Bez wizyt i klientów dashboard będzie pusty — to normalne na start.",
     position: "content",
   },
@@ -42,7 +38,6 @@ const tourSteps: TourStep[] = [
     icon: <Calendar className="w-6 h-6" />,
     title: "Kalendarz — serce salonu",
     description: "Tutaj zarządzasz wizytami. Kliknij w wolny slot, aby dodać wizytę. Widzisz grafik wszystkich pracowników na jednym ekranie. Klientki mogą też rezerwować same przez widget.",
-    voiceText: "Kalendarz to serce Twojego salonu. Kliknij w wolny slot, aby dodać wizytę. Widzisz grafik wszystkich pracowników na jednym ekranie. Klientki mogą też rezerwować same przez widget na Twojej stronie.",
     limitations: "Żeby widzieć sloty, musisz najpierw dodać pracowników i ustawić godziny pracy.",
     position: "content",
   },
@@ -52,7 +47,6 @@ const tourSteps: TourStep[] = [
     icon: <Users className="w-6 h-6" />,
     title: "Klienci — Twoja baza",
     description: "Lista wszystkich klientów salonu. Możesz dodać klientów ręcznie, importować z CSV, lub poczekać — system automatycznie tworzy profil przy pierwszej rezerwacji.",
-    voiceText: "Tu zarządzasz bazą klientów. Możesz dodać klientów ręcznie, importować z pliku CSV, lub poczekać — system automatycznie tworzy profil klienta przy pierwszej rezerwacji online. Widzisz historię wizyt, notatki, tagi i ocenę ryzyka odejścia.",
     limitations: "Bez klientów nie będziesz mogła tworzyć wizyt w kalendarzu.",
     position: "content",
   },
@@ -62,7 +56,6 @@ const tourSteps: TourStep[] = [
     icon: <Scissors className="w-6 h-6" />,
     title: "Usługi — Twój cennik",
     description: "Zarządzaj usługami: nazwy, ceny, czas trwania, kategorie. Te dane wyświetlają się w widgecie rezerwacji. Jeśli korzystałaś z szablonów w onboardingu, Twoje usługi już tu są.",
-    voiceText: "Sekcja usług to Twój cennik. Zarządzasz tu nazwami, cenami, czasem trwania i kategoriami zabiegów. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki. Jeśli korzystałaś z szablonów w onboardingu, Twoje usługi już tu są.",
     limitations: "Bez usług klientki nie będą mogły rezerwować wizyt.",
     position: "content",
   },
@@ -72,7 +65,6 @@ const tourSteps: TourStep[] = [
     icon: <UserCheck className="w-6 h-6" />,
     title: "Pracownicy — Twój zespół",
     description: "Dodaj członków zespołu, przypisz im usługi i ustaw godziny pracy. Każdy pracownik ma swój kolor w kalendarzu. Możesz też zaprosić ich do systemu.",
-    voiceText: "Tu dodajesz członków zespołu. Każdy pracownik ma swoje godziny pracy, przypisane usługi i unikalny kolor w kalendarzu. Jeśli pracujesz sama, dodaj siebie jako jedynego pracownika — to konieczne, żeby kalendarz działał.",
     limitations: "Bez pracowników kalendarz nie pokaże żadnych slotów.",
     position: "content",
   },
@@ -82,7 +74,6 @@ const tourSteps: TourStep[] = [
     icon: <Code className="w-6 h-6" />,
     title: "Widget — rezerwacje online",
     description: "Skopiuj kod widgetu i wklej na swoją stronę www lub udostępnij bezpośredni link. Klientki rezerwują 24/7 — nawet o 23:00. To najważniejszy krok do automatyzacji.",
-    voiceText: "Widget rezerwacji to klucz do automatyzacji. Skopiuj kod i wklej na swoją stronę, albo udostępnij bezpośredni link w mediach społecznościowych. Klientki rezerwują 24 na 7 — nawet o 23 w nocy, kiedy Ty odpoczywasz.",
     limitations: "Widget wymaga skonfigurowanych usług i pracowników, żeby pokazywać wolne terminy.",
     position: "content",
   },
@@ -92,7 +83,6 @@ const tourSteps: TourStep[] = [
     icon: <Settings className="w-6 h-6" />,
     title: "Ustawienia — personalizacja",
     description: "Skonfiguruj profil salonu, branding, powiadomienia SMS/email i integracje. Logo i kolory wyświetlają się w widgecie rezerwacji.",
-    voiceText: "W ustawieniach konfigurujesz profil salonu, logo, kolory brandingowe, powiadomienia SMS i email dla klientek, oraz integracje z innymi narzędziami jak Google Calendar. Twoje logo i kolory wyświetlają się w widgecie rezerwacji.",
     position: "content",
   },
   {
@@ -101,7 +91,6 @@ const tourSteps: TourStep[] = [
     icon: <Sparkles className="w-6 h-6" />,
     title: "Gotowa do startu! 🚀",
     description: "Znasz już wszystkie sekcje. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże Ci co jeszcze zostało. Możesz uruchomić ten samouczek ponownie w dowolnym momencie.",
-    voiceText: "Gratulacje! Znasz już wszystkie sekcje panelu. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże Ci co jeszcze zostało do zrobienia. Możesz uruchomić ten samouczek ponownie w dowolnym momencie z menu bocznego.",
     position: "center",
   },
 ];
@@ -214,10 +203,6 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
               </div>
             )}
 
-            {/* Voice guidance */}
-            <div className="mt-4">
-              <VoiceGuidanceButton text={step.voiceText} label="Posłuchaj wyjaśnienia" variant="outline" size="sm" />
-            </div>
 
             {isLastStep && (
               <div className="mt-4 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20">

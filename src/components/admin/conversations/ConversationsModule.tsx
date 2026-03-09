@@ -4,7 +4,7 @@ import { MessageSquarePlus, Settings, ExternalLink } from "lucide-react";
 import { ContactsList } from "./ContactsList";
 import { ConversationView } from "./ConversationView";
 import { Contact, Conversation, Message } from "./types";
-import { VideoTutorialCard } from "../VideoTutorialCard";
+import { SectionGuide } from "../SectionGuide";
 import { Button } from "@/components/ui/button";
 
 // Demo data - only shown in demo mode
@@ -182,10 +182,7 @@ export function ConversationsModule({ isDemo = false }: ConversationsModuleProps
   if (!isDemo && contacts.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak działają konwersacje z klientami"
-          voiceText="Moduł konwersacji pozwala komunikować się z klientkami przez SMS, e-mail i WhatsApp z jednego miejsca. Aby go aktywować, potrzebujesz integracji z platformą komunikacyjną. Przejdź do Ustawień i skonfiguruj integrację."
-        />
+        <SectionGuide sectionKey="conversations" />
         <div className="glass-card h-[calc(100vh-14rem)] flex items-center justify-center">
           <div className="text-center max-w-md mx-auto p-8">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">

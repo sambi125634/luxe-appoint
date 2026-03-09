@@ -1,77 +1,101 @@
 
 
-# Plan: Rozbudowa kontekstowej pomocy w każdej zakładce
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Co robimy
+### Co już mamy
 
-1. **Usuwamy** `VideoTutorialCard` i `VoiceGuidanceButton` ze wszystkich modułów (13 plików) oraz z `GuidedTour` (admin + demo)
-2. **Rozbudowujemy** baner kontekstowy ("Co to dla Ciebie oznacza?") — obecnie istnieje jako `DemoBenefitBanner` tylko w demo. Tworzymy nowy uniwersalny komponent `SectionGuide` używany zarówno w demo, jak i w panelu admina
-3. **Dodajemy auto-tutorial per zakładka** — przy pierwszym wejściu w daną zakładkę wyświetla się rozwinięty poradnik z krokami "jak to zrobić". Po zamknięciu zapisuje się w `localStorage` i przy kolejnych wejściach pokazuje się w wersji zwiniętej (możliwość ponownego rozwinięcia)
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## Nowy komponent `SectionGuide`
+### Problem do rozwiązania
 
-Każda zakładka dostanie baner z trzema sekcjami:
-- **Co tu zrobisz** — 1-2 zdania wyjaśniające cel modułu
-- **Jak to zrobić krok po kroku** — numerowana lista 3-5 kroków
-- **Jaki problem to rozwiązuje** — bezpośrednie odniesienie do pain pointów (np. "Koniec z chaosem w zeszytach", "Nigdy więcej pustych slotów")
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-Baner będzie:
-- Automatycznie rozwinięty przy pierwszej wizycie w zakładce
-- Zwinięty z przyciskiem "Pokaż poradnik" przy kolejnych wizytach
-- Animowany (fade-in, collapsible)
-- Używany i w demo, i w panelu admina (bez duplikacji)
+---
 
-## Zakres zmian
+### Plan implementacji
 
-### Nowe pliki
-- `src/components/admin/SectionGuide.tsx` — uniwersalny komponent z logiką localStorage per zakładka
+#### FAZA 1: Role-based routing po loginie
 
-### Edytowane pliki (usunięcie VideoTutorialCard + dodanie SectionGuide)
-- `DashboardHome.tsx`
-- `ScheduleManagement.tsx`
-- `ClientsManagement.tsx`
-- `ServicesManagement.tsx`
-- `StaffManagement.tsx`
-- `TimeOffManagement.tsx`
-- `WidgetsManagement.tsx`
-- `ConversationsModule.tsx`
-- `PipelineModule.tsx`
-- `AccountingModule.tsx`
-- `ProductsModule.tsx`
-- `SettingsModule.tsx`
-- `SupportModule.tsx`
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### Edytowane pliki (usunięcie VoiceGuidanceButton)
-- `GuidedTour.tsx` (admin) — usunięcie voice, zachowanie reszty turu
-- `GuidedTour.tsx` (demo) — usunięcie voice
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-### Pliki do usunięcia (opcjonalnie zachowane ale nieużywane)
-- `VideoTutorialCard.tsx` — usunięcie importów ze wszystkich modułów
-- `VoiceGuidanceButton.tsx` — usunięcie importów ze wszystkich modułów
-- `DemoBenefitBanner.tsx` — zastąpiony przez `SectionGuide`
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-### DemoPage.tsx
-- Zamiana `DemoBenefitBanner` na `SectionGuide`
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## Przykład treści dla zakładki "Kalendarz"
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-```text
-📋 Co tu zrobisz:
-Zarządzasz wizytami całego salonu w jednym miejscu — widzisz grafik 
-każdego pracownika, dodajesz i edytujesz wizyty jednym kliknięciem.
+#### FAZA 3: Indywidualne kokpity
 
-🔢 Jak to zrobić:
-1. Upewnij się, że masz dodanych pracowników i ustawione godziny pracy
-2. Kliknij w wolny slot w kalendarzu, aby dodać wizytę
-3. Wybierz klientkę, usługę i pracownika
-4. Wizyta pojawi się w kalendarzu z kolorem przypisanym do pracownika
-5. Udostępnij widget — klientki będą rezerwować same 24/7
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-💡 Jaki problem to rozwiązuje:
-Koniec z papierowymi kalendarzami i chaosem przy telefonie 
-podczas zabiegu. Klientki rezerwują same, nawet o 23:00.
-```
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-## Liczba zmian
-~18 plików edytowanych, 1 nowy komponent. Treści po polsku, skupione na pain pointach i konkretnych krokach.
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

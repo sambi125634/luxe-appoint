@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { cn } from "@/lib/utils";
 import { ServiceMediaUpload, MediaFile } from "./ServiceMediaUpload";
 import { CSVImport } from "./CSVImport";
-import { VideoTutorialCard } from "./VideoTutorialCard";
+import { SectionGuide } from "./SectionGuide";
 import { useServices, useServiceCategories, useCreateService, useUpdateService, useDeleteService, useCreateCategory, useUpdateCategory } from "@/hooks/useServices";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { useToast } from "@/hooks/use-toast";
@@ -239,10 +239,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   if (!isDemo && services.length === 0 && categories.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak zarządzać usługami"
-          voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji."
-        />
+        <SectionGuide sectionKey="services" />
         <div className="text-center py-16">
           <Package className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
           <h3 className="text-xl font-serif font-semibold mb-2">Brak usług</h3>
@@ -266,10 +263,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
 
   return (
     <div className="space-y-6">
-      <VideoTutorialCard
-        title="Jak zarządzać usługami"
-        voiceText="Zarządzaj swoimi usługami — cenami, czasem trwania, kategoriami. Te dane wyświetlają się w widgecie rezerwacji, który widzą Twoje klientki."
-      />
+      <SectionGuide sectionKey="services" />
       {/* Categories */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
