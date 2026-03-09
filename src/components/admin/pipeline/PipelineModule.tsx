@@ -19,7 +19,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PipelineColumn } from "./PipelineColumn";
 import { ContactDetailModal } from "./ContactDetailModal";
 import { PipelineReports } from "./PipelineReports";
-import { VideoTutorialCard } from "../VideoTutorialCard";
+import { SectionGuide } from "../SectionGuide";
 import {
   PipelineContact,
   defaultPipelineStages,
