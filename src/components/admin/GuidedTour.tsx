@@ -75,7 +75,6 @@ const tourSteps: TourStep[] = [
     icon: <Code className="w-6 h-6" />,
     title: "Widget — rezerwacje online",
     description: "Skopiuj kod widgetu i wklej na swoją stronę www lub udostępnij bezpośredni link. Klientki rezerwują 24/7 — nawet o 23:00. To najważniejszy krok do automatyzacji.",
-    voiceText: "Widget rezerwacji to klucz do automatyzacji. Skopiuj kod i wklej na swoją stronę, albo udostępnij bezpośredni link w mediach społecznościowych. Klientki rezerwują 24 na 7 — nawet o 23 w nocy, kiedy Ty odpoczywasz.",
     limitations: "Widget wymaga skonfigurowanych usług i pracowników, żeby pokazywać wolne terminy.",
     position: "content",
   },
