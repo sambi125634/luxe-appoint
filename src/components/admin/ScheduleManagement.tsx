@@ -20,7 +20,7 @@ import {
   SmartScheduleHelpers 
 } from "./schedule";
 import { useTranslation } from "react-i18next";
-import { VideoTutorialCard } from "./VideoTutorialCard";
+import { SectionGuide } from "./SectionGuide";
 
 interface ScheduleManagementProps {
   isDemo?: boolean;
