@@ -30,7 +30,6 @@ const tourSteps: TourStep[] = [
     icon: <LayoutDashboard className="w-6 h-6" />,
     title: "Dashboard — centrum dowodzenia",
     description: "Tutaj widzisz podsumowanie dnia: nadchodzące wizyty, przychody, alerty i statystyki. Im więcej danych dodasz, tym więcej informacji tutaj zobaczysz.",
-    voiceText: "Dashboard to Twoje centrum dowodzenia. Widzisz tu podsumowanie dnia — nadchodzące wizyty, przychody, alerty i statystyki. Na początek będzie pusto, ale gdy zaczniesz przyjmować rezerwacje, wszystko się wypełni.",
     limitations: "Bez wizyt i klientów dashboard będzie pusty — to normalne na start.",
     position: "content",
   },
