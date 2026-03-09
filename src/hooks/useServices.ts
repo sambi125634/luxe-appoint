@@ -81,6 +81,8 @@ export function useUpdateService() {
       duration?: number;
       price?: number;
       description?: string;
+      media?: import("@/integrations/supabase/types").Json;
+      benefits?: import("@/integrations/supabase/types").Json;
     }) => {
       const { data, error } = await supabase
         .from("services")

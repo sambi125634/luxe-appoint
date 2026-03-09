@@ -87,15 +87,15 @@ const serviceRecommendations: Record<string, { id: string; name: string; price: 
   ],
 };
 
-export function BookingWidget({ widgetConfig }: BookingWidgetProps) {
+export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
   // Check if this is demo mode (demo-salon slug or no real salon)
   const isDemo = widgetConfig?.slug === 'demo-salon' || widgetConfig?.slug === 'main' || !widgetConfig;
   
-  // Fetch salon settings for prepayment config - use real demo salon ID
-  const salonId = "583de420-3642-460c-9349-b3a5d8737db8";
+  // Use salon ID from props, or fallback for demo
+  const salonId = propSalonId || "demo";
   
   useEffect(() => {
     // In demo mode, use mock settings with prepayment enabled for demonstration
