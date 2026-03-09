@@ -22,7 +22,6 @@ const tourSteps: TourStep[] = [
     icon: <Sparkles className="w-6 h-6" />,
     title: "Witaj w Beauty Calendar! 🎉",
     description: "Przeprowadzimy Cię przez każdą sekcję panelu, żebyś wiedziała dokładnie co tu robisz, jakie dane wpisać i dlaczego to ważne. Zajmie to 2 minuty.",
-    voiceText: "Witaj w Beauty Calendar! Przeprowadzimy Cię przez każdą sekcję panelu, żebyś wiedziała dokładnie co tu robisz, jakie dane wpisać i dlaczego to ważne. Zajmie to 2 minuty.",
     position: "center",
   },
   {
