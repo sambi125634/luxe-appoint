@@ -3,7 +3,6 @@ import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutD
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { TabType } from "./AdminSidebar";
-import { TabType } from "./AdminSidebar";
 
 interface TourStep {
   id: string;
