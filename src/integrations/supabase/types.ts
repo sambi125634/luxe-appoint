@@ -808,6 +808,7 @@ export type Database = {
       }
       services: {
         Row: {
+          benefits: Json
           category_id: string | null
           created_at: string
           description: string | null
@@ -822,6 +823,7 @@ export type Database = {
           vat_rate: number | null
         }
         Insert: {
+          benefits?: Json
           category_id?: string | null
           created_at?: string
           description?: string | null
@@ -836,6 +838,7 @@ export type Database = {
           vat_rate?: number | null
         }
         Update: {
+          benefits?: Json
           category_id?: string | null
           created_at?: string
           description?: string | null
