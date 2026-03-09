@@ -7,7 +7,7 @@ import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
-import { VideoTutorialCard } from "../VideoTutorialCard";
+import { SectionGuide } from "../SectionGuide";
 
 export function SettingsModule() {
   const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
