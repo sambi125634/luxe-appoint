@@ -1,101 +1,104 @@
 
+## Analiza stanu obecnego
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+**Co już jest:**
+- `ServiceMediaUpload.tsx` – upload zdjęć i wideo (base64 w state), do 5 plików, drag & drop
+- `ServiceSelection.tsx` (booking widget) – pokazuje miniaturki zdjęć, badge "Hit", listę korzyści (benefits), dialog podglądu
+- `ServicesManagement.tsx` – lista usług z miniaturkami, formularz z zakładką mediów
 
-### Co już mamy
-
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
-
-### Problem do rozwiązania
-
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+**Co brakuje / można podnieść na "wow":**
+1. Zdjęcia i wideo nie trafiają realnie do Supabase Storage – MediaUpload działa tylko na base64 w pamięci
+2. Booking widget `ServiceSelection.tsx` nie pobiera danych z bazy (hardcoded demo data) – klient nie widzi zdjęć ze Storage
+3. Brak pola `benefits` (korzyści) przy usłudze w bazie danych i w formularzu admina
+4. Serwis admin pokazuje zwykłą listę – brak "wow" visual w panelu
+5. Brak real-time upload do Storage z paskiem postępu
 
 ---
 
-### Plan implementacji
+## Plan: "Wow" Service Showcase
 
-#### FAZA 1: Role-based routing po loginie
+### 1. Baza danych – nowe pole `benefits`
+Migracja dodająca kolumnę `benefits jsonb default '[]'` do tabeli `services`.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 2. Upload mediów do Supabase Storage (prawdziwy)
+Zmodyfikować `ServiceMediaUpload.tsx` + logikę w `saveService()` w `ServicesManagement.tsx`:
+- Zamiast base64 → upload do bucketu `salon-media` (już istnieje, publiczny)
+- Zwraca URL z Storage, zapisywany w kolumnie `media jsonb`
+- Pasek postępu przy wgrywaniu
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 3. Pole „Efekty zabiegu / Korzyści" w formularzu admina
+W dialogu edycji usługi dodać sekcję: dynamiczna lista korzyści (dodaj/usuń tag), np.: "Nawilżenie", "Redukcja zmarszczek". Zapisywane do nowej kolumny `benefits`.
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### 4. Nowy "Showcase View" w panelu admina – zmiana z listy na karty
+W `ServicesManagement.tsx` – toggle między widokiem lista (aktualny) a widokiem **kart (grid)** z pełną miniaturką, tytułem, ceną i benefits. Widok "jak klient to zobaczy".
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### 5. Booking widget – prawdziwe dane z Supabase
+`ServiceSelection.tsx` — pobierać usługi z bazy przez `useServices()` (hook już istnieje), wyświetlać prawdziwe zdjęcia z Storage, prawdziwe korzyści z `benefits`.
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
-
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+### 6. Service Detail Modal (nowy) – widok "cinema"
+Kliknięcie w usługę w booking widgecie otwiera **fullscreen modal** z:
+- hero zdjęcie / carousel zdjęć
+- odtwarzacz wideo (jeśli wgrane wideo)
+- lista korzyści z checkmarkami (animowane)
+- info: czas + cena + kto wykonuje
+- duży CTA "Zarezerwuj teraz"
 
 ---
 
-### Wymagane zmiany w bazie danych
+## Pliki do zmiany/stworzenia
 
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+```text
+MIGRACJA BAZY:
+  supabase/migrations/   → ADD COLUMN benefits jsonb
 
-### Nowe komponenty
+NOWE PLIKI:
+  src/components/admin/services/ServiceShowcaseCard.tsx
+  src/components/booking/ServiceDetailModal.tsx
 
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+EDYCJA:
+  src/components/admin/ServicesManagement.tsx
+    → toggle list/grid view
+    → pole benefits w formularzu
+    → upload do Storage zamiast base64
 
-### Kolejność implementacji
+  src/components/admin/ServiceMediaUpload.tsx
+    → upload do Storage z progress bar
 
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+  src/components/booking/ServiceSelection.tsx
+    → prawdziwe dane z useServices()
+    → ServiceDetailModal zamiast prostego dialog
+    → hero cards dla popularnych
 
+  src/hooks/useServices.ts
+    → typ Service rozszerzony o benefits: string[]
+```
+
+### Wygląd docelowy (booking widget – widok klienta):
+
+```text
+┌─────────────────────────────────────────┐
+│  ⭐ POPULARNE ZABIEGI                    │
+│ ┌────────────────┐ ┌────────────────┐   │
+│ │ [FOTO 16:9]    │ │ [FOTO 16:9]    │   │
+│ │ ★ Hit          │ │ ★ Hit          │   │
+│ │ Mezoterapia    │ │ Peeling kaw.   │   │
+│ │ 350 zł · 60min │ │ 150 zł · 45min │   │
+│ └────────────────┘ └────────────────┘   │
+│                                         │
+│  WSZYSTKIE ZABIEGI                      │
+│ ┌─────────────────────────────────────┐ │
+│ │[FOTO]  Masaż relaksacyjny     200 zł│ │
+│ │        ✓ Redukuje stres  ▶ wideo   │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│  [Klik → ServiceDetailModal fullscreen] │
+│  ┌───────────────────────────────────┐  │
+│  │ HERO PHOTO / VIDEO CAROUSEL       │  │
+│  │ Nazwa zabiegu                     │  │
+│  │ ✓ Korzyść 1  ✓ Korzyść 2         │  │
+│  │ Wykonuje: Maria N.                │  │
+│  │ ⏱ 60 min    💰 350 zł            │  │
+│  │  [ZAREZERWUJ TERAZ →]             │  │
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+```
