@@ -105,7 +105,7 @@ export default function DemoPage() {
 
     return (
       <>
-        <DemoBenefitBanner benefitKey={benefitKey} />
+        <SectionGuide sectionKey={benefitKey} />
         {content}
       </>
     );

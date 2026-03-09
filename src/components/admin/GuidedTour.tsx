@@ -204,10 +204,6 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
               </div>
             )}
 
-            {/* Voice guidance */}
-            <div className="mt-4">
-              <VoiceGuidanceButton text={step.voiceText} label="Posłuchaj wyjaśnienia" variant="outline" size="sm" />
-            </div>
 
             {isLastStep && (
               <div className="mt-4 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
