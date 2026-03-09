@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AppointmentModal } from "./AppointmentModal";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useQueryClient } from "@tanstack/react-query";
+import { useSalonId } from "@/hooks/useSalonId";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface Appointment {
   id: string;
