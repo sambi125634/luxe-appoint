@@ -18,7 +18,6 @@ import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
-import { SectionGuide } from "@/components/admin/SectionGuide";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 
 export default function DemoPage() {
@@ -46,29 +45,7 @@ export default function DemoPage() {
     }
   };
 
-  const getBenefitKey = (tab: TabType): string => {
-    const benefitMap: Record<TabType, string> = {
-      home: "home",
-      calendar: "calendar",
-      clients: "clients",
-      services: "services",
-      staff: "staff",
-      widgets: "widgets",
-      "time-off": "timeOff",
-      stats: "stats",
-      settings: "settings",
-      conversations: "conversations",
-      pipeline: "pipeline",
-      accounting: "accounting",
-      products: "products",
-      support: "support",
-    };
-    return benefitMap[tab] || tab;
-  };
-
   const renderContent = () => {
-    const benefitKey = getBenefitKey(activeTab);
-
     const content = (() => {
       switch (activeTab) {
         case "home":
@@ -104,12 +81,7 @@ export default function DemoPage() {
       }
     })();
 
-    return (
-      <>
-        <SectionGuide sectionKey={benefitKey} />
-        {content}
-      </>
-    );
+    return content;
   };
 
   const handleTourComplete = () => {

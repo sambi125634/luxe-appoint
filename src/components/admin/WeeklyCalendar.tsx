@@ -21,12 +21,21 @@ interface Appointment {
   status: "confirmed" | "pending" | "cancelled";
 }
 
-const mockAppointments: Appointment[] = [
-  { id: "1", time: "09:00", duration: 60, client: "Anna Kowalska", service: "Peeling kawitacyjny", staff: "Maria N.", staffId: "1", status: "confirmed" },
-  { id: "2", time: "10:30", duration: 45, client: "Joanna Nowak", service: "Stylizacja brwi", staff: "Karolina W.", staffId: "2", status: "confirmed" },
-  { id: "3", time: "12:00", duration: 90, client: "Magdalena Wiśniewska", service: "Masaż relaksacyjny", staff: "Joanna L.", staffId: "3", status: "pending" },
-  { id: "4", time: "14:00", duration: 60, client: "Katarzyna Dąbrowska", service: "Mezoterapia igłowa", staff: "Anna K.", staffId: "1", status: "confirmed" },
-  { id: "5", time: "16:00", duration: 45, client: "Agnieszka Lewandowska", service: "Depilacja laserowa", staff: "Maria N.", staffId: "1", status: "confirmed" },
+interface MockAppointment extends Appointment {
+  dayOffset: number; // 0=Mon, 1=Tue, ..., 6=Sun
+}
+
+const mockAppointmentsData: MockAppointment[] = [
+  { id: "1", time: "09:00", duration: 60, client: "Anna Kowalska", service: "Peeling kawitacyjny", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 0 },
+  { id: "2", time: "10:30", duration: 45, client: "Joanna Nowak", service: "Stylizacja brwi", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 0 },
+  { id: "3", time: "14:00", duration: 90, client: "Magdalena Wiśniewska", service: "Masaż relaksacyjny", staff: "Joanna L.", staffId: "3", status: "pending", dayOffset: 1 },
+  { id: "4", time: "11:00", duration: 60, client: "Katarzyna Dąbrowska", service: "Mezoterapia igłowa", staff: "Anna K.", staffId: "1", status: "confirmed", dayOffset: 1 },
+  { id: "5", time: "09:00", duration: 45, client: "Agnieszka Lewandowska", service: "Depilacja laserowa", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 2 },
+  { id: "6", time: "13:00", duration: 60, client: "Ewa Szymańska", service: "Henna brwi i rzęs", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 2 },
+  { id: "7", time: "15:00", duration: 45, client: "Natalia Zielińska", service: "Manicure hybrydowy", staff: "Joanna L.", staffId: "3", status: "confirmed", dayOffset: 3 },
+  { id: "8", time: "10:00", duration: 60, client: "Monika Wójcik", service: "Peeling chemiczny", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 3 },
+  { id: "9", time: "12:00", duration: 90, client: "Beata Kamińska", service: "Masaż gorącymi kamieniami", staff: "Anna K.", staffId: "1", status: "pending", dayOffset: 4 },
+  { id: "10", time: "16:00", duration: 45, client: "Sylwia Pawlak", service: "Oczyszczanie twarzy", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 4 },
 ];
 
 const mockStaff = [
@@ -50,7 +59,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [appointments, setAppointments] = useState(isDemo ? mockAppointments : []);
+  const [appointments, setAppointments] = useState<(Appointment & { dayOffset?: number })[]>(isDemo ? mockAppointmentsData : []);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
@@ -107,7 +116,13 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   };
 
   const getAppointmentsForSlot = (dayIndex: number, hour: string) => {
-    return appointments.filter(apt => apt.time === hour);
+    return appointments.filter(apt => {
+      const timeMatch = apt.time === hour;
+      if ('dayOffset' in apt && apt.dayOffset !== undefined) {
+        return timeMatch && apt.dayOffset === dayIndex;
+      }
+      return timeMatch;
+    });
   };
 
   const handleSlotClick = (dayIndex: number, hour: string) => {
