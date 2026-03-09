@@ -33,7 +33,7 @@ import { EmbedCodeModal } from "./EmbedCodeModal";
 import { WidgetEditor } from "./WidgetEditor";
 import { PromotionsManager } from "./PromotionsManager";
 import { InstagramLinkGenerator } from "./InstagramLinkGenerator";
-import { VideoTutorialCard } from "../VideoTutorialCard";
+import { SectionGuide } from "../SectionGuide";
 
 interface WidgetsManagementProps {
   isDemo?: boolean;
