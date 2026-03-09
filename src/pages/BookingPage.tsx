@@ -1,44 +1,113 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Sparkles, MapPin, Phone, Clock } from "lucide-react";
+import { Sparkles, MapPin, Phone, Clock, Loader2 } from "lucide-react";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { BookingWidget as WidgetConfig, mockWidgets } from "@/components/admin/widgets/types";
+import { supabase } from "@/integrations/supabase/client";
 
-// This would come from API/database
-const salonInfo = {
-  name: "Luxury Beauty Spa",
-  address: "ul. Piękna 15, 00-001 Warszawa",
-  phone: "+48 22 123 45 67",
-  hours: "Pon-Pt: 9:00-20:00, Sob: 10:00-18:00",
-  description: "Twój azyl piękna w sercu Warszawy. Oferujemy kompleksowe usługi kosmetyczne i spa na najwyższym poziomie.",
-};
+interface SalonInfo {
+  id: string;
+  name: string;
+  address: string | null;
+  city: string | null;
+  phone: string | null;
+  description: string | null;
+  slug: string;
+}
 
 export default function BookingPage() {
   const { slug } = useParams();
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
+  const [salonInfo, setSalonInfo] = useState<SalonInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Load widget configuration based on slug
-    // In production, this would be an API call to load from database
-    const loadWidgetConfig = () => {
+    const loadSalonData = async () => {
       setLoading(true);
-      
-      // Find widget by slug (mock implementation)
-      const widget = mockWidgets.find(w => w.slug === slug) || mockWidgets[0];
+      setError(null);
+
+      if (!slug) {
+        setError("Brak identyfikatora salonu");
+        setLoading(false);
+        return;
+      }
+
+      // Check if demo slug
+      const isDemo = slug === "demo-salon";
+
+      if (isDemo) {
+        const widget = mockWidgets.find(w => w.slug === slug) || mockWidgets[0];
+        setWidgetConfig(widget);
+        setSalonInfo({
+          id: "demo",
+          name: "Luxury Beauty Spa",
+          address: "ul. Piękna 15, 00-001 Warszawa",
+          city: "Warszawa",
+          phone: "+48 22 123 45 67",
+          description: "Twój azyl piękna w sercu Warszawy. Oferujemy kompleksowe usługi kosmetyczne i spa na najwyższym poziomie.",
+          slug: "demo-salon",
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Fetch real salon by slug
+      const { data: salon, error: salonError } = await supabase
+        .from("salons")
+        .select("id, name, address, city, phone, description, slug")
+        .eq("slug", slug)
+        .eq("is_active", true)
+        .maybeSingle();
+
+      if (salonError || !salon) {
+        setError("Nie znaleziono salonu");
+        setLoading(false);
+        return;
+      }
+
+      setSalonInfo({
+        id: salon.id,
+        name: salon.name,
+        address: salon.address,
+        city: salon.city,
+        phone: salon.phone,
+        description: salon.description,
+        slug: salon.slug,
+      });
+
+      // Use mock widget config with real salon data
+      const widget = mockWidgets.find(w => w.slug === slug) || {
+        ...mockWidgets[0],
+        slug: salon.slug,
+        salonId: salon.id,
+        theme: {
+          ...mockWidgets[0].theme,
+          headerText: salon.name,
+        },
+      };
       setWidgetConfig(widget);
-      
       setLoading(false);
     };
 
-    loadWidgetConfig();
+    loadSalonData();
   }, [slug]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin">
-          <Sparkles className="w-8 h-8 text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error || !salonInfo) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-serif font-bold mb-2">Salon nie znaleziony</h1>
+          <p className="text-muted-foreground mb-4">{error || "Sprawdź adres URL i spróbuj ponownie."}</p>
+          <Link to="/" className="text-primary hover:underline">Wróć na stronę główną</Link>
         </div>
       </div>
     );
@@ -59,22 +128,24 @@ export default function BookingPage() {
               <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2">
                 {widgetConfig?.theme?.headerText || salonInfo.name}
               </h1>
-              <p className="text-muted-foreground max-w-xl">{salonInfo.description}</p>
+              {salonInfo.description && (
+                <p className="text-muted-foreground max-w-xl">{salonInfo.description}</p>
+              )}
             </div>
             
             <div className="flex flex-col gap-2 text-sm">
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <MapPin className="w-4 h-4 text-primary" />
-                {salonInfo.address}
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Phone className="w-4 h-4 text-primary" />
-                {salonInfo.phone}
-              </div>
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Clock className="w-4 h-4 text-primary" />
-                {salonInfo.hours}
-              </div>
+              {salonInfo.address && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  {salonInfo.address}{salonInfo.city ? `, ${salonInfo.city}` : ""}
+                </div>
+              )}
+              {salonInfo.phone && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Phone className="w-4 h-4 text-primary" />
+                  {salonInfo.phone}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -82,7 +153,7 @@ export default function BookingPage() {
 
       {/* Booking Widget */}
       <main className="container mx-auto px-4 py-12">
-        <BookingWidget widgetConfig={widgetConfig} />
+        <BookingWidget widgetConfig={widgetConfig} salonId={salonInfo.id} />
       </main>
 
       {/* Footer */}
