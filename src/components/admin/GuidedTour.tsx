@@ -39,7 +39,6 @@ const tourSteps: TourStep[] = [
     icon: <Calendar className="w-6 h-6" />,
     title: "Kalendarz — serce salonu",
     description: "Tutaj zarządzasz wizytami. Kliknij w wolny slot, aby dodać wizytę. Widzisz grafik wszystkich pracowników na jednym ekranie. Klientki mogą też rezerwować same przez widget.",
-    voiceText: "Kalendarz to serce Twojego salonu. Kliknij w wolny slot, aby dodać wizytę. Widzisz grafik wszystkich pracowników na jednym ekranie. Klientki mogą też rezerwować same przez widget na Twojej stronie.",
     limitations: "Żeby widzieć sloty, musisz najpierw dodać pracowników i ustawić godziny pracy.",
     position: "content",
   },
