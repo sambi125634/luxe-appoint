@@ -84,7 +84,6 @@ const tourSteps: TourStep[] = [
     icon: <Settings className="w-6 h-6" />,
     title: "Ustawienia — personalizacja",
     description: "Skonfiguruj profil salonu, branding, powiadomienia SMS/email i integracje. Logo i kolory wyświetlają się w widgecie rezerwacji.",
-    voiceText: "W ustawieniach konfigurujesz profil salonu, logo, kolory brandingowe, powiadomienia SMS i email dla klientek, oraz integracje z innymi narzędziami jak Google Calendar. Twoje logo i kolory wyświetlają się w widgecie rezerwacji.",
     position: "content",
   },
   {
