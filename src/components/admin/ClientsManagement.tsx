@@ -360,10 +360,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   if (!isDemo && clients.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak zarządzać bazą klientów"
-          voiceText="Tu zarządzasz bazą klientów. Możesz dodać klientów ręcznie, importować z pliku CSV, lub poczekać — system automatycznie tworzy profil klienta przy pierwszej rezerwacji online."
-        />
+        <SectionGuide sectionKey="clients" />
         <div className="text-center py-16">
           <Users className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
           <h3 className="text-xl font-serif font-semibold mb-2">Brak klientów</h3>
