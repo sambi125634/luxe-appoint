@@ -1,104 +1,168 @@
 
-## Analiza stanu obecnego
 
-**Co już jest:**
-- `ServiceMediaUpload.tsx` – upload zdjęć i wideo (base64 w state), do 5 plików, drag & drop
-- `ServiceSelection.tsx` (booking widget) – pokazuje miniaturki zdjęć, badge "Hit", listę korzyści (benefits), dialog podglądu
-- `ServicesManagement.tsx` – lista usług z miniaturkami, formularz z zakładką mediów
+# Protokół Testowy — Panel Admin Beauty Calendar
 
-**Co brakuje / można podnieść na "wow":**
-1. Zdjęcia i wideo nie trafiają realnie do Supabase Storage – MediaUpload działa tylko na base64 w pamięci
-2. Booking widget `ServiceSelection.tsx` nie pobiera danych z bazy (hardcoded demo data) – klient nie widzi zdjęć ze Storage
-3. Brak pola `benefits` (korzyści) przy usłudze w bazie danych i w formularzu admina
-4. Serwis admin pokazuje zwykłą listę – brak "wow" visual w panelu
-5. Brak real-time upload do Storage z paskiem postępu
+## Cel
+Systematyczna weryfikacja każdego modułu panelu administracyjnego, zarówno w trybie demo (`/demo`) jak i w trybie produkcyjnym (`/admin`), aby potwierdzić gotowość platformy od rejestracji do pełnej obsługi salonu.
 
 ---
 
-## Plan: "Wow" Service Showcase
+## Faza 0: Rejestracja i Onboarding
 
-### 1. Baza danych – nowe pole `benefits`
-Migracja dodająca kolumnę `benefits jsonb default '[]'` do tabeli `services`.
-
-### 2. Upload mediów do Supabase Storage (prawdziwy)
-Zmodyfikować `ServiceMediaUpload.tsx` + logikę w `saveService()` w `ServicesManagement.tsx`:
-- Zamiast base64 → upload do bucketu `salon-media` (już istnieje, publiczny)
-- Zwraca URL z Storage, zapisywany w kolumnie `media jsonb`
-- Pasek postępu przy wgrywaniu
-
-### 3. Pole „Efekty zabiegu / Korzyści" w formularzu admina
-W dialogu edycji usługi dodać sekcję: dynamiczna lista korzyści (dodaj/usuń tag), np.: "Nawilżenie", "Redukcja zmarszczek". Zapisywane do nowej kolumny `benefits`.
-
-### 4. Nowy "Showcase View" w panelu admina – zmiana z listy na karty
-W `ServicesManagement.tsx` – toggle między widokiem lista (aktualny) a widokiem **kart (grid)** z pełną miniaturką, tytułem, ceną i benefits. Widok "jak klient to zobaczy".
-
-### 5. Booking widget – prawdziwe dane z Supabase
-`ServiceSelection.tsx` — pobierać usługi z bazy przez `useServices()` (hook już istnieje), wyświetlać prawdziwe zdjęcia z Storage, prawdziwe korzyści z `benefits`.
-
-### 6. Service Detail Modal (nowy) – widok "cinema"
-Kliknięcie w usługę w booking widgecie otwiera **fullscreen modal** z:
-- hero zdjęcie / carousel zdjęć
-- odtwarzacz wideo (jeśli wgrane wideo)
-- lista korzyści z checkmarkami (animowane)
-- info: czas + cena + kto wykonuje
-- duży CTA "Zarezerwuj teraz"
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 0.1 | Otwórz `/auth`, przejdź na zakładkę "Rejestracja" | Formularz: imię, nazwisko, email, hasło |
+| 0.2 | Wypełnij formularz i kliknij "Zarejestruj się" | Toast sukcesu, email weryfikacyjny wysłany |
+| 0.3 | Potwierdź email → automatyczny redirect do `/onboarding` | Kreator 5-krokowy widoczny |
+| 0.4 | **Krok 1** — Dane salonu: nazwa, adres, miasto, telefon, email | Walidacja (nazwa wymagana), przycisk "Dalej" aktywny |
+| 0.5 | **Krok 2** — Godziny pracy: domyślne pon-sob, edycja checkboxów i godzin | Zapis działa, można wyłączyć/włączyć dni |
+| 0.6 | **Krok 3** — Usługi: wybór branży → propozycje kategorii/usług | Kategorie i usługi dodane do bazy |
+| 0.7 | **Krok 4** — Pracownicy: dodanie min. 1 pracownika (opcjonalne) | Pominięcie lub dodanie działa |
+| 0.8 | **Krok 5** — Podsumowanie: link do rezerwacji, embed code | Kopiowanie linku/kodu działa, przycisk "Przejdź do panelu" |
+| 0.9 | Redirect do `/admin` | Dashboard widoczny, Setup Checklist pokazuje postęp |
 
 ---
 
-## Pliki do zmiany/stworzenia
+## Faza 1: Dashboard (`home`)
 
-```text
-MIGRACJA BAZY:
-  supabase/migrations/   → ADD COLUMN benefits jsonb
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 1.1 | KPI cards widoczne (wizyty dziś, przychód, klienci) | Dane z bazy lub "0" dla nowego salonu |
+| 1.2 | Setup Checklist — kliknij każdy item | Nawiguje do odpowiedniej zakładki |
+| 1.3 | "Szybka sprzedaż produktu" — przycisk otwiera modal | Modal QuickProductSale się otwiera |
+| 1.4 | Samouczek (GuidedTour) — przycisk w headerze | Tour startuje i przechodzi przez kroki |
 
-NOWE PLIKI:
-  src/components/admin/services/ServiceShowcaseCard.tsx
-  src/components/booking/ServiceDetailModal.tsx
+---
 
-EDYCJA:
-  src/components/admin/ServicesManagement.tsx
-    → toggle list/grid view
-    → pole benefits w formularzu
-    → upload do Storage zamiast base64
+## Faza 2: Kalendarz (`calendar`)
 
-  src/components/admin/ServiceMediaUpload.tsx
-    → upload do Storage z progress bar
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 2.1 | Widok tygodniowy się ładuje | Siatka godzin × pracownicy |
+| 2.2 | Kliknij slot → AppointmentModal | Formularz wizyty: klient, usługa, pracownik, data/godzina |
+| 2.3 | Zapisz wizytę | Toast sukcesu, wizyta pojawia się w kalendarzu |
+| 2.4 | Edytuj istniejącą wizytę | Modal z wypełnionymi danymi, zapis działa |
+| 2.5 | Anuluj wizytę | Status zmieniony, wizyta oznaczona |
 
-  src/components/booking/ServiceSelection.tsx
-    → prawdziwe dane z useServices()
-    → ServiceDetailModal zamiast prostego dialog
-    → hero cards dla popularnych
+---
 
-  src/hooks/useServices.ts
-    → typ Service rozszerzony o benefits: string[]
-```
+## Faza 3: Usługi (`services`)
 
-### Wygląd docelowy (booking widget – widok klienta):
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 3.1 | Lista usług się ładuje (lub pusta dla nowego salonu) | Skeleton loader → dane |
+| 3.2 | "Dodaj usługę" → dialog z formularzem | Pola: nazwa, kategoria, czas, cena, opis, media, korzyści |
+| 3.3 | Upload zdjęcia w zakładce "Media" | Plik uploadowany do Storage, miniatura widoczna |
+| 3.4 | Upload wideo | Wideo uploadowane, preview player |
+| 3.5 | Dodaj korzyści (benefits) — tagi | Dynamiczne dodawanie/usuwanie tagów |
+| 3.6 | Zapisz usługę | Toast sukcesu, usługa na liście |
+| 3.7 | Edytuj usługę | Dialog z wypełnionymi danymi, zapis działa |
+| 3.8 | Usuń usługę | Potwierdzenie, usunięcie z listy |
+| 3.9 | Dodaj kategorię | Dialog kategorii, zapis do bazy |
+| 3.10 | Filtruj po kategorii | Lista filtrowana |
+| 3.11 | Wyszukaj po nazwie | Wyniki filtrowane |
+| 3.12 | Toggle widok lista/karty (showcase) | Przełączenie między widokami |
+| 3.13 | Import CSV | Dialog importu, parsowanie pliku |
 
-```text
-┌─────────────────────────────────────────┐
-│  ⭐ POPULARNE ZABIEGI                    │
-│ ┌────────────────┐ ┌────────────────┐   │
-│ │ [FOTO 16:9]    │ │ [FOTO 16:9]    │   │
-│ │ ★ Hit          │ │ ★ Hit          │   │
-│ │ Mezoterapia    │ │ Peeling kaw.   │   │
-│ │ 350 zł · 60min │ │ 150 zł · 45min │   │
-│ └────────────────┘ └────────────────┘   │
-│                                         │
-│  WSZYSTKIE ZABIEGI                      │
-│ ┌─────────────────────────────────────┐ │
-│ │[FOTO]  Masaż relaksacyjny     200 zł│ │
-│ │        ✓ Redukuje stres  ▶ wideo   │ │
-│ └─────────────────────────────────────┘ │
-│                                         │
-│  [Klik → ServiceDetailModal fullscreen] │
-│  ┌───────────────────────────────────┐  │
-│  │ HERO PHOTO / VIDEO CAROUSEL       │  │
-│  │ Nazwa zabiegu                     │  │
-│  │ ✓ Korzyść 1  ✓ Korzyść 2         │  │
-│  │ Wykonuje: Maria N.                │  │
-│  │ ⏱ 60 min    💰 350 zł            │  │
-│  │  [ZAREZERWUJ TERAZ →]             │  │
-│  └───────────────────────────────────┘  │
-└─────────────────────────────────────────┘
-```
+---
+
+## Faza 4: Personel (`staff`)
+
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 4.1 | Lista pracowników | Karty z avatarami |
+| 4.2 | "Dodaj pracownika" | Formularz: imię, email, telefon, rola, kolor, godziny pracy |
+| 4.3 | Przypisz usługi do pracownika | Checkboxy usług, zapis |
+| 4.4 | Edytuj pracownika | Dane wypełnione, zapis działa |
+| 4.5 | Usuń pracownika | Potwierdzenie, usunięcie |
+| 4.6 | Ustaw godziny pracy per dzień | 7 dni z checkboxami i zakresami godzin |
+
+---
+
+## Faza 5: Klienci (`clients`)
+
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 5.1 | Lista klientów (lub pusta) | Tabela/karty z danymi |
+| 5.2 | "Dodaj klienta" | Formularz: imię, nazwisko, telefon, email, notatki, tagi, RODO |
+| 5.3 | Zapisz klienta | Toast sukcesu, klient na liście |
+| 5.4 | Edytuj klienta | Dialog z danymi, zapis |
+| 5.5 | Filtruj (VIP, problematyczny, tagi) | Filtry działają |
+| 5.6 | Wyszukaj klienta | Wyniki filtrowane |
+| 5.7 | Widok historii wizyt klienta | Zakładka z listą wizyt |
+
+---
+
+## Faza 6: Produkty (`products`)
+
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 6.1 | Katalog produktów — dodaj produkt | Formularz: nazwa, marka, kategoria, cena, SKU, EAN, zdjęcie |
+| 6.2 | Magazyn — stany magazynowe | Lista z current_stock, korekta stanu |
+| 6.3 | Dostawy — dodaj dostawę | Formularz z dostawcą, produktami, ilościami |
+| 6.4 | Raport sprzedaży | Tabela/wykresy |
+| 6.5 | Dostawcy — dodaj dostawcę | Formularz: nazwa, kontakt, email, telefon, warunki |
+
+---
+
+## Faza 7: Pozostałe moduły
+
+| # | Moduł | Test | Oczekiwany wynik |
+|---|-------|------|-----------------|
+| 7.1 | Urlopy (`time-off`) | Dodaj urlop dla pracownika | Formularz z datami, typem, zapis |
+| 7.2 | Widgety (`widgets`) | Widget editor, embed code | Kod do skopiowania, podgląd widgetu |
+| 7.3 | Konwersacje (`conversations`) | Lista kontaktów, wysłanie wiadomości | UI czatu widoczne |
+| 7.4 | Pipeline (`pipeline`) | Kolumny Kanban, dodaj/przesuń kartę | Drag & drop lub zmiana statusu |
+| 7.5 | Księgowość (`accounting`) | Wykresy, filtry, export | Dane wyświetlane, eksport działa |
+| 7.6 | Statystyki (`stats`) | Wykresy KPI | Dane renderowane |
+| 7.7 | Ustawienia (`settings`) | Profil salonu, powiadomienia, integracje, rezerwacje | Formularz zapisu, toggle'e |
+| 7.8 | Pomoc (`support`) | Chat AI, szybkie akcje | Wiadomość wysłana, odpowiedź |
+
+---
+
+## Faza 8: Booking Widget (strona klienta)
+
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 8.1 | Otwórz `/book/{slug}` | Widget się ładuje, usługi z bazy |
+| 8.2 | Wybierz usługę | ServiceDetailModal z mediami, korzyściami, CTA |
+| 8.3 | Wybierz pracownika | Lista dostępnych pracowników |
+| 8.4 | Wybierz datę i godzinę | Dostępne sloty wyświetlone |
+| 8.5 | Wypełnij formularz klienta | Imię, nazwisko, telefon, email |
+| 8.6 | Potwierdź rezerwację | Konfirmacja z confetti, wizyta w kalendarzu admina |
+
+---
+
+## Faza 9: Demo vs Produkcja
+
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 9.1 | `/demo` — wszystkie moduły z danymi mockowanymi | `isDemo=true` → dane demo, baner "To jest wersja demo" |
+| 9.2 | `/admin` (nowe konto) — pusta karta | `isDemo=false` → puste tabele, Setup Checklist |
+| 9.3 | Demo: przyciski "Dodaj" działają (ale nie zapisują do bazy) | UI responsywne, brak błędów |
+| 9.4 | Admin: CRUD operacje zapisują do bazy | Dane trwałe po odświeżeniu |
+
+---
+
+## Faza 10: Responsywność i UX
+
+| # | Test | Oczekiwany wynik |
+|---|------|-----------------|
+| 10.1 | Panel na mobile (< 768px) | Sidebar hamburger, treść bez overflow |
+| 10.2 | Wszystkie dialogi/modale na mobile | Scrollowalne, przyciski widoczne |
+| 10.3 | Toast notifications | Pojawiają się i znikają |
+| 10.4 | Loading states | Skeleton loaders we wszystkich modułach |
+| 10.5 | Logout | Redirect do `/auth`, sesja wyczyszczona |
+
+---
+
+## Sposób przeprowadzenia
+
+Mogę przeprowadzić ten protokół krok po kroku używając narzędzi przeglądarki — ale wymaga to, żebyś najpierw:
+1. **Zalogował/a się w podglądzie** (preview) na konto testowe
+2. **Dał/a mi znać**, że mogę zacząć testować
+
+Alternatywnie mogę przejrzeć kod każdego modułu i zidentyfikować potencjalne problemy bez uruchamiania przeglądarki — to szybsze i nie wymaga logowania.
+
+**Które podejście preferujesz?**
+
