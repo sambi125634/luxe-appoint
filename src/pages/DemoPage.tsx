@@ -18,7 +18,7 @@ import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
-import { DemoBenefitBanner } from "@/components/demo/DemoBenefitBanner";
+import { SectionGuide } from "@/components/admin/SectionGuide";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 
 export default function DemoPage() {
