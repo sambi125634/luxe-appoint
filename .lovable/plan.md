@@ -1,168 +1,101 @@
 
 
-# Protokół Testowy — Panel Admin Beauty Calendar
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Cel
-Systematyczna weryfikacja każdego modułu panelu administracyjnego, zarówno w trybie demo (`/demo`) jak i w trybie produkcyjnym (`/admin`), aby potwierdzić gotowość platformy od rejestracji do pełnej obsługi salonu.
+### Co już mamy
 
----
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## Faza 0: Rejestracja i Onboarding
+### Problem do rozwiązania
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 0.1 | Otwórz `/auth`, przejdź na zakładkę "Rejestracja" | Formularz: imię, nazwisko, email, hasło |
-| 0.2 | Wypełnij formularz i kliknij "Zarejestruj się" | Toast sukcesu, email weryfikacyjny wysłany |
-| 0.3 | Potwierdź email → automatyczny redirect do `/onboarding` | Kreator 5-krokowy widoczny |
-| 0.4 | **Krok 1** — Dane salonu: nazwa, adres, miasto, telefon, email | Walidacja (nazwa wymagana), przycisk "Dalej" aktywny |
-| 0.5 | **Krok 2** — Godziny pracy: domyślne pon-sob, edycja checkboxów i godzin | Zapis działa, można wyłączyć/włączyć dni |
-| 0.6 | **Krok 3** — Usługi: wybór branży → propozycje kategorii/usług | Kategorie i usługi dodane do bazy |
-| 0.7 | **Krok 4** — Pracownicy: dodanie min. 1 pracownika (opcjonalne) | Pominięcie lub dodanie działa |
-| 0.8 | **Krok 5** — Podsumowanie: link do rezerwacji, embed code | Kopiowanie linku/kodu działa, przycisk "Przejdź do panelu" |
-| 0.9 | Redirect do `/admin` | Dashboard widoczny, Setup Checklist pokazuje postęp |
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
 ---
 
-## Faza 1: Dashboard (`home`)
+### Plan implementacji
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 1.1 | KPI cards widoczne (wizyty dziś, przychód, klienci) | Dane z bazy lub "0" dla nowego salonu |
-| 1.2 | Setup Checklist — kliknij każdy item | Nawiguje do odpowiedniej zakładki |
-| 1.3 | "Szybka sprzedaż produktu" — przycisk otwiera modal | Modal QuickProductSale się otwiera |
-| 1.4 | Samouczek (GuidedTour) — przycisk w headerze | Tour startuje i przechodzi przez kroki |
+#### FAZA 1: Role-based routing po loginie
 
----
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-## Faza 2: Kalendarz (`calendar`)
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 2.1 | Widok tygodniowy się ładuje | Siatka godzin × pracownicy |
-| 2.2 | Kliknij slot → AppointmentModal | Formularz wizyty: klient, usługa, pracownik, data/godzina |
-| 2.3 | Zapisz wizytę | Toast sukcesu, wizyta pojawia się w kalendarzu |
-| 2.4 | Edytuj istniejącą wizytę | Modal z wypełnionymi danymi, zapis działa |
-| 2.5 | Anuluj wizytę | Status zmieniony, wizyta oznaczona |
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
----
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## Faza 3: Usługi (`services`)
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 3.1 | Lista usług się ładuje (lub pusta dla nowego salonu) | Skeleton loader → dane |
-| 3.2 | "Dodaj usługę" → dialog z formularzem | Pola: nazwa, kategoria, czas, cena, opis, media, korzyści |
-| 3.3 | Upload zdjęcia w zakładce "Media" | Plik uploadowany do Storage, miniatura widoczna |
-| 3.4 | Upload wideo | Wideo uploadowane, preview player |
-| 3.5 | Dodaj korzyści (benefits) — tagi | Dynamiczne dodawanie/usuwanie tagów |
-| 3.6 | Zapisz usługę | Toast sukcesu, usługa na liście |
-| 3.7 | Edytuj usługę | Dialog z wypełnionymi danymi, zapis działa |
-| 3.8 | Usuń usługę | Potwierdzenie, usunięcie z listy |
-| 3.9 | Dodaj kategorię | Dialog kategorii, zapis do bazy |
-| 3.10 | Filtruj po kategorii | Lista filtrowana |
-| 3.11 | Wyszukaj po nazwie | Wyniki filtrowane |
-| 3.12 | Toggle widok lista/karty (showcase) | Przełączenie między widokami |
-| 3.13 | Import CSV | Dialog importu, parsowanie pliku |
+#### FAZA 3: Indywidualne kokpity
 
----
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-## Faza 4: Personel (`staff`)
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 4.1 | Lista pracowników | Karty z avatarami |
-| 4.2 | "Dodaj pracownika" | Formularz: imię, email, telefon, rola, kolor, godziny pracy |
-| 4.3 | Przypisz usługi do pracownika | Checkboxy usług, zapis |
-| 4.4 | Edytuj pracownika | Dane wypełnione, zapis działa |
-| 4.5 | Usuń pracownika | Potwierdzenie, usunięcie |
-| 4.6 | Ustaw godziny pracy per dzień | 7 dni z checkboxami i zakresami godzin |
+#### FAZA 4: Aplikacja mobilna (PWA)
 
----
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-## Faza 5: Klienci (`clients`)
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 5.1 | Lista klientów (lub pusta) | Tabela/karty z danymi |
-| 5.2 | "Dodaj klienta" | Formularz: imię, nazwisko, telefon, email, notatki, tagi, RODO |
-| 5.3 | Zapisz klienta | Toast sukcesu, klient na liście |
-| 5.4 | Edytuj klienta | Dialog z danymi, zapis |
-| 5.5 | Filtruj (VIP, problematyczny, tagi) | Filtry działają |
-| 5.6 | Wyszukaj klienta | Wyniki filtrowane |
-| 5.7 | Widok historii wizyt klienta | Zakładka z listą wizyt |
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
 
 ---
 
-## Faza 6: Produkty (`products`)
+### Wymagane zmiany w bazie danych
 
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 6.1 | Katalog produktów — dodaj produkt | Formularz: nazwa, marka, kategoria, cena, SKU, EAN, zdjęcie |
-| 6.2 | Magazyn — stany magazynowe | Lista z current_stock, korekta stanu |
-| 6.3 | Dostawy — dodaj dostawę | Formularz z dostawcą, produktami, ilościami |
-| 6.4 | Raport sprzedaży | Tabela/wykresy |
-| 6.5 | Dostawcy — dodaj dostawcę | Formularz: nazwa, kontakt, email, telefon, warunki |
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
 
----
+### Nowe komponenty
 
-## Faza 7: Pozostałe moduły
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
 
-| # | Moduł | Test | Oczekiwany wynik |
-|---|-------|------|-----------------|
-| 7.1 | Urlopy (`time-off`) | Dodaj urlop dla pracownika | Formularz z datami, typem, zapis |
-| 7.2 | Widgety (`widgets`) | Widget editor, embed code | Kod do skopiowania, podgląd widgetu |
-| 7.3 | Konwersacje (`conversations`) | Lista kontaktów, wysłanie wiadomości | UI czatu widoczne |
-| 7.4 | Pipeline (`pipeline`) | Kolumny Kanban, dodaj/przesuń kartę | Drag & drop lub zmiana statusu |
-| 7.5 | Księgowość (`accounting`) | Wykresy, filtry, export | Dane wyświetlane, eksport działa |
-| 7.6 | Statystyki (`stats`) | Wykresy KPI | Dane renderowane |
-| 7.7 | Ustawienia (`settings`) | Profil salonu, powiadomienia, integracje, rezerwacje | Formularz zapisu, toggle'e |
-| 7.8 | Pomoc (`support`) | Chat AI, szybkie akcje | Wiadomość wysłana, odpowiedź |
+### Kolejność implementacji
 
----
-
-## Faza 8: Booking Widget (strona klienta)
-
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 8.1 | Otwórz `/book/{slug}` | Widget się ładuje, usługi z bazy |
-| 8.2 | Wybierz usługę | ServiceDetailModal z mediami, korzyściami, CTA |
-| 8.3 | Wybierz pracownika | Lista dostępnych pracowników |
-| 8.4 | Wybierz datę i godzinę | Dostępne sloty wyświetlone |
-| 8.5 | Wypełnij formularz klienta | Imię, nazwisko, telefon, email |
-| 8.6 | Potwierdź rezerwację | Konfirmacja z confetti, wizyta w kalendarzu admina |
-
----
-
-## Faza 9: Demo vs Produkcja
-
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 9.1 | `/demo` — wszystkie moduły z danymi mockowanymi | `isDemo=true` → dane demo, baner "To jest wersja demo" |
-| 9.2 | `/admin` (nowe konto) — pusta karta | `isDemo=false` → puste tabele, Setup Checklist |
-| 9.3 | Demo: przyciski "Dodaj" działają (ale nie zapisują do bazy) | UI responsywne, brak błędów |
-| 9.4 | Admin: CRUD operacje zapisują do bazy | Dane trwałe po odświeżeniu |
-
----
-
-## Faza 10: Responsywność i UX
-
-| # | Test | Oczekiwany wynik |
-|---|------|-----------------|
-| 10.1 | Panel na mobile (< 768px) | Sidebar hamburger, treść bez overflow |
-| 10.2 | Wszystkie dialogi/modale na mobile | Scrollowalne, przyciski widoczne |
-| 10.3 | Toast notifications | Pojawiają się i znikają |
-| 10.4 | Loading states | Skeleton loaders we wszystkich modułach |
-| 10.5 | Logout | Redirect do `/auth`, sesja wyczyszczona |
-
----
-
-## Sposób przeprowadzenia
-
-Mogę przeprowadzić ten protokół krok po kroku używając narzędzi przeglądarki — ale wymaga to, żebyś najpierw:
-1. **Zalogował/a się w podglądzie** (preview) na konto testowe
-2. **Dał/a mi znać**, że mogę zacząć testować
-
-Alternatywnie mogę przejrzeć kod każdego modułu i zidentyfikować potencjalne problemy bez uruchamiania przeglądarki — to szybsze i nie wymaga logowania.
-
-**Które podejście preferujesz?**
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

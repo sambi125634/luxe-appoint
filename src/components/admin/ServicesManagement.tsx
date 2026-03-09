@@ -157,6 +157,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
           duration: serviceForm.duration,
           price: serviceForm.price,
           description: serviceForm.description,
+          media: serviceForm.media as unknown as import("@/integrations/supabase/types").Json,
         });
       } else {
         await createServiceMutation.mutateAsync({
@@ -165,6 +166,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
           duration: serviceForm.duration,
           price: serviceForm.price,
           description: serviceForm.description,
+          media: serviceForm.media as unknown as import("@/integrations/supabase/types").Json,
         });
       }
       setIsServiceDialogOpen(false);
