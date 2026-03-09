@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ClientRiskBadge } from "./ClientRiskBadge";
 import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup } from "./clients";
-import { VideoTutorialCard } from "./VideoTutorialCard";
+import { SectionGuide } from "./SectionGuide";
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
 import { Skeleton } from "@/components/ui/skeleton";
 
