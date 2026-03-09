@@ -66,7 +66,6 @@ const tourSteps: TourStep[] = [
     icon: <UserCheck className="w-6 h-6" />,
     title: "Pracownicy — Twój zespół",
     description: "Dodaj członków zespołu, przypisz im usługi i ustaw godziny pracy. Każdy pracownik ma swój kolor w kalendarzu. Możesz też zaprosić ich do systemu.",
-    voiceText: "Tu dodajesz członków zespołu. Każdy pracownik ma swoje godziny pracy, przypisane usługi i unikalny kolor w kalendarzu. Jeśli pracujesz sama, dodaj siebie jako jedynego pracownika — to konieczne, żeby kalendarz działał.",
     limitations: "Bez pracowników kalendarz nie pokaże żadnych slotów.",
     position: "content",
   },
