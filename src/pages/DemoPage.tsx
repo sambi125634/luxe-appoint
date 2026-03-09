@@ -45,29 +45,7 @@ export default function DemoPage() {
     }
   };
 
-  const getBenefitKey = (tab: TabType): string => {
-    const benefitMap: Record<TabType, string> = {
-      home: "home",
-      calendar: "calendar",
-      clients: "clients",
-      services: "services",
-      staff: "staff",
-      widgets: "widgets",
-      "time-off": "timeOff",
-      stats: "stats",
-      settings: "settings",
-      conversations: "conversations",
-      pipeline: "pipeline",
-      accounting: "accounting",
-      products: "products",
-      support: "support",
-    };
-    return benefitMap[tab] || tab;
-  };
-
   const renderContent = () => {
-    const benefitKey = getBenefitKey(activeTab);
-
     const content = (() => {
       switch (activeTab) {
         case "home":
