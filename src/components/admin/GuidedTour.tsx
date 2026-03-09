@@ -11,7 +11,6 @@ interface TourStep {
   icon: React.ReactNode;
   title: string;
   description: string;
-  voiceText: string;
   limitations?: string;
   position: "center" | "content";
 }
