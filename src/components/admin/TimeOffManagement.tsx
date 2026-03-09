@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { VideoTutorialCard } from "./VideoTutorialCard";
+import { SectionGuide } from "./SectionGuide";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { useSalonId } from "@/hooks/useSalonId";
 import { supabase } from "@/integrations/supabase/client";
