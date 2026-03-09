@@ -4,7 +4,7 @@ import { MessageSquarePlus, Settings, ExternalLink } from "lucide-react";
 import { ContactsList } from "./ContactsList";
 import { ConversationView } from "./ConversationView";
 import { Contact, Conversation, Message } from "./types";
-import { VideoTutorialCard } from "../VideoTutorialCard";
+import { SectionGuide } from "../SectionGuide";
 import { Button } from "@/components/ui/button";
 
 // Demo data - only shown in demo mode
