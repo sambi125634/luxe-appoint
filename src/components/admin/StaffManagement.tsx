@@ -127,7 +127,14 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       return;
     }
 
+    if (!form.name.trim()) {
+      toast({ title: t('common.error'), description: "Imię pracownika jest wymagane", variant: "destructive" });
+      return;
+    }
+
     try {
+      let staffId = editingStaff?.id;
+
       if (editingStaff) {
         const { error } = await supabase
           .from("staff_members")
@@ -135,15 +142,45 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           .eq("id", editingStaff.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("staff_members")
-          .insert({ name: form.name, role: form.role, email: form.email || null, phone: form.phone || null, color: form.color, salon_id: salonId! });
+          .insert({ name: form.name, role: form.role, email: form.email || null, phone: form.phone || null, color: form.color, salon_id: salonId! })
+          .select("id")
+          .single();
         if (error) throw error;
+        staffId = data.id;
       }
+
+      // Save working hours
+      if (staffId) {
+        await supabase.from("working_hours").delete().eq("staff_id", staffId);
+        const workingDays = form.workingHours.filter(h => h.isWorking);
+        if (workingDays.length > 0) {
+          await supabase.from("working_hours").insert(
+            workingDays.map(h => ({
+              staff_id: staffId!,
+              day_of_week: h.dayOfWeek,
+              start_time: h.startTime,
+              end_time: h.endTime,
+              is_working: true,
+            }))
+          );
+        }
+
+        // Save service assignments
+        await supabase.from("staff_services").delete().eq("staff_id", staffId);
+        if (form.serviceIds.length > 0) {
+          await supabase.from("staff_services").insert(
+            form.serviceIds.map(serviceId => ({ staff_id: staffId!, service_id: serviceId }))
+          );
+        }
+      }
+
       queryClient.invalidateQueries({ queryKey: ["staff-members", salonId] });
       setIsDialogOpen(false);
       toast({ title: t('common.saved') });
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast({ title: t('common.error'), description: "Nie udało się zapisać pracownika", variant: "destructive" });
     }
   };
