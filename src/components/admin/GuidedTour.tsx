@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutDashboard, Code, Settings, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { VoiceGuidanceButton } from "./VoiceGuidanceButton";
+import { TabType } from "./AdminSidebar";
 import { TabType } from "./AdminSidebar";
 
 interface TourStep {
