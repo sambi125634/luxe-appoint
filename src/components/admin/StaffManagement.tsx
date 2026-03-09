@@ -226,10 +226,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   if (!isDemo && staff.length === 0) {
     return (
       <div className="space-y-6">
-        <VideoTutorialCard
-          title="Jak zarządzać zespołem"
-          voiceText="Dodaj członków zespołu, przypisz im usługi i ustaw godziny pracy. Jeśli pracujesz sama, dodaj siebie jako jedynego pracownika."
-        />
+        <SectionGuide sectionKey="staff" />
         <div className="text-center py-16">
           <UserPlus className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
           <h3 className="text-xl font-serif font-semibold mb-2">Brak pracowników</h3>
