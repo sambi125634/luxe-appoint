@@ -116,7 +116,13 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   };
 
   const getAppointmentsForSlot = (dayIndex: number, hour: string) => {
-    return appointments.filter(apt => apt.time === hour);
+    return appointments.filter(apt => {
+      const timeMatch = apt.time === hour;
+      if ('dayOffset' in apt && apt.dayOffset !== undefined) {
+        return timeMatch && apt.dayOffset === dayIndex;
+      }
+      return timeMatch;
+    });
   };
 
   const handleSlotClick = (dayIndex: number, hour: string) => {

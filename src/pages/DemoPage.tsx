@@ -104,12 +104,7 @@ export default function DemoPage() {
       }
     })();
 
-    return (
-      <>
-        <SectionGuide sectionKey={benefitKey} />
-        {content}
-      </>
-    );
+    return content;
   };
 
   const handleTourComplete = () => {
