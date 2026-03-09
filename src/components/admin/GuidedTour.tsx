@@ -92,7 +92,6 @@ const tourSteps: TourStep[] = [
     icon: <Sparkles className="w-6 h-6" />,
     title: "Gotowa do startu! 🚀",
     description: "Znasz już wszystkie sekcje. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże Ci co jeszcze zostało. Możesz uruchomić ten samouczek ponownie w dowolnym momencie.",
-    voiceText: "Gratulacje! Znasz już wszystkie sekcje panelu. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże Ci co jeszcze zostało do zrobienia. Możesz uruchomić ten samouczek ponownie w dowolnym momencie z menu bocznego.",
     position: "center",
   },
 ];
