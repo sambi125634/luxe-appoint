@@ -9,8 +9,6 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2, Building2, Clock, Scissors, Users, CheckCircle2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles } from "lucide-react";
-import { VoiceGuidanceButton } from "@/components/admin/VoiceGuidanceButton";
-import { VideoTutorialPlaceholder } from "@/components/admin/VideoTutorialPlaceholder";
 import { Confetti } from "@/components/booking/Confetti";
 import { cn } from "@/lib/utils";
 
