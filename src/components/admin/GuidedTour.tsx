@@ -48,7 +48,6 @@ const tourSteps: TourStep[] = [
     icon: <Users className="w-6 h-6" />,
     title: "Klienci — Twoja baza",
     description: "Lista wszystkich klientów salonu. Możesz dodać klientów ręcznie, importować z CSV, lub poczekać — system automatycznie tworzy profil przy pierwszej rezerwacji.",
-    voiceText: "Tu zarządzasz bazą klientów. Możesz dodać klientów ręcznie, importować z pliku CSV, lub poczekać — system automatycznie tworzy profil klienta przy pierwszej rezerwacji online. Widzisz historię wizyt, notatki, tagi i ocenę ryzyka odejścia.",
     limitations: "Bez klientów nie będziesz mogła tworzyć wizyt w kalendarzu.",
     position: "content",
   },
