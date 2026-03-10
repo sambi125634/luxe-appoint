@@ -43,6 +43,7 @@ export default function DemoPage() {
       case "time-off": return t("timeOff.title");
       case "stats": return t("admin.reports");
       case "settings": return t("admin.settings");
+      case "retention": return "Retencja klientek";
       default: return "Dashboard";
     }
   };
