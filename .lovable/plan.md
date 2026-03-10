@@ -1,91 +1,101 @@
 
 
-# Plan: Weekly CEO Brief — automatyczny raport tygodniowy
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Zakres
+### Co już mamy
 
-System generowania i wyświetlania tygodniowego briefu CEO: edge function do generowania briefu via AI, tabela do archiwum, widget na dashboardzie i komponent pełnego briefu.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## 1. Migracja — tabela `weekly_briefs`
+### Problem do rozwiązania
 
-```sql
-CREATE TABLE weekly_briefs (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  week_start date NOT NULL,
-  -- Stats
-  appointments_count integer DEFAULT 0,
-  revenue numeric DEFAULT 0,
-  occupancy_pct numeric DEFAULT 0,
-  noshow_count integer DEFAULT 0,
-  noshow_pct numeric DEFAULT 0,
-  -- Trends vs previous week
-  revenue_change_pct numeric DEFAULT 0,
-  appointments_change_pct numeric DEFAULT 0,
-  -- Autopilot summary
-  autopilot_actions jsonb DEFAULT '[]',
-  -- AI-generated content
-  ai_narrative text,
-  ai_top_action jsonb,
-  ai_warning jsonb,
-  -- Delivery
-  email_sent_at timestamptz,
-  sms_sent_at timestamptz,
-  push_sent_at timestamptz,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(salon_id, week_start)
-);
-```
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-RLS: salon owner + super_admin (standard pattern).
+---
 
-## 2. Edge Function: `supabase/functions/generate-weekly-brief/index.ts`
+### Plan implementacji
 
-- Input: `{ salon_id, week_start? }` (defaults to last week)
-- Queries: appointments, transactions, autopilot_actions, autopilot_stats for the week
-- Computes: visit count, revenue, occupancy %, no-show rate, trends vs prior week
-- Calls Lovable AI (gemini-3-flash-preview) with structured tool calling to generate:
-  - `ai_narrative`: 2-3 sentence summary
-  - `ai_top_action`: one recommended action with CTA
-  - `ai_warning`: anomaly detection (optional)
-- Saves to `weekly_briefs` table
-- Sends email via Resend (existing infrastructure)
+#### FAZA 1: Role-based routing po loginie
 
-## 3. Nowe pliki UI
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### `src/components/admin/dashboard/WeeklyBriefWidget.tsx`
-Kompaktowy widget na dashboardzie — fold-out card:
-- Header: "Ostatni Brief — tydzień [data]"
-- 3 liczby: wizyty, przychód, obłożenie (z trendami)
-- Lista autopilot actions (bullet points)
-- AI top action z CTA button
-- Warning section (if present)
-- Link "Zobacz pełną historię"
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-### `src/components/admin/dashboard/WeeklyBriefHistory.tsx`
-Archiwum briefów — lista kart z porównaniem tydzień-do-tygodnia. Dostępne z dashboardu.
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-### `src/hooks/useWeeklyBrief.ts`
-Hook: `useLatestBrief(salonId)`, `useBriefHistory(salonId)`, `useGenerateBrief()` mutation.
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## 4. Integracja
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-- `DashboardHome.tsx`: dodanie `WeeklyBriefWidget` pod sekcją KPI
-- `DemoPage.tsx`: mock brief data w demo mode
-- `supabase/config.toml`: nowa function entry
+#### FAZA 3: Indywidualne kokpity
 
-## Pliki do stworzenia
-| Plik | Opis |
-|------|------|
-| `supabase/functions/generate-weekly-brief/index.ts` | Edge function AI brief |
-| `src/components/admin/dashboard/WeeklyBriefWidget.tsx` | Widget dashboard |
-| `src/components/admin/dashboard/WeeklyBriefHistory.tsx` | Archiwum briefów |
-| `src/hooks/useWeeklyBrief.ts` | Hooki danych |
-| Migracja SQL | Tabela weekly_briefs + RLS |
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-## Pliki do edycji
-| Plik | Zmiana |
-|------|--------|
-| `src/components/admin/DashboardHome.tsx` | Dodanie WeeklyBriefWidget |
-| `supabase/config.toml` | Nowa function entry |
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
