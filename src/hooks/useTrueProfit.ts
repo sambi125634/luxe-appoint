@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSalonId } from '@/hooks/useSalonId';
-import { useServices } from '@/hooks/useServices';
 import { useProducts } from '@/hooks/useProducts';
 import { useServiceRecipes } from '@/hooks/useServiceRecipes';
 import {
