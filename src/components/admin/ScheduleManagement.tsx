@@ -82,7 +82,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
       {/* Main Content */}
       {activeView === "calendar" && (
         <div className="space-y-6">
-          <WeeklyCalendar />
+          <WeeklyCalendar isDemo={isDemo} />
           <WeekDuplication />
         </div>
       )}
