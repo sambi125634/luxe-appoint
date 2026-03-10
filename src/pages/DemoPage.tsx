@@ -23,6 +23,7 @@ import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 import { PixelDashboard } from "@/modules/pixel";
+import { TrueProfitDashboard } from "@/modules/analytics";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -48,6 +49,7 @@ export default function DemoPage() {
       case "retention": return "Retencja klientek";
       case "inventory": return "Magazyn & Receptury";
       case "pixel": return "Meta Pixel & CRM Sync";
+      case "analytics": return "True Profit Analytics";
       default: return "Dashboard";
     }
   };
@@ -89,6 +91,8 @@ export default function DemoPage() {
           return <RetentionDashboard isDemo />;
         case "pixel":
           return <PixelDashboard isDemo />;
+        case "analytics":
+          return <TrueProfitDashboard isDemo />;
         default:
           return null;
       }

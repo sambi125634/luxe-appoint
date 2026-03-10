@@ -23,6 +23,7 @@ import { SupportModule } from "@/components/admin/support";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 import { PixelDashboard } from "@/modules/pixel";
+import { TrueProfitDashboard } from "@/modules/analytics";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
@@ -85,6 +86,7 @@ export default function AdminDashboard() {
       case "support": return "Pomoc & AI Asystent";
       case "retention": return "Retencja klientek";
       case "pixel": return "Meta Pixel & CRM Sync";
+      case "analytics": return "True Profit Analytics";
       default: return "Dashboard";
     }
   };
@@ -108,6 +110,7 @@ export default function AdminDashboard() {
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard />;
       case "pixel": return <PixelDashboard />;
+      case "analytics": return <TrueProfitDashboard />;
       default: return null;
     }
   };
