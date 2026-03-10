@@ -1176,5 +1176,8 @@
       "settings": "How to change salon logo?",
       "reports": "How to generate a report?"
     }
+  },
+  "admin": {
+    "trueProfit": "True Profit"
   }
 }
