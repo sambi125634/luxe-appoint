@@ -156,7 +156,8 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
                   ? localIdx / (count - 1)
                   : 0.5;
                 const rJitter = (hashStr(client.id + "r") - 0.5) * (rMax - rMin) * 0.3;
-                const r = Math.max(rMin + 8, Math.min(rMax - 8,
+                const half = bubbleSize / 2;
+                const r = Math.max(rMin + half, Math.min(rMax - half,
                   rMin + tRadius * (rMax - rMin) + rJitter
                 ));
 
