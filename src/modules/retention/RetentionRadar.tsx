@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 import { type RetentionRadarClient, type RiskZone, RISK_ZONE_CONFIG } from "./types";
 
 interface RetentionRadarProps {
@@ -12,13 +12,50 @@ interface RetentionRadarProps {
   compact?: boolean;
 }
 
+// Simple hash from string to [0,1)
+function hashStr(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h * 31 + s.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h % 10000) / 10000;
+}
+
+// Zone order: inner → outer = safe → lost
+const ZONE_ORDER: RiskZone[] = ["green", "yellow", "orange", "red"];
+
+const ZONE_LABELS: Record<RiskZone, string> = {
+  green: "Aktywne",
+  yellow: "Uwaga",
+  orange: "Ryzyko",
+  red: "Utracone",
+};
+
+const ZONE_FILLS: Record<RiskZone, string> = {
+  green: "rgba(34,197,94,0.08)",
+  yellow: "rgba(234,179,8,0.06)",
+  orange: "rgba(249,115,22,0.06)",
+  red: "rgba(239,68,68,0.05)",
+};
+
 export function RetentionRadar({ clients, onClientClick, compact = false }: RetentionRadarProps) {
-  const zones: RiskZone[] = ["green", "yellow", "orange", "red"];
-  const grouped = zones.map((zone) => ({
+  const canvasSize = compact ? 264 : 384;
+  const maxRadius = canvasSize / 2 - 12;
+
+  // Group clients by zone
+  const grouped = ZONE_ORDER.map((zone) => ({
     zone,
-    ...RISK_ZONE_CONFIG[zone],
     clients: clients.filter((c) => c.risk_zone === zone),
   }));
+
+  // Ring boundaries: zone index 0 (green) = innermost, 3 (red) = outermost
+  const ringBands = ZONE_ORDER.map((_, i) => ({
+    rMin: (i / 4) * maxRadius,
+    rMax: ((i + 1) / 4) * maxRadius,
+  }));
+
+  // Ring sizes for concentric circles (outermost first for rendering)
+  const ringSizes = ZONE_ORDER.map((_, i) => ((i + 1) / 4) * maxRadius * 2);
 
   return (
     <Card>
@@ -31,25 +68,26 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
         </p>
       </CardHeader>
       <CardContent>
-        {/* Zone rings */}
-        <div className={cn("relative mx-auto", compact ? "w-64 h-64" : "w-80 h-80 md:w-96 md:h-96")}>
-          {/* Concentric rings */}
-          {zones.map((zone, i) => {
-            const size = compact
-              ? [240, 180, 120, 60][i]
-              : [360, 270, 180, 90][i];
+        <div
+          className="relative mx-auto"
+          style={{ width: canvasSize, height: canvasSize }}
+        >
+          {/* Concentric rings — render outer first so inner paints on top */}
+          {[...ZONE_ORDER].reverse().map((zone, revIdx) => {
+            const i = 3 - revIdx; // actual zone index
+            const size = ringSizes[i];
             return (
               <motion.div
                 key={zone}
                 initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 0.3 }}
-                transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: revIdx * 0.08, duration: 0.4, ease: "easeOut" }}
                 className={cn(
-                  "absolute rounded-full border-2 border-dashed",
-                  zone === "green" && "border-green-500",
-                  zone === "yellow" && "border-yellow-500",
-                  zone === "orange" && "border-orange-500",
-                  zone === "red" && "border-red-500",
+                  "absolute rounded-full border border-dashed",
+                  zone === "green" && "border-green-500/40",
+                  zone === "yellow" && "border-yellow-500/40",
+                  zone === "orange" && "border-orange-500/40",
+                  zone === "red" && "border-red-500/40",
                 )}
                 style={{
                   width: size,
@@ -57,119 +95,168 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
                   left: "50%",
                   top: "50%",
                   transform: "translate(-50%, -50%)",
+                  backgroundColor: ZONE_FILLS[zone],
                 }}
               />
             );
           })}
 
+          {/* Zone labels at top of each ring */}
+          {ZONE_ORDER.map((zone, i) => {
+            const r = ringBands[i].rMax;
+            return (
+              <div
+                key={`label-${zone}`}
+                className="absolute text-[9px] font-medium tracking-wide pointer-events-none"
+                style={{
+                  left: "50%",
+                  top: `calc(50% - ${r}px + 2px)`,
+                  transform: "translateX(-50%)",
+                  color: RISK_ZONE_CONFIG[zone].color,
+                  opacity: 0.7,
+                }}
+              >
+                {ZONE_LABELS[zone]}
+              </div>
+            );
+          })}
+
+          {/* Red zone outer glow */}
+          <motion.div
+            animate={{ opacity: [0.15, 0.3, 0.15] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute rounded-full pointer-events-none"
+            style={{
+              width: ringSizes[3] + 8,
+              height: ringSizes[3] + 8,
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              boxShadow: "0 0 20px 4px rgba(239,68,68,0.2)",
+            }}
+          />
+
           {/* Client bubbles */}
           <TooltipProvider delayDuration={200}>
-            {clients.map((client, idx) => {
-              const config = RISK_ZONE_CONFIG[client.risk_zone];
-              const zoneIndex = zones.indexOf(client.risk_zone);
-              const maxRadius = compact ? 110 : 170;
-              const ringMin = zoneIndex * (maxRadius / 4);
-              const ringMax = (zoneIndex + 1) * (maxRadius / 4);
-              const r = ringMin + (ringMax - ringMin) * 0.5 + (idx % 3 - 1) * 8;
-              const angle = (idx * 137.5 * Math.PI) / 180;
-              const x = Math.cos(angle) * r;
-              const y = Math.sin(angle) * r;
+            {grouped.map(({ zone, clients: zoneClients }, zoneIdx) =>
+              zoneClients.map((client, localIdx) => {
+                const config = RISK_ZONE_CONFIG[zone];
+                const { rMin, rMax } = ringBands[zoneIdx];
+                const count = zoneClients.length;
 
-              const isRed = client.risk_zone === "red";
-              const isGreen = client.risk_zone === "green";
+                // Angle: evenly distribute within zone + jitter
+                const baseAngle = count > 0
+                  ? (localIdx / count) * 2 * Math.PI
+                  : 0;
+                const jitter = (hashStr(client.id) - 0.5) * 0.4;
+                const angle = baseAngle + jitter + zoneIdx * 0.7;
 
-              return (
-                <Tooltip key={client.id}>
-                  <TooltipTrigger asChild>
-                    <motion.button
-                      onClick={() => onClientClick?.(client)}
-                      initial={isGreen ? { opacity: 0, scale: 0 } : { opacity: 0, scale: 0.6 }}
-                      animate={
-                        isRed
-                          ? {
-                              opacity: 1,
-                              scale: [1, 1.15, 1],
-                              transition: {
-                                opacity: { duration: 0.3, delay: idx * 0.03 },
-                                scale: {
-                                  duration: 1.6,
-                                  repeat: Infinity,
-                                  ease: "easeInOut",
-                                  delay: idx * 0.2,
+                // Radius: interpolate within band with hash-based variation
+                const tRadius = count > 1
+                  ? localIdx / (count - 1)
+                  : 0.5;
+                const rJitter = (hashStr(client.id + "r") - 0.5) * (rMax - rMin) * 0.3;
+                const r = Math.max(rMin + 8, Math.min(rMax - 8,
+                  rMin + tRadius * (rMax - rMin) + rJitter
+                ));
+
+                const x = Math.cos(angle) * r;
+                const y = Math.sin(angle) * r;
+                const isRed = zone === "red";
+                const bubbleSize = compact ? 28 : 34;
+
+                return (
+                  <Tooltip key={client.id}>
+                    <TooltipTrigger asChild>
+                      <motion.button
+                        onClick={() => onClientClick?.(client)}
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={
+                          isRed
+                            ? {
+                                opacity: 1,
+                                scale: [1, 1.12, 1],
+                                transition: {
+                                  opacity: { duration: 0.3, delay: localIdx * 0.03 },
+                                  scale: {
+                                    duration: 1.8,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: localIdx * 0.15,
+                                  },
                                 },
-                              },
-                            }
-                          : isGreen
-                          ? {
-                              opacity: 1,
-                              scale: 1,
-                              transition: {
-                                duration: 0.5,
-                                delay: 0.4 + idx * 0.05,
-                                ease: "easeOut",
-                              },
-                            }
-                          : {
-                              opacity: 1,
-                              scale: 1,
-                              transition: { duration: 0.3, delay: idx * 0.03 },
-                            }
-                      }
-                      whileHover={{ scale: 1.25, zIndex: 10 }}
-                      className={cn(
-                        "absolute rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer border-2 border-background shadow-sm",
-                        config.bgClass, config.textClass,
-                        compact ? "w-7 h-7" : "w-9 h-9"
-                      )}
-                      style={{
-                        left: `calc(50% + ${x}px)`,
-                        top: `calc(50% + ${y}px)`,
-                        transform: "translate(-50%, -50%)",
-                      }}
-                    >
-                      {client.avatar_initials}
-                    </motion.button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
-                    <div className="space-y-1">
-                      <p className="font-semibold">{client.first_name} {client.last_name}</p>
-                      <p className="text-xs">Nieaktywna: <strong>{client.days_inactive} dni</strong></p>
-                      {client.last_service && (
-                        <p className="text-xs">Ostatni zabieg: {client.last_service}</p>
-                      )}
-                      {client.last_sequence_sent && (
-                        <p className="text-xs">Wysłano: sekwencja {client.last_sequence_sent}</p>
-                      )}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              );
-            })}
+                              }
+                            : {
+                                opacity: 1,
+                                scale: 1,
+                                transition: {
+                                  duration: 0.4,
+                                  delay: 0.2 + localIdx * 0.04,
+                                  ease: "easeOut",
+                                },
+                              }
+                        }
+                        whileHover={{ scale: 1.3, zIndex: 10 }}
+                        className={cn(
+                          "absolute rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer border-2 border-background shadow-sm",
+                          config.bgClass,
+                          config.textClass,
+                        )}
+                        style={{
+                          width: bubbleSize,
+                          height: bubbleSize,
+                          left: `calc(50% + ${x}px)`,
+                          top: `calc(50% + ${y}px)`,
+                          transform: "translate(-50%, -50%)",
+                        }}
+                      >
+                        {client.avatar_initials}
+                      </motion.button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <div className="space-y-1">
+                        <p className="font-semibold">{client.first_name} {client.last_name}</p>
+                        <p className="text-xs">Nieaktywna: <strong>{client.days_inactive} dni</strong></p>
+                        {client.last_service && (
+                          <p className="text-xs">Ostatni zabieg: {client.last_service}</p>
+                        )}
+                        {client.last_sequence_sent && (
+                          <p className="text-xs">Wysłano: sekwencja {client.last_sequence_sent}</p>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                );
+              })
+            )}
           </TooltipProvider>
 
-          {/* Center label */}
+          {/* Center — salon icon */}
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.5, duration: 0.4 }}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-0"
+            transition={{ delay: 0.4, duration: 0.4 }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 flex items-center justify-center rounded-full bg-background border border-border shadow-sm"
+            style={{ width: compact ? 36 : 44, height: compact ? 36 : 44 }}
           >
-            <div className="text-2xl font-bold font-serif">{clients.filter(c => c.risk_zone === "red").length}</div>
-            <div className="text-xs text-muted-foreground">utraconych</div>
+            <Sparkles className="w-5 h-5 text-primary" />
           </motion.div>
         </div>
 
         {/* Zone legend */}
         <div className="flex flex-wrap justify-center gap-3 mt-4">
-          {grouped.map(({ zone, label, clients: zClients }) => (
-            <Badge key={zone} variant="outline" className={cn("gap-1", RISK_ZONE_CONFIG[zone].textClass)}>
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: RISK_ZONE_CONFIG[zone].color }}
-              />
-              {label}: {zClients.length}
-            </Badge>
-          ))}
+          {ZONE_ORDER.map((zone) => {
+            const count = clients.filter((c) => c.risk_zone === zone).length;
+            return (
+              <Badge key={zone} variant="outline" className={cn("gap-1", RISK_ZONE_CONFIG[zone].textClass)}>
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ backgroundColor: RISK_ZONE_CONFIG[zone].color }}
+                />
+                {RISK_ZONE_CONFIG[zone].label}: {count}
+              </Badge>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
