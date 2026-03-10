@@ -87,6 +87,8 @@ export default function DemoPage() {
           return <SupportModule />;
         case "retention":
           return <RetentionDashboard isDemo />;
+        case "pixel":
+          return <PixelDashboard isDemo />;
         default:
           return null;
       }

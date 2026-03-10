@@ -107,6 +107,7 @@ export default function AdminDashboard() {
       case "settings": return <SettingsModule />;
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard />;
+      case "pixel": return <PixelDashboard />;
       default: return null;
     }
   };

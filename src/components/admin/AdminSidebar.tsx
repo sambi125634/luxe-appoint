@@ -39,6 +39,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
     { icon: Package, labelKey: "admin.products", tab: "products" },
     { icon: ScanLine, labelKey: "admin.inventory", tab: "inventory" },
+    { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
     { icon: Users, labelKey: "admin.staff", tab: "staff" },
     { icon: Scissors, labelKey: "admin.services", tab: "services" },
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
