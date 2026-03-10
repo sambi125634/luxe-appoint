@@ -333,7 +333,10 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
       <RevenuePredictionCard salonId={salonId ?? undefined} />
 
       {/* Retention Radar */}
-      <RetentionRadarCompact salonId={salonId ?? undefined} isDemo={isDemo} onNavigate={handleNavigate} />
+      {(() => {
+        const radarData = isDemo ? MOCK_RADAR_CLIENTS : [];
+        return radarData.length > 0 ? <RetentionRadar clients={radarData} compact /> : null;
+      })()}
 
       {/* Bottom section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
