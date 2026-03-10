@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "inventory" | "staff" | "services" | "time-off" | "stats" | "settings" | "support" | "retention";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "inventory" | "staff" | "services" | "time-off" | "stats" | "settings" | "support" | "retention" | "pixel";
 
 interface AdminSidebarProps {
   activeTab: TabType;
