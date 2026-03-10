@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 import { type RetentionRadarClient, type RiskZone, RISK_ZONE_CONFIG } from "./types";
 
 interface RetentionRadarProps {
@@ -38,10 +39,13 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
               ? [240, 180, 120, 60][i]
               : [360, 270, 180, 90][i];
             return (
-              <div
+              <motion.div
                 key={zone}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.3 }}
+                transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
                 className={cn(
-                  "absolute rounded-full border-2 border-dashed opacity-30",
+                  "absolute rounded-full border-2 border-dashed",
                   zone === "green" && "border-green-500",
                   zone === "yellow" && "border-yellow-500",
                   zone === "orange" && "border-orange-500",
@@ -63,22 +67,57 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
             {clients.map((client, idx) => {
               const config = RISK_ZONE_CONFIG[client.risk_zone];
               const zoneIndex = zones.indexOf(client.risk_zone);
-              // Position in the ring area
               const maxRadius = compact ? 110 : 170;
               const ringMin = zoneIndex * (maxRadius / 4);
               const ringMax = (zoneIndex + 1) * (maxRadius / 4);
               const r = ringMin + (ringMax - ringMin) * 0.5 + (idx % 3 - 1) * 8;
-              const angle = (idx * 137.5 * Math.PI) / 180; // golden angle
+              const angle = (idx * 137.5 * Math.PI) / 180;
               const x = Math.cos(angle) * r;
               const y = Math.sin(angle) * r;
+
+              const isRed = client.risk_zone === "red";
+              const isGreen = client.risk_zone === "green";
 
               return (
                 <Tooltip key={client.id}>
                   <TooltipTrigger asChild>
-                    <button
+                    <motion.button
                       onClick={() => onClientClick?.(client)}
+                      initial={isGreen ? { opacity: 0, scale: 0 } : { opacity: 0, scale: 0.6 }}
+                      animate={
+                        isRed
+                          ? {
+                              opacity: 1,
+                              scale: [1, 1.15, 1],
+                              transition: {
+                                opacity: { duration: 0.3, delay: idx * 0.03 },
+                                scale: {
+                                  duration: 1.6,
+                                  repeat: Infinity,
+                                  ease: "easeInOut",
+                                  delay: idx * 0.2,
+                                },
+                              },
+                            }
+                          : isGreen
+                          ? {
+                              opacity: 1,
+                              scale: 1,
+                              transition: {
+                                duration: 0.5,
+                                delay: 0.4 + idx * 0.05,
+                                ease: "easeOut",
+                              },
+                            }
+                          : {
+                              opacity: 1,
+                              scale: 1,
+                              transition: { duration: 0.3, delay: idx * 0.03 },
+                            }
+                      }
+                      whileHover={{ scale: 1.25, zIndex: 10 }}
                       className={cn(
-                        "absolute rounded-full flex items-center justify-center text-[10px] font-bold transition-all hover:scale-125 hover:z-10 cursor-pointer border-2 border-background shadow-sm",
+                        "absolute rounded-full flex items-center justify-center text-[10px] font-bold cursor-pointer border-2 border-background shadow-sm",
                         config.bgClass, config.textClass,
                         compact ? "w-7 h-7" : "w-9 h-9"
                       )}
@@ -89,7 +128,7 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
                       }}
                     >
                       {client.avatar_initials}
-                    </button>
+                    </motion.button>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="max-w-xs">
                     <div className="space-y-1">
@@ -109,10 +148,15 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
           </TooltipProvider>
 
           {/* Center label */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-0">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-0"
+          >
             <div className="text-2xl font-bold font-serif">{clients.filter(c => c.risk_zone === "red").length}</div>
             <div className="text-xs text-muted-foreground">utraconych</div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Zone legend */}
