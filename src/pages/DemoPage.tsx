@@ -20,6 +20,7 @@ import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
+import { RetentionDashboard } from "@/modules/retention";
 
 export default function DemoPage() {
   const { t } = useTranslation();
