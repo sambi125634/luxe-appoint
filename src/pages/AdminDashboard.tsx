@@ -86,6 +86,7 @@ export default function AdminDashboard() {
       case "support": return "Pomoc & AI Asystent";
       case "retention": return "Retencja klientek";
       case "pixel": return "Meta Pixel & CRM Sync";
+      case "analytics": return "True Profit Analytics";
       default: return "Dashboard";
     }
   };
