@@ -1,101 +1,66 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: True Profit Analytics Dashboard
 
-### Co już mamy
+## Zakres
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Nowy moduł `/src/modules/analytics/` z dashboardem True Profit — ranking usług wg zysku/h, ranking klientek wg LTV/CAC, prognoza cashflow i porównania branżowe. Czysto frontendowe kalkulacje oparte na istniejących danych (appointments, transactions, services, products, service_product_recipes, staff_members, clients). Brak nowych tabel — wszystkie dane już istnieją.
 
-### Problem do rozwiązania
+## 1. Nowe pliki
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### `src/modules/analytics/TrueProfitDashboard.tsx`
+Główny dashboard z tabami: Centrum Zysku | Ranking Usług | Ranking Klientek | Prognoza | Benchmarki.
 
----
+### `src/modules/analytics/TodayProfitCard.tsx`
+Karta "Dziś": przychód, true profit, najlepsza usługa wg TP/h. Dane z appointments (today) + recipes + staff rates.
 
-### Plan implementacji
+### `src/modules/analytics/MonthlyProfitCard.tsx`
+Karta "Ten miesiąc": przychód, koszty materiałów/pracowników/akwizycji, TRUE PROFIT (zł + %), trend vs poprzedni miesiąc.
 
-#### FAZA 1: Role-based routing po loginie
+### `src/modules/analytics/ServiceProfitRanking.tsx`
+Tabela posortowana wg TP/godz. Kolumny: Usługa | Cena | Koszt mat. | Czas | TP/wizyta | TP/godz | Wykonano. Color coding (zielony/żółty/czerwony top 33%). Alert dla usług z niskim TP/h.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### `src/modules/analytics/ClientLTVRanking.tsx`
+Ranking klientek wg LTV i LTV/CAC ratio. Suma wydatków z transactions, source-based CAC estimation.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### `src/modules/analytics/CashflowForecast.tsx`
+Wykres 30/60/90 dni: zaplanowane wizyty + historyczna sezonowość. Suwak "co jeśli reaktywuję X klientek". Alert "luka przychodów".
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### `src/modules/analytics/IndustryBenchmarks.tsx`
+Porównanie do branży — mock benchmarki (anonimowe dane z beauty_products_db w przyszłości). True Margin vs avg, koszty materiałów vs avg.
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### `src/modules/analytics/ProfitSetupWizard.tsx`
+3-krokowy wizard: stawki pracowników → link do magazynu → import CAC. Wyświetlany przy pierwszym uruchomieniu lub gdy brak danych.
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### `src/modules/analytics/index.ts`
+Eksporty modułu.
 
-#### FAZA 3: Indywidualne kokpity
+### `src/hooks/useTrueProfit.ts`
+Hook agregujący: pobiera appointments, transactions, services, recipes, staff_members, clients i oblicza True Profit per usługa, per klientka, per dzień/miesiąc. Formuła: `TP = price - materialCost - staffCost - acquisitionCost`.
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+## 2. Integracja
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+| Plik | Zmiana |
+|------|--------|
+| `AdminSidebar.tsx` | Dodanie taba "analytics" z ikoną `TrendingUp`, labelKey "admin.trueProfit" |
+| `AdminDashboard.tsx` | Import + renderowanie `TrueProfitDashboard` dla taba "analytics" |
+| `DemoPage.tsx` | Rejestracja modułu analytics w demo |
+| `TabType` | Rozszerzenie o `"analytics"` |
+| `i18n pl.json / en.json` | Nowe klucze tłumaczeń |
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+## 3. Logika kalkulacji (w `useTrueProfit.ts`)
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+- **Koszt materiałów**: z `useServiceRecipes.getMaterialCost(serviceId)` — istniejący hook
+- **Koszt pracownika**: `(service.duration / 60) * staffHourlyRate` — stawka z nowego pola lub domyślna (np. 35 zł/h)
+- **Koszt akwizycji**: jednorazowy per klient, amortyzowany przez liczbę wizyt. Estimation: source="facebook" → 40zł, "google" → 30zł, "polecenie" → 0zł
+- **TP/godz**: `trueProfit / (duration / 60)`
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+## 4. Brak nowych tabel
+Wszystkie dane istnieją w: `appointments`, `transactions`, `services`, `products`, `service_product_recipes`, `staff_members`, `clients`. Ewentualnie w przyszłości: kolumna `hourly_rate` w `staff_members` (opcjonalna migracja).
 
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+## 5. Uwagi
+- Gdy brak receptur → True Profit = "szacunkowy (bez kosztów materiałów)" z odpowiednią adnotacją
+- Gdy brak stawek pracowników → domyślna 35 zł/h z info "ustaw stawki w ustawieniach"
+- Mobile-first: karty stackowane pionowo, wykresy responsywne (recharts)
+- Demo mode: mock data
 
