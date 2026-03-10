@@ -42,6 +42,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
     { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
     { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
+    { icon: Heart, labelKey: "admin.referral", tab: "referral" },
     { icon: Users, labelKey: "admin.staff", tab: "staff" },
     { icon: Scissors, labelKey: "admin.services", tab: "services" },
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
