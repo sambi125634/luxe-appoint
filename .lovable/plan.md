@@ -1,119 +1,101 @@
 
 
-# Plan: Moduł Meta Pixel & CRM Sync
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Zakres
+### Co już mamy
 
-System synchronizacji tagów CRM z Meta Custom Audiences, server-side Conversions API, Lookalike Engine i Pixel Health Dashboard. Ponieważ integracja z Meta API wymaga OAuth i kluczy API, moduł startuje jako konfigurowalny UI z mock data w demo, gotowy do podłączenia prawdziwego Meta API przez edge function.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## 1. Migracja — 5 nowych tabel
+### Problem do rozwiązania
 
-```sql
--- pixel_config: połączenie Meta per salon
-CREATE TABLE pixel_config (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL UNIQUE,
-  pixel_id text,
-  ad_account_id text,
-  access_token_encrypted text,
-  is_active boolean DEFAULT false,
-  last_sync_at timestamptz,
-  sync_interval_hours integer DEFAULT 24,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
--- audience_mappings: tag CRM → Custom Audience
-CREATE TABLE audience_mappings (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  audience_id text, -- Meta audience ID
-  audience_name text NOT NULL,
-  is_exclusion boolean DEFAULT false,
-  created_at timestamptz DEFAULT now(),
-  tag_name text NOT NULL,
-  UNIQUE(salon_id, tag_name)
-);
+---
 
--- pixel_sync_log: historia synchronizacji
-CREATE TABLE pixel_sync_log (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  started_at timestamptz DEFAULT now(),
-  completed_at timestamptz,
-  events_sent integer DEFAULT 0,
-  audiences_updated integer DEFAULT 0,
-  errors jsonb DEFAULT '[]',
-  status text DEFAULT 'running'
-);
+### Plan implementacji
 
--- pixel_events: wysłane zdarzenia
-CREATE TABLE pixel_events (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  client_id uuid,
-  event_value numeric,
-  hashed_email text,
-  hashed_phone text,
-  sent_at timestamptz DEFAULT now(),
-  event_name text NOT NULL,
-  source_type text DEFAULT 'calendar'
-);
+#### FAZA 1: Role-based routing po loginie
 
--- pixel_attributions: rezerwacje z kampanii
-CREATE TABLE pixel_attributions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  client_id uuid NOT NULL,
-  appointment_id uuid,
-  audience_name text,
-  ad_campaign text,
-  revenue numeric DEFAULT 0,
-  created_at timestamptz DEFAULT now()
-);
-```
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-RLS: salon owner + super_admin pattern (standard).
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-## 2. Nowe pliki UI
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-### `src/modules/pixel/PixelDashboard.tsx`
-Główny komponent z tabami: Konfiguracja | Audiences | Zdarzenia | Health | Atrybucja.
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-### `src/modules/pixel/PixelSetupWizard.tsx`
-3-krokowy wizard: Połącz Meta → Zmapuj tagi → Włącz Pixel Conditioning. W demo mode: symulowane UI z mock danymi. W production: formularz na pixel_id, ad_account_id + przycisk OAuth (przyszłość).
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-### `src/modules/pixel/AudienceMappings.tsx`
-Dwie kolumny: tagi CRM (z `client_tags`) ↔ Custom Audiences. Przycisk "Auto-utwórz recommended" tworzy 5 standardowych mapowań. Toggle `is_exclusion` per mapowanie.
+#### FAZA 3: Indywidualne kokpity
 
-### `src/modules/pixel/PixelHealthDashboard.tsx`
-Karty: Event Match Quality (%), Events last 30d, Audience sizes, Health score (Doskonały/Dobry/Słaby) z rekomendacjami.
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-### `src/modules/pixel/PixelEventsLog.tsx`
-Tabela ostatnich zdarzeń pixel z filtrami (typ, data, klient). Statusy wysyłki.
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-### `src/modules/pixel/LookalikeEngine.tsx`
-Alert gdy audience >100 osób. Przyciski "Stwórz Lookalike 1%" / "2-3%". Lista istniejących lookalikes.
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-### `src/modules/pixel/PixelAttribution.tsx`
-ROAS dashboard: rezerwacje z kampanii, przychód, koszt reklam (manual input), auto-ROAS.
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-### `src/modules/pixel/types.ts` + `src/modules/pixel/mock-data.ts` + `src/modules/pixel/index.ts`
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-### `src/hooks/usePixelSync.ts`
-Hooki: `usePixelConfig(salonId)`, `useAudienceMappings(salonId)`, `usePixelEvents(salonId)`, `usePixelHealth(salonId)`, `usePixelAttributions(salonId)`.
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
 
-## 3. Integracja
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
 
-| Plik | Zmiana |
-|------|--------|
-| `AdminSidebar.tsx` | Nowy tab "Pixel" (ikona `Zap`) |
-| `AdminDashboard.tsx` | Renderowanie `PixelDashboard` |
-| `DemoPage.tsx` | Rejestracja modułu pixel |
+---
 
-## 4. Uwagi
-- Meta OAuth + Conversions API to przyszły edge function (`pixel-sync`). UI jest gotowy do podłączenia.
-- Haszowanie SHA256 email/phone realizowane client-side przed zapisem do `pixel_events`.
-- Respektuje `marketing_consent` z tabeli `clients` — brak zgody = nigdy nie trafia do audiences.
-- RODO: tylko haszowane dane, checkbox zgody w widgecie rezerwacji (istniejące pole `marketing_consent`).
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

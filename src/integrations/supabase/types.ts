@@ -127,6 +127,44 @@ export type Database = {
           },
         ]
       }
+      audience_mappings: {
+        Row: {
+          audience_id: string | null
+          audience_name: string
+          created_at: string | null
+          id: string
+          is_exclusion: boolean | null
+          salon_id: string
+          tag_name: string
+        }
+        Insert: {
+          audience_id?: string | null
+          audience_name: string
+          created_at?: string | null
+          id?: string
+          is_exclusion?: boolean | null
+          salon_id: string
+          tag_name: string
+        }
+        Update: {
+          audience_id?: string | null
+          audience_name?: string
+          created_at?: string | null
+          id?: string
+          is_exclusion?: boolean | null
+          salon_id?: string
+          tag_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audience_mappings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       autopilot_actions: {
         Row: {
           ai_explanation: string
@@ -813,6 +851,200 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      pixel_attributions: {
+        Row: {
+          ad_campaign: string | null
+          appointment_id: string | null
+          audience_name: string | null
+          client_id: string
+          created_at: string | null
+          id: string
+          revenue: number | null
+          salon_id: string
+        }
+        Insert: {
+          ad_campaign?: string | null
+          appointment_id?: string | null
+          audience_name?: string | null
+          client_id: string
+          created_at?: string | null
+          id?: string
+          revenue?: number | null
+          salon_id: string
+        }
+        Update: {
+          ad_campaign?: string | null
+          appointment_id?: string | null
+          audience_name?: string | null
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          revenue?: number | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pixel_attributions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pixel_attributions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pixel_attributions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pixel_config: {
+        Row: {
+          access_token_encrypted: string | null
+          ad_account_id: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_sync_at: string | null
+          pixel_id: string | null
+          salon_id: string
+          sync_interval_hours: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_token_encrypted?: string | null
+          ad_account_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          pixel_id?: string | null
+          salon_id: string
+          sync_interval_hours?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_token_encrypted?: string | null
+          ad_account_id?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_sync_at?: string | null
+          pixel_id?: string | null
+          salon_id?: string
+          sync_interval_hours?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pixel_config_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pixel_events: {
+        Row: {
+          client_id: string | null
+          event_name: string
+          event_value: number | null
+          hashed_email: string | null
+          hashed_phone: string | null
+          id: string
+          salon_id: string
+          sent_at: string | null
+          source_type: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          event_name: string
+          event_value?: number | null
+          hashed_email?: string | null
+          hashed_phone?: string | null
+          id?: string
+          salon_id: string
+          sent_at?: string | null
+          source_type?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          event_name?: string
+          event_value?: number | null
+          hashed_email?: string | null
+          hashed_phone?: string | null
+          id?: string
+          salon_id?: string
+          sent_at?: string | null
+          source_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pixel_events_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pixel_events_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pixel_sync_log: {
+        Row: {
+          audiences_updated: number | null
+          completed_at: string | null
+          errors: Json | null
+          events_sent: number | null
+          id: string
+          salon_id: string
+          started_at: string | null
+          status: string | null
+        }
+        Insert: {
+          audiences_updated?: number | null
+          completed_at?: string | null
+          errors?: Json | null
+          events_sent?: number | null
+          id?: string
+          salon_id: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          audiences_updated?: number | null
+          completed_at?: string | null
+          errors?: Json | null
+          events_sent?: number | null
+          id?: string
+          salon_id?: string
+          started_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pixel_sync_log_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {

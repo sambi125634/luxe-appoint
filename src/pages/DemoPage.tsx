@@ -22,6 +22,7 @@ import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
+import { PixelDashboard } from "@/modules/pixel";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -46,6 +47,7 @@ export default function DemoPage() {
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
       case "inventory": return "Magazyn & Receptury";
+      case "pixel": return "Meta Pixel & CRM Sync";
       default: return "Dashboard";
     }
   };
@@ -85,6 +87,8 @@ export default function DemoPage() {
           return <SupportModule />;
         case "retention":
           return <RetentionDashboard isDemo />;
+        case "pixel":
+          return <PixelDashboard isDemo />;
         default:
           return null;
       }
