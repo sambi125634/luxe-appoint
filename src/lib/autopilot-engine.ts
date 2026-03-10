@@ -257,7 +257,7 @@ export function generateMockActions(): AutopilotAction[] {
       scheduled_at: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
       executed_at: new Date(now.getTime() - 3 * 60 * 60 * 1000).toISOString(),
       status: "sent",
-      ai_explanation: "Klientka Zofia Lewandowska nie stawiła się na wizytę o 10:00. Wysłałam delikatną wiadomość z propozycją przełożenia — nie oskarżam, buduję relację.",
+      ai_explanation: "Klientka Zofia Lewandowska nie stawila sie na wizyte o 10:00. Wyslalam delikatna wiadomosc z propozycja przelozenia \u2014 nie oskarzam, buduje relacje.",
       cta_label: "Oznacz jako problematyczną",
       cta_action: "flag_client",
       metadata: { client_name: "Zofia Lewandowska" },
