@@ -45,6 +45,7 @@ export default function DemoPage() {
       case "stats": return t("admin.reports");
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
+      case "inventory": return "Magazyn & Receptury";
       default: return "Dashboard";
     }
   };
