@@ -167,6 +167,8 @@ export default function AdminDashboard() {
           </div>
         </header>
 
+        <AutopilotStatusBar />
+
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {renderContent()}
         </main>

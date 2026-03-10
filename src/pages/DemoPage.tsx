@@ -168,6 +168,8 @@ export default function DemoPage() {
             </div>
           </header>
 
+          <AutopilotStatusBar isDemo />
+
           {/* Content */}
           <main className="flex-1 p-4 lg:p-6 overflow-auto">
             {renderContent()}
