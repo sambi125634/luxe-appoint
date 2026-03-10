@@ -227,7 +227,7 @@ export function generateMockActions(): AutopilotAction[] {
       scheduled_at: new Date(now.getTime() + 1 * 60 * 60 * 1000).toISOString(),
       executed_at: null,
       status: "pending",
-      ai_explanation: "Przypomnę Katarzynie Wiśniewskiej o jutrzejszej wizycie o 14:00 — „Manicure hybrydowy". Zmniejsza no-show o 47%.",
+      ai_explanation: "Przypomn\u0119 Katarzynie Wi\u015Bniewskiej o jutrzejszej wizycie o 14:00 \u2014 \u201EManicure hybrydowy\u201D. Zmniejsza no-show o 47%.",
       cta_label: "Edytuj wiadomość",
       cta_action: "edit_message",
       metadata: { client_name: "Katarzyna Wiśniewska", service: "Manicure hybrydowy" },
