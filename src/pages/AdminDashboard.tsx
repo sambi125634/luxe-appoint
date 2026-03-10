@@ -24,6 +24,7 @@ import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 import { PixelDashboard } from "@/modules/pixel";
 import { TrueProfitDashboard } from "@/modules/analytics";
+import { ConsultationModule } from "@/modules/consultation";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
