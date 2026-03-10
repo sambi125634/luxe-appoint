@@ -97,6 +97,7 @@ export default function AdminDashboard() {
       case "pipeline": return <PipelineModule />;
       case "accounting": return <AccountingModule />;
       case "products": return <ProductsModule />;
+      case "inventory": return <InventoryDashboard />;
       case "services": return <ServicesManagement />;
       case "staff": return <StaffManagement />;
       case "time-off": return <TimeOffManagement />;

@@ -79,6 +79,8 @@ export default function DemoPage() {
           return <AccountingModule isDemo={true} />;
         case "products":
           return <ProductsModule />;
+        case "inventory":
+          return <InventoryDashboard isDemo />;
         case "support":
           return <SupportModule />;
         case "retention":
