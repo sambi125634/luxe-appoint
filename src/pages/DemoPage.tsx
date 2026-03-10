@@ -23,6 +23,7 @@ import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 import { PixelDashboard } from "@/modules/pixel";
+import { TrueProfitDashboard } from "@/modules/analytics";
 
 export default function DemoPage() {
   const { t } = useTranslation();
