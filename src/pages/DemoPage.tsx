@@ -99,6 +99,8 @@ export default function DemoPage() {
           return <TrueProfitDashboard isDemo />;
         case "consultation":
           return <ConsultationModule isDemo />;
+        case "referral":
+          return <ReferralEngine isDemo />;
         default:
           return null;
       }

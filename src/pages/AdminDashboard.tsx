@@ -116,6 +116,7 @@ export default function AdminDashboard() {
       case "pixel": return <PixelDashboard />;
       case "analytics": return <TrueProfitDashboard />;
       case "consultation": return <ConsultationModule />;
+      case "referral": return <ReferralEngine />;
       default: return null;
     }
   };
