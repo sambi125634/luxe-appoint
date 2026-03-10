@@ -60,6 +60,13 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState<(Appointment & { dayOffset?: number })[]>(isDemo ? mockAppointmentsData : []);
+
+  // Sync demo state when isDemo prop changes (e.g. HMR)
+  useEffect(() => {
+    if (isDemo) {
+      setAppointments(mockAppointmentsData);
+    }
+  }, [isDemo]);
   const [draggedAppointment, setDraggedAppointment] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
