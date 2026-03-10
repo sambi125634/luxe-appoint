@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
 import { toast } from "sonner";
+import type { Json } from "@/integrations/supabase/types";
 
 export interface ConsultationField {
   id: string;
@@ -57,7 +58,7 @@ export interface VoiceNote {
 }
 
 export function useConsultationTemplates() {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["consultation-templates", salonId],
     queryFn: async () => {
@@ -71,7 +72,7 @@ export function useConsultationTemplates() {
       if (error) throw error;
       return (data || []).map((t) => ({
         ...t,
-        fields: (t.fields || []) as ConsultationField[],
+        fields: (t.fields as unknown as ConsultationField[]) || [],
       })) as ConsultationTemplate[];
     },
     enabled: !!salonId,
@@ -80,20 +81,21 @@ export function useConsultationTemplates() {
 
 export function useSaveTemplate() {
   const qc = useQueryClient();
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useMutation({
     mutationFn: async (template: { name: string; fields: ConsultationField[]; id?: string }) => {
       if (!salonId) throw new Error("Brak salon_id");
+      const fieldsJson = template.fields as unknown as Json;
       if (template.id) {
         const { error } = await supabase
           .from("consultation_templates")
-          .update({ name: template.name, fields: template.fields as unknown as Record<string, unknown>[], updated_at: new Date().toISOString() })
+          .update({ name: template.name, fields: fieldsJson, updated_at: new Date().toISOString() })
           .eq("id", template.id);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from("consultation_templates")
-          .insert({ salon_id: salonId, name: template.name, fields: template.fields as unknown as Record<string, unknown>[] });
+          .insert({ salon_id: salonId, name: template.name, fields: fieldsJson });
         if (error) throw error;
       }
     },
@@ -106,7 +108,7 @@ export function useSaveTemplate() {
 }
 
 export function useConsultationCards(clientId?: string) {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["consultation-cards", salonId, clientId],
     queryFn: async () => {
@@ -127,7 +129,7 @@ export function useConsultationCards(clientId?: string) {
 
 export function useSaveCard() {
   const qc = useQueryClient();
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useMutation({
     mutationFn: async (card: {
       client_id: string;
@@ -142,7 +144,7 @@ export function useSaveCard() {
         salon_id: salonId,
         client_id: card.client_id,
         template_id: card.template_id || null,
-        responses: card.responses,
+        responses: card.responses as unknown as Json,
         signature_url: card.signature_url || null,
         red_flags: card.red_flags || [],
         status: card.status || "completed",
@@ -159,7 +161,7 @@ export function useSaveCard() {
 }
 
 export function useVoiceNotes(clientId?: string) {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["voice-notes", salonId, clientId],
     queryFn: async () => {
@@ -180,7 +182,7 @@ export function useVoiceNotes(clientId?: string) {
 
 export function useSaveVoiceNote() {
   const qc = useQueryClient();
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useMutation({
     mutationFn: async (note: {
       client_id: string;

@@ -44,7 +44,7 @@ export function VoiceNoteRecorder({ isDemo, clientId }: Props) {
   const salonId = useSalonId();
   const { data: voiceNotes = [] } = useVoiceNotes(clientId);
   const saveVoiceNote = useSaveVoiceNote();
-  const { clients = [] } = useClients();
+  const { data: clients = [] } = useClients();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [selectedClientId, setSelectedClientId] = useState(clientId || "");

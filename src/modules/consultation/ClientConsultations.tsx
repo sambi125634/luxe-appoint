@@ -34,7 +34,7 @@ interface Props {
 export function ClientConsultations({ isDemo, clientId }: Props) {
   const { data: cards = [] } = useConsultationCards(clientId);
   const { data: templates = [] } = useConsultationTemplates();
-  const { clients = [] } = useClients();
+  const { data: clients = [] } = useClients();
   const saveCard = useSaveCard();
   const [showForm, setShowForm] = useState(false);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>("");
