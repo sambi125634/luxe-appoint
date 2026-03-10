@@ -21,6 +21,7 @@ import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
+import { InventoryDashboard } from "@/modules/inventory";
 
 export default function DemoPage() {
   const { t } = useTranslation();
