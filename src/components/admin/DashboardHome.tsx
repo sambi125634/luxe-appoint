@@ -18,6 +18,7 @@ import { useRetentionRadar } from "@/hooks/useRetention";
 // Note: useRetentionRadar used for production mode
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
+import { WeeklyBriefWidget } from "./dashboard/WeeklyBriefWidget";
 import { SectionGuide } from "./SectionGuide";
 import { SetupChecklist } from "./SetupChecklist";
 import { useSalonId } from "@/hooks/useSalonId";
