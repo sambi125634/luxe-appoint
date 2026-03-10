@@ -1718,6 +1718,77 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_briefs: {
+        Row: {
+          ai_narrative: string | null
+          ai_top_action: Json | null
+          ai_warning: Json | null
+          appointments_change_pct: number | null
+          appointments_count: number | null
+          autopilot_actions: Json | null
+          created_at: string | null
+          email_sent_at: string | null
+          id: string
+          noshow_count: number | null
+          noshow_pct: number | null
+          occupancy_pct: number | null
+          push_sent_at: string | null
+          revenue: number | null
+          revenue_change_pct: number | null
+          salon_id: string
+          sms_sent_at: string | null
+          week_start: string
+        }
+        Insert: {
+          ai_narrative?: string | null
+          ai_top_action?: Json | null
+          ai_warning?: Json | null
+          appointments_change_pct?: number | null
+          appointments_count?: number | null
+          autopilot_actions?: Json | null
+          created_at?: string | null
+          email_sent_at?: string | null
+          id?: string
+          noshow_count?: number | null
+          noshow_pct?: number | null
+          occupancy_pct?: number | null
+          push_sent_at?: string | null
+          revenue?: number | null
+          revenue_change_pct?: number | null
+          salon_id: string
+          sms_sent_at?: string | null
+          week_start: string
+        }
+        Update: {
+          ai_narrative?: string | null
+          ai_top_action?: Json | null
+          ai_warning?: Json | null
+          appointments_change_pct?: number | null
+          appointments_count?: number | null
+          autopilot_actions?: Json | null
+          created_at?: string | null
+          email_sent_at?: string | null
+          id?: string
+          noshow_count?: number | null
+          noshow_pct?: number | null
+          occupancy_pct?: number | null
+          push_sent_at?: string | null
+          revenue?: number | null
+          revenue_change_pct?: number | null
+          salon_id?: string
+          sms_sent_at?: string | null
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_briefs_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       working_hours: {
         Row: {
           created_at: string
