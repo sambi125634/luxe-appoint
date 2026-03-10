@@ -331,6 +331,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
         </Card>
       </div>
 
+      {/* Weekly Brief Widget */}
+      <WeeklyBriefWidget isDemo={isDemo} />
+
       {/* AI Revenue Prediction */}
       <RevenuePredictionCard salonId={salonId ?? undefined} />
 
