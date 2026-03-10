@@ -40,7 +40,7 @@ const ZONE_FILLS: Record<RiskZone, string> = {
 
 export function RetentionRadar({ clients, onClientClick, compact = false }: RetentionRadarProps) {
   const canvasSize = compact ? 264 : 384;
-  const maxRadius = canvasSize / 2 - 12;
+  const maxRadius = canvasSize / 2 - 24;
 
   // Group clients by zone
   const grouped = ZONE_ORDER.map((zone) => ({
