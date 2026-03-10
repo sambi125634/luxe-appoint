@@ -1,98 +1,101 @@
 
 
-# Plan: Moduł Inventory Scanner z True Profit i Recepturami
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Zakres
+### Co już mamy
 
-Nowy moduł `/src/modules/inventory/` rozszerzający istniejący system produktów o: zaawansowany skaner z globalną bazą EAN, receptury produktów per usługa (service_product_recipes), automatyczne odejmowanie stanów po wizycie, True Profit per usługa, tryb przyjęcia dostawy i statystyki magazynowe.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## 1. Migracja — 2 nowe tabele
+### Problem do rozwiązania
 
-```sql
--- Receptury: jakie produkty zużywa każda usługa
-CREATE TABLE service_product_recipes (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  service_id uuid NOT NULL,
-  product_id uuid NOT NULL,
-  quantity_used numeric NOT NULL DEFAULT 1,
-  unit text DEFAULT 'szt', -- szt/ml/g
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(salon_id, service_id, product_id)
-);
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
--- Globalna baza produktów kosmetycznych (EAN lookup)
-CREATE TABLE beauty_products_db (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  brand text,
-  category text,
-  capacity text,
-  avg_wholesale_price numeric,
-  image_url text,
-  created_at timestamptz DEFAULT now(),
-  ean text NOT NULL UNIQUE,
-  name text NOT NULL
-);
-```
+---
 
-RLS: `service_product_recipes` — salon owner pattern. `beauty_products_db` — public SELECT, super_admin ALL.
+### Plan implementacji
 
-## 2. Nowe pliki
+#### FAZA 1: Role-based routing po loginie
 
-### `src/modules/inventory/InventoryScanner.tsx`
-Główny komponent skanera:
-- FAB button z 3 opcjami: Skanuj kod | Dodaj ręcznie | Przyjmij dostawę
-- Skanowanie: reużywa istniejący `BarcodeScanner` (html5-qrcode)
-- Po skanie: 1) szukaj w `products` (salon), 2) szukaj w `beauty_products_db` (global), 3) formularz nowego produktu
-- Modal wyniku z akcjami: aktualizuj stan / dodaj do katalogu
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### `src/modules/inventory/DeliveryMode.tsx`
-Tryb przyjęcia dostawy:
-- Skanuj produkty jeden po drugim → +X do stanu
-- Pole faktury i zdjęcie paragonu (upload do salon-media bucket)
-- Lista zeskanowanych produktów z podsumowaniem wartości
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-### `src/modules/inventory/ServiceRecipes.tsx`
-Konfiguracja receptur:
-- Wybierz usługę → dodaj produkty z ilością zużycia
-- Podgląd kosztu materiałowego per usługa
-- True Profit formula: Cena - Materiały - Czas pracownika - Akwizycja
-- Progress bar marżowości
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-### `src/modules/inventory/InventoryStats.tsx`
-Statystyki:
-- Łączna wartość magazynu
-- Zużycie miesięczne (ranking)
-- Koszt materiałów/miesiąc
-- % kosztów materiałowych w przychodzie
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-### `src/modules/inventory/InventoryDashboard.tsx`
-Główny widok łączący:
-- Grid kart produktów z color-coded stanami (zielony/żółty/czerwony)
-- Tabs: Magazyn | Receptury | Statystyki | Przyjęcie dostawy
-- Sticky FAB
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-### `src/modules/inventory/index.ts`
-Eksporty modułu.
+#### FAZA 3: Indywidualne kokpity
 
-### `src/hooks/useServiceRecipes.ts`
-Hook do CRUD receptur + kalkulacji kosztu materiałowego per usługa.
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-## 3. Integracja
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-| Plik | Zmiana |
-|------|--------|
-| `src/pages/AdminDashboard.tsx` | Dodanie "inventory" tab renderującego `InventoryDashboard` |
-| `src/components/admin/AdminSidebar.tsx` | Nowy nav item "Magazyn" (ikona `ScanLine`) |
-| `src/pages/DemoPage.tsx` | Rejestracja modułu inventory w demo |
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-## 4. Logika automatycznego odejmowania
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-W `ServiceRecipes` — konfiguracja. Faktyczne automatyczne odejmowanie po ukończeniu wizyty to przyszły krok (edge function trigger na `appointments.status = 'completed'`). Na razie: UI do konfiguracji receptur + ręczny przycisk "Odejmij materiały" przy wizytach.
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-## Uwagi
-- Skaner reużywa istniejący `BarcodeScanner` z html5-qrcode (EAN-13, EAN-8, QR, Code128)
-- `beauty_products_db` startuje z seed data (popularne polskie marki kosmetyczne) — dodamy w przyszłości
-- True Profit kalkulacja: czysto frontendowa na podstawie receptur + ceny usługi
-- Mobile-first: karty zamiast tabeli, duże przyciski skanowania
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

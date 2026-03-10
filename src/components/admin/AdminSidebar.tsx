@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar, ScanLine
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "stats" | "settings" | "support" | "retention";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "inventory" | "staff" | "services" | "time-off" | "stats" | "settings" | "support" | "retention";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -38,6 +38,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
     { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
     { icon: Package, labelKey: "admin.products", tab: "products" },
+    { icon: ScanLine, labelKey: "admin.inventory", tab: "inventory" },
     { icon: Users, labelKey: "admin.staff", tab: "staff" },
     { icon: Scissors, labelKey: "admin.services", tab: "services" },
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },

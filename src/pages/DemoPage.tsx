@@ -21,6 +21,7 @@ import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
+import { InventoryDashboard } from "@/modules/inventory";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -44,6 +45,7 @@ export default function DemoPage() {
       case "stats": return t("admin.reports");
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
+      case "inventory": return "Magazyn & Receptury";
       default: return "Dashboard";
     }
   };
@@ -77,6 +79,8 @@ export default function DemoPage() {
           return <AccountingModule isDemo={true} />;
         case "products":
           return <ProductsModule />;
+        case "inventory":
+          return <InventoryDashboard isDemo />;
         case "support":
           return <SupportModule />;
         case "retention":
