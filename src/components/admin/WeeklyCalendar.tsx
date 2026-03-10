@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Plus, Clock, CalendarDays } from "lucide-react";
 import { Button } from "@/components/ui/button";
