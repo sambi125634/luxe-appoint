@@ -51,6 +51,7 @@ export default function DemoPage() {
       case "inventory": return "Magazyn & Receptury";
       case "pixel": return "Meta Pixel & CRM Sync";
       case "analytics": return "True Profit Analytics";
+      case "consultation": return "Karty konsultacyjne";
       default: return "Dashboard";
     }
   };
