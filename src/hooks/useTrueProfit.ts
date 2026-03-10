@@ -21,7 +21,22 @@ function estimateCAC(source: string | null): number {
 
 export function useTrueProfit() {
   const { salonId } = useSalonId();
-  const { services } = useServices(salonId || '');
+
+  // Fetch services directly
+  const { data: services } = useQuery({
+    queryKey: ['tp-services', salonId],
+    queryFn: async () => {
+      if (!salonId) return [];
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('salon_id', salonId);
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!salonId,
+  });
+
   const { products } = useProducts(salonId || '');
   const { recipes, getMaterialCost } = useServiceRecipes(salonId || '');
 
