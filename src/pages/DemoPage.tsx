@@ -22,6 +22,7 @@ import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
+import { PixelDashboard } from "@/modules/pixel";
 
 export default function DemoPage() {
   const { t } = useTranslation();
