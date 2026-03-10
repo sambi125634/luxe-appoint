@@ -299,6 +299,60 @@ export type Database = {
           },
         ]
       }
+      client_communication_preferences: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          id: string
+          opted_out: boolean | null
+          opted_out_at: string | null
+          preferred_channel: string | null
+          preferred_day: number | null
+          preferred_hour: number | null
+          salon_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          id?: string
+          opted_out?: boolean | null
+          opted_out_at?: string | null
+          preferred_channel?: string | null
+          preferred_day?: number | null
+          preferred_hour?: number | null
+          salon_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          opted_out?: boolean | null
+          opted_out_at?: string | null
+          preferred_channel?: string | null
+          preferred_day?: number | null
+          preferred_hour?: number | null
+          salon_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_communication_preferences_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_communication_preferences_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_risk_scores: {
         Row: {
           calculated_at: string
@@ -876,6 +930,179 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      retention_conversions: {
+        Row: {
+          appointment_id: string | null
+          client_id: string
+          created_at: string | null
+          id: string
+          message_id: string | null
+          revenue_recovered: number | null
+          salon_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          client_id: string
+          created_at?: string | null
+          id?: string
+          message_id?: string | null
+          revenue_recovered?: number | null
+          salon_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          message_id?: string | null
+          revenue_recovered?: number | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retention_conversions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retention_conversions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retention_conversions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "retention_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retention_conversions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retention_messages: {
+        Row: {
+          channel: string
+          clicked_at: string | null
+          client_id: string
+          created_at: string | null
+          id: string
+          message_content: string | null
+          opened_at: string | null
+          salon_id: string
+          sequence_id: string | null
+          status: string | null
+        }
+        Insert: {
+          channel?: string
+          clicked_at?: string | null
+          client_id: string
+          created_at?: string | null
+          id?: string
+          message_content?: string | null
+          opened_at?: string | null
+          salon_id: string
+          sequence_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          channel?: string
+          clicked_at?: string | null
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          message_content?: string | null
+          opened_at?: string | null
+          salon_id?: string
+          sequence_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retention_messages_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retention_messages_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "retention_messages_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "retention_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retention_sequences: {
+        Row: {
+          countdown_hours: number | null
+          created_at: string | null
+          id: string
+          incentive_details: Json | null
+          include_incentive: boolean | null
+          is_active: boolean | null
+          message_template: string
+          salon_id: string
+          sequence_key: string
+          tone: string | null
+          trigger_days: number
+          updated_at: string | null
+        }
+        Insert: {
+          countdown_hours?: number | null
+          created_at?: string | null
+          id?: string
+          incentive_details?: Json | null
+          include_incentive?: boolean | null
+          is_active?: boolean | null
+          message_template: string
+          salon_id: string
+          sequence_key: string
+          tone?: string | null
+          trigger_days: number
+          updated_at?: string | null
+        }
+        Update: {
+          countdown_hours?: number | null
+          created_at?: string | null
+          id?: string
+          incentive_details?: Json | null
+          include_incentive?: boolean | null
+          is_active?: boolean | null
+          message_template?: string
+          salon_id?: string
+          sequence_key?: string
+          tone?: string | null
+          trigger_days?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retention_sequences_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       salons: {
         Row: {
