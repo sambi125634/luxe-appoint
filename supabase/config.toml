@@ -41,3 +41,6 @@ verify_jwt = false
 
 [functions.ai-profile-scanner]
 verify_jwt = false
+
+[functions.transcribe-voice-note]
+verify_jwt = false

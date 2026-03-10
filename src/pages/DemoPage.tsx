@@ -95,6 +95,8 @@ export default function DemoPage() {
           return <PixelDashboard isDemo />;
         case "analytics":
           return <TrueProfitDashboard isDemo />;
+        case "consultation":
+          return <ConsultationModule isDemo />;
         default:
           return null;
       }

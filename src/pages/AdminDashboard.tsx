@@ -113,6 +113,7 @@ export default function AdminDashboard() {
       case "retention": return <RetentionDashboard />;
       case "pixel": return <PixelDashboard />;
       case "analytics": return <TrueProfitDashboard />;
+      case "consultation": return <ConsultationModule />;
       default: return null;
     }
   };
