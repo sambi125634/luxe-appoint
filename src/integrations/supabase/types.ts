@@ -127,6 +127,178 @@ export type Database = {
           },
         ]
       }
+      autopilot_actions: {
+        Row: {
+          ai_explanation: string
+          client_id: string | null
+          created_at: string | null
+          cta_action: string | null
+          cta_label: string | null
+          executed_at: string | null
+          id: string
+          metadata: Json | null
+          salon_id: string
+          scheduled_at: string
+          status: string
+          triggered_by: string
+          type: string
+        }
+        Insert: {
+          ai_explanation: string
+          client_id?: string | null
+          created_at?: string | null
+          cta_action?: string | null
+          cta_label?: string | null
+          executed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          salon_id: string
+          scheduled_at?: string
+          status?: string
+          triggered_by: string
+          type: string
+        }
+        Update: {
+          ai_explanation?: string
+          client_id?: string | null
+          created_at?: string | null
+          cta_action?: string | null
+          cta_label?: string | null
+          executed_at?: string | null
+          id?: string
+          metadata?: Json | null
+          salon_id?: string
+          scheduled_at?: string
+          status?: string
+          triggered_by?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autopilot_actions_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "autopilot_actions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      autopilot_config: {
+        Row: {
+          ai_suggestions_enabled: boolean | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          max_messages_per_client_days: number | null
+          noshow_followup_minutes: number | null
+          paused_until: string | null
+          pixel_sync_enabled: boolean | null
+          quiet_hours_end: string | null
+          quiet_hours_start: string | null
+          reminder_hours_before: number[] | null
+          retention_trigger_days: number[] | null
+          review_request_delay_hours: number | null
+          salon_id: string
+          updated_at: string | null
+          weekly_brief_day: string | null
+          weekly_brief_hour: number | null
+        }
+        Insert: {
+          ai_suggestions_enabled?: boolean | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_messages_per_client_days?: number | null
+          noshow_followup_minutes?: number | null
+          paused_until?: string | null
+          pixel_sync_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          reminder_hours_before?: number[] | null
+          retention_trigger_days?: number[] | null
+          review_request_delay_hours?: number | null
+          salon_id: string
+          updated_at?: string | null
+          weekly_brief_day?: string | null
+          weekly_brief_hour?: number | null
+        }
+        Update: {
+          ai_suggestions_enabled?: boolean | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          max_messages_per_client_days?: number | null
+          noshow_followup_minutes?: number | null
+          paused_until?: string | null
+          pixel_sync_enabled?: boolean | null
+          quiet_hours_end?: string | null
+          quiet_hours_start?: string | null
+          reminder_hours_before?: number[] | null
+          retention_trigger_days?: number[] | null
+          review_request_delay_hours?: number | null
+          salon_id?: string
+          updated_at?: string | null
+          weekly_brief_day?: string | null
+          weekly_brief_hour?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autopilot_config_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      autopilot_stats: {
+        Row: {
+          actions_taken: number | null
+          clients_reactivated: number | null
+          created_at: string | null
+          id: string
+          revenue_recovered: number | null
+          reviews_collected: number | null
+          salon_id: string
+          week_start: string
+        }
+        Insert: {
+          actions_taken?: number | null
+          clients_reactivated?: number | null
+          created_at?: string | null
+          id?: string
+          revenue_recovered?: number | null
+          reviews_collected?: number | null
+          salon_id: string
+          week_start: string
+        }
+        Update: {
+          actions_taken?: number | null
+          clients_reactivated?: number | null
+          created_at?: string | null
+          id?: string
+          revenue_recovered?: number | null
+          reviews_collected?: number | null
+          salon_id?: string
+          week_start?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autopilot_stats_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_risk_scores: {
         Row: {
           calculated_at: string
