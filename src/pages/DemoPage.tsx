@@ -86,7 +86,7 @@ export default function DemoPage() {
         case "accounting":
           return <AccountingModule isDemo={true} />;
         case "products":
-          return <ProductsModule />;
+          return <ProductsModule isDemo />;
         case "inventory":
           return <InventoryDashboard isDemo />;
         case "support":

@@ -14,13 +14,12 @@ import type { ProductTab } from "./types";
 // Demo salon ID for mock data
 const DEMO_SALON_ID = "demo-salon-id";
 
-export function ProductsModule() {
+export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
   const { t } = useTranslation();
   const { salonId, isLoading } = useSalonId();
   const [activeTab, setActiveTab] = useState<ProductTab>("catalog");
 
-  // Use demo salon ID if no real salon found (for demo mode)
-  const effectiveSalonId = salonId || DEMO_SALON_ID;
+  const effectiveSalonId = isDemo ? DEMO_SALON_ID : (salonId || DEMO_SALON_ID);
 
   const tabs = [
     { id: "catalog" as ProductTab, label: t("products.catalog"), icon: Package },
