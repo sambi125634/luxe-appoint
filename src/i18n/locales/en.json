@@ -1178,6 +1178,14 @@
     }
   },
   "admin": {
-    "trueProfit": "True Profit"
+    "trueProfit": "True Profit",
+    "consultation": "Consultations"
+  },
+  "consultation": {
+    "title": "Consultation Cards & Voice Notes",
+    "subtitle": "Digital cards, signatures and AI-powered voice notes",
+    "cards": "Cards",
+    "templates": "Templates",
+    "voiceNotes": "Voice Notes"
   }
 }

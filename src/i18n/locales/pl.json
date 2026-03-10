@@ -1288,6 +1288,14 @@
     }
   },
   "admin": {
-    "trueProfit": "True Profit"
+    "trueProfit": "True Profit",
+    "consultation": "Konsultacje"
+  },
+  "consultation": {
+    "title": "Karty konsultacyjne & Voice Notes",
+    "subtitle": "Cyfrowe karty, podpisy i notatki głosowe z AI",
+    "cards": "Karty",
+    "templates": "Szablony",
+    "voiceNotes": "Voice Notes"
   }
 }

@@ -24,6 +24,7 @@ import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 import { PixelDashboard } from "@/modules/pixel";
 import { TrueProfitDashboard } from "@/modules/analytics";
+import { ConsultationModule } from "@/modules/consultation";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -50,6 +51,7 @@ export default function DemoPage() {
       case "inventory": return "Magazyn & Receptury";
       case "pixel": return "Meta Pixel & CRM Sync";
       case "analytics": return "True Profit Analytics";
+      case "consultation": return "Karty konsultacyjne";
       default: return "Dashboard";
     }
   };
@@ -93,6 +95,8 @@ export default function DemoPage() {
           return <PixelDashboard isDemo />;
         case "analytics":
           return <TrueProfitDashboard isDemo />;
+        case "consultation":
+          return <ConsultationModule isDemo />;
         default:
           return null;
       }

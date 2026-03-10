@@ -631,6 +631,108 @@ export type Database = {
           },
         ]
       }
+      consultation_cards: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          filled_at: string | null
+          id: string
+          red_flags: string[] | null
+          responses: Json
+          salon_id: string
+          signature_url: string | null
+          status: string | null
+          template_id: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          red_flags?: string[] | null
+          responses?: Json
+          salon_id: string
+          signature_url?: string | null
+          status?: string | null
+          template_id?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          filled_at?: string | null
+          id?: string
+          red_flags?: string[] | null
+          responses?: Json
+          salon_id?: string
+          signature_url?: string | null
+          status?: string | null
+          template_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_cards_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_cards_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_cards_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consultation_templates: {
+        Row: {
+          created_at: string | null
+          fields: Json
+          id: string
+          is_active: boolean | null
+          is_system: boolean | null
+          name: string
+          salon_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name: string
+          salon_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          is_system?: boolean | null
+          name?: string
+          salon_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_templates_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followup_queue: {
         Row: {
           channel: string
@@ -2037,6 +2139,74 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      voice_notes: {
+        Row: {
+          ai_extracted: Json | null
+          appointment_id: string | null
+          audio_url: string
+          client_id: string
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          salon_id: string
+          staff_id: string | null
+          transcript: string | null
+        }
+        Insert: {
+          ai_extracted?: Json | null
+          appointment_id?: string | null
+          audio_url: string
+          client_id: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          salon_id: string
+          staff_id?: string | null
+          transcript?: string | null
+        }
+        Update: {
+          ai_extracted?: Json | null
+          appointment_id?: string | null
+          audio_url?: string
+          client_id?: string
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          salon_id?: string
+          staff_id?: string | null
+          transcript?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "voice_notes_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_notes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_notes_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       weekly_briefs: {
         Row: {
