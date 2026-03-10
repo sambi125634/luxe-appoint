@@ -24,6 +24,7 @@ import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 import { PixelDashboard } from "@/modules/pixel";
 import { TrueProfitDashboard } from "@/modules/analytics";
+import { ConsultationModule } from "@/modules/consultation";
 
 export default function DemoPage() {
   const { t } = useTranslation();
