@@ -1,101 +1,87 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Nowy 6-etapowy AI Onboarding Wizard
 
-### Co już mamy
+## Zakres
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Przebudowa `OnboardingPage.tsx` z obecnych 5 kroków (dane → godziny → usługi → pracownicy → summary) na nowy 6-etapowy flow z AI profile scanning, Autopilot setup, widget install i CSV import klientek.
 
-### Problem do rozwiązania
+## Zmiany
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### 1. Przebudowa `src/pages/OnboardingPage.tsx`
 
----
+Zastąpienie obecnego 5-krokowego wizarda nowym 6-etapowym:
 
-### Plan implementacji
+**Etap 1 — "Powiedz nam o salonie"**
+- Formularz: nazwa, miasto, typ salonu (paznokcie/fryzjer/kosmetologia/makijaż/multi), liczba pracowników
+- Pole opcjonalne: URL Instagram lub Google Maps z zachętą "Oszczędź 10 minut — AI uzupełni dane"
+- Zapisuje do `salons` table
 
-#### FAZA 1: Role-based routing po loginie
+**Etap 2 — "AI skanuje Twój profil"** (jeśli podano URL, inaczej skip)
+- Animowany loading z sekwencyjnymi komunikatami (🔍 Skanuję... → 💅 Znalazłam usługi... → ✅ Gotowe!)
+- Wywołanie edge function `ai-profile-scanner` (nowa)
+- Podgląd wyników z inline edycją
+- Przycisk "Wygląda świetnie, zapisz" lub "Edytuj przed zapisem"
+- Jeśli brak URL → auto-skip do Etapu 3, który wtedy używa istniejących templates usług
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+**Etap 3 — "Twój Autopilot jest gotowy"**
+- Lista 5 automatycznych funkcji (przypomnienia SMS, reaktywacja, opinie Google, no-show follow-up, weekly brief)
+- Każda z toggle (domyślnie ON) i linkiem "Dostosuj"
+- Przycisk "Uruchom Autopilot →"
+- Tworzy rekord w `autopilot_config` z domyślnymi wartościami
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+**Etap 4 — "Zainstaluj widget rezerwacji"**
+- Gotowy kod embed (1-klik copy)
+- Instrukcje dla WordPress, Squarespace, "Wyślij deweloperowi"
+- Opcja "Mam tylko Instagram" → instrukcja link in bio + Stories
+- Przycisk skip "Zrobię to później"
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+**Etap 5 — "Przenieś klientki"** (opcjonalny)
+- Opcja A: drag & drop CSV → AI mapuje kolumny → podgląd 5 rekordów → "Importuj X klientek"
+- Opcja B: "Zacznę od nowa" (skip)
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+**Etap 6 — "🎉 Jesteś gotowa!"**
+- Podsumowanie: nazwa salonu, usługi, widget status, klientki, Autopilot status
+- CTA: "Przejdź do Dashboard →"
+- Małe CTA: "Zaproś pierwszą klientkę" → generuje link do udostępnienia
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### 2. Design
 
-#### FAZA 3: Indywidualne kokpity
+- Tło: gradient `from-[#1A1A2E] to-[#16213E]`, karty białe z shadow
+- Accent: `#E91E8C`
+- Mobile-first layout
+- Animacje: istniejący `StepTransition` + sekwencyjne komunikaty w AI scan
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+### 3. Nowa Edge Function: `supabase/functions/ai-profile-scanner/index.ts`
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+- Input: `{ url: string, salon_id: string }`
+- Używa Lovable AI (gemini-2.5-flash) do analizy URL
+- Scrape URL content → AI extract services, hours, description
+- Output: `{ services, opening_hours, description, photos }`
+- Zwraca mock-enriched data na start (edge function przygotowana, AI parsing jako next step)
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+### 4. Migracja: kolumna `salon_type` w `salons`
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+```sql
+ALTER TABLE salons ADD COLUMN IF NOT EXISTS salon_type text DEFAULT 'multi';
+ALTER TABLE salons ADD COLUMN IF NOT EXISTS team_size integer DEFAULT 1;
+ALTER TABLE salons ADD COLUMN IF NOT EXISTS social_url text;
+```
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+### 5. Resumable onboarding
 
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
+Istniejąca logika `onboarding_step` w tabeli `salons` jest zachowana. Nowy wizard mapuje 6 etapów na `onboarding_step` 0-5. Przy powrocie użytkownik wznawia od zapisanego kroku.
 
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+## Pliki
 
----
+| Plik | Akcja |
+|------|-------|
+| `src/pages/OnboardingPage.tsx` | Przebudowa (pełny rewrite) |
+| `supabase/functions/ai-profile-scanner/index.ts` | Nowy |
+| Migracja SQL | Nowa (3 kolumny w salons) |
 
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+## Uwagi
+- Etap 2 (AI scan) jest skip-owalny — jeśli użytkownik nie poda URL, przechodzi do Etap 3 z istniejącymi templates usług (zachowane z obecnego kodu)
+- Etap 5 (CSV import) reużywa logikę parsowania CSV z `CSVImport.tsx` ale uproszczoną inline
+- Autopilot config w Etapie 3 korzysta z istniejącej tabeli `autopilot_config` i `DEFAULT_AUTOPILOT_CONFIG` z `autopilot-engine.ts`
 
