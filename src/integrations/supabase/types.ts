@@ -1301,6 +1301,147 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_codes: {
+        Row: {
+          client_id: string
+          code: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          new_client_reward_value: number | null
+          referral_url: string | null
+          reward_type: string | null
+          reward_value: number | null
+          salon_id: string
+          total_referrals: number | null
+          total_revenue: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          client_id: string
+          code: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          new_client_reward_value?: number | null
+          referral_url?: string | null
+          reward_type?: string | null
+          reward_value?: number | null
+          salon_id: string
+          total_referrals?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          code?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          new_client_reward_value?: number | null
+          referral_url?: string | null
+          reward_type?: string | null
+          reward_value?: number | null
+          salon_id?: string
+          total_referrals?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_codes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_codes_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_events: {
+        Row: {
+          appointment_id: string | null
+          created_at: string | null
+          event_type: string
+          id: string
+          referral_code_id: string
+          referred_client_id: string | null
+          referrer_client_id: string
+          revenue: number | null
+          reward_amount: number | null
+          reward_given: boolean | null
+          salon_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          referral_code_id: string
+          referred_client_id?: string | null
+          referrer_client_id: string
+          revenue?: number | null
+          reward_amount?: number | null
+          reward_given?: boolean | null
+          salon_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          referral_code_id?: string
+          referred_client_id?: string | null
+          referrer_client_id?: string
+          revenue?: number | null
+          reward_amount?: number | null
+          reward_given?: boolean | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_events_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_events_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "referral_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_events_referred_client_id_fkey"
+            columns: ["referred_client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_events_referrer_client_id_fkey"
+            columns: ["referrer_client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_events_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       retention_conversions: {
         Row: {
           appointment_id: string | null
@@ -1467,6 +1608,134 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "retention_sequences_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_outcomes: {
+        Row: {
+          client_id: string
+          created_at: string | null
+          detected_at: string | null
+          id: string
+          platform: string | null
+          rating: number | null
+          review_request_id: string | null
+          review_text: string | null
+          reward_sent: boolean | null
+          reward_type: string | null
+          reward_value: number | null
+          salon_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string | null
+          detected_at?: string | null
+          id?: string
+          platform?: string | null
+          rating?: number | null
+          review_request_id?: string | null
+          review_text?: string | null
+          reward_sent?: boolean | null
+          reward_type?: string | null
+          reward_value?: number | null
+          salon_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string | null
+          detected_at?: string | null
+          id?: string
+          platform?: string | null
+          rating?: number | null
+          review_request_id?: string | null
+          review_text?: string | null
+          reward_sent?: boolean | null
+          reward_type?: string | null
+          reward_value?: number | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_outcomes_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_outcomes_review_request_id_fkey"
+            columns: ["review_request_id"]
+            isOneToOne: false
+            referencedRelation: "review_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_outcomes_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      review_requests: {
+        Row: {
+          appointment_id: string | null
+          channel: string | null
+          clicked_at: string | null
+          client_id: string
+          created_at: string | null
+          id: string
+          message_number: number | null
+          salon_id: string
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          channel?: string | null
+          clicked_at?: string | null
+          client_id: string
+          created_at?: string | null
+          id?: string
+          message_number?: number | null
+          salon_id: string
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          channel?: string | null
+          clicked_at?: string | null
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          message_number?: number | null
+          salon_id?: string
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_requests_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_requests_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_requests_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
