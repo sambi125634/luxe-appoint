@@ -19,6 +19,7 @@ import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
+import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -166,6 +167,8 @@ export default function DemoPage() {
               </a>
             </div>
           </header>
+
+          <AutopilotStatusBar isDemo />
 
           {/* Content */}
           <main className="flex-1 p-4 lg:p-6 overflow-auto">

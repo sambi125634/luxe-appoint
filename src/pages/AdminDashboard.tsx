@@ -21,6 +21,7 @@ import { SettingsModule } from "@/components/admin/settings";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
+import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -165,6 +166,8 @@ export default function AdminDashboard() {
             </Link>
           </div>
         </header>
+
+        <AutopilotStatusBar />
 
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
           {renderContent()}

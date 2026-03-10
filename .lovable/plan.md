@@ -1,115 +1,101 @@
 
 
-# Plan: Autopilot Engine — baza systemu AI
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Zakres
+### Co już mamy
 
-Tworzę fundamentalny system Autopilot Engine: typy, konfigurację, hook, tabele w bazie, komponent statusu i sidebar z logiem akcji.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## 1. Tabele w bazie (migracja)
+### Problem do rozwiązania
 
-```sql
--- autopilot_config: per-salon konfiguracja z intelligent defaults
-CREATE TABLE autopilot_config (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL UNIQUE,
-  is_active boolean DEFAULT true,
-  paused_until timestamptz,
-  retention_trigger_days integer[] DEFAULT '{45,60,75,90}',
-  reminder_hours_before integer[] DEFAULT '{24,2}',
-  review_request_delay_hours integer DEFAULT 2,
-  noshow_followup_minutes integer DEFAULT 30,
-  weekly_brief_day text DEFAULT 'monday',
-  weekly_brief_hour integer DEFAULT 8,
-  ai_suggestions_enabled boolean DEFAULT true,
-  pixel_sync_enabled boolean DEFAULT false,
-  quiet_hours_start time DEFAULT '20:00',
-  quiet_hours_end time DEFAULT '08:00',
-  max_messages_per_client_days integer DEFAULT 7,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
--- autopilot_actions: log każdej automatycznej akcji
-CREATE TABLE autopilot_actions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  type text NOT NULL, -- retention|review|reminder|noshow|revenue_suggestion|pixel_sync|brief
-  triggered_by text NOT NULL,
-  client_id uuid,
-  scheduled_at timestamptz NOT NULL DEFAULT now(),
-  executed_at timestamptz,
-  status text NOT NULL DEFAULT 'pending', -- pending|sent|completed|failed|dismissed
-  ai_explanation text NOT NULL,
-  cta_label text,
-  cta_action text,
-  metadata jsonb DEFAULT '{}',
-  created_at timestamptz DEFAULT now()
-);
+---
 
--- autopilot_stats: tygodniowe podsumowania
-CREATE TABLE autopilot_stats (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  salon_id uuid NOT NULL,
-  week_start date NOT NULL,
-  actions_taken integer DEFAULT 0,
-  revenue_recovered numeric DEFAULT 0,
-  clients_reactivated integer DEFAULT 0,
-  reviews_collected integer DEFAULT 0,
-  created_at timestamptz DEFAULT now(),
-  UNIQUE(salon_id, week_start)
-);
-```
+### Plan implementacji
 
-RLS: salon owner + super_admin na wszystkie 3 tabele (wzorzec jak reszta tabel).
+#### FAZA 1: Role-based routing po loginie
 
-## 2. Nowy plik: `src/lib/autopilot-engine.ts`
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-Eksportuje:
-- `AutopilotConfig` interface z defaultami
-- `AutopilotAction` type z ai_explanation i one_click_cta
-- `DEFAULT_AUTOPILOT_CONFIG` — obiekt z intelligent defaults branży beauty PL
-- Helper do formatowania akcji w formacie `[INSIGHT] → [POWÓD] → [REKOMENDACJA] → [CTA]`
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-## 3. Hook: `src/hooks/useAutopilot.ts`
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-- `useAutopilotConfig(salonId)` — pobiera/tworzy config z domyślnymi wartościami
-- `useAutopilotActions(salonId)` — pobiera scheduled/pending actions
-- `dismissAction(id)` — ustawia status = 'dismissed'
-- `executeNow(id)` — ustawia executed_at = now(), status = 'sent'
-- `useAutopilotStats(salonId)` — bieżący tydzień stats
-- `togglePause(until?: Date)` — pauzuje/wznawia autopilot
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## 4. Komponent: `src/components/admin/AutopilotStatusBar.tsx`
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-Sticky banner 40px na górze dashboardu:
-- Gradient `from-[#1A1A2E] to-[#E91E8C]`, tekst biały
-- Treść: "🤖 Autopilot aktywny · Dziś zadziałał X razy · Odzyskano Y zł · [Zobacz akcje]"
-- Gdy spauzowany: "⏸️ Autopilot wstrzymany do DD.MM · [Wznów]"
-- Demo mode: mock dane statyczne
-- Link "Zobacz akcje" otwiera sidebar
+#### FAZA 3: Indywidualne kokpity
 
-## 5. Komponent: `src/components/admin/AutopilotActionLog.tsx`
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-Sheet/sidebar z listą ostatnich akcji:
-- Każda akcja: typ (ikona), ai_explanation, status badge, CTA button
-- Filtry: typ, status
-- Opcja "Cofnij" dla wysłanych akcji
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-## 6. Integracja z AdminDashboard.tsx
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-Dodanie `<AutopilotStatusBar />` między headerem a `<main>` — widoczny na każdej zakładce.
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-## Pliki do stworzenia
-- `src/lib/autopilot-engine.ts`
-- `src/hooks/useAutopilot.ts`
-- `src/components/admin/AutopilotStatusBar.tsx`
-- `src/components/admin/AutopilotActionLog.tsx`
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-## Pliki do edycji
-- `src/pages/AdminDashboard.tsx` — dodanie AutopilotStatusBar
-- `src/pages/DemoPage.tsx` — dodanie AutopilotStatusBar w demo mode
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
 
-## Migracja
-- 1 migracja: 3 tabele + RLS policies + trigger updated_at
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
