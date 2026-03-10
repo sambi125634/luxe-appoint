@@ -80,6 +80,7 @@ export default function AdminDashboard() {
       case "stats": return "Statystyki";
       case "settings": return "Ustawienia";
       case "support": return "Pomoc & AI Asystent";
+      case "retention": return "Retencja klientek";
       default: return "Dashboard";
     }
   };
