@@ -40,7 +40,7 @@ const ZONE_FILLS: Record<RiskZone, string> = {
 
 export function RetentionRadar({ clients, onClientClick, compact = false }: RetentionRadarProps) {
   const canvasSize = compact ? 264 : 384;
-  const maxRadius = canvasSize / 2 - 12;
+  const maxRadius = canvasSize / 2 - 24;
 
   // Group clients by zone
   const grouped = ZONE_ORDER.map((zone) => ({
@@ -69,7 +69,7 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
       </CardHeader>
       <CardContent>
         <div
-          className="relative mx-auto"
+          className="relative mx-auto overflow-hidden"
           style={{ width: canvasSize, height: canvasSize }}
         >
           {/* Concentric rings — render outer first so inner paints on top */}
@@ -152,18 +152,19 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
                 const angle = baseAngle + jitter + zoneIdx * 0.7;
 
                 // Radius: interpolate within band with hash-based variation
+                const bubbleSize = compact ? 28 : 34;
+                const half = bubbleSize / 2;
                 const tRadius = count > 1
                   ? localIdx / (count - 1)
                   : 0.5;
                 const rJitter = (hashStr(client.id + "r") - 0.5) * (rMax - rMin) * 0.3;
-                const r = Math.max(rMin + 8, Math.min(rMax - 8,
+                const r = Math.max(rMin + half, Math.min(rMax - half,
                   rMin + tRadius * (rMax - rMin) + rJitter
                 ));
 
                 const x = Math.cos(angle) * r;
                 const y = Math.sin(angle) * r;
                 const isRed = zone === "red";
-                const bubbleSize = compact ? 28 : 34;
 
                 return (
                   <Tooltip key={client.id}>
