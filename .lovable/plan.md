@@ -1,101 +1,108 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Consultation Cards & Voice Notes Module
 
-### Co już mamy
+## Zakres
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Moduł `/src/modules/consultation/` z dwoma częściami: (A) cyfrowe karty konsultacyjne z builderem, szablonami i podpisem, (B) voice notes z transkrypcją AI i strukturyzacją danych. Nowe tabele DB + edge function do transkrypcji.
 
-### Problem do rozwiązania
+## 1. Migracja — 3 nowe tabele
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+```sql
+-- Szablony kart konsultacyjnych (builder)
+CREATE TABLE consultation_templates (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  salon_id uuid NOT NULL,
+  name text NOT NULL,
+  fields jsonb NOT NULL DEFAULT '[]',
+  is_system boolean DEFAULT false,
+  is_active boolean DEFAULT true,
+  created_at timestamptz DEFAULT now(),
+  updated_at timestamptz DEFAULT now()
+);
 
----
+-- Wypełnione karty konsultacyjne
+CREATE TABLE consultation_cards (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  salon_id uuid NOT NULL,
+  client_id uuid NOT NULL,
+  template_id uuid REFERENCES consultation_templates(id),
+  responses jsonb NOT NULL DEFAULT '{}',
+  signature_url text,
+  red_flags text[] DEFAULT '{}',
+  status text DEFAULT 'pending', -- pending/completed/signed
+  filled_at timestamptz,
+  created_at timestamptz DEFAULT now()
+);
 
-### Plan implementacji
+-- Voice notes
+CREATE TABLE voice_notes (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  salon_id uuid NOT NULL,
+  client_id uuid NOT NULL,
+  staff_id uuid,
+  appointment_id uuid,
+  audio_url text NOT NULL,
+  duration_seconds integer,
+  transcript text,
+  ai_extracted jsonb DEFAULT '{}',
+  -- ai_extracted: { products: [], tags: [], nextVisit: {}, notes: "" }
+  created_at timestamptz DEFAULT now()
+);
+```
 
-#### FAZA 1: Role-based routing po loginie
+RLS: standard salon owner + staff pattern.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+## 2. Edge Function — Voice Transcription
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+`supabase/functions/transcribe-voice-note/index.ts`
+- Receives audio file, uses Lovable AI (gemini-2.5-flash) for transcription + structured extraction
+- Returns: transcript + extracted products/tags/next visit suggestion
+- Uses tool calling for structured output
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+## 3. Nowe pliki UI
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### `src/modules/consultation/ConsultationModule.tsx`
+Główny dashboard z tabami: Karty | Szablony | Voice Notes.
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### `src/modules/consultation/CardBuilder.tsx`
+Builder kart — lista pól (drag reorder): text, select, slider, photo, signature, medical contraindications. Gotowe szablony 1-klik: twarz, paznokcie, fryzjer, RODO, wywiad.
 
-#### FAZA 3: Indywidualne kokpity
+### `src/modules/consultation/CardFillForm.tsx`
+Mobile-friendly formularz do wypełnienia karty. Pole podpisu (canvas finger drawing). Submit → status "signed".
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+### `src/modules/consultation/ClientConsultations.tsx`
+Zakładka w profilu klientki: lista kart + red flags pinned na górze. PDF download.
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+### `src/modules/consultation/VoiceNoteRecorder.tsx`
+Przycisk mikrofonu → nagrywanie (max 2 min) → upload do storage → trigger transkrypcji AI. Wyświetlanie: waveform, transcript expandable, extracted chips.
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+### `src/modules/consultation/VoiceNoteCard.tsx`
+Karta voice note: audio player, transkrypcja, wyciągnięte dane (produkty, tagi, sugestia wizyty), przyciski akcji.
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+### `src/modules/consultation/index.ts`
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+### `src/hooks/useConsultations.ts`
+CRUD hooki: templates, cards, voice notes.
 
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
+## 4. Integracja
 
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+| Plik | Zmiana |
+|------|--------|
+| `AdminSidebar.tsx` | Tab `"consultation"` z ikoną `ClipboardList` |
+| `AdminDashboard.tsx` | Render `ConsultationModule` |
+| `DemoPage.tsx` | Rejestracja z `isDemo` |
+| `TabType` | Rozszerzenie o `"consultation"` |
+| `i18n pl.json / en.json` | Klucze tłumaczeń |
 
----
+## 5. Storage
 
-### Wymagane zmiany w bazie danych
+Audio files → istniejący bucket `salon-media` (subfolder `voice-notes/`).
 
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+## 6. Uwagi
+- Podpis: HTML Canvas z touch events, export jako PNG → upload do storage
+- Red flags z kart konsultacyjnych wyświetlane jako pinned badges w profilu klientki
+- Voice notes: transkrypcja przez Lovable AI (gemini-2.5-flash) — nie wymaga dodatkowego API key
+- Strukturyzacja AI wyciąga: użyte produkty, tagi, sugestię następnej wizyty, notatki
+- Demo mode: mock data bez prawdziwego nagrywania
 
