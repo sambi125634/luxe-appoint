@@ -242,7 +242,7 @@ export function generateMockActions(): AutopilotAction[] {
       scheduled_at: now.toISOString(),
       executed_at: null,
       status: "pending",
-      ai_explanation: "Środy masz obłożone w 40%. Proponuję promocję „Środowa Odnowa -15%" na zabiegi pielęgnacyjne — potencjał +1200 zł/mies.",
+      ai_explanation: "Srody masz oblozone w 40%. Proponuje promocje \u201ESrodowa Odnowa -15%\u201D na zabiegi pielegnacyjne \u2014 potencjal +1200 zl/mies.",
       cta_label: "Utwórz promocję",
       cta_action: "create_promotion",
       metadata: { day: "środa", potential_revenue: 1200 },
