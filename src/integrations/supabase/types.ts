@@ -892,8 +892,11 @@ export type Database = {
           onboarding_step: number
           owner_id: string | null
           phone: string | null
+          salon_type: string | null
           settings: Json | null
           slug: string
+          social_url: string | null
+          team_size: number | null
           theme_primary_color: string | null
           theme_secondary_color: string | null
           updated_at: string
@@ -912,8 +915,11 @@ export type Database = {
           onboarding_step?: number
           owner_id?: string | null
           phone?: string | null
+          salon_type?: string | null
           settings?: Json | null
           slug: string
+          social_url?: string | null
+          team_size?: number | null
           theme_primary_color?: string | null
           theme_secondary_color?: string | null
           updated_at?: string
@@ -932,8 +938,11 @@ export type Database = {
           onboarding_step?: number
           owner_id?: string | null
           phone?: string | null
+          salon_type?: string | null
           settings?: Json | null
           slug?: string
+          social_url?: string | null
+          team_size?: number | null
           theme_primary_color?: string | null
           theme_secondary_color?: string | null
           updated_at?: string

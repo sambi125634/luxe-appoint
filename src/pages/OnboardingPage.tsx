@@ -1,88 +1,112 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Building2, Clock, Scissors, Users, CheckCircle2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles } from "lucide-react";
+import {
+  Loader2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles,
+  CheckCircle2, Upload, Instagram, Globe, Rocket, Bot, Code2,
+  Mail, FileText, PartyPopper, Users, Scissors, Building2,
+} from "lucide-react";
 import { Confetti } from "@/components/booking/Confetti";
 import { cn } from "@/lib/utils";
 
+// ---- Constants ----
+
 const STEPS = [
-  { title: "Dane salonu", icon: Building2, emoji: "🏢" },
-  { title: "Godziny pracy", icon: Clock, emoji: "⏰" },
-  { title: "Usługi", icon: Scissors, emoji: "✂️" },
-  { title: "Pracownicy", icon: Users, emoji: "👥" },
-  { title: "Podsumowanie", icon: CheckCircle2, emoji: "🎉" },
+  { title: "O salonie", emoji: "🏢", icon: Building2 },
+  { title: "AI Skan", emoji: "🔍", icon: Sparkles },
+  { title: "Autopilot", emoji: "🤖", icon: Bot },
+  { title: "Widget", emoji: "🔗", icon: Code2 },
+  { title: "Klientki", emoji: "👥", icon: Users },
+  { title: "Gotowe!", emoji: "🎉", icon: PartyPopper },
 ];
 
-const VOICE_SCRIPTS: Record<number, string> = {
-  0: "Witaj w Beauty Calendar! Zacznijmy od podstaw. Wpisz nazwę swojego salonu, adres, miasto i dane kontaktowe. Te informacje będą widoczne dla Twoich klientów na stronie rezerwacji. Nazwa salonu jest wymagana — reszta jest opcjonalna, ale warto uzupełnić wszystko od razu.",
-  1: "Teraz ustawmy Twoje godziny pracy. Domyślnie ustawiliśmy standardowe godziny od poniedziałku do soboty. Możesz je dowolnie zmienić — wystarczy kliknąć checkbox przy danym dniu, aby go włączyć lub wyłączyć, oraz ustawić godziny otwarcia i zamknięcia.",
-  2: "Wybierz branżę najbliższą Twojemu salonowi — kosmetyka, fryzjerstwo lub medycyna estetyczna. System automatycznie zaproponuje listę popularnych usług z cenami i czasem trwania. Możesz wybrać kategorie, które Cię interesują. Ceny i nazwy usług będziesz mogła edytować później w panelu.",
-  3: "Jeśli masz zespół, dodaj pracowników. Wpisz imię i nazwisko oraz opcjonalnie email. Jeśli pracujesz sama — po prostu pomiń ten krok. Pracowników możesz dodać lub edytować w dowolnym momencie w panelu administracyjnym.",
-  4: "Gratulacje! Twój salon jest gotowy do przyjmowania rezerwacji. Skopiuj link do rezerwacji i udostępnij go swoim klientom — na Instagramie, Facebooku, w Google Maps lub na swojej stronie internetowej. Możesz też skopiować kod embed, aby osadzić widget rezerwacji bezpośrednio na swojej stronie.",
-};
+const SALON_TYPES = [
+  { key: "nails", label: "Paznokcie", emoji: "💅" },
+  { key: "hair", label: "Fryzjerstwo", emoji: "💇‍♀️" },
+  { key: "cosmetology", label: "Kosmetologia", emoji: "🧴" },
+  { key: "makeup", label: "Makijaż", emoji: "💄" },
+  { key: "multi", label: "Multi / Inne", emoji: "✨" },
+];
 
-const DEFAULT_HOURS = [
-  { day: 1, label: "Poniedziałek", start: "09:00", end: "18:00", working: true },
-  { day: 2, label: "Wtorek", start: "09:00", end: "18:00", working: true },
-  { day: 3, label: "Środa", start: "09:00", end: "18:00", working: true },
-  { day: 4, label: "Czwartek", start: "09:00", end: "18:00", working: true },
-  { day: 5, label: "Piątek", start: "09:00", end: "18:00", working: true },
-  { day: 6, label: "Sobota", start: "09:00", end: "14:00", working: true },
-  { day: 0, label: "Niedziela", start: "10:00", end: "14:00", working: false },
+const TEAM_SIZES = [
+  { key: "1", label: "Tylko ja" },
+  { key: "2-3", label: "2-3 osoby" },
+  { key: "4-6", label: "4-6 osób" },
+  { key: "7+", label: "7+ osób" },
+];
+
+const AI_SCAN_MESSAGES = [
+  "🔍 Skanuję Twój profil...",
+  "💅 Znalazłam usługi — weryfikuję ceny...",
+  "📸 Importuję zdjęcia salonu...",
+  "⏰ Ustawiam godziny otwarcia...",
+  "✅ Gotowe! Uzupełniłam profil za Ciebie.",
+];
+
+const AUTOPILOT_FEATURES = [
+  { key: "reminders", label: "Przypomnienia SMS przed wizytą", description: "24h i 2h przed wizytą", icon: "📲" },
+  { key: "retention", label: "Reaktywacja nieaktywnych klientek", description: "Automatyczne wiadomości po 45, 60, 75 dniach", icon: "🔄" },
+  { key: "reviews", label: "Prośby o opinie Google", description: "2h po zakończonej wizycie", icon: "⭐" },
+  { key: "noshow", label: "Follow-up po no-show", description: "30 minut po niestawieniu się", icon: "🚫" },
+  { key: "brief", label: "Tygodniowy Brief CEO", description: "Każdy poniedziałek o 8:00", icon: "📊" },
 ];
 
 const SERVICE_TEMPLATES: Record<string, { category: string; services: { name: string; duration: number; price: number }[] }[]> = {
-  beauty: [
-    { category: "Twarz", services: [
-      { name: "Makijaż dzienny", duration: 45, price: 150 },
-      { name: "Makijaż wieczorowy", duration: 60, price: 200 },
-      { name: "Oczyszczanie twarzy", duration: 60, price: 180 },
-    ]},
+  nails: [
     { category: "Paznokcie", services: [
       { name: "Manicure hybrydowy", duration: 60, price: 120 },
       { name: "Pedicure", duration: 75, price: 140 },
-      { name: "Przedłużanie paznokci", duration: 120, price: 200 },
-    ]},
-    { category: "Depilacja", services: [
-      { name: "Depilacja woskiem – nogi", duration: 45, price: 100 },
-      { name: "Depilacja woskiem – bikini", duration: 30, price: 80 },
-      { name: "Depilacja laserowa", duration: 30, price: 250 },
+      { name: "Przedłużanie paznokci żelem", duration: 120, price: 200 },
+      { name: "Ściągnięcie hybrydy", duration: 20, price: 30 },
     ]},
   ],
-  hairdresser: [
+  hair: [
     { category: "Strzyżenie", services: [
       { name: "Strzyżenie damskie", duration: 45, price: 120 },
       { name: "Strzyżenie męskie", duration: 30, price: 60 },
-      { name: "Strzyżenie dziecięce", duration: 30, price: 50 },
     ]},
     { category: "Koloryzacja", services: [
       { name: "Koloryzacja całkowita", duration: 120, price: 250 },
       { name: "Baleyage / Ombre", duration: 180, price: 400 },
-      { name: "Pasemka", duration: 90, price: 200 },
-    ]},
-    { category: "Pielęgnacja", services: [
-      { name: "Keratynowe prostowanie", duration: 120, price: 350 },
-      { name: "Odbudowa włosów", duration: 60, price: 150 },
-      { name: "Modelowanie", duration: 30, price: 80 },
     ]},
   ],
-  medical: [
-    { category: "Medycyna estetyczna", services: [
-      { name: "Botox", duration: 30, price: 800 },
-      { name: "Kwas hialuronowy – usta", duration: 45, price: 1200 },
+  cosmetology: [
+    { category: "Zabiegi na twarz", services: [
+      { name: "Oczyszczanie twarzy", duration: 60, price: 180 },
       { name: "Mezoterapia igłowa", duration: 45, price: 500 },
+      { name: "Peeling chemiczny", duration: 40, price: 200 },
     ]},
-    { category: "Zabiegi laserowe", services: [
-      { name: "Usuwanie zmian skórnych", duration: 30, price: 300 },
-      { name: "Fotoodmładzanie", duration: 45, price: 400 },
-      { name: "Frakcyjny laser CO2", duration: 60, price: 800 },
+    { category: "Depilacja", services: [
+      { name: "Depilacja laserowa — nogi", duration: 45, price: 300 },
+      { name: "Depilacja woskiem — bikini", duration: 30, price: 80 },
+    ]},
+  ],
+  makeup: [
+    { category: "Makijaż", services: [
+      { name: "Makijaż dzienny", duration: 45, price: 150 },
+      { name: "Makijaż wieczorowy", duration: 60, price: 200 },
+      { name: "Makijaż ślubny", duration: 90, price: 400 },
+    ]},
+  ],
+  multi: [
+    { category: "Twarz", services: [
+      { name: "Oczyszczanie twarzy", duration: 60, price: 180 },
+      { name: "Makijaż dzienny", duration: 45, price: 150 },
+    ]},
+    { category: "Paznokcie", services: [
+      { name: "Manicure hybrydowy", duration: 60, price: 120 },
+      { name: "Pedicure", duration: 75, price: 140 },
+    ]},
+    { category: "Depilacja", services: [
+      { name: "Depilacja woskiem — nogi", duration: 45, price: 100 },
     ]},
   ],
 };
@@ -99,66 +123,61 @@ function generateSlug(name: string): string {
     .slice(0, 50) || "salon";
 }
 
-const STEP_DESCRIPTIONS = [
-  "Podstawowe informacje o Twoim salonie — to zobaczy każdy klient.",
-  "Ustaw typowe godziny pracy — możesz je zmienić w dowolnym momencie.",
-  "Wybierz szablon usług lub dodaj własne — ceny i czas edytujesz później.",
-  "Dodaj pracowników (opcjonalne — możesz pominąć i dodać później).",
-  "Twój salon jest gotowy! Udostępnij link swoim klientom.",
-];
+// ---- Animated wrappers ----
 
-// Animated step content wrapper
 function StepTransition({ children, stepKey }: { children: React.ReactNode; stepKey: number }) {
-  const [isVisible, setIsVisible] = useState(false);
-
+  const [visible, setVisible] = useState(false);
   useEffect(() => {
-    setIsVisible(false);
-    const timer = setTimeout(() => setIsVisible(true), 50);
-    return () => clearTimeout(timer);
+    setVisible(false);
+    const t = setTimeout(() => setVisible(true), 50);
+    return () => clearTimeout(t);
   }, [stepKey]);
-
   return (
-    <div
-      className={cn(
-        "transition-all duration-500 ease-out",
-        isVisible
-          ? "opacity-100 translate-y-0 scale-100"
-          : "opacity-0 translate-y-4 scale-[0.98]"
-      )}
-    >
+    <div className={cn("transition-all duration-500 ease-out", visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-4 scale-[0.98]")}>
       {children}
     </div>
   );
 }
 
-// Animated progress bar
 function AnimatedProgress({ value }: { value: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDisplayValue(value), 100);
-    return () => clearTimeout(timer);
-  }, [value]);
-
+  const [display, setDisplay] = useState(0);
+  useEffect(() => { const t = setTimeout(() => setDisplay(value), 100); return () => clearTimeout(t); }, [value]);
   return (
-    <div className="relative mt-4 h-3 bg-muted rounded-full overflow-hidden">
-      <div
-        className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-primary to-primary/80 rounded-full transition-all duration-700 ease-out"
-        style={{ width: `${displayValue}%` }}
-      >
+    <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
+      <div className="absolute inset-y-0 left-0 bg-gradient-to-r from-[#E91E8C] to-[#E91E8C]/70 rounded-full transition-all duration-700 ease-out" style={{ width: `${display}%` }}>
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-[shimmer_2s_infinite]" />
       </div>
-      {displayValue > 0 && (
-        <div
-          className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-primary rounded-full shadow-lg border-2 border-primary-foreground transition-all duration-700 ease-out flex items-center justify-center"
-          style={{ left: `calc(${displayValue}% - 10px)` }}
-        >
-          <Sparkles className="w-3 h-3 text-primary-foreground" />
+      {display > 0 && (
+        <div className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-[#E91E8C] rounded-full shadow-lg border-2 border-white transition-all duration-700 ease-out flex items-center justify-center" style={{ left: `calc(${display}% - 10px)` }}>
+          <Sparkles className="w-3 h-3 text-white" />
         </div>
       )}
     </div>
   );
 }
+
+// ---- Interfaces ----
+
+interface ScannedService {
+  name: string;
+  price: number;
+  duration: number;
+  category: string;
+}
+
+interface ScanResult {
+  services: ScannedService[];
+  opening_hours: Record<string, string>;
+  description: string;
+  avg_rating: number;
+  existing_reviews_count: number;
+}
+
+interface CsvRow {
+  [key: string]: string;
+}
+
+// ---- Main Component ----
 
 export default function OnboardingPage() {
   const navigate = useNavigate();
@@ -167,278 +186,289 @@ export default function OnboardingPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [userId, setUserId] = useState<string | null>(null);
   const [createdSalonId, setCreatedSalonId] = useState<string | null>(null);
-  const [createdSlug, setCreatedSlug] = useState<string>("");
+  const [createdSlug, setCreatedSlug] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
-  const [stepCompleted, setStepCompleted] = useState(false);
 
-  // Step 1 - salon data
+  // Step 1 — Salon info
   const [salonName, setSalonName] = useState("");
-  const [salonAddress, setSalonAddress] = useState("");
   const [salonCity, setSalonCity] = useState("");
-  const [salonPhone, setSalonPhone] = useState("");
-  const [salonEmail, setSalonEmail] = useState("");
+  const [salonType, setSalonType] = useState("multi");
+  const [teamSize, setTeamSize] = useState("1");
+  const [socialUrl, setSocialUrl] = useState("");
 
-  // Step 2 - hours
-  const [hours, setHours] = useState(DEFAULT_HOURS);
+  // Step 2 — AI Scan
+  const [scanning, setScanning] = useState(false);
+  const [scanMessageIndex, setScanMessageIndex] = useState(0);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [scanSkipped, setScanSkipped] = useState(false);
+  const [scanPercentage, setScanPercentage] = useState(0);
 
-  // Step 3 - services
-  const [selectedTemplate, setSelectedTemplate] = useState<string>("beauty");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  // Step 3 — Autopilot toggles
+  const [autopilotToggles, setAutopilotToggles] = useState<Record<string, boolean>>({
+    reminders: true, retention: true, reviews: true, noshow: true, brief: true,
+  });
 
-  // Step 4 - staff
-  const [staffMembers, setStaffMembers] = useState<{ name: string; email: string }[]>([]);
-  const [newStaffName, setNewStaffName] = useState("");
-  const [newStaffEmail, setNewStaffEmail] = useState("");
+  // Step 5 — CSV Import
+  const [csvData, setCsvData] = useState<CsvRow[]>([]);
+  const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
+  const [importedCount, setImportedCount] = useState(0);
 
-  // Step completion celebration
-  const showStepSuccess = () => {
-    setStepCompleted(true);
-    setTimeout(() => setStepCompleted(false), 600);
-  };
+  // Widget tab
+  const [widgetTab, setWidgetTab] = useState("wordpress");
 
+  // ---- Auth check & resume ----
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!session) {
-        navigate("/auth");
-        setCheckingAuth(false);
-        return;
-      }
-
+      if (!session) { navigate("/auth"); setCheckingAuth(false); return; }
       const uid = session.user.id;
       setUserId(uid);
-      setSalonEmail(session.user.email ?? "");
 
-      const { data: existingSalon } = await supabase
+      const { data: salon } = await supabase
         .from("salons")
-        .select("id, slug, name, address, city, phone, email, onboarding_completed, onboarding_step")
+        .select("id, slug, name, city, onboarding_completed, onboarding_step")
         .eq("owner_id", uid)
         .maybeSingle();
 
-      if (existingSalon?.onboarding_completed) {
-        navigate("/admin");
-        return;
+      if (salon?.onboarding_completed) { navigate("/admin"); return; }
+      if (salon) {
+        setCreatedSalonId(salon.id);
+        setCreatedSlug(salon.slug);
+        setSalonName(salon.name ?? "");
+        setSalonCity(salon.city ?? "");
+        setStep(Math.min(salon.onboarding_step ?? 0, 5));
       }
-
-      if (existingSalon) {
-        setCreatedSalonId(existingSalon.id);
-        setCreatedSlug(existingSalon.slug);
-        setSalonName(existingSalon.name ?? "");
-        setSalonAddress(existingSalon.address ?? "");
-        setSalonCity(existingSalon.city ?? "");
-        setSalonPhone(existingSalon.phone ?? "");
-        setSalonEmail(existingSalon.email ?? session.user.email ?? "");
-        setStep(existingSalon.onboarding_step ?? 0);
-      }
-
       setCheckingAuth(false);
     });
   }, [navigate]);
 
+  // Confetti on final step
   useEffect(() => {
-    const cats = SERVICE_TEMPLATES[selectedTemplate]?.map(c => c.category) ?? [];
-    setSelectedCategories(cats);
-  }, [selectedTemplate]);
-
-  // Show confetti when reaching final step
-  useEffect(() => {
-    if (step === 4) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 4000);
-      return () => clearTimeout(timer);
-    }
+    if (step === 5) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
   }, [step]);
 
-  const handleSaveSalon = async () => {
-    if (!salonName.trim()) {
-      toast.error("Podaj nazwę salonu");
-      return;
+  // ---- Step handlers ----
+
+  const goTo = useCallback(async (nextStep: number) => {
+    if (createdSalonId) {
+      await supabase.from("salons").update({ onboarding_step: nextStep }).eq("id", createdSalonId);
     }
+    setStep(nextStep);
+  }, [createdSalonId]);
+
+  const handleSaveSalon = async () => {
+    if (!salonName.trim()) { toast.error("Podaj nazwę salonu"); return; }
     if (!userId) return;
     setSaving(true);
 
     if (createdSalonId) {
-      const { error } = await supabase
-        .from("salons")
-        .update({
-          name: salonName.trim(),
-          address: salonAddress.trim() || null,
-          city: salonCity.trim() || null,
-          phone: salonPhone.trim() || null,
-          email: salonEmail.trim() || null,
-          onboarding_step: 1,
-        })
-        .eq("id", createdSalonId);
+      const { error } = await supabase.from("salons").update({
+        name: salonName.trim(), city: salonCity.trim() || null,
+        salon_type: salonType, team_size: parseInt(teamSize) || 1,
+        social_url: socialUrl.trim() || null, onboarding_step: 1,
+      }).eq("id", createdSalonId);
+      if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
+    } else {
+      const slug = generateSlug(salonName) + "-" + Date.now().toString(36);
+      const { data: salon, error } = await supabase.from("salons").insert({
+        name: salonName.trim(), slug, city: salonCity.trim() || null,
+        owner_id: userId, onboarding_step: 1, onboarding_completed: false,
+        salon_type: salonType, team_size: parseInt(teamSize) || 1,
+        social_url: socialUrl.trim() || null,
+      }).select("id, slug").single();
+      if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
+      setCreatedSalonId(salon.id);
+      setCreatedSlug(salon.slug);
 
-      if (error) {
-        toast.error("Nie udało się zaktualizować salonu: " + error.message);
-        setSaving(false);
-        return;
-      }
-      setSaving(false);
-      showStepSuccess();
-      setTimeout(() => setStep(1), 300);
-      return;
-    }
-
-    const slug = generateSlug(salonName) + "-" + Date.now().toString(36);
-
-    const { data: salon, error } = await supabase
-      .from("salons")
-      .insert({
-        name: salonName.trim(),
-        slug,
-        address: salonAddress.trim() || null,
-        city: salonCity.trim() || null,
-        phone: salonPhone.trim() || null,
-        email: salonEmail.trim() || null,
-        owner_id: userId,
-        onboarding_step: 1,
-        onboarding_completed: false,
-      })
-      .select("id, slug")
-      .single();
-
-    if (error) {
-      toast.error("Nie udało się utworzyć salonu: " + error.message);
-      setSaving(false);
-      return;
-    }
-
-    setCreatedSalonId(salon.id);
-    setCreatedSlug(salon.slug);
-    setSaving(false);
-    showStepSuccess();
-    setTimeout(() => setStep(1), 300);
-  };
-
-  const handleSaveHours = async () => {
-    if (!createdSalonId || !userId) return;
-    setSaving(true);
-
-    const { data: staffMember, error: staffErr } = await supabase
-      .from("staff_members")
-      .insert({
-        salon_id: createdSalonId,
-        name: salonName.trim(),
-        email: salonEmail.trim() || null,
-        user_id: userId,
-        role: "owner",
-      })
-      .select("id")
-      .single();
-
-    if (staffErr) {
-      toast.error("Błąd tworzenia profilu pracownika");
-      setSaving(false);
-      return;
-    }
-
-    const hoursInsert = hours.map(h => ({
-      staff_id: staffMember.id,
-      day_of_week: h.day,
-      start_time: h.start,
-      end_time: h.end,
-      is_working: h.working,
-    }));
-
-    const { error: hoursErr } = await supabase.from("working_hours").insert(hoursInsert);
-    if (hoursErr) {
-      toast.error("Błąd zapisywania godzin pracy");
-      setSaving(false);
-      return;
-    }
-
-    await supabase.from("salons").update({ onboarding_step: 2 }).eq("id", createdSalonId);
-    setSaving(false);
-    showStepSuccess();
-    setTimeout(() => setStep(2), 300);
-  };
-
-  const handleSaveServices = async () => {
-    if (!createdSalonId) return;
-    setSaving(true);
-
-    const template = SERVICE_TEMPLATES[selectedTemplate] ?? [];
-    const filteredTemplate = template.filter(c => selectedCategories.includes(c.category));
-
-    for (let i = 0; i < filteredTemplate.length; i++) {
-      const cat = filteredTemplate[i];
-      const { data: category, error: catErr } = await supabase
-        .from("service_categories")
-        .insert({ salon_id: createdSalonId, name: cat.category, sort_order: i })
-        .select("id")
-        .single();
-
-      if (catErr) continue;
-
-      const servicesInsert = cat.services.map(s => ({
-        salon_id: createdSalonId,
-        category_id: category.id,
-        name: s.name,
-        duration: s.duration,
-        price: s.price,
-      }));
-
-      await supabase.from("services").insert(servicesInsert);
-    }
-
-    await supabase.from("salons").update({ onboarding_step: 3 }).eq("id", createdSalonId);
-    setSaving(false);
-    showStepSuccess();
-    setTimeout(() => setStep(3), 300);
-  };
-
-  const handleSaveStaff = async () => {
-    if (!createdSalonId) return;
-    setSaving(true);
-
-    for (const member of staffMembers) {
+      // Create owner as staff member
       await supabase.from("staff_members").insert({
-        salon_id: createdSalonId,
-        name: member.name,
-        email: member.email || null,
+        salon_id: salon.id, name: salonName.trim(), user_id: userId, role: "owner",
       });
     }
-
-    await supabase.from("salons").update({ onboarding_step: 4 }).eq("id", createdSalonId);
     setSaving(false);
-    showStepSuccess();
-    setTimeout(() => setStep(4), 300);
+
+    // If social URL provided, go to AI scan, otherwise skip to step 2 (autopilot, which is step index 2)
+    if (socialUrl.trim()) {
+      setStep(1);
+      startAiScan();
+    } else {
+      setScanSkipped(true);
+      // Save default services from template
+      if (createdSalonId || true) {
+        await saveDefaultServices();
+      }
+      setStep(2);
+    }
+  };
+
+  const saveDefaultServices = async () => {
+    const salonId = createdSalonId;
+    if (!salonId) return;
+    const template = SERVICE_TEMPLATES[salonType] ?? SERVICE_TEMPLATES.multi;
+    for (let i = 0; i < template.length; i++) {
+      const cat = template[i];
+      const { data: category } = await supabase.from("service_categories")
+        .insert({ salon_id: salonId, name: cat.category, sort_order: i }).select("id").single();
+      if (!category) continue;
+      const services = cat.services.map(s => ({ salon_id: salonId, category_id: category.id, name: s.name, duration: s.duration, price: s.price }));
+      await supabase.from("services").insert(services);
+    }
+  };
+
+  const startAiScan = async () => {
+    setScanning(true);
+    setScanMessageIndex(0);
+    setScanPercentage(0);
+
+    // Animate messages
+    for (let i = 0; i < AI_SCAN_MESSAGES.length; i++) {
+      await new Promise(r => setTimeout(r, i === AI_SCAN_MESSAGES.length - 1 ? 500 : 1500));
+      setScanMessageIndex(i);
+      setScanPercentage(Math.min(((i + 1) / AI_SCAN_MESSAGES.length) * 100, 100));
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-profile-scanner", {
+        body: { url: socialUrl, salon_type: salonType },
+      });
+
+      if (error || !data?.success) {
+        toast.error("Nie udało się przeskanować profilu. Kontynuuję z domyślnymi ustawieniami.");
+        setScanSkipped(true);
+        await saveDefaultServices();
+        setScanning(false);
+        goTo(2);
+        return;
+      }
+
+      setScanResult(data.data as ScanResult);
+      setScanPercentage(100);
+    } catch {
+      toast.error("Błąd skanowania — kontynuuję z szablonami.");
+      setScanSkipped(true);
+      await saveDefaultServices();
+      goTo(2);
+    }
+    setScanning(false);
+  };
+
+  const handleSaveScanResults = async () => {
+    if (!createdSalonId || !scanResult) return;
+    setSaving(true);
+
+    // Group services by category
+    const grouped: Record<string, ScannedService[]> = {};
+    scanResult.services.forEach(s => {
+      if (!grouped[s.category]) grouped[s.category] = [];
+      grouped[s.category].push(s);
+    });
+
+    let i = 0;
+    for (const [catName, services] of Object.entries(grouped)) {
+      const { data: cat } = await supabase.from("service_categories")
+        .insert({ salon_id: createdSalonId, name: catName, sort_order: i++ }).select("id").single();
+      if (!cat) continue;
+      await supabase.from("services").insert(
+        services.map(s => ({ salon_id: createdSalonId!, category_id: cat.id, name: s.name, duration: s.duration, price: s.price }))
+      );
+    }
+
+    if (scanResult.description) {
+      await supabase.from("salons").update({ description: scanResult.description }).eq("id", createdSalonId);
+    }
+
+    setSaving(false);
+    goTo(2);
+  };
+
+  const handleActivateAutopilot = async () => {
+    if (!createdSalonId) return;
+    setSaving(true);
+
+    await supabase.from("autopilot_config").insert({
+      salon_id: createdSalonId,
+      is_active: true,
+      ai_suggestions_enabled: autopilotToggles.reviews,
+    });
+
+    setSaving(false);
+    goTo(3);
+  };
+
+  const handleWidgetDone = () => goTo(4);
+
+  const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      const lines = text.split("\n").filter(l => l.trim());
+      if (lines.length < 2) { toast.error("Plik CSV jest pusty"); return; }
+      const headers = lines[0].split(/[,;]/).map(h => h.trim().replace(/^"|"$/g, ""));
+      setCsvHeaders(headers);
+      const rows = lines.slice(1, 50).map(line => {
+        const values = line.split(/[,;]/).map(v => v.trim().replace(/^"|"$/g, ""));
+        const row: CsvRow = {};
+        headers.forEach((h, i) => { row[h] = values[i] || ""; });
+        return row;
+      });
+      setCsvData(rows);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImportClients = async () => {
+    if (!createdSalonId || csvData.length === 0) return;
+    setSaving(true);
+
+    // Try to auto-map columns
+    const findCol = (patterns: string[]) => csvHeaders.find(h => patterns.some(p => h.toLowerCase().includes(p))) || "";
+    const firstNameCol = findCol(["imię", "imie", "first", "name", "nazwa"]);
+    const lastNameCol = findCol(["nazwisko", "last"]);
+    const phoneCol = findCol(["telefon", "phone", "tel", "numer"]);
+    const emailCol = findCol(["email", "mail", "e-mail"]);
+
+    let imported = 0;
+    for (const row of csvData) {
+      const firstName = row[firstNameCol]?.trim();
+      const lastName = row[lastNameCol]?.trim() || "";
+      const phone = row[phoneCol]?.trim() || "000000000";
+      const email = row[emailCol]?.trim() || null;
+
+      if (!firstName) continue;
+
+      const { error } = await supabase.from("clients").insert({
+        salon_id: createdSalonId, first_name: firstName, last_name: lastName,
+        phone, email, rodo_consent: true,
+      });
+      if (!error) imported++;
+    }
+    setImportedCount(imported);
+    setSaving(false);
+    toast.success(`Zaimportowano ${imported} klientek`);
+    goTo(5);
   };
 
   const handleComplete = async () => {
     if (!createdSalonId) return;
     setSaving(true);
-    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 5 }).eq("id", createdSalonId);
+    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 6 }).eq("id", createdSalonId);
     toast.success("🎉 Salon skonfigurowany! Witamy w Beauty Calendar.");
     navigate("/admin");
   };
 
-  const addStaffMember = () => {
-    if (!newStaffName.trim()) return;
-    setStaffMembers(prev => [...prev, { name: newStaffName.trim(), email: newStaffEmail.trim() }]);
-    setNewStaffName("");
-    setNewStaffEmail("");
-  };
-
-  const updateHour = (index: number, field: string, value: string | boolean) => {
-    setHours(prev => prev.map((h, i) => i === index ? { ...h, [field]: value } : h));
-  };
-
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast.success("Skopiowano do schowka!");
+    toast.success("Skopiowano!");
   };
 
+  // ---- Loading ----
   if (checkingAuth) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1A1A2E] to-[#16213E]">
         <div className="flex flex-col items-center gap-4">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
-            <Sparkles className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-          </div>
-          <p className="text-muted-foreground text-sm animate-pulse">Ładowanie...</p>
+          <div className="w-16 h-16 rounded-full border-4 border-[#E91E8C]/20 border-t-[#E91E8C] animate-spin" />
+          <p className="text-white/60 text-sm animate-pulse">Ładowanie...</p>
         </div>
       </div>
     );
@@ -446,294 +476,400 @@ export default function OnboardingPage() {
 
   const progress = ((step + 1) / STEPS.length) * 100;
   const bookingUrl = `${window.location.origin}/s/${createdSlug}`;
+  const embedCode = `<iframe src="${bookingUrl}" width="100%" height="700" frameborder="0" style="border-radius:12px;"></iframe>`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 py-8 px-4 overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#1A1A2E] to-[#16213E] py-6 px-4 overflow-hidden">
       {showConfetti && <Confetti duration={4000} />}
-      
-      {/* Success flash overlay */}
-      <div className={cn(
-        "fixed inset-0 bg-primary/5 pointer-events-none z-40 transition-opacity duration-300",
-        stepCompleted ? "opacity-100" : "opacity-0"
-      )} />
 
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="font-serif text-3xl font-bold text-foreground mb-2 animate-fade-in">
-            Skonfiguruj swój salon
+        <div className="text-center mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">
+            {STEPS[step].emoji} {STEPS[step].title}
           </h1>
-          <p className="text-muted-foreground transition-all duration-300">
-            Krok {step + 1} z {STEPS.length}: <span className="font-medium text-foreground">{STEPS[step].title}</span>
+          <p className="text-white/50 text-sm mb-4">
+            Krok {step + 1} z {STEPS.length}
           </p>
           <AnimatedProgress value={progress} />
         </div>
 
         {/* Step indicators */}
-        <div className="flex justify-center gap-2 mb-8">
-          {STEPS.map((s, i) => {
-            const Icon = s.icon;
-            const isActive = i === step;
-            const isCompleted = i < step;
-            return (
-              <div
-                key={i}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-all duration-500 ease-out",
-                  isActive && "bg-primary text-primary-foreground shadow-lg shadow-primary/25 scale-110",
-                  isCompleted && "bg-primary/20 text-primary",
-                  !isActive && !isCompleted && "bg-muted text-muted-foreground"
-                )}
-              >
-                {isCompleted ? (
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                ) : (
-                  <Icon className={cn("w-3.5 h-3.5", isActive && "animate-pulse")} />
-                )}
-                <span className="hidden sm:inline">{s.title}</span>
-              </div>
-            );
-          })}
+        <div className="flex justify-center gap-1.5 mb-6 flex-wrap">
+          {STEPS.map((s, i) => (
+            <div key={i} className={cn(
+              "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300",
+              i === step && "bg-[#E91E8C] text-white scale-110 shadow-lg shadow-[#E91E8C]/30",
+              i < step && "bg-[#E91E8C]/30 text-white",
+              i > step && "bg-white/10 text-white/30"
+            )}>
+              {i < step ? <CheckCircle2 className="w-4 h-4" /> : s.emoji}
+            </div>
+          ))}
         </div>
 
-        {/* Step description */}
+        {/* Content */}
         <StepTransition stepKey={step}>
-          <div className="mb-6">
-            <div className="flex items-start gap-3 p-4 bg-card border border-border/50 rounded-xl">
-              <div className="flex-1">
-                <p className="text-sm font-medium text-foreground mb-1">
-                  <span className="mr-1.5">{STEPS[step].emoji}</span>
-                  {STEP_DESCRIPTIONS[step]}
-                </p>
-              </div>
-            </div>
-          </div>
-        </StepTransition>
-
-        {/* Step content */}
-        <StepTransition stepKey={step}>
-          <Card className="border-border/50 shadow-lg transition-shadow duration-300 hover:shadow-xl">
-            <CardHeader>
-              <CardTitle className="font-serif flex items-center gap-2">
-                <span>{STEPS[step].emoji}</span>
-                {STEPS[step].title}
-              </CardTitle>
-              <CardDescription>{STEP_DESCRIPTIONS[step]}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* Step 0: Salon data */}
-              {step === 0 && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label>Nazwa salonu *</Label>
-                    <Input value={salonName} onChange={(e) => setSalonName(e.target.value)} placeholder="np. Beauty Studio Anna" className="transition-all duration-200 focus:scale-[1.01]" />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Miasto</Label>
-                      <Input value={salonCity} onChange={(e) => setSalonCity(e.target.value)} placeholder="np. Warszawa" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Telefon</Label>
-                      <Input value={salonPhone} onChange={(e) => setSalonPhone(e.target.value)} placeholder="+48 600 000 000" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Adres</Label>
-                    <Input value={salonAddress} onChange={(e) => setSalonAddress(e.target.value)} placeholder="ul. Piękna 10" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Email kontaktowy</Label>
-                    <Input type="email" value={salonEmail} onChange={(e) => setSalonEmail(e.target.value)} placeholder="kontakt@salon.pl" />
-                  </div>
-                  <Button onClick={handleSaveSalon} disabled={saving} className="w-full group">
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
-                    Dalej
-                  </Button>
+          {/* ===== STEP 0: Salon Info ===== */}
+          {step === 0 && (
+            <Card className="bg-white shadow-2xl border-0">
+              <CardContent className="p-6 space-y-5">
+                <div>
+                  <h2 className="text-lg font-bold mb-1">Powiedz nam o salonie</h2>
+                  <p className="text-sm text-muted-foreground">Podstawowe informacje — zajmie to 2 minuty.</p>
                 </div>
-              )}
 
-              {/* Step 1: Working hours */}
-              {step === 1 && (
-                <div className="space-y-4">
-                  {hours.map((h, i) => (
-                    <div key={h.day} className="flex items-center gap-3 p-2 rounded-lg transition-colors hover:bg-muted/50" style={{ animationDelay: `${i * 50}ms` }}>
-                      <Checkbox checked={h.working} onCheckedChange={(checked) => updateHour(i, "working", !!checked)} />
-                      <span className={cn("w-28 text-sm font-medium transition-colors", !h.working && "text-muted-foreground")}>{h.label}</span>
-                      <Input type="time" value={h.start} onChange={(e) => updateHour(i, "start", e.target.value)} disabled={!h.working} className="w-28" />
-                      <span className="text-muted-foreground">–</span>
-                      <Input type="time" value={h.end} onChange={(e) => updateHour(i, "end", e.target.value)} disabled={!h.working} className="w-28" />
-                    </div>
-                  ))}
-                  <div className="flex gap-3 pt-4">
-                    <Button variant="outline" onClick={() => setStep(0)} className="group">
-                      <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />Wstecz
-                    </Button>
-                    <Button onClick={handleSaveHours} disabled={saving} className="flex-1 group">
-                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
-                      Dalej
-                    </Button>
+                <div className="space-y-2">
+                  <Label>Nazwa salonu *</Label>
+                  <Input value={salonName} onChange={e => setSalonName(e.target.value)} placeholder="np. Beauty Studio Anna" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Miasto</Label>
+                  <Input value={salonCity} onChange={e => setSalonCity(e.target.value)} placeholder="np. Warszawa" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Typ salonu</Label>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    {SALON_TYPES.map(t => (
+                      <Button key={t.key} variant={salonType === t.key ? "default" : "outline"} size="sm"
+                        onClick={() => setSalonType(t.key)} className={cn("text-xs h-auto py-2", salonType === t.key && "shadow-lg")}>
+                        <span className="mr-1">{t.emoji}</span>{t.label}
+                      </Button>
+                    ))}
                   </div>
                 </div>
-              )}
 
-              {/* Step 2: Services */}
-              {step === 2 && (
-                <div className="space-y-6">
-                  <div>
-                    <Label className="mb-3 block">Wybierz branżę</Label>
-                    <div className="grid grid-cols-3 gap-3">
-                      {[
-                        { key: "beauty", label: "Beauty / Kosmetyka", emoji: "💄" },
-                        { key: "hairdresser", label: "Fryzjerstwo", emoji: "💇‍♀️" },
-                        { key: "medical", label: "Medycyna estetyczna", emoji: "💉" },
-                      ].map(t => (
-                        <Button
-                          key={t.key}
-                          variant={selectedTemplate === t.key ? "default" : "outline"}
-                          onClick={() => setSelectedTemplate(t.key)}
-                          className={cn(
-                            "h-auto py-3 text-xs transition-all duration-300",
-                            selectedTemplate === t.key && "shadow-lg shadow-primary/20 scale-105"
-                          )}
-                        >
-                          <span className="mr-1">{t.emoji}</span> {t.label}
-                        </Button>
+                <div className="space-y-2">
+                  <Label>Liczba pracowników</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {TEAM_SIZES.map(s => (
+                      <Button key={s.key} variant={teamSize === s.key ? "default" : "outline"} size="sm"
+                        onClick={() => setTeamSize(s.key)} className="text-xs h-auto py-2">
+                        {s.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#E91E8C]" />
+                    <Label className="text-sm font-semibold">Profil Instagram lub Google Maps</Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Oszczędź 10 minut — AI uzupełni dane za Ciebie!
+                  </p>
+                  <Input value={socialUrl} onChange={e => setSocialUrl(e.target.value)}
+                    placeholder="https://instagram.com/twojsalon lub link Google Maps" />
+                </div>
+
+                <Button onClick={handleSaveSalon} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
+                  {socialUrl.trim() ? "Dalej — AI przeskanuje profil" : "Dalej"}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ===== STEP 1: AI Scan ===== */}
+          {step === 1 && (
+            <Card className="bg-white shadow-2xl border-0">
+              <CardContent className="p-6">
+                {scanning ? (
+                  <div className="text-center py-8 space-y-6">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#E91E8C]/20 to-[#E91E8C]/5 flex items-center justify-center animate-pulse">
+                      <Sparkles className="w-10 h-10 text-[#E91E8C]" />
+                    </div>
+                    <div className="space-y-2">
+                      {AI_SCAN_MESSAGES.map((msg, i) => (
+                        <p key={i} className={cn(
+                          "text-sm transition-all duration-500",
+                          i <= scanMessageIndex ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2",
+                          i === scanMessageIndex ? "font-semibold text-foreground" : "text-muted-foreground"
+                        )}>{msg}</p>
                       ))}
                     </div>
-                  </div>
-
-                  <div>
-                    <Label className="mb-3 block">Kategorie usług</Label>
-                    <div className="space-y-2">
-                      {(SERVICE_TEMPLATES[selectedTemplate] ?? []).map((cat, idx) => (
-                        <div
-                          key={cat.category}
-                          className="border border-border rounded-lg p-3 transition-all duration-300 hover:border-primary/30"
-                          style={{ animationDelay: `${idx * 100}ms` }}
-                        >
-                          <div className="flex items-center gap-2 mb-2">
-                            <Checkbox
-                              checked={selectedCategories.includes(cat.category)}
-                              onCheckedChange={(checked) => {
-                                setSelectedCategories(prev =>
-                                  checked ? [...prev, cat.category] : prev.filter(c => c !== cat.category)
-                                );
-                              }}
-                            />
-                            <span className="font-medium text-sm">{cat.category}</span>
-                          </div>
-                          <div className={cn(
-                            "ml-6 space-y-1 overflow-hidden transition-all duration-300",
-                            selectedCategories.includes(cat.category) ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-                          )}>
-                            {cat.services.map(s => (
-                              <div key={s.name} className="text-xs text-muted-foreground flex justify-between">
-                                <span>{s.name} ({s.duration} min)</span>
-                                <span className="font-medium">{s.price} PLN</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                      <div className="h-full bg-[#E91E8C] rounded-full transition-all duration-700" style={{ width: `${scanPercentage}%` }} />
                     </div>
                   </div>
-
-                  <div className="flex gap-3">
-                    <Button variant="outline" onClick={() => setStep(1)} className="group">
-                      <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />Wstecz
-                    </Button>
-                    <Button onClick={handleSaveServices} disabled={saving} className="flex-1 group">
-                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
-                      Dalej
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 3: Staff */}
-              {step === 3 && (
-                <div className="space-y-4">
-                  {staffMembers.length > 0 && (
-                    <div className="space-y-2">
-                      {staffMembers.map((m, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg animate-scale-in">
-                          <div>
-                            <p className="font-medium text-sm">{m.name}</p>
-                            {m.email && <p className="text-xs text-muted-foreground">{m.email}</p>}
-                          </div>
-                          <Button variant="ghost" size="sm" onClick={() => setStaffMembers(prev => prev.filter((_, j) => j !== i))} className="hover:bg-destructive/10 hover:text-destructive">✕</Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <Label className="text-xs">Imię i nazwisko</Label>
-                      <Input value={newStaffName} onChange={(e) => setNewStaffName(e.target.value)} placeholder="np. Kasia Nowak" />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Email (opcjonalny)</Label>
-                      <Input value={newStaffEmail} onChange={(e) => setNewStaffEmail(e.target.value)} placeholder="kasia@salon.pl" />
-                    </div>
-                  </div>
-                  <Button variant="outline" onClick={addStaffMember} disabled={!newStaffName.trim()} className="w-full transition-all hover:border-primary/50">+ Dodaj pracownika</Button>
-
-                  <div className="flex gap-3 pt-4">
-                    <Button variant="outline" onClick={() => setStep(2)} className="group">
-                      <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />Wstecz
-                    </Button>
-                    <Button onClick={handleSaveStaff} disabled={saving} className="flex-1 group">
-                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4 transition-transform group-hover:translate-x-1" />}
-                      {staffMembers.length === 0 ? "Pomiń" : "Dalej"}
-                    </Button>
-                  </div>
-                </div>
-              )}
-
-              {/* Step 4: Summary */}
-              {step === 4 && (
-                <div className="space-y-6">
-                  <div className="text-center py-6">
-                    <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mb-4 animate-scale-in">
-                      <CheckCircle2 className="w-10 h-10 text-primary" />
-                    </div>
-                    <h3 className="font-serif text-2xl font-bold mb-2 animate-fade-in">Gratulacje! 🎉</h3>
-                    <p className="text-muted-foreground animate-fade-in" style={{ animationDelay: "200ms" }}>
-                      Twój salon <strong className="text-foreground">{salonName}</strong> jest gotowy do przyjmowania rezerwacji.
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="p-4 bg-muted rounded-lg animate-fade-in" style={{ animationDelay: "300ms" }}>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Twój link do rezerwacji</Label>
-                      <div className="flex items-center gap-2">
-                        <code className="flex-1 text-sm bg-background px-3 py-2 rounded border border-border truncate">{bookingUrl}</code>
-                        <Button size="sm" variant="outline" onClick={() => copyToClipboard(bookingUrl)} className="hover-scale"><Copy className="w-4 h-4" /></Button>
-                        <Button size="sm" variant="outline" onClick={() => window.open(bookingUrl, "_blank")} className="hover-scale"><ExternalLink className="w-4 h-4" /></Button>
+                ) : scanResult ? (
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <div>
+                        <h2 className="font-bold">Co znalazłam</h2>
+                        <p className="text-xs text-muted-foreground">
+                          {scanResult.services.length} usług · ocena {scanResult.avg_rating}/5 · {scanResult.existing_reviews_count} opinii
+                        </p>
                       </div>
                     </div>
 
-                    <div className="p-4 bg-muted rounded-lg animate-fade-in" style={{ animationDelay: "400ms" }}>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Kod embed na stronę</Label>
-                      <code className="block text-xs bg-background px-3 py-2 rounded border border-border overflow-x-auto">
-                        {`<iframe src="${bookingUrl}" width="100%" height="700" frameborder="0"></iframe>`}
-                      </code>
-                      <Button size="sm" variant="outline" className="mt-2 hover-scale" onClick={() => copyToClipboard(`<iframe src="${bookingUrl}" width="100%" height="700" frameborder="0"></iframe>`)}>
-                        <Copy className="w-4 h-4 mr-1" />Kopiuj embed
+                    {scanResult.description && (
+                      <div className="p-3 bg-muted rounded-lg">
+                        <p className="text-xs font-medium text-muted-foreground mb-1">Opis</p>
+                        <p className="text-sm">{scanResult.description}</p>
+                      </div>
+                    )}
+
+                    <div>
+                      <p className="text-sm font-medium mb-2">Znalezione usługi:</p>
+                      <div className="space-y-1 max-h-48 overflow-y-auto">
+                        {scanResult.services.map((s, i) => (
+                          <div key={i} className="flex justify-between items-center text-sm p-2 rounded hover:bg-muted">
+                            <span>{s.name} <span className="text-xs text-muted-foreground">({s.duration} min)</span></span>
+                            <span className="font-semibold">{s.price} PLN</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-3">
+                      <Button variant="outline" onClick={() => { setScanResult(null); setScanSkipped(true); saveDefaultServices(); goTo(2); }} className="flex-1">
+                        Użyj szablonów
+                      </Button>
+                      <Button onClick={handleSaveScanResults} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
+                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                        Wygląda świetnie, zapisz
                       </Button>
                     </div>
                   </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-muted-foreground mb-4">Nie udało się przeskanować profilu.</p>
+                    <Button onClick={() => goTo(2)}>Kontynuuj z szablonami</Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
-                  <Button onClick={handleComplete} disabled={saving} className="w-full group" size="lg">
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />}
-                    Przejdź do panelu administracyjnego
+          {/* ===== STEP 2: Autopilot ===== */}
+          {step === 2 && (
+            <Card className="bg-white shadow-2xl border-0">
+              <CardContent className="p-6 space-y-5">
+                <div className="text-center">
+                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#E91E8C] flex items-center justify-center mb-3">
+                    <Bot className="w-8 h-8 text-white" />
+                  </div>
+                  <h2 className="text-lg font-bold">Twój Autopilot jest gotowy</h2>
+                  <p className="text-sm text-muted-foreground">Wszystko działa automatycznie od teraz. Możesz cokolwiek wyłączyć.</p>
+                </div>
+
+                <div className="space-y-3">
+                  {AUTOPILOT_FEATURES.map(f => (
+                    <div key={f.key} className="flex items-center justify-between p-3 rounded-xl border hover:border-[#E91E8C]/30 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{f.icon}</span>
+                        <div>
+                          <p className="text-sm font-medium">{f.label}</p>
+                          <p className="text-xs text-muted-foreground">{f.description}</p>
+                        </div>
+                      </div>
+                      <Switch checked={autopilotToggles[f.key]} onCheckedChange={v => setAutopilotToggles(prev => ({ ...prev, [f.key]: v }))} />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setStep(socialUrl ? 1 : 0)} size="sm">
+                    <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
+                  </Button>
+                  <Button onClick={handleActivateAutopilot} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Rocket className="mr-2 h-4 w-4" />}
+                    Uruchom Autopilot →
                   </Button>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ===== STEP 3: Widget Install ===== */}
+          {step === 3 && (
+            <Card className="bg-white shadow-2xl border-0">
+              <CardContent className="p-6 space-y-5">
+                <div>
+                  <h2 className="text-lg font-bold">Zainstaluj widget rezerwacji</h2>
+                  <p className="text-sm text-muted-foreground">Twoi klienci będą mogli rezerwować wizyty online.</p>
+                </div>
+
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-xs text-muted-foreground mb-1 block">Twój link do rezerwacji</Label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 text-xs bg-background px-2 py-1.5 rounded border truncate">{bookingUrl}</code>
+                    <Button size="sm" variant="outline" onClick={() => copyToClipboard(bookingUrl)}><Copy className="w-3.5 h-3.5" /></Button>
+                    <Button size="sm" variant="outline" onClick={() => window.open(bookingUrl, "_blank")}><ExternalLink className="w-3.5 h-3.5" /></Button>
+                  </div>
+                </div>
+
+                <Tabs value={widgetTab} onValueChange={setWidgetTab}>
+                  <TabsList className="grid grid-cols-3 w-full">
+                    <TabsTrigger value="wordpress" className="text-xs">WordPress</TabsTrigger>
+                    <TabsTrigger value="squarespace" className="text-xs">Squarespace</TabsTrigger>
+                    <TabsTrigger value="email" className="text-xs">Wyślij dev</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="wordpress" className="mt-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">Wklej ten kod w edytorze WordPress (blok HTML):</p>
+                    <code className="block text-xs bg-muted p-2 rounded border overflow-x-auto">{embedCode}</code>
+                    <Button size="sm" variant="outline" onClick={() => copyToClipboard(embedCode)}><Copy className="w-3.5 h-3.5 mr-1" />Kopiuj kod</Button>
+                  </TabsContent>
+                  <TabsContent value="squarespace" className="mt-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">W Squarespace: Dodaj sekcję → Code Block → wklej:</p>
+                    <code className="block text-xs bg-muted p-2 rounded border overflow-x-auto">{embedCode}</code>
+                    <Button size="sm" variant="outline" onClick={() => copyToClipboard(embedCode)}><Copy className="w-3.5 h-3.5 mr-1" />Kopiuj kod</Button>
+                  </TabsContent>
+                  <TabsContent value="email" className="mt-3 space-y-2">
+                    <p className="text-xs text-muted-foreground">Wyślij ten email do swojego developera:</p>
+                    <div className="bg-muted p-3 rounded text-xs space-y-1">
+                      <p className="font-medium">Temat: Widget rezerwacji — kod do osadzenia</p>
+                      <p>Cześć, proszę o osadzenie widgetu rezerwacji na naszej stronie.</p>
+                      <p>Kod: <code>{embedCode}</code></p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => copyToClipboard(`Cześć, proszę o osadzenie widgetu rezerwacji na naszej stronie.\n\nKod:\n${embedCode}`)}>
+                      <Mail className="w-3.5 h-3.5 mr-1" />Kopiuj treść
+                    </Button>
+                  </TabsContent>
+                </Tabs>
+
+                <div className="p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Instagram className="w-4 h-4 text-[#E91E8C]" />
+                    <p className="text-sm font-medium">Mam tylko Instagram</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Dodaj link <code className="bg-white/50 px-1 rounded">{bookingUrl}</code> w bio swojego profilu na Instagramie.
+                    Możesz też udostępnić go w Stories z naklejką "Link".
+                  </p>
+                  <Button size="sm" variant="outline" onClick={() => copyToClipboard(bookingUrl)}>
+                    <Copy className="w-3.5 h-3.5 mr-1" />Kopiuj link
+                  </Button>
+                </div>
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setStep(2)} size="sm">
+                    <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
+                  </Button>
+                  <Button onClick={handleWidgetDone} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
+                    <ArrowRight className="mr-2 h-4 w-4" />Dalej
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ===== STEP 4: Import Clients ===== */}
+          {step === 4 && (
+            <Card className="bg-white shadow-2xl border-0">
+              <CardContent className="p-6 space-y-5">
+                <div>
+                  <h2 className="text-lg font-bold">Przenieś klientki</h2>
+                  <p className="text-sm text-muted-foreground">Importuj bazę klientów z Booksy, Calendesk lub innego systemu.</p>
+                </div>
+
+                {csvData.length === 0 ? (
+                  <div className="space-y-4">
+                    <label className="block w-full p-8 border-2 border-dashed border-[#E91E8C]/30 rounded-xl text-center cursor-pointer hover:bg-[#E91E8C]/5 transition-colors">
+                      <Upload className="w-8 h-8 text-[#E91E8C] mx-auto mb-2" />
+                      <p className="text-sm font-medium">Przeciągnij plik CSV lub kliknij</p>
+                      <p className="text-xs text-muted-foreground mt-1">Obsługiwane: CSV z Booksy, Versum, Excel</p>
+                      <input type="file" accept=".csv,.txt" onChange={handleCsvUpload} className="hidden" />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm">
+                      <FileText className="w-4 h-4 text-[#E91E8C]" />
+                      <span className="font-medium">Znaleziono {csvData.length} rekordów</span>
+                    </div>
+
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-xs">
+                          <thead className="bg-muted">
+                            <tr>{csvHeaders.slice(0, 4).map(h => <th key={h} className="px-2 py-1.5 text-left font-medium">{h}</th>)}</tr>
+                          </thead>
+                          <tbody>
+                            {csvData.slice(0, 5).map((row, i) => (
+                              <tr key={i} className="border-t">
+                                {csvHeaders.slice(0, 4).map(h => <td key={h} className="px-2 py-1.5 truncate max-w-[120px]">{row[h]}</td>)}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <Button onClick={handleImportClients} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
+                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+                      Importuj {csvData.length} klientek
+                    </Button>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <Button variant="outline" onClick={() => setStep(3)} size="sm">
+                    <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
+                  </Button>
+                  <Button variant="ghost" onClick={() => goTo(5)} className="flex-1 text-muted-foreground">
+                    Zacznę od nowa — pomiń
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ===== STEP 5: Celebration ===== */}
+          {step === 5 && (
+            <Card className="bg-white shadow-2xl border-0">
+              <CardContent className="p-6 space-y-6">
+                <div className="text-center py-4">
+                  <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#E91E8C]/20 to-emerald-100 flex items-center justify-center mb-4 animate-scale-in">
+                    <PartyPopper className="w-10 h-10 text-[#E91E8C]" />
+                  </div>
+                  <h2 className="text-2xl font-bold mb-1 animate-fade-in">Jesteś gotowa! 🎉</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Beauty Calendar jest aktywny dla <strong className="text-foreground">{salonName}</strong>
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {[
+                    { label: "Usługi skonfigurowane", value: scanResult ? `${scanResult.services.length} (AI)` : "✓ z szablonu", done: true },
+                    { label: "Autopilot", value: "AKTYWNY", done: true },
+                    { label: "Widget rezerwacji", value: "Gotowy", done: true },
+                    { label: "Klientki zaimportowane", value: importedCount > 0 ? `${importedCount}` : "—", done: importedCount > 0 },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                      <span className="text-sm">{item.label}</span>
+                      <span className={cn("text-sm font-semibold", item.done ? "text-emerald-600" : "text-muted-foreground")}>
+                        {item.done && <CheckCircle2 className="w-4 h-4 inline mr-1" />}{item.value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <Button onClick={handleComplete} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                  {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Rocket className="mr-2 h-4 w-4" />}
+                  Przejdź do Dashboard →
+                </Button>
+
+                <div className="text-center">
+                  <Button variant="ghost" size="sm" className="text-xs text-muted-foreground" onClick={() => {
+                    const shareUrl = bookingUrl;
+                    const text = `Zarezerwuj wizytę w ${salonName} 💅`;
+                    if (navigator.share) { navigator.share({ title: salonName, text, url: shareUrl }); }
+                    else { copyToClipboard(shareUrl); }
+                  }}>
+                    <Globe className="w-3.5 h-3.5 mr-1" />Zaproś pierwszą klientkę do rezerwacji
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </StepTransition>
       </div>
     </div>
