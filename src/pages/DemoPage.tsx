@@ -49,6 +49,7 @@ export default function DemoPage() {
       case "retention": return "Retencja klientek";
       case "inventory": return "Magazyn & Receptury";
       case "pixel": return "Meta Pixel & CRM Sync";
+      case "analytics": return "True Profit Analytics";
       default: return "Dashboard";
     }
   };
