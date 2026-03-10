@@ -152,11 +152,12 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
                 const angle = baseAngle + jitter + zoneIdx * 0.7;
 
                 // Radius: interpolate within band with hash-based variation
+                const bubbleSize = compact ? 28 : 34;
+                const half = bubbleSize / 2;
                 const tRadius = count > 1
                   ? localIdx / (count - 1)
                   : 0.5;
                 const rJitter = (hashStr(client.id + "r") - 0.5) * (rMax - rMin) * 0.3;
-                const half = bubbleSize / 2;
                 const r = Math.max(rMin + half, Math.min(rMax - half,
                   rMin + tRadius * (rMax - rMin) + rJitter
                 ));
@@ -164,7 +165,6 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
                 const x = Math.cos(angle) * r;
                 const y = Math.sin(angle) * r;
                 const isRed = zone === "red";
-                const bubbleSize = compact ? 28 : 34;
 
                 return (
                   <Tooltip key={client.id}>
