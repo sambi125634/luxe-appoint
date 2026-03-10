@@ -17,7 +17,8 @@ interface ServiceRecipesProps {
 }
 
 const ServiceRecipes: React.FC<ServiceRecipesProps> = ({ salonId, isDemo }) => {
-  const { services } = useServices(salonId || '');
+  const servicesQuery = useServices();
+  const services = servicesQuery.data;
   const { products } = useProducts(salonId || '');
   const { recipes, addRecipe, removeRecipe, getMaterialCost } = useServiceRecipes(salonId || '');
   const [selectedService, setSelectedService] = useState<string>('');
