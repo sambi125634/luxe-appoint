@@ -212,7 +212,7 @@ export function generateMockActions(): AutopilotAction[] {
       scheduled_at: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
       executed_at: new Date(now.getTime() - 1 * 60 * 60 * 1000).toISOString(),
       status: "completed",
-      ai_explanation: "Wysłałam prośbę o opinię do Anny Nowak po wizycie „Balayage" — 2h po zakończeniu, kiedy wrażenia są najświeższe.",
+      ai_explanation: "Wys\u0142a\u0142am pro\u015Bb\u0119 o opini\u0119 do Anny Nowak po wizycie \u201EBalayage\u201D \u2014 2h po zako\u0144czeniu, kiedy wra\u017Cenia s\u0105 naj\u015Bwie\u017Csze.",
       cta_label: "Zobacz opinię",
       cta_action: "view_review",
       metadata: { client_name: "Anna Nowak", service: "Balayage" },
