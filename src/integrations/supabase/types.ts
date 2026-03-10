@@ -299,6 +299,42 @@ export type Database = {
           },
         ]
       }
+      beauty_products_db: {
+        Row: {
+          avg_wholesale_price: number | null
+          brand: string | null
+          capacity: string | null
+          category: string | null
+          created_at: string | null
+          ean: string
+          id: string
+          image_url: string | null
+          name: string
+        }
+        Insert: {
+          avg_wholesale_price?: number | null
+          brand?: string | null
+          capacity?: string | null
+          category?: string | null
+          created_at?: string | null
+          ean: string
+          id?: string
+          image_url?: string | null
+          name: string
+        }
+        Update: {
+          avg_wholesale_price?: number | null
+          brand?: string | null
+          capacity?: string | null
+          category?: string | null
+          created_at?: string | null
+          ean?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
       client_communication_preferences: {
         Row: {
           client_id: string
@@ -1210,6 +1246,58 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_product_recipes: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_id: string
+          quantity_used: number
+          salon_id: string
+          service_id: string
+          unit: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_id: string
+          quantity_used?: number
+          salon_id: string
+          service_id: string
+          unit?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_id?: string
+          quantity_used?: number
+          salon_id?: string
+          service_id?: string
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_product_recipes_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_product_recipes_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_product_recipes_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
