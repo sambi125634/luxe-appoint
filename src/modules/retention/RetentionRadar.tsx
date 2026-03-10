@@ -69,7 +69,7 @@ export function RetentionRadar({ clients, onClientClick, compact = false }: Rete
       </CardHeader>
       <CardContent>
         <div
-          className="relative mx-auto"
+          className="relative mx-auto overflow-hidden"
           style={{ width: canvasSize, height: canvasSize }}
         >
           {/* Concentric rings — render outer first so inner paints on top */}
