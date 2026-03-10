@@ -7,10 +7,8 @@ export type Supplier = Tables<"suppliers">;
 export type SupplierInsert = TablesInsert<"suppliers">;
 export type SupplierUpdate = TablesUpdate<"suppliers">;
 
-// Demo salon ID for mock data mode
 const DEMO_SALON_ID = "demo-salon-id";
 
-// Mock suppliers for demo mode
 const mockSuppliers: Supplier[] = [
   { id: "s1", salon_id: DEMO_SALON_ID, name: "Beauty Cosmetics Sp. z o.o.", contact_person: "Anna Kowalska", email: "anna@beautycosmetics.pl", phone: "+48 111 222 333", address: "ul. Handlowa 5, Warszawa", payment_terms: "14 dni", discount_info: "10% przy zamówieniach powyżej 1000 zł", notes: "Główny dostawca kosmetyków profesjonalnych", is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: "s2", salon_id: DEMO_SALON_ID, name: "NailPro Distributor", contact_person: "Marek Nowak", email: "marek@nailpro.pl", phone: "+48 444 555 666", address: "ul. Przemysłowa 22, Kraków", payment_terms: "30 dni", discount_info: "5% stały rabat", notes: "Specjalista w produktach do manicure", is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
@@ -25,10 +23,7 @@ export function useSuppliers(salonId?: string) {
   const suppliersQuery = useQuery({
     queryKey: ["suppliers", salonId],
     queryFn: async () => {
-      // Return mock data for demo mode
-      if (isDemo) {
-        return mockSuppliers;
-      }
+      if (isDemo) return mockSuppliers;
 
       let query = supabase
         .from("suppliers")
@@ -48,6 +43,9 @@ export function useSuppliers(salonId?: string) {
 
   const createSupplier = useMutation({
     mutationFn: async (supplier: SupplierInsert) => {
+      if (isDemo) {
+        return { ...supplier, id: `demo-${Date.now()}`, created_at: new Date().toISOString(), updated_at: new Date().toISOString() } as Supplier;
+      }
       const { data, error } = await supabase
         .from("suppliers")
         .insert(supplier)
@@ -67,6 +65,9 @@ export function useSuppliers(salonId?: string) {
 
   const updateSupplier = useMutation({
     mutationFn: async ({ id, ...updates }: SupplierUpdate & { id: string }) => {
+      if (isDemo) {
+        return { id, ...updates } as Supplier;
+      }
       const { data, error } = await supabase
         .from("suppliers")
         .update(updates)
@@ -87,6 +88,7 @@ export function useSuppliers(salonId?: string) {
 
   const deleteSupplier = useMutation({
     mutationFn: async (id: string) => {
+      if (isDemo) return;
       const { error } = await supabase
         .from("suppliers")
         .delete()
