@@ -41,7 +41,7 @@ interface Props {
 }
 
 export function VoiceNoteRecorder({ isDemo, clientId }: Props) {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   const { data: voiceNotes = [] } = useVoiceNotes(clientId);
   const saveVoiceNote = useSaveVoiceNote();
   const { data: clients = [] } = useClients();
