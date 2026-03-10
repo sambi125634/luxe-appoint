@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "./useSalonId";
 
 export function useReferralCodes() {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["referral-codes", salonId],
     queryFn: async () => {
@@ -21,14 +21,14 @@ export function useReferralCodes() {
 }
 
 export function useReferralEvents(codeId?: string) {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["referral-events", salonId, codeId],
     queryFn: async () => {
       if (!salonId) return [];
       let query = supabase
         .from("referral_events")
-        .select("*, referral_codes(code, clients(first_name, last_name)), clients:referred_client_id(first_name, last_name)")
+        .select("*")
         .eq("salon_id", salonId)
         .order("created_at", { ascending: false });
       if (codeId) query = query.eq("referral_code_id", codeId);
@@ -41,7 +41,7 @@ export function useReferralEvents(codeId?: string) {
 }
 
 export function useReviewRequests() {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["review-requests", salonId],
     queryFn: async () => {
@@ -59,7 +59,7 @@ export function useReviewRequests() {
 }
 
 export function useReviewOutcomes() {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["review-outcomes", salonId],
     queryFn: async () => {
@@ -78,7 +78,7 @@ export function useReviewOutcomes() {
 
 export function useCreateReferralCode() {
   const queryClient = useQueryClient();
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useMutation({
     mutationFn: async ({ clientId, rewardType, rewardValue, newClientRewardValue }: {
       clientId: string;
@@ -108,7 +108,7 @@ export function useCreateReferralCode() {
 }
 
 export function useReferralStats() {
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   return useQuery({
     queryKey: ["referral-stats", salonId],
     queryFn: async () => {
