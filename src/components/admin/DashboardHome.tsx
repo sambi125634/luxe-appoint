@@ -15,6 +15,7 @@ import { QuickProductSale } from "./products/QuickProductSale";
 import { RetentionRadar } from "@/modules/retention/RetentionRadar";
 import { MOCK_RADAR_CLIENTS } from "@/modules/retention/mock-data";
 import { useRetentionRadar } from "@/hooks/useRetention";
+// Note: useRetentionRadar used for production mode
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
 import { SectionGuide } from "./SectionGuide";

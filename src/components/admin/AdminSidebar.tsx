@@ -33,6 +33,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
     { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
     { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
+    { icon: Radar, labelKey: "admin.retention", tab: "retention" },
     { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
     { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
     { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
