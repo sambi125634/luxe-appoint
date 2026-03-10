@@ -79,6 +79,8 @@ export default function DemoPage() {
           return <ProductsModule />;
         case "support":
           return <SupportModule />;
+        case "retention":
+          return <RetentionDashboard isDemo />;
         default:
           return null;
       }
