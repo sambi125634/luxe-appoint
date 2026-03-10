@@ -26,16 +26,25 @@ interface MockAppointment extends Appointment {
 }
 
 const mockAppointmentsData: MockAppointment[] = [
+  // Poniedziałek (dayOffset: 0)
   { id: "1", time: "09:00", duration: 60, client: "Anna Kowalska", service: "Peeling kawitacyjny", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 0 },
-  { id: "2", time: "10:30", duration: 45, client: "Joanna Nowak", service: "Stylizacja brwi", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 0 },
-  { id: "3", time: "14:00", duration: 90, client: "Magdalena Wiśniewska", service: "Masaż relaksacyjny", staff: "Joanna L.", staffId: "3", status: "pending", dayOffset: 1 },
-  { id: "4", time: "11:00", duration: 60, client: "Katarzyna Dąbrowska", service: "Mezoterapia igłowa", staff: "Anna K.", staffId: "1", status: "confirmed", dayOffset: 1 },
-  { id: "5", time: "09:00", duration: 45, client: "Agnieszka Lewandowska", service: "Depilacja laserowa", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 2 },
-  { id: "6", time: "13:00", duration: 60, client: "Ewa Szymańska", service: "Henna brwi i rzęs", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 2 },
-  { id: "7", time: "15:00", duration: 45, client: "Natalia Zielińska", service: "Manicure hybrydowy", staff: "Joanna L.", staffId: "3", status: "confirmed", dayOffset: 3 },
-  { id: "8", time: "10:00", duration: 60, client: "Monika Wójcik", service: "Peeling chemiczny", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 3 },
-  { id: "9", time: "12:00", duration: 90, client: "Beata Kamińska", service: "Masaż gorącymi kamieniami", staff: "Anna K.", staffId: "1", status: "pending", dayOffset: 4 },
-  { id: "10", time: "16:00", duration: 45, client: "Sylwia Pawlak", service: "Oczyszczanie twarzy", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 4 },
+  { id: "2", time: "10:00", duration: 45, client: "Joanna Nowak", service: "Stylizacja brwi", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 0 },
+  { id: "3", time: "11:00", duration: 60, client: "Ewa Mazur", service: "Manicure hybrydowy", staff: "Joanna L.", staffId: "3", status: "confirmed", dayOffset: 0 },
+  // Wtorek (dayOffset: 1)
+  { id: "4", time: "09:00", duration: 90, client: "Magdalena Wiśniewska", service: "Masaż relaksacyjny", staff: "Joanna L.", staffId: "3", status: "pending", dayOffset: 1 },
+  { id: "5", time: "11:00", duration: 60, client: "Katarzyna Dąbrowska", service: "Mezoterapia igłowa", staff: "Anna K.", staffId: "4", status: "confirmed", dayOffset: 1 },
+  { id: "6", time: "14:00", duration: 45, client: "Paulina Król", service: "Henna brwi i rzęs", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 1 },
+  // Środa (dayOffset: 2)
+  { id: "7", time: "10:00", duration: 45, client: "Agnieszka Lewandowska", service: "Depilacja laserowa", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 2 },
+  { id: "8", time: "13:00", duration: 60, client: "Ewa Szymańska", service: "Oczyszczanie twarzy", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 2 },
+  // Czwartek (dayOffset: 3)
+  { id: "9", time: "15:00", duration: 45, client: "Natalia Zielińska", service: "Manicure hybrydowy", staff: "Joanna L.", staffId: "3", status: "confirmed", dayOffset: 3 },
+  { id: "10", time: "10:00", duration: 60, client: "Monika Wójcik", service: "Peeling chemiczny", staff: "Anna K.", staffId: "4", status: "confirmed", dayOffset: 3 },
+  { id: "11", time: "12:00", duration: 45, client: "Izabela Kowal", service: "Laminacja brwi", staff: "Karolina W.", staffId: "2", status: "pending", dayOffset: 3 },
+  // Piątek (dayOffset: 4)
+  { id: "12", time: "09:00", duration: 90, client: "Beata Kamińska", service: "Masaż gorącymi kamieniami", staff: "Anna K.", staffId: "4", status: "confirmed", dayOffset: 4 },
+  { id: "13", time: "16:00", duration: 45, client: "Sylwia Pawlak", service: "Stylizacja rzęs", staff: "Karolina W.", staffId: "2", status: "confirmed", dayOffset: 4 },
+  { id: "14", time: "11:00", duration: 60, client: "Dorota Jasińska", service: "Peeling kawitacyjny", staff: "Maria N.", staffId: "1", status: "confirmed", dayOffset: 4 },
 ];
 
 const mockStaff = [
