@@ -20,6 +20,7 @@ import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
+import { RetentionDashboard } from "@/modules/retention";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -42,6 +43,7 @@ export default function DemoPage() {
       case "time-off": return t("timeOff.title");
       case "stats": return t("admin.reports");
       case "settings": return t("admin.settings");
+      case "retention": return "Retencja klientek";
       default: return "Dashboard";
     }
   };
@@ -77,6 +79,8 @@ export default function DemoPage() {
           return <ProductsModule />;
         case "support":
           return <SupportModule />;
+        case "retention":
+          return <RetentionDashboard isDemo />;
         default:
           return null;
       }

@@ -12,6 +12,10 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
+import { RetentionRadar } from "@/modules/retention/RetentionRadar";
+import { MOCK_RADAR_CLIENTS } from "@/modules/retention/mock-data";
+import { useRetentionRadar } from "@/hooks/useRetention";
+// Note: useRetentionRadar used for production mode
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
 import { SectionGuide } from "./SectionGuide";
@@ -328,6 +332,12 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
 
       {/* AI Revenue Prediction */}
       <RevenuePredictionCard salonId={salonId ?? undefined} />
+
+      {/* Retention Radar */}
+      {(() => {
+        const radarData = isDemo ? MOCK_RADAR_CLIENTS : [];
+        return radarData.length > 0 ? <RetentionRadar clients={radarData} compact /> : null;
+      })()}
 
       {/* Bottom section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

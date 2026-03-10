@@ -20,6 +20,7 @@ import { WidgetsManagement } from "@/components/admin/widgets";
 import { SettingsModule } from "@/components/admin/settings";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
+import { RetentionDashboard } from "@/modules/retention";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
@@ -79,6 +80,7 @@ export default function AdminDashboard() {
       case "stats": return "Statystyki";
       case "settings": return "Ustawienia";
       case "support": return "Pomoc & AI Asystent";
+      case "retention": return "Retencja klientek";
       default: return "Dashboard";
     }
   };
@@ -99,6 +101,7 @@ export default function AdminDashboard() {
       case "stats": return <StatsModule />;
       case "settings": return <SettingsModule />;
       case "support": return <SupportModule />;
+      case "retention": return <RetentionDashboard />;
       default: return null;
     }
   };
