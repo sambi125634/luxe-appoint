@@ -581,97 +581,101 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <SectionGuide sectionKey="clients" />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-serif font-bold">{t('clients.title')}</h2>
-          <p className="text-muted-foreground">
-            {clients.length} {t('clients.clientsInDatabase')}
-            {inactiveClientsCount > 0 && (
-              <span className="ml-2 text-orange-600">
-                • {inactiveClientsCount} {t('clients.needsAttention')}
-              </span>
-            )}
-          </p>
+    <Dialog open={isDialogOpen} onOpenChange={handleClientDialogOpenChange}>
+      <div className="space-y-6">
+        <SectionGuide sectionKey="clients" />
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-serif font-bold">{t('clients.title')}</h2>
+            <p className="text-muted-foreground">
+              {clients.length} {t('clients.clientsInDatabase')}
+              {inactiveClientsCount > 0 && (
+                <span className="ml-2 text-orange-600">
+                  • {inactiveClientsCount} {t('clients.needsAttention')}
+                </span>
+              )}
+            </p>
+          </div>
+          <DialogTrigger asChild>
+            <Button type="button" onClick={openNewClient} className="gap-2">
+              <Plus className="w-4 h-4" />
+              {t('clients.addClient')}
+            </Button>
+          </DialogTrigger>
         </div>
-        <Button onClick={openNewClient} className="gap-2">
-          <Plus className="w-4 h-4" />
-          {t('clients.addClient')}
-        </Button>
-      </div>
 
-      {/* Main view tabs */}
-      <div className="flex items-center gap-4 border-b">
-        <button
-          onClick={() => setMainViewTab("list")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-            mainViewTab === "list" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Users className="w-4 h-4" />
-          {t('clients.listView')}
-        </button>
-        <button
-          onClick={() => setMainViewTab("groups")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-            mainViewTab === "groups" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <FolderOpen className="w-4 h-4" />
-          {t('clients.purchaseGroups.title')}
-        </button>
-      </div>
+        {/* Main view tabs */}
+        <div className="flex items-center gap-4 border-b">
+          <button
+            onClick={() => setMainViewTab("list")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              mainViewTab === "list" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Users className="w-4 h-4" />
+            {t('clients.listView')}
+          </button>
+          <button
+            onClick={() => setMainViewTab("groups")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              mainViewTab === "groups" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <FolderOpen className="w-4 h-4" />
+            {t('clients.purchaseGroups.title')}
+          </button>
+        </div>
 
-      {mainViewTab === "list" ? (
-        <>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder={t('clients.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+        {mainViewTab === "list" ? (
+          <>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t('clients.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <ClientFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                availableTags={availableTags}
+                availableCategories={availableCategories}
               />
             </div>
-            <ClientFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              availableTags={availableTags}
-              availableCategories={availableCategories}
-            />
-          </div>
 
-          <div className="grid gap-3">
-            {filteredClients.map((client) => (
-              <ClientListItem
-                key={client.id}
-                client={client}
-                availableTags={availableTags}
-                onClick={() => openClientDetails(client)}
-              />
-            ))}
+            <div className="grid gap-3">
+              {filteredClients.map((client) => (
+                <ClientListItem
+                  key={client.id}
+                  client={client}
+                  availableTags={availableTags}
+                  onClick={() => openClientDetails(client)}
+                />
+              ))}
 
-            {filteredClients.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>{t('clients.noResults')}</p>
-              </div>
-            )}
-          </div>
-        </>
-      ) : (
-        <PurchaseGroups 
-          groups={purchaseGroups}
-          onSelectCategory={handleSelectCategory}
-        />
-      )}
+              {filteredClients.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>{t('clients.noResults')}</p>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <PurchaseGroups 
+            groups={purchaseGroups}
+            onSelectCategory={handleSelectCategory}
+          />
+        )}
+      </div>
 
       {renderClientDialog()}
-    </div>
+    </Dialog>
   );
 }
