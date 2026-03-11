@@ -306,6 +306,13 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     setIsDialogOpen(true);
   };
 
+  const handleClientDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setIsEditing(false);
+    }
+  };
+
   const saveClient = async () => {
     if (!editedClient) return;
     if (!editedClient.firstName || !editedClient.lastName || !editedClient.phone) {
