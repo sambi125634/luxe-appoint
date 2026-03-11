@@ -282,7 +282,7 @@ export default function OnboardingPage() {
       setCreatedSlug(salon.slug);
 
       // Create owner as staff member
-      const ownerName = `${session.user.user_metadata?.first_name ?? ''} ${session.user.user_metadata?.last_name ?? ''}`.trim() || salonName.trim();
+      const ownerName = `${userMeta.first_name ?? ''} ${userMeta.last_name ?? ''}`.trim() || salonName.trim();
       await supabase.from("staff_members").insert({
         salon_id: salon.id, name: ownerName, user_id: userId, role: "owner",
       });
