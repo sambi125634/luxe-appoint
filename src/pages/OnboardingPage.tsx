@@ -223,6 +223,7 @@ export default function OnboardingPage() {
       if (!session) { navigate("/auth"); setCheckingAuth(false); return; }
       const uid = session.user.id;
       setUserId(uid);
+      setUserMeta(session.user.user_metadata as { first_name?: string; last_name?: string } ?? {});
 
       const { data: salon } = await supabase
         .from("salons")
