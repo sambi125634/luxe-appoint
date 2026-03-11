@@ -69,16 +69,16 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
 
       const { error } = await supabase
         .from("appointments")
-        .insert({
+        .insert([{
           salon_id: salonId,
           staff_id: staffId,
           service_id: services[0].id,
           start_time: startTime,
           end_time: endTime,
-          status: "cancelled" as const,
+          status: "cancelled" as "cancelled",
           internal_notes: `[${block.type}] ${block.note || "Blokada czasu"}`,
           notes: block.note || `Blokada: ${block.type}`,
-        });
+        }]);
 
       if (error) throw error;
 

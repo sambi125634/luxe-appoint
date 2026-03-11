@@ -30,7 +30,7 @@ interface ScheduleGridViewProps {
 export function ScheduleGridView({ isDemo = false, onWeekDuplicate }: ScheduleGridViewProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const salonId = useSalonId();
+  const { salonId } = useSalonId();
   const { data: dbStaff } = useStaffMembers();
 
   const [currentWeekStart, setCurrentWeekStart] = useState(() => 
