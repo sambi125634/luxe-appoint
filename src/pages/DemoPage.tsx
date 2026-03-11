@@ -78,7 +78,7 @@ export default function DemoPage() {
         case "stats":
           return <StatsModule isDemo={true} />;
         case "settings":
-          return <SettingsModule />;
+          return <SettingsModule isDemo />;
         case "conversations":
           return <ConversationsModule isDemo={true} />;
         case "pipeline":

@@ -70,6 +70,69 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   const [currentDate, setCurrentDate] = useState(new Date());
   const [appointments, setAppointments] = useState<(Appointment & { dayOffset?: number })[]>(isDemo ? mockAppointmentsData : []);
 
+  // Calculate week boundaries for DB query
+  const getWeekStart = (date: Date) => {
+    const start = new Date(date);
+    start.setDate(start.getDate() - start.getDay() + 1);
+    start.setHours(0, 0, 0, 0);
+    return start;
+  };
+  const getWeekEnd = (date: Date) => {
+    const end = getWeekStart(date);
+    end.setDate(end.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+    return end;
+  };
+
+  const weekStartISO = getWeekStart(currentDate).toISOString();
+  const weekEndISO = getWeekEnd(currentDate).toISOString();
+
+  // Fetch appointments from DB in production mode
+  const { data: dbAppointments } = useQuery({
+    queryKey: ["calendar-appointments", salonId, weekStartISO],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("id, start_time, end_time, status, price, notes, clients(first_name, last_name), services(name, duration), staff_members(name)")
+        .eq("salon_id", salonId!)
+        .gte("start_time", weekStartISO)
+        .lte("start_time", weekEndISO)
+        .neq("status", "cancelled");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  // Sync DB appointments to local state in production
+  useEffect(() => {
+    if (isDemo) return;
+    if (!dbAppointments) return;
+
+    const weekStart = getWeekStart(currentDate);
+    const mapped = dbAppointments.map((apt) => {
+      const start = new Date(apt.start_time);
+      const end = new Date(apt.end_time);
+      const client = apt.clients as { first_name: string; last_name: string } | null;
+      const service = apt.services as { name: string; duration: number } | null;
+      const staff = apt.staff_members as { name: string } | null;
+      const dayOffset = Math.floor((start.getTime() - weekStart.getTime()) / (1000 * 60 * 60 * 24));
+
+      return {
+        id: apt.id,
+        time: `${start.getHours().toString().padStart(2, "0")}:${start.getMinutes().toString().padStart(2, "0")}`,
+        duration: service?.duration || Math.round((end.getTime() - start.getTime()) / 60000),
+        client: client ? `${client.first_name} ${client.last_name}` : "Klient",
+        service: service?.name || "Usługa",
+        staff: staff?.name || "—",
+        staffId: apt.staff_id ?? "",
+        status: (apt.status === "booked" ? "pending" : apt.status === "cancelled" ? "cancelled" : "confirmed") as "confirmed" | "pending" | "cancelled",
+        dayOffset,
+      };
+    });
+    setAppointments(mapped);
+  }, [dbAppointments, isDemo, currentDate]);
+
   // Sync demo state when isDemo prop changes (e.g. HMR)
   useEffect(() => {
     if (isDemo) {

@@ -9,9 +9,28 @@ import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 import { SectionGuide } from "../SectionGuide";
 
-export function SettingsModule() {
+interface SettingsModuleProps {
+  isDemo?: boolean;
+}
+
+const demoProfile = {
+  id: "demo-salon-id",
+  name: "Lux Beauty Studio",
+  description: "Nowoczesny salon kosmetyczny w centrum Warszawy",
+  address: "ul. Marszałkowska 42",
+  city: "Warszawa",
+  phone: "+48 500 123 456",
+  email: "kontakt@luxbeauty.pl",
+  logoUrl: null,
+  themePrimaryColor: "#C9A96E",
+  themeSecondaryColor: "#1a1a2e",
+};
+
+export function SettingsModule({ isDemo = false }: SettingsModuleProps) {
   const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
-  const { profile, settings, isLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
+  const { profile: realProfile, settings, isLoading: realLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
+  const profile = isDemo ? demoProfile : realProfile;
+  const isLoading = isDemo ? false : realLoading;
 
   const tabs = [
     { id: "profile" as const, label: "Profil salonu", icon: Building2 },
