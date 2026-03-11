@@ -13,7 +13,7 @@ import { useServices } from "@/hooks/useServices";
 import { useSalonId } from "@/hooks/useSalonId";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface StaffMember {
