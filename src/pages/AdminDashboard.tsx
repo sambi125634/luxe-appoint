@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useQuery } from "@tanstack/react-query";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
 import { DashboardHome } from "@/components/admin/DashboardHome";
 import { ScheduleManagement } from "@/components/admin/ScheduleManagement";
