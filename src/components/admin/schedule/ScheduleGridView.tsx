@@ -1,10 +1,15 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { format, addDays, startOfWeek, addWeeks, subWeeks } from "date-fns";
 import { pl } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Copy, Check, X, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useSalonId } from "@/hooks/useSalonId";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { 
   StaffMember, 
   StaffSchedule, 
@@ -18,24 +23,75 @@ interface EditingCell {
 }
 
 interface ScheduleGridViewProps {
+  isDemo?: boolean;
   onWeekDuplicate?: (staffId: string, weekStart: Date, targetWeeks: number) => void;
 }
 
-export function ScheduleGridView({ onWeekDuplicate }: ScheduleGridViewProps) {
+export function ScheduleGridView({ isDemo = false, onWeekDuplicate }: ScheduleGridViewProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const { salonId } = useSalonId();
+  const { data: dbStaff } = useStaffMembers();
+
   const [currentWeekStart, setCurrentWeekStart] = useState(() => 
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [editValues, setEditValues] = useState({ startTime: "", endTime: "", isWorking: true });
+  const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Mock schedule data - in real app, this would come from database
-  const [schedules, setSchedules] = useState<Record<string, StaffSchedule[]>>(() => {
-    const initial: Record<string, StaffSchedule[]> = {};
-    mockStaffMembers.forEach(staff => {
-      initial[staff.id] = Array.from({ length: 7 }, (_, i) => {
+  // Staff list: demo vs real
+  const staffMembers: StaffMember[] = useMemo(() => {
+    if (isDemo) return mockStaffMembers;
+    if (!dbStaff) return [];
+    return dbStaff.map(s => ({
+      id: s.id,
+      name: s.name,
+      role: s.role || "Specjalista",
+      color: s.color || "#7c3aed",
+    }));
+  }, [isDemo, dbStaff]);
+
+  // Fetch working_hours from DB
+  const { data: dbWorkingHours } = useQuery({
+    queryKey: ["working-hours-grid", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("working_hours")
+        .select("*")
+        .order("day_of_week");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  // Build schedules from DB or mock
+  const schedules = useMemo(() => {
+    const result: Record<string, StaffSchedule[]> = {};
+    
+    staffMembers.forEach(staff => {
+      result[staff.id] = Array.from({ length: 7 }, (_, i) => {
         const date = format(addDays(currentWeekStart, i), "yyyy-MM-dd");
-        const dayOfWeek = (i + 1) % 7; // Monday = 1, Sunday = 0
+        const dayOfWeek = (i + 1) % 7; // Monday=1..Sunday=0
+
+        if (!isDemo && dbWorkingHours) {
+          const wh = dbWorkingHours.find(
+            h => h.staff_id === staff.id && h.day_of_week === dayOfWeek
+          );
+          if (wh) {
+            return {
+              staffId: staff.id,
+              date,
+              startTime: wh.start_time?.substring(0, 5) || "09:00",
+              endTime: wh.end_time?.substring(0, 5) || "17:00",
+              isWorking: wh.is_working,
+            };
+          }
+        }
+
+        // Default / demo fallback
         const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
         return {
           staffId: staff.id,
@@ -46,8 +102,8 @@ export function ScheduleGridView({ onWeekDuplicate }: ScheduleGridViewProps) {
         };
       });
     });
-    return initial;
-  });
+    return result;
+  }, [staffMembers, currentWeekStart, isDemo, dbWorkingHours]);
 
   const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
@@ -69,22 +125,55 @@ export function ScheduleGridView({ onWeekDuplicate }: ScheduleGridViewProps) {
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingCell) return;
     
-    setSchedules(prev => {
-      const newSchedules = { ...prev };
-      if (newSchedules[editingCell.staffId]) {
-        newSchedules[editingCell.staffId] = [...newSchedules[editingCell.staffId]];
-        newSchedules[editingCell.staffId][editingCell.dayIndex] = {
-          ...newSchedules[editingCell.staffId][editingCell.dayIndex],
-          startTime: editValues.startTime,
-          endTime: editValues.endTime,
-          isWorking: editValues.isWorking,
-        };
+    const dayOfWeek = (editingCell.dayIndex + 1) % 7;
+
+    if (!isDemo && salonId) {
+      setIsSaving(true);
+      try {
+        // Check if record exists
+        const { data: existing } = await supabase
+          .from("working_hours")
+          .select("id")
+          .eq("staff_id", editingCell.staffId)
+          .eq("day_of_week", dayOfWeek)
+          .maybeSingle();
+
+        if (existing) {
+          await supabase
+            .from("working_hours")
+            .update({
+              start_time: editValues.startTime,
+              end_time: editValues.endTime,
+              is_working: editValues.isWorking,
+            })
+            .eq("id", existing.id);
+        } else {
+          await supabase
+            .from("working_hours")
+            .insert({
+              staff_id: editingCell.staffId,
+              day_of_week: dayOfWeek,
+              start_time: editValues.startTime,
+              end_time: editValues.endTime,
+              is_working: editValues.isWorking,
+            });
+        }
+
+        queryClient.invalidateQueries({ queryKey: ["working-hours-grid"] });
+        queryClient.invalidateQueries({ queryKey: ["working-hours"] });
+        toast({ title: "Zapisano", description: "Godziny pracy zostały zaktualizowane" });
+      } catch {
+        toast({ title: "Błąd", description: "Nie udało się zapisać godzin pracy", variant: "destructive" });
+      } finally {
+        setIsSaving(false);
       }
-      return newSchedules;
-    });
+    } else if (isDemo) {
+      toast({ title: "Tryb Demo", description: "Dane nie zostały zapisane" });
+    }
+
     setEditingCell(null);
   };
 
@@ -169,7 +258,7 @@ export function ScheduleGridView({ onWeekDuplicate }: ScheduleGridViewProps) {
             </tr>
           </thead>
           <tbody>
-            {mockStaffMembers.map((staff, staffIndex) => (
+            {staffMembers.map((staff) => (
               <tr key={staff.id} className="border-b border-border/50 last:border-b-0">
                 <td className="p-3 bg-muted/10">
                   <div className="flex items-center gap-3">
@@ -239,6 +328,7 @@ export function ScheduleGridView({ onWeekDuplicate }: ScheduleGridViewProps) {
                                 size="icon" 
                                 className="h-6 w-6" 
                                 onClick={handleSaveEdit}
+                                disabled={isSaving}
                               >
                                 <Check className="w-3 h-3 text-green-600" />
                               </Button>

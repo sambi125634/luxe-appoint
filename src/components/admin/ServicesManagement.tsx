@@ -136,9 +136,31 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
     setIsServiceDialogOpen(true);
   };
 
-  const handleCSVImport = (importedServices: { name: string; category: string; duration: number; price: number; description: string }[]) => {
-    // In production, would create via Supabase
-    toast({ title: "Import CSV", description: `Zaimportowano ${importedServices.length} usług` });
+  const handleCSVImport = async (importedServices: { name: string; category: string; duration: number; price: number; description: string }[]) => {
+    if (isDemo) {
+      toast({ title: "Tryb Demo", description: `Zaimportowano ${importedServices.length} usług (dane nie zostały zapisane)` });
+      return;
+    }
+
+    try {
+      let successCount = 0;
+      for (const service of importedServices) {
+        // Find matching category by name
+        const matchingCategory = categories.find(c => c.name.toLowerCase() === service.category.toLowerCase());
+        
+        await createServiceMutation.mutateAsync({
+          name: service.name,
+          category_id: matchingCategory?.id || undefined,
+          duration: service.duration,
+          price: service.price,
+          description: service.description,
+        });
+        successCount++;
+      }
+      toast({ title: "Import CSV", description: `Zaimportowano ${successCount} usług` });
+    } catch {
+      toast({ title: "Błąd importu", description: "Nie udało się zaimportować wszystkich usług", variant: "destructive" });
+    }
   };
 
   const saveService = async () => {
