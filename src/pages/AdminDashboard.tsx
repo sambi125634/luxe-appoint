@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useQuery } from "@tanstack/react-query";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
 import { DashboardHome } from "@/components/admin/DashboardHome";
 import { ScheduleManagement } from "@/components/admin/ScheduleManagement";
@@ -35,8 +36,17 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const { role, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
+  const { role, salonId, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
   const { showTour, setShowTour, restartTour } = useAdminTourState();
+
+  const { data: salonSlug } = useQuery({
+    queryKey: ["salon-slug", salonId],
+    queryFn: async () => {
+      const { data } = await supabase.from("salons").select("slug").eq("id", salonId!).single();
+      return data?.slug ?? null;
+    },
+    enabled: !!salonId,
+  });
 
   // Guard: redirect to onboarding if not completed
   useEffect(() => {
@@ -176,12 +186,14 @@ export default function AdminDashboard() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full" />
             </Button>
-            <Link to="/book/demo-salon">
-              <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
-                <ChevronRight className="w-4 h-4" />
-                Zobacz widget
-              </Button>
-            </Link>
+            {salonSlug && (
+              <Link to={`/book/${salonSlug}`}>
+                <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
+                  <ChevronRight className="w-4 h-4" />
+                  Zobacz widget
+                </Button>
+              </Link>
+            )}
           </div>
         </header>
 

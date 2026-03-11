@@ -16,6 +16,7 @@ import InstallPage from "./pages/InstallPage";
 import ClientApp from "./pages/ClientApp";
 import MobileAdminApp from "./pages/MobileAdminApp";
 import JoinSalonPage from "./pages/JoinSalonPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => {
             
             {/* Auth & panel routes (both domains) */}
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
