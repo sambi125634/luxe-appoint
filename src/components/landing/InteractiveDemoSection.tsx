@@ -11,7 +11,7 @@ export const InteractiveDemoSection = () => {
   const [activeTab, setActiveTab] = useState("client");
 
   return (
-    <section className="py-20 lg:py-32 bg-gradient-to-b from-muted/20 to-background">
+    <section id="interactive-demo" className="py-20 lg:py-32 bg-gradient-to-b from-muted/20 to-background">
       <div className="container">
         {/* Section header */}
         <div className="text-center mb-12">
