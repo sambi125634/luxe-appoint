@@ -20,6 +20,9 @@ import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, Cate
 import { SectionGuide } from "./SectionGuide";
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface Visit {
   id: string;
