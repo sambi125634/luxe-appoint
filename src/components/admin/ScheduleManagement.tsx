@@ -186,6 +186,43 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
         onClose={() => setIsQuickBlockOpen(false)}
         onSave={handleSaveBlock}
       />
+
+      {/* New Appointment Modal (header button) */}
+      <AppointmentModal
+        isOpen={isNewAppointmentOpen}
+        onClose={() => setIsNewAppointmentOpen(false)}
+        onSave={async (appointment) => {
+          if (isDemo) {
+            toast({ title: "Tryb Demo", description: "Dane nie zostały zapisane" });
+            setIsNewAppointmentOpen(false);
+            return;
+          }
+          if (!salonId) return;
+          try {
+            const startDate = new Date(`${appointment.date}T${appointment.time}`);
+            const endDate = new Date(startDate.getTime() + appointment.duration * 60000);
+            const { error } = await supabase.from("appointments").insert({
+              salon_id: salonId,
+              client_id: appointment.clientId || null,
+              staff_id: appointment.staffId,
+              service_id: appointment.serviceId,
+              start_time: startDate.toISOString(),
+              end_time: endDate.toISOString(),
+              status: "booked",
+              notes: appointment.notes || null,
+              price: null,
+            });
+            if (error) throw error;
+            queryClient.invalidateQueries({ queryKey: ["appointments"] });
+            queryClient.invalidateQueries({ queryKey: ["calendar-appointments"] });
+            toast({ title: "Zapisano", description: "Wizyta została dodana" });
+            setIsNewAppointmentOpen(false);
+          } catch {
+            toast({ title: "Błąd", description: "Nie udało się zapisać wizyty", variant: "destructive" });
+          }
+        }}
+        isDemo={isDemo}
+      />
     </div>
   );
 }
