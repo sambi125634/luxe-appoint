@@ -556,24 +556,27 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     </DialogContent>
   );
 
-  // Empty state for production (no clients yet)
   if (!isDemo && clients.length === 0) {
     return (
-      <div className="space-y-6">
-        <SectionGuide sectionKey="clients" />
-        <div className="text-center py-16">
-          <Users className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-          <h3 className="text-xl font-serif font-semibold mb-2">Brak klientów</h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
-          </p>
-          <Button onClick={openNewClient} className="gap-2">
-            <Plus className="w-4 h-4" />
-            {t('clients.addClient')}
-          </Button>
+      <Dialog open={isDialogOpen} onOpenChange={handleClientDialogOpenChange}>
+        <div className="space-y-6">
+          <SectionGuide sectionKey="clients" />
+          <div className="text-center py-16">
+            <Users className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="text-xl font-serif font-semibold mb-2">Brak klientów</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
+            </p>
+            <DialogTrigger asChild>
+              <Button type="button" onClick={openNewClient} className="gap-2">
+                <Plus className="w-4 h-4" />
+                {t('clients.addClient')}
+              </Button>
+            </DialogTrigger>
+          </div>
         </div>
         {renderClientDialog()}
-      </div>
+      </Dialog>
     );
   }
 
