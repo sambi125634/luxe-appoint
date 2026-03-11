@@ -1,101 +1,73 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Audyt gotowości produkcyjnej — pozostające problemy
 
-### Co już mamy
+## Podsumowanie statusu
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
-
-### Problem do rozwiązania
-
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+Poprzednie naprawy zostały poprawnie wdrożone: kalendarz pobiera wizyty z bazy, klienci mają agregację wizyt/wydatków, staff_services i working_hours są pobierane, księgowość ciągnie transakcje, time_off tabela istnieje. Jednak kilka istotnych problemów nadal blokuje bezproblemowe doświadczenie właścicielki salonu.
 
 ---
 
-### Plan implementacji
+## Problemy wymagające naprawy
 
-#### FAZA 1: Role-based routing po loginie
+### 1. KRYTYCZNY: Link "Zobacz widget" prowadzi do `/book/demo-salon` zamiast do prawdziwego sluga salonu
+**Plik:** `src/pages/AdminDashboard.tsx` linia 179
+**Problem:** Hardcoded `<Link to="/book/demo-salon">` — każda właścicielka po rejestracji widzi swój panel, klika "Zobacz widget" i trafia na demo salon zamiast na SWÓJ kalendarz rezerwacji.
+**Fix:** Użyć `useUserRole()` do pobrania `salonId`, a potem query slug z tabeli `salons` lub dodać `salonSlug` do `useUserRole`.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 2. KRYTYCZNY: Brak obsługi "password reset" flow
+**Problem:** Strona `/auth` nie ma opcji "Zapomniałem hasła". Brak komponentu `/reset-password`. Właścicielka, która zapomni hasła, nie może odzyskać konta.
+**Fix:** Dodać link "Zapomniałem hasła" + formularz resetujący + stronę `/reset-password`.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 3. WYSOKI: `useStaffMembers` hook nie respektuje `isDemo`
+**Problem:** W demo, `useStaffMembers()` jest wywoływany w `TimeOffManagement`, `AppointmentModal`, `WeeklyCalendar` i `StaffManagement`. Hook zawsze używa `useSalonId()` — jeśli użytkownik jest zalogowany i przegląda demo, hook pobiera prawdziwych pracowników z bazy zamiast mock data. Mieszanie danych demo z produkcyjnymi.
+**Fix:** Dodać parametr `isDemo` do hooka lub wywoływać go warunkowo.
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### 4. WYSOKI: `useClients()` i `useServices()` w `AppointmentModal` nie respektują `isDemo`
+**Problem:** Linia 105-107 — hooki wywoływane bezwarunkowo. Gdy użytkownik jest zalogowany i przegląda demo, pobierają dane produkcyjne.
+**Fix:** Hooki są wywoływane, ale dane `clients`/`services`/`staffMembers` są mapowane z mock gdy `isDemo=true` (linie 111-136). Problem polega na **niepotrzebnych zapytaniach sieciowych** — nie powoduje to błędów widocznych dla użytkownika, ale to marnowanie zasobów.
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### 5. ŚREDNI: Dashboard "Zobacz widget" powinien używać prawdziwego sluga
+**Problem:** Powiązany z #1. Również w `DashboardHome` brak szybkiego linku do własnego widgetu rezerwacji.
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### 6. ŚREDNI: Brak obsługi logout w panelu admin
+**Problem:** W `AdminSidebar.tsx` powinien być przycisk wylogowania. Trzeba sprawdzić, czy istnieje.
 
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+### 7. NISKI: Stale network error na `/demo` — `salon_id=eq.demo-salon-id`
+**Obserwacja:** Widoczny w network logs. Może pochodzić z nieodświeżonej wersji lub z komponentów ładowanych lazy. Jeśli QuickProductSale ma `enabled: !isDemo && !!realSalonId`, to zapytanie nie powinno się wykonywać. Do weryfikacji po deployu.
 
 ---
 
-### Wymagane zmiany w bazie danych
+## Plan implementacji
 
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+| # | Plik | Zmiana | Priorytet |
+|---|------|--------|-----------|
+| 1 | `AdminDashboard.tsx` | Pobrać `salonSlug` z bazy i użyć w linku "Zobacz widget" | Krytyczny |
+| 2 | `AuthPage.tsx` + nowy `ResetPasswordPage.tsx` | Dodać "Zapomniałem hasła" + stronę resetu | Krytyczny |
+| 3 | `App.tsx` | Dodać route `/reset-password` | Krytyczny |
+| 4 | `AdminSidebar.tsx` | Sprawdzić/dodać przycisk logout | Średni |
 
-### Nowe komponenty
+### Szczegóły techniczne
 
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+**Fix #1 — Widget link:**
+```typescript
+// AdminDashboard.tsx
+const { salonId } = useUserRole();
+const { data: salonSlug } = useQuery({
+  queryKey: ["salon-slug", salonId],
+  queryFn: async () => {
+    const { data } = await supabase.from("salons").select("slug").eq("id", salonId!).single();
+    return data?.slug;
+  },
+  enabled: !!salonId,
+});
 
-### Kolejność implementacji
+// W render:
+<Link to={salonSlug ? `/book/${salonSlug}` : "#"}>
+```
 
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+**Fix #2 — Password reset:**
+- W `AuthPage`: dodać link "Zapomniałem hasła" pod formularzem logowania
+- Nowy komponent `ResetPasswordPage.tsx`: formularz z nowym hasłem, sprawdzanie `type=recovery` w URL hash
+- Route `/reset-password` w `App.tsx`
 
