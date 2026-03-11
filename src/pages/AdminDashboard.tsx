@@ -36,8 +36,17 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
-  const { role, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
+  const { role, salonId, salonName, onboardingCompleted, isLoading: roleLoading } = useUserRole();
   const { showTour, setShowTour, restartTour } = useAdminTourState();
+
+  const { data: salonSlug } = useQuery({
+    queryKey: ["salon-slug", salonId],
+    queryFn: async () => {
+      const { data } = await supabase.from("salons").select("slug").eq("id", salonId!).single();
+      return data?.slug ?? null;
+    },
+    enabled: !!salonId,
+  });
 
   // Guard: redirect to onboarding if not completed
   useEffect(() => {
