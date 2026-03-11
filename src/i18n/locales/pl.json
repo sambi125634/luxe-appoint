@@ -345,7 +345,8 @@
     "referral": "Polecenia",
     "logout": "Wyloguj",
     "profile": "Profil salonu",
-    "loading": "Ładowanie..."
+    "loading": "Ładowanie...",
+    "stats": "Statystyki"
   },
   "products": {
     "catalog": "Katalog produktów",
