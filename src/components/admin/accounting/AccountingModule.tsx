@@ -124,7 +124,7 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
       relatedVoucherId: null,
       status: "opłacone",
     };
-    setTransactions((prev) => [newTransaction, ...prev]);
+    setManualTransactions((prev) => [newTransaction, ...prev]);
   };
 
   // Empty state for production mode
