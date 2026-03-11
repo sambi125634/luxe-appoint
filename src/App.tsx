@@ -60,6 +60,7 @@ const App = () => {
             
             {/* Auth & panel routes (both domains) */}
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/super-admin" element={<SuperAdminDashboard />} />
             <Route path="/onboarding" element={<OnboardingPage />} />

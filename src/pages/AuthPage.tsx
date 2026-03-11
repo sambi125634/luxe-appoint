@@ -183,6 +183,31 @@ export default function AuthPage() {
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("auth.loggingIn")}</>) : t("auth.loginButton")}
                 </Button>
+                <div className="text-center mt-2">
+                  <button
+                    type="button"
+                    className="text-sm text-muted-foreground hover:text-primary underline transition-colors"
+                    onClick={async () => {
+                      if (!loginEmail.trim()) {
+                        toast.error("Wpisz adres e-mail, aby zresetować hasło");
+                        return;
+                      }
+                      setIsLoading(true);
+                      const { error } = await supabase.auth.resetPasswordForEmail(loginEmail.trim(), {
+                        redirectTo: `${window.location.origin}/reset-password`,
+                      });
+                      if (error) {
+                        toast.error("Nie udało się wysłać linku resetującego");
+                      } else {
+                        toast.success("Link do resetu hasła został wysłany na Twój e-mail");
+                      }
+                      setIsLoading(false);
+                    }}
+                    disabled={isLoading}
+                  >
+                    Zapomniałam hasła
+                  </button>
+                </div>
               </form>
             </TabsContent>
             <TabsContent value="signup">

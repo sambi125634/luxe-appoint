@@ -186,12 +186,14 @@ export default function AdminDashboard() {
               <Bell className="w-5 h-5" />
               <span className="absolute top-1 right-1 w-2 h-2 bg-secondary rounded-full" />
             </Button>
-            <Link to="/book/demo-salon">
-              <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
-                <ChevronRight className="w-4 h-4" />
-                Zobacz widget
-              </Button>
-            </Link>
+            {salonSlug && (
+              <Link to={`/book/${salonSlug}`}>
+                <Button variant="outline" size="sm" className="hidden sm:flex gap-2">
+                  <ChevronRight className="w-4 h-4" />
+                  Zobacz widget
+                </Button>
+              </Link>
+            )}
           </div>
         </header>
 
