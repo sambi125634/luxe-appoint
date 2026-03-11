@@ -340,7 +340,8 @@
     "referral": "Referrals",
     "logout": "Logout",
     "profile": "Salon profile",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "stats": "Statistics"
   },
   "settings": {
     "salonProfile": "Salon profile",
