@@ -1,101 +1,90 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Audyt persystencji danych — wyniki
 
-### Co już mamy
+## Status modułów: co działa poprawnie
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+| Moduł | Odczyt z bazy | Zapis do bazy | Demo guard | Status |
+|-------|:---:|:---:|:---:|:---:|
+| Usługi (Services) | OK | OK | OK | **Gotowy** |
+| Kategorie usług | OK | OK | OK | **Gotowy** |
+| Pracownicy (Staff) | OK | OK | OK | **Gotowy** |
+| Godziny pracy | OK | OK | OK | **Gotowy** |
+| Staff-Services (przypisania) | OK | OK | OK | **Gotowy** |
+| Klienci (Clients) | OK | OK | OK | **Gotowy** |
+| Statystyki klientów (wizyty/wydatki) | OK | — | OK | **Gotowy** |
+| Kalendarz (Appointments) | OK | OK | OK | **Gotowy** |
+| Nieobecności (Time Off) | OK | OK | OK | **Gotowy** |
+| Produkty (Products) | OK | OK | OK | **Gotowy** |
+| Ustawienia salonu | OK | OK | OK | **Gotowy** |
+| Ustawienia rezerwacji/powiadomień | OK | OK | OK | **Gotowy** |
+| Transakcje (Accounting) | OK | — | OK | **Gotowy** |
 
-### Problem do rozwiązania
+## Znalezione problemy
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### 1. ScheduleGridView — dane NIGDY nie trafiają do bazy
+**Plik:** `src/components/admin/schedule/ScheduleGridView.tsx` linie 33-49, 72-88
+**Problem:** Komponent `ScheduleGridView` (zakładka "Siatka" w Grafiku) używa **wyłącznie `useState` z mock data** (`mockStaffMembers`). Edycja godzin w siatce zmienia tylko stan lokalny — `handleSaveEdit()` (linia 72) aktualizuje `setSchedules()` bez żadnego zapisu do bazy. Po odświeżeniu strony wszystkie zmiany znikają. To dotyczy widoku produkcyjnego.
+**Priorytet:** Wysoki — użytkownik edytuje godziny i myśli, że się zapisały.
 
----
+### 2. ScheduleTemplates i WeekDuplication — brak persystencji
+**Plik:** `src/components/admin/ScheduleManagement.tsx` linie 86-100
+**Problem:** Komponenty `ScheduleTemplates`, `WeekDuplication` i `SmartScheduleHelpers` nie otrzymują `isDemo` i nie mają logiki zapisu do bazy. Wszystkie operują na lokalnym stanie.
+**Priorytet:** Średni — funkcje pomocnicze, ale użytkownik oczekuje zapisu.
 
-### Plan implementacji
+### 3. QuickBlockModal — handleSaveBlock to console.log
+**Plik:** `src/components/admin/ScheduleManagement.tsx` linie 34-37
+**Problem:** `handleSaveBlock` robi tylko `console.log("Saving block:", block)` — szybka blokada czasu nie jest nigdy zapisywana.
+**Priorytet:** Średni.
 
-#### FAZA 1: Role-based routing po loginie
+### 4. CSV Import usług — brak zapisu
+**Plik:** `src/components/admin/ServicesManagement.tsx` linia 139-142
+**Problem:** `handleCSVImport` robi tylko toast "Zaimportowano X usług" bez faktycznego tworzenia usług w bazie. Komentarz w kodzie: `// In production, would create via Supabase`.
+**Priorytet:** Średni.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+## Plan naprawy
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+| # | Plik | Zmiana |
+|---|------|--------|
+| 1 | `ScheduleGridView.tsx` | Pobrać dane z `working_hours` zamiast mock, zapisywać edycje do bazy przez `supabase.from("working_hours").upsert()` |
+| 2 | `ScheduleManagement.tsx` | Przekazać `isDemo` do `ScheduleGridView`, `ScheduleTemplates`, `WeekDuplication`, `SmartScheduleHelpers` |
+| 3 | `ScheduleManagement.tsx` | Zaimplementować `handleSaveBlock` — wstawić blokadę jako appointment ze statusem "blocked" lub zapis do `working_hours` z `is_working=false` |
+| 4 | `ServicesManagement.tsx` | Zaimplementować `handleCSVImport` — iteracja po importowanych usługach i `createServiceMutation.mutateAsync()` dla każdej |
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### Szczegóły techniczne — Fix #1 (ScheduleGridView)
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+```typescript
+// Pobranie danych z bazy
+const { data: dbWorkingHours } = useQuery({
+  queryKey: ["working-hours-grid", salonId, weekStartISO],
+  queryFn: async () => {
+    const { data } = await supabase
+      .from("working_hours")
+      .select("*, staff_members(id, name, color)")
+      .order("day_of_week");
+    return data;
+  },
+  enabled: !isDemo && !!salonId,
+});
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+// Zapis po edycji
+const handleSaveEdit = async () => {
+  if (!editingCell) return;
+  // ... update local state ...
+  if (!isDemo) {
+    await supabase.from("working_hours")
+      .upsert({
+        staff_id: editingCell.staffId,
+        day_of_week: editingCell.dayIndex,
+        start_time: editValues.startTime,
+        end_time: editValues.endTime,
+        is_working: editValues.isWorking,
+      }, { onConflict: 'staff_id,day_of_week' });
+  }
+};
+```
 
-#### FAZA 3: Indywidualne kokpity
+### Podsumowanie
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+Wszystkie główne moduły CRUD (usługi, pracownicy, klienci, wizyty, produkty, ustawienia, nieobecności) poprawnie zapisują i odczytują dane z bazy. Jedyny poważny problem to **ScheduleGridView**, który operuje wyłącznie na danych lokalnych. Pozostałe 3 problemy to brakujące implementacje funkcji pomocniczych (quick block, CSV import, szablony grafiku).
 
