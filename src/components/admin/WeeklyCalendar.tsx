@@ -93,7 +93,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments")
-        .select("id, start_time, end_time, status, price, notes, clients(first_name, last_name), services(name, duration), staff_members(name)")
+        .select("id, staff_id, start_time, end_time, status, price, notes, clients(first_name, last_name), services(name, duration), staff_members(name)")
         .eq("salon_id", salonId!)
         .gte("start_time", weekStartISO)
         .lte("start_time", weekEndISO)
