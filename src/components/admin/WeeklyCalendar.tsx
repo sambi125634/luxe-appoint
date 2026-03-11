@@ -244,12 +244,21 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     }
 
     // Production — persist to Supabase
+    if (!appointmentData.serviceId) {
+      toast({ title: "Brak usługi", description: "Dodaj najpierw usługi w zakładce Usługi", variant: "destructive" });
+      setIsModalOpen(false);
+      return;
+    }
+    if (!appointmentData.staffId) {
+      toast({ title: "Brak pracownika", description: "Wybierz pracownika", variant: "destructive" });
+      setIsModalOpen(false);
+      return;
+    }
+
     try {
-      const [hours, minutes] = appointmentData.time.split(":").map(Number);
       const dateStr = appointmentData.date || new Date().toISOString().split('T')[0];
       const startTime = new Date(`${dateStr}T${appointmentData.time}:00`);
       const endTime = new Date(startTime.getTime() + appointmentData.duration * 60 * 1000);
-
       if (editingAppointment && editingAppointment.id !== Date.now().toString()) {
         // Update existing appointment
         const { error } = await supabase
@@ -311,7 +320,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         }]);
       }
 
-      queryClient.invalidateQueries({ queryKey: ["appointments", salonId] });
+      queryClient.invalidateQueries({ queryKey: ["calendar-appointments"] });
       toast({ title: "Wizyta zapisana" });
     } catch (err) {
       console.error(err);

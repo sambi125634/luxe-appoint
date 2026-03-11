@@ -415,7 +415,7 @@ export function AppointmentModal({
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-3">
-              <ProductSaleSection cart={productCart} onCartChange={setProductCart} salonId={isDemo ? "demo-salon-id" : undefined} />
+              <ProductSaleSection cart={productCart} onCartChange={setProductCart} />
             </CollapsibleContent>
           </Collapsible>
 

@@ -13,7 +13,7 @@ import { useServices } from "@/hooks/useServices";
 import { useSalonId } from "@/hooks/useSalonId";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface StaffMember {
@@ -74,6 +74,47 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   const { data: dbStaff, isLoading: loadingStaff } = useStaffMembers();
   const { data: dbServices } = useServices();
 
+  // Fetch staff_services assignments from DB
+  const { data: staffServicesMap } = useQuery({
+    queryKey: ["staff-services-map", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("staff_services")
+        .select("staff_id, service_id");
+      if (error) throw error;
+      const map: Record<string, string[]> = {};
+      (data || []).forEach((row) => {
+        if (!map[row.staff_id]) map[row.staff_id] = [];
+        map[row.staff_id].push(row.service_id);
+      });
+      return map;
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  // Fetch working_hours from DB
+  const { data: workingHoursMap } = useQuery({
+    queryKey: ["working-hours-map", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("working_hours")
+        .select("staff_id, day_of_week, start_time, end_time, is_working");
+      if (error) throw error;
+      const map: Record<string, WorkingHours[]> = {};
+      (data || []).forEach((row) => {
+        if (!map[row.staff_id]) map[row.staff_id] = [];
+        map[row.staff_id].push({
+          dayOfWeek: row.day_of_week,
+          startTime: row.start_time,
+          endTime: row.end_time,
+          isWorking: row.is_working,
+        });
+      });
+      return map;
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
   const staff: StaffMember[] = useMemo(() => {
     if (isDemo) return DEMO_STAFF;
     if (!dbStaff) return [];
@@ -84,10 +125,15 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       email: s.email || "",
       phone: s.phone || "",
       color: s.color || "bg-primary",
-      serviceIds: [],
-      workingHours: defaultWorkingHours,
+      serviceIds: staffServicesMap?.[s.id] || [],
+      workingHours: workingHoursMap?.[s.id]?.length
+        ? defaultWorkingHours.map(dh => {
+            const found = workingHoursMap[s.id].find(wh => wh.dayOfWeek === dh.dayOfWeek);
+            return found || dh;
+          })
+        : defaultWorkingHours,
     }));
-  }, [isDemo, dbStaff]);
+  }, [isDemo, dbStaff, staffServicesMap, workingHoursMap]);
 
   const servicesList = useMemo(() => {
     if (isDemo) return DEMO_SERVICES;

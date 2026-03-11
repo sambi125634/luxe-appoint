@@ -44,15 +44,22 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
 
-  // Fetch clients from database
-  const { data: clients = [], isLoading: clientsLoading } = useQuery({
-    queryKey: ["clients", salonId],
+  // Demo mock clients
+  const demoClients: Client[] = [
+    { id: "1", name: "Anna Kowalska", phone: "+48 500 100 200", email: "anna@example.com" },
+    { id: "2", name: "Joanna Nowak", phone: "+48 500 100 201", email: "joanna@example.com" },
+    { id: "3", name: "Magdalena Wiśniewska", phone: "+48 500 100 202", email: "magda@example.com" },
+  ];
+
+  // Fetch clients from database (only in production mode)
+  const { data: dbClients = [], isLoading: clientsLoading } = useQuery({
+    queryKey: ["clients", realSalonId],
     queryFn: async () => {
-      if (!salonId) return [];
+      if (!realSalonId) return [];
       const { data, error } = await supabase
         .from("clients")
         .select("id, first_name, last_name, phone, email")
-        .eq("salon_id", salonId)
+        .eq("salon_id", realSalonId)
         .order("first_name");
       if (error) throw error;
       return data.map((c) => ({
@@ -62,8 +69,10 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
         email: c.email || "",
       }));
     },
-    enabled: !!salonId,
+    enabled: !isDemo && !!realSalonId,
   });
+
+  const clients = isDemo ? demoClients : dbClients;
 
   const filteredClients = clients.filter(
     (client) =>
