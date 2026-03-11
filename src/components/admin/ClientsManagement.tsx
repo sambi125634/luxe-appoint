@@ -399,6 +399,158 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     );
   }
 
+  // Shared client dialog renderer
+  const renderClientDialog = () => (
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-serif">
+            {selectedClient 
+              ? `${selectedClient.firstName} ${selectedClient.lastName}`
+              : t('clients.newClient')
+            }
+          </DialogTitle>
+        </DialogHeader>
+
+        {(isEditing || !selectedClient) ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>{t('clients.firstName')}</Label>
+                <Input
+                  value={editedClient?.firstName || ""}
+                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, firstName: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label>{t('clients.lastName')}</Label>
+                <Input
+                  value={editedClient?.lastName || ""}
+                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, lastName: e.target.value } : null)}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>{t('clients.phone')}</Label>
+                <Input
+                  value={editedClient?.phone || ""}
+                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, phone: e.target.value } : null)}
+                />
+              </div>
+              <div>
+                <Label>{t('clients.email')}</Label>
+                <Input
+                  value={editedClient?.email || ""}
+                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, email: e.target.value } : null)}
+                />
+              </div>
+            </div>
+            <div>
+              <Label>{t('clients.notes')}</Label>
+              <Textarea
+                value={editedClient?.notes || ""}
+                onChange={(e) => setEditedClient(prev => prev ? { ...prev, notes: e.target.value } : null)}
+              />
+            </div>
+            <div>
+              <Label>{t('clients.tags')}</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {availableTags.map(tag => (
+                  <Button
+                    key={tag.id}
+                    type="button"
+                    variant={editedClient?.tags.includes(tag.id) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => toggleTag(tag.id)}
+                  >
+                    {tag.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="info">{t('clients.info')}</TabsTrigger>
+              <TabsTrigger value="history">{t('clients.visitHistory')}</TabsTrigger>
+            </TabsList>
+            <TabsContent value="info" className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="w-4 h-4 text-muted-foreground" />
+                  {selectedClient.phone}
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Mail className="w-4 h-4 text-muted-foreground" />
+                  {selectedClient.email || "—"}
+                </div>
+              </div>
+              {selectedClient.notes && (
+                <div className="p-3 rounded-lg bg-muted/30">
+                  <p className="text-sm">{selectedClient.notes}</p>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {selectedClient.tags.map(tagId => {
+                  const tag = getTagInfo(tagId);
+                  return tag ? (
+                    <Badge key={tagId} className={tag.color}>{tag.label}</Badge>
+                  ) : null;
+                })}
+              </div>
+              <ClientRiskBadge clientId={selectedClient.id} />
+            </TabsContent>
+            <TabsContent value="history">
+              <div className="space-y-2">
+                {selectedClient.visits.length === 0 ? (
+                  <p className="text-center py-8 text-muted-foreground">{t('clients.noVisits')}</p>
+                ) : (
+                  selectedClient.visits.map(visit => (
+                    <div key={visit.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                      <div>
+                        <p className="font-medium text-sm">{visit.service}</p>
+                        <p className="text-xs text-muted-foreground">{visit.date} • {visit.time} • {visit.staff}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(visit.status)}
+                        <span className="text-sm font-medium">{visit.price} zł</span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
+
+        <DialogFooter>
+          {selectedClient && !isEditing && (
+            <>
+              <Button variant="destructive" size="sm" onClick={() => deleteClient(selectedClient.id)}>
+                <Trash2 className="w-4 h-4 mr-2" />
+                {t('common.delete')}
+              </Button>
+              <Button variant="outline" onClick={() => setIsEditing(true)}>
+                <Edit2 className="w-4 h-4 mr-2" />
+                {t('common.edit')}
+              </Button>
+            </>
+          )}
+          {(isEditing || !selectedClient) && (
+            <>
+              <Button variant="outline" onClick={() => { setIsDialogOpen(false); setIsEditing(false); }}>
+                {t('common.cancel')}
+              </Button>
+              <Button onClick={saveClient}>{t('common.save')}</Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   // Empty state for production (no clients yet)
   if (!isDemo && clients.length === 0) {
     return (
@@ -415,6 +567,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             {t('clients.addClient')}
           </Button>
         </div>
+        {renderClientDialog()}
       </div>
     );
   }
@@ -510,155 +663,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
         />
       )}
 
-      {/* Client Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="font-serif">
-              {selectedClient 
-                ? `${selectedClient.firstName} ${selectedClient.lastName}`
-                : t('clients.newClient')
-              }
-            </DialogTitle>
-          </DialogHeader>
-
-          {(isEditing || !selectedClient) ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>{t('clients.firstName')}</Label>
-                  <Input
-                    value={editedClient?.firstName || ""}
-                    onChange={(e) => setEditedClient(prev => prev ? { ...prev, firstName: e.target.value } : null)}
-                  />
-                </div>
-                <div>
-                  <Label>{t('clients.lastName')}</Label>
-                  <Input
-                    value={editedClient?.lastName || ""}
-                    onChange={(e) => setEditedClient(prev => prev ? { ...prev, lastName: e.target.value } : null)}
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>{t('clients.phone')}</Label>
-                  <Input
-                    value={editedClient?.phone || ""}
-                    onChange={(e) => setEditedClient(prev => prev ? { ...prev, phone: e.target.value } : null)}
-                  />
-                </div>
-                <div>
-                  <Label>{t('clients.email')}</Label>
-                  <Input
-                    value={editedClient?.email || ""}
-                    onChange={(e) => setEditedClient(prev => prev ? { ...prev, email: e.target.value } : null)}
-                  />
-                </div>
-              </div>
-              <div>
-                <Label>{t('clients.notes')}</Label>
-                <Textarea
-                  value={editedClient?.notes || ""}
-                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, notes: e.target.value } : null)}
-                />
-              </div>
-              <div>
-                <Label>{t('clients.tags')}</Label>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {availableTags.map(tag => (
-                    <Button
-                      key={tag.id}
-                      type="button"
-                      variant={editedClient?.tags.includes(tag.id) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleTag(tag.id)}
-                    >
-                      {tag.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList>
-                <TabsTrigger value="info">{t('clients.info')}</TabsTrigger>
-                <TabsTrigger value="history">{t('clients.visitHistory')}</TabsTrigger>
-              </TabsList>
-              <TabsContent value="info" className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Phone className="w-4 h-4 text-muted-foreground" />
-                    {selectedClient.phone}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Mail className="w-4 h-4 text-muted-foreground" />
-                    {selectedClient.email || "—"}
-                  </div>
-                </div>
-                {selectedClient.notes && (
-                  <div className="p-3 rounded-lg bg-muted/30">
-                    <p className="text-sm">{selectedClient.notes}</p>
-                  </div>
-                )}
-                <div className="flex flex-wrap gap-2">
-                  {selectedClient.tags.map(tagId => {
-                    const tag = getTagInfo(tagId);
-                    return tag ? (
-                      <Badge key={tagId} className={tag.color}>{tag.label}</Badge>
-                    ) : null;
-                  })}
-                </div>
-                <ClientRiskBadge clientId={selectedClient.id} />
-              </TabsContent>
-              <TabsContent value="history">
-                <div className="space-y-2">
-                  {selectedClient.visits.length === 0 ? (
-                    <p className="text-center py-8 text-muted-foreground">{t('clients.noVisits')}</p>
-                  ) : (
-                    selectedClient.visits.map(visit => (
-                      <div key={visit.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                        <div>
-                          <p className="font-medium text-sm">{visit.service}</p>
-                          <p className="text-xs text-muted-foreground">{visit.date} • {visit.time} • {visit.staff}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {getStatusBadge(visit.status)}
-                          <span className="text-sm font-medium">{visit.price} zł</span>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
-          )}
-
-          <DialogFooter>
-            {selectedClient && !isEditing && (
-              <>
-                <Button variant="destructive" size="sm" onClick={() => deleteClient(selectedClient.id)}>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  {t('common.delete')}
-                </Button>
-                <Button variant="outline" onClick={() => setIsEditing(true)}>
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  {t('common.edit')}
-                </Button>
-              </>
-            )}
-            {(isEditing || !selectedClient) && (
-              <>
-                <Button variant="outline" onClick={() => { setIsDialogOpen(false); setIsEditing(false); }}>
-                  {t('common.cancel')}
-                </Button>
-                <Button onClick={saveClient}>{t('common.save')}</Button>
-              </>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {renderClientDialog()}
     </div>
   );
 }

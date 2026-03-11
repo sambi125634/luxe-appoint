@@ -182,7 +182,18 @@ export const AIGameChangersSection = () => {
                 </div>
 
                 {/* CTA */}
-                <Button className="w-full" size="lg">
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => {
+                    const demoSection = document.getElementById("interactive-demo");
+                    if (demoSection) {
+                      demoSection.scrollIntoView({ behavior: "smooth" });
+                    } else {
+                      window.location.href = "/demo";
+                    }
+                  }}
+                >
                   Zobacz demo tej funkcji
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>

@@ -349,18 +349,20 @@ export function ScheduleGridView({ isDemo = false, onWeekDuplicate }: ScheduleGr
                             <div 
                               className="px-2 py-1.5 rounded-md text-xs font-medium transition-all"
                               style={{ 
-                                backgroundColor: `${staff.color}15`,
+                                backgroundColor: `${staff.color}20`,
                                 borderLeft: `3px solid ${staff.color}`
                               }}
                             >
-                              {schedule.startTime} - {schedule.endTime}
+                              <span>{schedule.startTime} - {schedule.endTime}</span>
+                              <span className="ml-1 opacity-0 group-hover:opacity-50 transition-opacity inline-block w-3 h-3 align-middle">
+                                <Pencil className="w-3 h-3" />
+                              </span>
                             </div>
                           ) : (
                             <div className="px-2 py-1.5 rounded-md text-xs text-muted-foreground bg-muted/30">
                               Wolne
                             </div>
                           )}
-                          <Pencil className="w-3 h-3 absolute top-1 right-1 opacity-0 group-hover:opacity-50 transition-opacity" />
                         </div>
                       )}
                     </td>
