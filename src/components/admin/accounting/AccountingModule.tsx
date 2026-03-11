@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { startOfMonth, endOfMonth } from "date-fns";
 import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -16,6 +16,9 @@ import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "react-i18next";
 import { SectionGuide } from "../SectionGuide";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface AccountingModuleProps {
   isDemo?: boolean;
@@ -24,8 +27,9 @@ interface AccountingModuleProps {
 export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
+  const { salonId } = useSalonId();
   const [activeTab, setActiveTab] = useState("charts");
-  const [transactions, setTransactions] = useState<Transaction[]>(isDemo ? mockTransactions : []);
+  const [manualTransactions, setManualTransactions] = useState<Transaction[]>([]);
   const [filters, setFilters] = useState<AccountingFilters>({
     dateRange: {
       from: startOfMonth(new Date()),
@@ -34,6 +38,51 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
     location: null,
     reportType: "daily",
   });
+
+  // Fetch real transactions from DB in production
+  const { data: dbTransactions } = useQuery({
+    queryKey: ["accounting-transactions", salonId, filters.dateRange.from.toISOString(), filters.dateRange.to.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*, clients(first_name, last_name), staff_members(name)")
+        .eq("salon_id", salonId!)
+        .gte("transaction_date", filters.dateRange.from.toISOString())
+        .lte("transaction_date", filters.dateRange.to.toISOString())
+        .order("transaction_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map((tx: any): Transaction => ({
+        id: tx.id,
+        salonId: tx.salon_id,
+        dateTime: tx.transaction_date,
+        clientId: tx.client_id,
+        clientName: tx.clients ? `${tx.clients.first_name} ${tx.clients.last_name}` : null,
+        staffId: tx.staff_id,
+        staffName: tx.staff_members?.name || null,
+        locationId: null,
+        itemType: tx.type === "product" ? "produkt" : "usługa",
+        itemCategory: tx.category || "",
+        itemName: tx.description || "",
+        quantity: tx.quantity || 1,
+        unitPriceBrutto: Number(tx.unit_price || tx.amount),
+        discountAmount: 0,
+        vatRate: Number(tx.vat_rate || 23),
+        netAmount: Number(tx.amount) / (1 + Number(tx.vat_rate || 23) / 100),
+        vatAmount: Number(tx.amount) - Number(tx.amount) / (1 + Number(tx.vat_rate || 23) / 100),
+        grossAmount: Number(tx.amount),
+        paymentMethod: (tx.payment_method === "cash" ? "gotówka" : tx.payment_method === "card" ? "karta" : "online") as Transaction["paymentMethod"],
+        tipAmount: Number(tx.tip_amount || 0),
+        relatedVoucherId: null,
+        status: "opłacone",
+      }));
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  const transactions = useMemo(() => {
+    if (isDemo) return mockTransactions;
+    return [...(dbTransactions || []), ...manualTransactions];
+  }, [isDemo, dbTransactions, manualTransactions]);
 
   const handleExportCSV = () => {
     toast({
