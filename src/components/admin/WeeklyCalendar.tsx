@@ -311,7 +311,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         }]);
       }
 
-      queryClient.invalidateQueries({ queryKey: ["appointments", salonId] });
+      queryClient.invalidateQueries({ queryKey: ["calendar-appointments"] });
       toast({ title: "Wizyta zapisana" });
     } catch (err) {
       console.error(err);
