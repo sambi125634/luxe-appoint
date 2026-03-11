@@ -184,7 +184,8 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+   const [userId, setUserId] = useState<string | null>(null);
+   const [userMeta, setUserMeta] = useState<{ first_name?: string; last_name?: string }>({});
   const [createdSalonId, setCreatedSalonId] = useState<string | null>(null);
   const [createdSlug, setCreatedSlug] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
