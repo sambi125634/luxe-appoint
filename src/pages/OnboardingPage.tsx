@@ -184,7 +184,8 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
+   const [userId, setUserId] = useState<string | null>(null);
+   const [userMeta, setUserMeta] = useState<{ first_name?: string; last_name?: string }>({});
   const [createdSalonId, setCreatedSalonId] = useState<string | null>(null);
   const [createdSlug, setCreatedSlug] = useState("");
   const [showConfetti, setShowConfetti] = useState(false);
@@ -222,6 +223,7 @@ export default function OnboardingPage() {
       if (!session) { navigate("/auth"); setCheckingAuth(false); return; }
       const uid = session.user.id;
       setUserId(uid);
+      setUserMeta(session.user.user_metadata as { first_name?: string; last_name?: string } ?? {});
 
       const { data: salon } = await supabase
         .from("salons")
@@ -280,8 +282,9 @@ export default function OnboardingPage() {
       setCreatedSlug(salon.slug);
 
       // Create owner as staff member
+      const ownerName = `${userMeta.first_name ?? ''} ${userMeta.last_name ?? ''}`.trim() || salonName.trim();
       await supabase.from("staff_members").insert({
-        salon_id: salon.id, name: salonName.trim(), user_id: userId, role: "owner",
+        salon_id: salon.id, name: ownerName, user_id: userId, role: "owner",
       });
     }
     setSaving(false);
@@ -293,7 +296,7 @@ export default function OnboardingPage() {
     } else {
       setScanSkipped(true);
       // Save default services from template
-      if (createdSalonId || true) {
+      if (createdSalonId) {
         await saveDefaultServices();
       }
       setStep(2);
