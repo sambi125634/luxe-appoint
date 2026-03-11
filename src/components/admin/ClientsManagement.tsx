@@ -108,12 +108,52 @@ interface ClientsManagementProps {
 export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
+  const { salonId } = useSalonId();
 
   // Supabase data (only fetched when not demo)
   const { data: dbClients, isLoading } = useClients();
   const createClient = useCreateClient();
   const updateClient = useUpdateClient();
   const deleteClientMutation = useDeleteClient();
+
+  // Fetch appointment stats per client
+  const { data: clientStats } = useQuery({
+    queryKey: ["client-stats", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("client_id, status, price, start_time, services(name), staff_members(name)")
+        .eq("salon_id", salonId!)
+        .not("client_id", "is", null);
+      if (error) throw error;
+      
+      const statsMap: Record<string, { totalVisits: number; totalSpent: number; visits: Visit[] }> = {};
+      (data || []).forEach((apt: any) => {
+        const cid = apt.client_id;
+        if (!cid) return;
+        if (!statsMap[cid]) statsMap[cid] = { totalVisits: 0, totalSpent: 0, visits: [] };
+        
+        if (apt.status === "completed") {
+          statsMap[cid].totalVisits += 1;
+          statsMap[cid].totalSpent += Number(apt.price || 0);
+        }
+        
+        const startDate = new Date(apt.start_time);
+        statsMap[cid].visits.push({
+          id: apt.client_id + "-" + apt.start_time,
+          date: startDate.toISOString().split('T')[0],
+          time: `${startDate.getHours().toString().padStart(2,'0')}:${startDate.getMinutes().toString().padStart(2,'0')}`,
+          service: apt.services?.name || "Usługa",
+          category: "",
+          staff: apt.staff_members?.name || "—",
+          status: apt.status === "completed" ? "completed" : apt.status === "cancelled" ? "cancelled" : "completed",
+          price: Number(apt.price || 0),
+        });
+      });
+      return statsMap;
+    },
+    enabled: !isDemo && !!salonId,
+  });
 
   // Map DB data to component format
   const clients: Client[] = useMemo(() => {
@@ -129,12 +169,12 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
       notes: c.notes || "",
       createdAt: c.created_at.split('T')[0],
       lastVisit: c.last_visit_at?.split('T')[0],
-      totalVisits: 0,
-      totalSpent: 0,
-      visits: [],
+      totalVisits: clientStats?.[c.id]?.totalVisits || 0,
+      totalSpent: clientStats?.[c.id]?.totalSpent || 0,
+      visits: clientStats?.[c.id]?.visits || [],
       purchaseCategories: c.purchase_categories || [],
     }));
-  }, [isDemo, dbClients]);
+  }, [isDemo, dbClients, clientStats]);
 
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
