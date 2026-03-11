@@ -1,101 +1,73 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Audyt interaktywności: Demo + Panel Admin
 
-### Co już mamy
+## Przeprowadzona analiza
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Przejrzałem systematycznie kod wszystkich zakładek w demo (`DemoPage.tsx`) i panelu admin (`AdminDashboard.tsx`), ze szczególnym uwzględnieniem: przekazywania `isDemo`, mutacji (CRUD), mock data, oraz empty states.
 
-### Problem do rozwiązania
+## Znalezione problemy
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### 1. **QuickProductSale na Dashboardzie (demo)** — brak produktów
+- `DashboardHome` → `QuickProductSale` — komponent pobiera produkty przez `useSalonId()`, a nie `salonId` z demo. W demo nie załaduje mock produktów.
+- **Fix**: Przekazać `salonId="demo-salon-id"` do `QuickProductSale` gdy `isDemo=true`.
 
----
+### 2. **ProductSaleSection w AppointmentModal (demo)** — brak produktów przy dodawaniu wizyty
+- `AppointmentModal` zawiera `ProductSaleSection` ale nie przekazuje `salonId` w kontekście demo.
+- **Fix**: Przekazać odpowiedni `salonId` do `ProductSaleSection` wewnątrz `AppointmentModal`.
 
-### Plan implementacji
+### 3. **TimeOffManagement (admin)** — mutacje bez demo guard
+- W demo mode, tworzenie/edycja/usuwanie urlopów próbuje pisać do Supabase (brak `isDemo` guard w mutation logic).
+- **Fix**: Dodać demo guard w `handleSave` i `handleDelete`.
 
-#### FAZA 1: Role-based routing po loginie
+### 4. **SettingsModule** — nie przyjmuje `isDemo`
+- `SettingsModule` zawsze pobiera dane z `useSalonSettings()`. W demo (brak salonu) settings mogą być puste lub powodować błędy.
+- **Fix**: Dodać `isDemo` prop z mock danymi profilu salonu.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 5. **WeeklyCalendar (admin — produkcja)** — nie ładuje wizyt z bazy
+- W trybie produkcyjnym (`isDemo=false`), `appointments` zaczyna jako pusta tablica i **nigdy nie jest wypełniana danymi z bazy** — brakuje `useQuery` do pobierania wizyt z Supabase.
+- Calendar w admin zawsze pokaże "brak wizyt" mimo że wizyty istnieją w bazie.
+- **Fix**: Dodać `useQuery` do pobierania wizyt z tabeli `appointments` filtrowanych po `salonId` i aktualnym tygodniu.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 6. **ProductSalesReport** — nie przyjmuje `salonId` ani `isDemo`
+- W `ProductsModule` zakładka "Raport sprzedaży" renderuje `<ProductSalesReport />` bez żadnych propsów.
+- **Fix**: Sprawdzić czy komponent ma mock data lub dodać.
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+## Plan implementacji
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+| # | Plik | Zmiana | Priorytet |
+|---|------|--------|-----------|
+| 1 | `WeeklyCalendar.tsx` | Dodać `useQuery` do pobierania wizyt z bazy w produkcji | Krytyczny |
+| 2 | `DashboardHome.tsx` | Przekazać `salonId` do `QuickProductSale` w demo | Wysoki |
+| 3 | `AppointmentModal.tsx` | Przekazać `salonId` do `ProductSaleSection` w demo | Wysoki |
+| 4 | `TimeOffManagement.tsx` | Dodać demo guard w mutacjach | Średni |
+| 5 | `SettingsModule.tsx` | Dodać `isDemo` prop z mock danymi | Średni |
+| 6 | `ProductSalesReport.tsx` | Sprawdzić/dodać mock data | Niski |
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### Szczegóły techniczne kluczowej zmiany (#1)
 
-#### FAZA 3: Indywidualne kokpity
+```typescript
+// WeeklyCalendar.tsx — dodać pobieranie wizyt z bazy
+const { data: dbAppointments } = useQuery({
+  queryKey: ["calendar-appointments", salonId, weekStart],
+  queryFn: async () => {
+    const { data } = await supabase
+      .from("appointments")
+      .select("*, clients(first_name, last_name), services(name, duration), staff_members(name)")
+      .eq("salon_id", salonId!)
+      .gte("start_time", weekStart)
+      .lte("start_time", weekEnd)
+      .neq("status", "cancelled");
+    return data;
+  },
+  enabled: !isDemo && !!salonId,
+});
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+// Sync appointments from DB
+useEffect(() => {
+  if (!isDemo && dbAppointments) {
+    setAppointments(dbAppointments.map(transformToLocalFormat));
+  }
+}, [dbAppointments, isDemo]);
+```
 
