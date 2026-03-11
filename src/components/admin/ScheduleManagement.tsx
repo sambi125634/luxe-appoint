@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { WeeklyCalendar } from "./WeeklyCalendar";
+import { AppointmentModal } from "./AppointmentModal";
 import { 
   ScheduleGridView, 
   ScheduleTemplates, 
@@ -39,6 +40,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
   const { data: dbStaff } = useStaffMembers();
   const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart">("calendar");
   const [isQuickBlockOpen, setIsQuickBlockOpen] = useState(false);
+  const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
 
   const handleSaveBlock = async (block: { staffId: string; date: string; startTime: string; endTime: string; type: string; note?: string }) => {
     if (isDemo) {
