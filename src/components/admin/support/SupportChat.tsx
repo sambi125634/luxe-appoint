@@ -76,42 +76,42 @@ export function SupportChat({ initialMessage, onMessageSent }: SupportChatProps)
       const decoder = new TextDecoder();
       let buffer = "";
 
+      // Add initial assistant message placeholder
+      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
 
-        let newlineIndex: number;
-        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, newlineIndex);
-          buffer = buffer.slice(newlineIndex + 1);
+        const lines = buffer.split("\n");
+        // Keep last potentially incomplete line in buffer
+        buffer = lines.pop() || "";
 
-          if (line.endsWith("\r")) line = line.slice(0, -1);
+        for (const rawLine of lines) {
+          const line = rawLine.replace(/\r$/, "");
+          
+          // Skip SSE comments and empty lines
           if (line.startsWith(":") || line.trim() === "") continue;
           if (!line.startsWith("data: ")) continue;
 
           const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") break;
+          if (jsonStr === "[DONE]") continue;
 
           try {
             const parsed = JSON.parse(jsonStr);
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               assistantContent += content;
-              setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last?.role === "assistant" && prev.length > 1) {
-                  return prev.map((m, i) => 
-                    i === prev.length - 1 ? { ...m, content: assistantContent } : m
-                  );
-                }
-                return [...prev, { role: "assistant", content: assistantContent }];
-              });
+              setMessages(prev => 
+                prev.map((m, i) => 
+                  i === prev.length - 1 ? { ...m, content: assistantContent } : m
+                )
+              );
             }
           } catch {
-            buffer = line + "\n" + buffer;
-            break;
+            // Skip unparseable lines
           }
         }
       }
