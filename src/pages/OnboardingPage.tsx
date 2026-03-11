@@ -294,7 +294,7 @@ export default function OnboardingPage() {
     } else {
       setScanSkipped(true);
       // Save default services from template
-      if (createdSalonId || true) {
+      if (createdSalonId) {
         await saveDefaultServices();
       }
       setStep(2);
