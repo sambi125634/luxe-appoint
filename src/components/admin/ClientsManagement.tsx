@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -306,6 +306,13 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     setIsDialogOpen(true);
   };
 
+  const handleClientDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open);
+    if (!open) {
+      setIsEditing(false);
+    }
+  };
+
   const saveClient = async () => {
     if (!editedClient) return;
     if (!editedClient.firstName || !editedClient.lastName || !editedClient.phone) {
@@ -401,269 +408,274 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
 
   // Shared client dialog renderer
   const renderClientDialog = () => (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-serif">
-            {selectedClient 
-              ? `${selectedClient.firstName} ${selectedClient.lastName}`
-              : t('clients.newClient')
-            }
-          </DialogTitle>
-        </DialogHeader>
+    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="font-serif">
+          {selectedClient 
+            ? `${selectedClient.firstName} ${selectedClient.lastName}`
+            : t('clients.newClient')
+          }
+        </DialogTitle>
+      </DialogHeader>
 
-        {(isEditing || !selectedClient) ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>{t('clients.firstName')}</Label>
-                <Input
-                  value={editedClient?.firstName || ""}
-                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, firstName: e.target.value } : null)}
-                />
-              </div>
-              <div>
-                <Label>{t('clients.lastName')}</Label>
-                <Input
-                  value={editedClient?.lastName || ""}
-                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, lastName: e.target.value } : null)}
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>{t('clients.phone')}</Label>
-                <Input
-                  value={editedClient?.phone || ""}
-                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, phone: e.target.value } : null)}
-                />
-              </div>
-              <div>
-                <Label>{t('clients.email')}</Label>
-                <Input
-                  value={editedClient?.email || ""}
-                  onChange={(e) => setEditedClient(prev => prev ? { ...prev, email: e.target.value } : null)}
-                />
-              </div>
-            </div>
+      {(isEditing || !selectedClient) ? (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>{t('clients.notes')}</Label>
-              <Textarea
-                value={editedClient?.notes || ""}
-                onChange={(e) => setEditedClient(prev => prev ? { ...prev, notes: e.target.value } : null)}
+              <Label>{t('clients.firstName')}</Label>
+              <Input
+                value={editedClient?.firstName || ""}
+                onChange={(e) => setEditedClient(prev => prev ? { ...prev, firstName: e.target.value } : null)}
               />
             </div>
             <div>
-              <Label>{t('clients.tags')}</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {availableTags.map(tag => (
-                  <Button
-                    key={tag.id}
-                    type="button"
-                    variant={editedClient?.tags.includes(tag.id) ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => toggleTag(tag.id)}
-                  >
-                    {tag.label}
-                  </Button>
-                ))}
-              </div>
+              <Label>{t('clients.lastName')}</Label>
+              <Input
+                value={editedClient?.lastName || ""}
+                onChange={(e) => setEditedClient(prev => prev ? { ...prev, lastName: e.target.value } : null)}
+              />
             </div>
           </div>
-        ) : (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList>
-              <TabsTrigger value="info">{t('clients.info')}</TabsTrigger>
-              <TabsTrigger value="history">{t('clients.visitHistory')}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="info" className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  {selectedClient.phone}
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  {selectedClient.email || "—"}
-                </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label>{t('clients.phone')}</Label>
+              <Input
+                value={editedClient?.phone || ""}
+                onChange={(e) => setEditedClient(prev => prev ? { ...prev, phone: e.target.value } : null)}
+              />
+            </div>
+            <div>
+              <Label>{t('clients.email')}</Label>
+              <Input
+                value={editedClient?.email || ""}
+                onChange={(e) => setEditedClient(prev => prev ? { ...prev, email: e.target.value } : null)}
+              />
+            </div>
+          </div>
+          <div>
+            <Label>{t('clients.notes')}</Label>
+            <Textarea
+              value={editedClient?.notes || ""}
+              onChange={(e) => setEditedClient(prev => prev ? { ...prev, notes: e.target.value } : null)}
+            />
+          </div>
+          <div>
+            <Label>{t('clients.tags')}</Label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {availableTags.map(tag => (
+                <Button
+                  key={tag.id}
+                  type="button"
+                  variant={editedClient?.tags.includes(tag.id) ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => toggleTag(tag.id)}
+                >
+                  {tag.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="info">{t('clients.info')}</TabsTrigger>
+            <TabsTrigger value="history">{t('clients.visitHistory')}</TabsTrigger>
+          </TabsList>
+          <TabsContent value="info" className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-2 text-sm">
+                <Phone className="w-4 h-4 text-muted-foreground" />
+                {selectedClient.phone}
               </div>
-              {selectedClient.notes && (
-                <div className="p-3 rounded-lg bg-muted/30">
-                  <p className="text-sm">{selectedClient.notes}</p>
-                </div>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {selectedClient.tags.map(tagId => {
-                  const tag = getTagInfo(tagId);
-                  return tag ? (
-                    <Badge key={tagId} className={tag.color}>{tag.label}</Badge>
-                  ) : null;
-                })}
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="w-4 h-4 text-muted-foreground" />
+                {selectedClient.email || "—"}
               </div>
-              <ClientRiskBadge clientId={selectedClient.id} />
-            </TabsContent>
-            <TabsContent value="history">
-              <div className="space-y-2">
-                {selectedClient.visits.length === 0 ? (
-                  <p className="text-center py-8 text-muted-foreground">{t('clients.noVisits')}</p>
-                ) : (
-                  selectedClient.visits.map(visit => (
-                    <div key={visit.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                      <div>
-                        <p className="font-medium text-sm">{visit.service}</p>
-                        <p className="text-xs text-muted-foreground">{visit.date} • {visit.time} • {visit.staff}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(visit.status)}
-                        <span className="text-sm font-medium">{visit.price} zł</span>
-                      </div>
+            </div>
+            {selectedClient.notes && (
+              <div className="p-3 rounded-lg bg-muted/30">
+                <p className="text-sm">{selectedClient.notes}</p>
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {selectedClient.tags.map(tagId => {
+                const tag = getTagInfo(tagId);
+                return tag ? (
+                  <Badge key={tagId} className={tag.color}>{tag.label}</Badge>
+                ) : null;
+              })}
+            </div>
+            <ClientRiskBadge clientId={selectedClient.id} />
+          </TabsContent>
+          <TabsContent value="history">
+            <div className="space-y-2">
+              {selectedClient.visits.length === 0 ? (
+                <p className="text-center py-8 text-muted-foreground">{t('clients.noVisits')}</p>
+              ) : (
+                selectedClient.visits.map(visit => (
+                  <div key={visit.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                    <div>
+                      <p className="font-medium text-sm">{visit.service}</p>
+                      <p className="text-xs text-muted-foreground">{visit.date} • {visit.time} • {visit.staff}</p>
                     </div>
-                  ))
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
-        )}
+                    <div className="flex items-center gap-2">
+                      {getStatusBadge(visit.status)}
+                      <span className="text-sm font-medium">{visit.price} zł</span>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
 
-        <DialogFooter>
-          {selectedClient && !isEditing && (
-            <>
-              <Button variant="destructive" size="sm" onClick={() => deleteClient(selectedClient.id)}>
-                <Trash2 className="w-4 h-4 mr-2" />
-                {t('common.delete')}
-              </Button>
-              <Button variant="outline" onClick={() => setIsEditing(true)}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                {t('common.edit')}
-              </Button>
-            </>
-          )}
-          {(isEditing || !selectedClient) && (
-            <>
-              <Button variant="outline" onClick={() => { setIsDialogOpen(false); setIsEditing(false); }}>
-                {t('common.cancel')}
-              </Button>
-              <Button onClick={saveClient}>{t('common.save')}</Button>
-            </>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        {selectedClient && !isEditing && (
+          <>
+            <Button variant="destructive" size="sm" onClick={() => deleteClient(selectedClient.id)}>
+              <Trash2 className="w-4 h-4 mr-2" />
+              {t('common.delete')}
+            </Button>
+            <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <Edit2 className="w-4 h-4 mr-2" />
+              {t('common.edit')}
+            </Button>
+          </>
+        )}
+        {(isEditing || !selectedClient) && (
+          <>
+            <Button variant="outline" onClick={() => { setIsDialogOpen(false); setIsEditing(false); }}>
+              {t('common.cancel')}
+            </Button>
+            <Button onClick={saveClient}>{t('common.save')}</Button>
+          </>
+        )}
+      </DialogFooter>
+    </DialogContent>
   );
 
-  // Empty state for production (no clients yet)
   if (!isDemo && clients.length === 0) {
     return (
-      <div className="space-y-6">
-        <SectionGuide sectionKey="clients" />
-        <div className="text-center py-16">
-          <Users className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-          <h3 className="text-xl font-serif font-semibold mb-2">Brak klientów</h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
-          </p>
-          <Button onClick={openNewClient} className="gap-2">
-            <Plus className="w-4 h-4" />
-            {t('clients.addClient')}
-          </Button>
+      <Dialog open={isDialogOpen} onOpenChange={handleClientDialogOpenChange}>
+        <div className="space-y-6">
+          <SectionGuide sectionKey="clients" />
+          <div className="text-center py-16">
+            <Users className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
+            <h3 className="text-xl font-serif font-semibold mb-2">Brak klientów</h3>
+            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+              Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
+            </p>
+            <DialogTrigger asChild>
+              <Button type="button" onClick={openNewClient} className="gap-2">
+                <Plus className="w-4 h-4" />
+                {t('clients.addClient')}
+              </Button>
+            </DialogTrigger>
+          </div>
         </div>
         {renderClientDialog()}
-      </div>
+      </Dialog>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <SectionGuide sectionKey="clients" />
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-serif font-bold">{t('clients.title')}</h2>
-          <p className="text-muted-foreground">
-            {clients.length} {t('clients.clientsInDatabase')}
-            {inactiveClientsCount > 0 && (
-              <span className="ml-2 text-orange-600">
-                • {inactiveClientsCount} {t('clients.needsAttention')}
-              </span>
-            )}
-          </p>
+    <Dialog open={isDialogOpen} onOpenChange={handleClientDialogOpenChange}>
+      <div className="space-y-6">
+        <SectionGuide sectionKey="clients" />
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-serif font-bold">{t('clients.title')}</h2>
+            <p className="text-muted-foreground">
+              {clients.length} {t('clients.clientsInDatabase')}
+              {inactiveClientsCount > 0 && (
+                <span className="ml-2 text-orange-600">
+                  • {inactiveClientsCount} {t('clients.needsAttention')}
+                </span>
+              )}
+            </p>
+          </div>
+          <DialogTrigger asChild>
+            <Button type="button" onClick={openNewClient} className="gap-2">
+              <Plus className="w-4 h-4" />
+              {t('clients.addClient')}
+            </Button>
+          </DialogTrigger>
         </div>
-        <Button onClick={openNewClient} className="gap-2">
-          <Plus className="w-4 h-4" />
-          {t('clients.addClient')}
-        </Button>
-      </div>
 
-      {/* Main view tabs */}
-      <div className="flex items-center gap-4 border-b">
-        <button
-          onClick={() => setMainViewTab("list")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-            mainViewTab === "list" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <Users className="w-4 h-4" />
-          {t('clients.listView')}
-        </button>
-        <button
-          onClick={() => setMainViewTab("groups")}
-          className={cn(
-            "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
-            mainViewTab === "groups" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-          )}
-        >
-          <FolderOpen className="w-4 h-4" />
-          {t('clients.purchaseGroups.title')}
-        </button>
-      </div>
+        {/* Main view tabs */}
+        <div className="flex items-center gap-4 border-b">
+          <button
+            onClick={() => setMainViewTab("list")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              mainViewTab === "list" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Users className="w-4 h-4" />
+            {t('clients.listView')}
+          </button>
+          <button
+            onClick={() => setMainViewTab("groups")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              mainViewTab === "groups" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <FolderOpen className="w-4 h-4" />
+            {t('clients.purchaseGroups.title')}
+          </button>
+        </div>
 
-      {mainViewTab === "list" ? (
-        <>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder={t('clients.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+        {mainViewTab === "list" ? (
+          <>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t('clients.searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <ClientFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                availableTags={availableTags}
+                availableCategories={availableCategories}
               />
             </div>
-            <ClientFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              availableTags={availableTags}
-              availableCategories={availableCategories}
-            />
-          </div>
 
-          <div className="grid gap-3">
-            {filteredClients.map((client) => (
-              <ClientListItem
-                key={client.id}
-                client={client}
-                availableTags={availableTags}
-                onClick={() => openClientDetails(client)}
-              />
-            ))}
+            <div className="grid gap-3">
+              {filteredClients.map((client) => (
+                <ClientListItem
+                  key={client.id}
+                  client={client}
+                  availableTags={availableTags}
+                  onClick={() => openClientDetails(client)}
+                />
+              ))}
 
-            {filteredClients.length === 0 && (
-              <div className="text-center py-12 text-muted-foreground">
-                <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>{t('clients.noResults')}</p>
-              </div>
-            )}
-          </div>
-        </>
-      ) : (
-        <PurchaseGroups 
-          groups={purchaseGroups}
-          onSelectCategory={handleSelectCategory}
-        />
-      )}
+              {filteredClients.length === 0 && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>{t('clients.noResults')}</p>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <PurchaseGroups 
+            groups={purchaseGroups}
+            onSelectCategory={handleSelectCategory}
+          />
+        )}
+      </div>
 
       {renderClientDialog()}
-    </div>
+    </Dialog>
   );
 }
