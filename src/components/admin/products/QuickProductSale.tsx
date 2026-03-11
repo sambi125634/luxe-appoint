@@ -20,9 +20,12 @@ interface Client {
   email: string;
 }
 
+const DEMO_SALON_ID = "demo-salon-id";
+
 interface QuickProductSaleProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isDemo?: boolean;
   onComplete?: (saleData: {
     cart: CartItem[];
     clientId?: string;
@@ -31,9 +34,10 @@ interface QuickProductSaleProps {
   }) => void;
 }
 
-export function QuickProductSale({ open, onOpenChange, onComplete }: QuickProductSaleProps) {
+export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplete }: QuickProductSaleProps) {
   const { t } = useTranslation();
-  const { salonId } = useSalonId();
+  const { salonId: realSalonId } = useSalonId();
+  const salonId = isDemo ? DEMO_SALON_ID : realSalonId;
   const [cart, setCart] = useState<CartItem[]>([]);
   const [clientSearch, setClientSearch] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
