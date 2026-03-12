@@ -11,6 +11,8 @@ import { VouchersReport } from "./VouchersReport";
 import { ExportSection } from "./ExportSection";
 import { ProductSalesAccountingReport } from "./ProductSalesAccountingReport";
 import { ManualEntryModal, ManualTransaction } from "./ManualEntryModal";
+import { OccupancyReport } from "./OccupancyReport";
+import { NoShowsReport } from "./NoShowsReport";
 import { AccountingFilters, Transaction } from "./types";
 import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
