@@ -88,7 +88,7 @@ const serviceRecommendations: Record<string, { id: string; name: string; price: 
   ],
 };
 
-export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWidgetProps) {
+export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
