@@ -70,7 +70,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
         </TabsContent>
 
         <TabsContent value="recipes" className="mt-6">
-          <ServiceRecipes salonId={effectiveSalonId} />
+          <ServiceRecipes salonId={effectiveSalonId} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="deliveries" className="mt-6">
