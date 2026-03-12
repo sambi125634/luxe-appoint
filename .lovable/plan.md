@@ -1,86 +1,101 @@
 
 
-# Plan: Pełna internacjonalizacja platformy (i18n audit)
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Diagnoza
+### Co już mamy
 
-Po audycie zidentyfikowałem **~40 komponentów** z hardkodowanymi polskimi stringami, które nie przechodzą przez system tłumaczeń `react-i18next`. Komponenty korzystające z `useTranslation` (ok. 44 pliki) działają poprawnie. Problem dotyczy reszty.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-## Zakres zmian
+### Problem do rozwiązania
 
-### Grupa 1: Nawigacja i Layout
-| Plik | Problem |
-|------|---------|
-| `AdminSidebar.tsx` | Tytuły sekcji: "Codzienna praca", "Marketing & Wzrost", etc. |
-| `MobileMoreMenu.tsx` | Tytuły sekcji + opisy: "Odzyskiwanie klientów", "Kategorie i cennik", etc. |
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-### Grupa 2: Ustawienia (całość bez i18n)
-| Plik | Problem |
-|------|---------|
-| `SalonProfileSettings.tsx` | Wszystkie labele: "Nazwa salonu", "Miasto", "Branding i wygląd", etc. |
-| `BookingSettingsPanel.tsx` | Cały formularz |
-| `NotificationSettings.tsx` | Cały formularz |
-| `IntegrationSettings.tsx` | Cały formularz |
-| `AutomationSettings.tsx` | Cały formularz: "Autopilot", "Godziny ciszy", "RODO i prywatność", etc. |
+---
 
-### Grupa 3: Dashboard i widgety
-| Plik | Problem |
-|------|---------|
-| `DashboardHome.tsx` | Etykiety kart |
-| `WeeklyBriefWidget.tsx` | "Autopilot zadziałał", etc. |
-| `RevenuePredictionCard.tsx` | Etykiety |
-| `SetupChecklist.tsx` | Cały checklist |
-| `AutopilotStatusBar.tsx` | Wszystkie statusy |
+### Plan implementacji
 
-### Grupa 4: SectionGuide (poradniki)
-| Plik | Problem |
-|------|---------|
-| `SectionGuide.tsx` | 15 sekcji po ~5 stringów = ~75 stringów. "Pokaż poradnik", "Jak to zrobić", "Zwiń" |
+#### FAZA 1: Role-based routing po loginie
 
-### Grupa 5: Moduły specjalistyczne (cała zawartość)
-| Moduł | Pliki |
-|-------|-------|
-| **Retention** | RetentionDashboard, RetentionHealthBoard, RetentionKPI, RetentionRadar, RetentionTimeline, SequenceConfig |
-| **Pixel** | PixelDashboard, PixelSetupWizard, PixelAttribution, PixelEventsLog, PixelHealthDashboard, AudienceMappings, LookalikeEngine |
-| **Analytics/TrueProfit** | TrueProfitDashboard, TodayProfitCard, MonthlyProfitCard, ServiceProfitRanking, ClientLTVRanking, CashflowForecast, IndustryBenchmarks, ProfitSetupWizard |
-| **Referral** | ReferralDashboard, AmbassadorLeaderboard, SilentFansDashboard, StoriesGenerator |
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### Grupa 6: Landing (nowe komponenty)
-| Plik | Problem |
-|------|---------|
-| `TargetAudienceSection.tsx` | "Stworzone dla", nazwy branż |
-| `NewFAQSection.tsx` | 6 pytań i odpowiedzi |
-| `NewFinalCTASection.tsx` | CTA tekst |
-| Inne nowe sekcje landing | Hardkodowane PL |
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-## Podejście implementacyjne
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-1. **Rozbudować `pl.json` i `en.json`** o brakujące klucze (~500+ nowych kluczy) w logicznych sekcjach:
-   - `sidebarSections.*` — tytuły nawigacji
-   - `sectionGuide.*` — poradniki
-   - `automation.*` — ustawienia automatyzacji
-   - `settingsModule.*` (rozszerzyć istniejącą sekcję)
-   - `retention.*`, `pixel.*`, `analytics.*`, `referral.*` — moduły
-   - `landing.*` (rozszerzyć) — nowe sekcje
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-2. **Dodać `useTranslation`** do każdego komponentu z hardkodowanymi stringami i zamienić stringi na `t("klucz")`.
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-3. **Zachować dane demo** (np. nazwy salonów, imiona) jako dane, nie jako tłumaczenia — te pozostają niezmienione.
+#### FAZA 3: Indywidualne kokpity
 
-## Kolejność implementacji (ze względu na objętość, 6 etapów)
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-1. Nawigacja (Sidebar + MobileMenu) + Ustawienia (5 komponentów)
-2. Dashboard + SectionGuide
-3. Moduł Retention + Pixel
-4. Moduł Analytics/TrueProfit + Referral
-5. Landing (nowe sekcje)
-6. Pozostałe drobne komponenty
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-## Szacunkowy rozmiar zmian
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-- **~500 nowych kluczy** w obu plikach JSON
-- **~40 plików** TSX do aktualizacji
-- **0 zmian w bazie danych**
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-Ze względu na ogromny zakres, zaczynam od Grupy 1+2 (nawigacja + ustawienia), następnie kolejne grupy w osobnych wiadomościach.
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

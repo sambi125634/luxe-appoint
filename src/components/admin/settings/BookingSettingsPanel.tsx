@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Calendar, Clock, Ban, CreditCard, Save, Loader2, AlertTriangle, Percent, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,7 @@ const defaultPrepayment: PrepaymentSettings = {
 };
 
 export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: BookingSettingsPanelProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<BookingSettings>({
     ...settings,
     prepayment: settings.prepayment || defaultPrepayment,
@@ -62,16 +64,16 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-primary" />
-            Okno rezerwacji
+            {t("settingsModule.bookingWindow")}
           </CardTitle>
           <CardDescription>
-            Określ jak daleko w przyszłość klienci mogą rezerwować wizyty
+            {t("settingsModule.bookingWindowDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="advanceDays">Maksymalne wyprzedzenie (dni)</Label>
+              <Label htmlFor="advanceDays">{t("settingsModule.maxAdvanceDays")}</Label>
               <Select
                 value={formData.advanceBookingDays.toString()}
                 onValueChange={(v) => setFormData({ ...formData, advanceBookingDays: parseInt(v) })}
@@ -80,19 +82,19 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="7">7 dni</SelectItem>
-                  <SelectItem value="14">14 dni</SelectItem>
-                  <SelectItem value="30">30 dni</SelectItem>
-                  <SelectItem value="60">60 dni</SelectItem>
-                  <SelectItem value="90">90 dni</SelectItem>
+                  <SelectItem value="7">7 {t("settingsModule.days")}</SelectItem>
+                  <SelectItem value="14">14 {t("settingsModule.days")}</SelectItem>
+                  <SelectItem value="30">30 {t("settingsModule.days")}</SelectItem>
+                  <SelectItem value="60">60 {t("settingsModule.days")}</SelectItem>
+                  <SelectItem value="90">90 {t("settingsModule.days")}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Klienci mogą rezerwować z wyprzedzeniem do {formData.advanceBookingDays} dni
+                {t("settingsModule.clientsCanBookAdvance", { days: formData.advanceBookingDays })}
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minAdvance">Minimalne wyprzedzenie (godziny)</Label>
+              <Label htmlFor="minAdvance">{t("settingsModule.minAdvanceHours")}</Label>
               <Select
                 value={formData.minAdvanceHours.toString()}
                 onValueChange={(v) => setFormData({ ...formData, minAdvanceHours: parseInt(v) })}
@@ -101,15 +103,15 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">Bez limitu</SelectItem>
-                  <SelectItem value="1">1 godzina</SelectItem>
-                  <SelectItem value="2">2 godziny</SelectItem>
-                  <SelectItem value="4">4 godziny</SelectItem>
-                  <SelectItem value="24">24 godziny</SelectItem>
+                  <SelectItem value="0">{t("settingsModule.noLimit")}</SelectItem>
+                  <SelectItem value="1">1 {t("settingsModule.hour")}</SelectItem>
+                  <SelectItem value="2">2 {t("settingsModule.hours2")}</SelectItem>
+                  <SelectItem value="4">4 {t("settingsModule.hours4")}</SelectItem>
+                  <SelectItem value="24">24 {t("settingsModule.hours24")}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground">
-                Klient musi zarezerwować co najmniej {formData.minAdvanceHours}h przed wizytą
+                {t("settingsModule.clientMustBookHours", { hours: formData.minAdvanceHours })}
               </p>
             </div>
           </div>
@@ -121,16 +123,16 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Clock className="w-5 h-5 text-primary" />
-            Sloty czasowe
+            {t("settingsModule.timeSlots")}
           </CardTitle>
           <CardDescription>
-            Konfiguracja domyślnych godzin pracy i interwałów
+            {t("settingsModule.timeSlotsDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="workStart">Domyślna godzina otwarcia</Label>
+              <Label htmlFor="workStart">{t("settingsModule.defaultOpenTime")}</Label>
               <Input
                 id="workStart"
                 type="time"
@@ -139,7 +141,7 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="workEnd">Domyślna godzina zamknięcia</Label>
+              <Label htmlFor="workEnd">{t("settingsModule.defaultCloseTime")}</Label>
               <Input
                 id="workEnd"
                 type="time"
@@ -151,7 +153,7 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="slotInterval">Interwał slotów (minuty)</Label>
+              <Label htmlFor="slotInterval">{t("settingsModule.slotInterval")}</Label>
               <Select
                 value={formData.slotInterval.toString()}
                 onValueChange={(v) => setFormData({ ...formData, slotInterval: parseInt(v) })}
@@ -160,14 +162,14 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="15">15 minut</SelectItem>
-                  <SelectItem value="30">30 minut</SelectItem>
-                  <SelectItem value="60">60 minut</SelectItem>
+                  <SelectItem value="15">15 {t("settingsModule.minutes")}</SelectItem>
+                  <SelectItem value="30">30 {t("settingsModule.minutes")}</SelectItem>
+                  <SelectItem value="60">60 {t("settingsModule.minutes")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="buffer">Bufor między wizytami (minuty)</Label>
+              <Label htmlFor="buffer">{t("settingsModule.bufferBetween")}</Label>
               <Select
                 value={formData.bufferBetweenAppointments.toString()}
                 onValueChange={(v) => setFormData({ ...formData, bufferBetweenAppointments: parseInt(v) })}
@@ -176,10 +178,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">Bez bufora</SelectItem>
-                  <SelectItem value="5">5 minut</SelectItem>
-                  <SelectItem value="10">10 minut</SelectItem>
-                  <SelectItem value="15">15 minut</SelectItem>
+                  <SelectItem value="0">{t("settingsModule.noBuffer")}</SelectItem>
+                  <SelectItem value="5">5 {t("settingsModule.minutes")}</SelectItem>
+                  <SelectItem value="10">10 {t("settingsModule.minutes")}</SelectItem>
+                  <SelectItem value="15">15 {t("settingsModule.minutes")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -187,23 +189,23 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         </CardContent>
       </Card>
 
-      {/* Prepayment / Zaliczki */}
+      {/* Prepayment */}
       <Card className="border-primary/20">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-primary" />
-            Zaliczki i płatności online
+            {t("settingsModule.prepayments")}
           </CardTitle>
           <CardDescription>
-            Wymagaj zaliczki przy rezerwacji, aby zmniejszyć liczbę nieobecności
+            {t("settingsModule.prepaymentsDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Włącz zaliczki</Label>
+              <Label>{t("settingsModule.enablePrepayments")}</Label>
               <p className="text-xs text-muted-foreground">
-                Klienci muszą wpłacić zaliczkę przy rezerwacji
+                {t("settingsModule.prepaymentsRequired")}
               </p>
             </div>
             <Switch
@@ -214,9 +216,8 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
 
           {formData.prepayment?.enabled && (
             <div className="space-y-4 pt-4 border-t">
-              {/* Prepayment Type */}
               <div className="space-y-2">
-                <Label>Typ zaliczki</Label>
+                <Label>{t("settingsModule.prepaymentType")}</Label>
                 <div className="grid grid-cols-3 gap-2">
                   <Button
                     type="button"
@@ -226,7 +227,7 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                     className="flex items-center gap-1"
                   >
                     <Banknote className="w-4 h-4" />
-                    Stała kwota
+                    {t("settingsModule.fixedAmount")}
                   </Button>
                   <Button
                     type="button"
@@ -236,7 +237,7 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                     className="flex items-center gap-1"
                   >
                     <Percent className="w-4 h-4" />
-                    Procent
+                    {t("settingsModule.percentage")}
                   </Button>
                   <Button
                     type="button"
@@ -246,16 +247,15 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                     className="flex items-center gap-1"
                   >
                     <CreditCard className="w-4 h-4" />
-                    Pełna cena
+                    {t("settingsModule.fullPrice")}
                   </Button>
                 </div>
               </div>
 
-              {/* Amount input (for fixed and percentage) */}
               {formData.prepayment.type !== 'full' && (
                 <div className="space-y-2">
                   <Label htmlFor="prepaymentAmount">
-                    {formData.prepayment.type === 'fixed' ? 'Kwota zaliczki (PLN)' : 'Procent ceny usługi (%)'}
+                    {formData.prepayment.type === 'fixed' ? t("settingsModule.fixedAmountLabel") : t("settingsModule.percentageLabel")}
                   </Label>
                   <Input
                     id="prepaymentAmount"
@@ -264,26 +264,24 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                     max={formData.prepayment.type === 'percentage' ? 100 : undefined}
                     value={formData.prepayment.amount}
                     onChange={(e) => updatePrepayment({ amount: parseInt(e.target.value) || 0 })}
-                    placeholder={formData.prepayment.type === 'fixed' ? 'np. 50' : 'np. 30'}
                   />
                   <p className="text-xs text-muted-foreground">
                     {formData.prepayment.type === 'fixed'
-                      ? `Każda rezerwacja wymaga wpłaty ${formData.prepayment.amount} PLN`
-                      : `Klient wpłaca ${formData.prepayment.amount}% ceny usługi`}
+                      ? t("settingsModule.fixedAmountDesc", { amount: formData.prepayment.amount })
+                      : t("settingsModule.percentageDesc", { amount: formData.prepayment.amount })}
                   </p>
                 </div>
               )}
 
-              {/* Conditional requirements */}
               <div className="space-y-3 pt-2">
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
                     <Label className="flex items-center gap-2">
                       <AlertTriangle className="w-4 h-4 text-amber-500" />
-                      Wymagaj tylko dla klientów high-risk
+                      {t("settingsModule.requireHighRisk")}
                     </Label>
                     <p className="text-xs text-muted-foreground">
-                      Zaliczka wymagana tylko dla klientów z historią no-show
+                      {t("settingsModule.requireHighRiskDesc")}
                     </p>
                   </div>
                   <Switch
@@ -294,9 +292,9 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
 
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
-                    <Label>Wymagaj dla nowych klientów</Label>
+                    <Label>{t("settingsModule.requireNewClients")}</Label>
                     <p className="text-xs text-muted-foreground">
-                      Zaliczka wymagana dla klientów bez historii wizyt
+                      {t("settingsModule.requireNewClientsDesc")}
                     </p>
                   </div>
                   <Switch
@@ -306,14 +304,13 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                 </div>
               </div>
 
-              {/* Info box */}
               <div className="p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
-                <p className="font-medium mb-1 text-primary">Jak działają zaliczki?</p>
+                <p className="font-medium mb-1 text-primary">{t("settingsModule.howPrepaymentsWork")}</p>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1 text-xs">
-                  <li>Klient płaci BLIK, kartą lub przelewem przez Przelewy24</li>
-                  <li>Zaliczka jest odliczana od ceny usługi podczas wizyty</li>
-                  <li>Bez płatności - rezerwacja nie zostaje potwierdzona</li>
-                  <li>Sprawdź ustawienia Przelewy24 w zakładce Integracje</li>
+                  <li>{t("settingsModule.prepaymentInfo1")}</li>
+                  <li>{t("settingsModule.prepaymentInfo2")}</li>
+                  <li>{t("settingsModule.prepaymentInfo3")}</li>
+                  <li>{t("settingsModule.prepaymentInfo4")}</li>
                 </ul>
               </div>
             </div>
@@ -326,15 +323,15 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Ban className="w-5 h-5 text-primary" />
-            Polityka anulowania
+            {t("settingsModule.cancellationPolicy")}
           </CardTitle>
           <CardDescription>
-            Zasady dotyczące anulowania i zmiany rezerwacji
+            {t("settingsModule.cancellationPolicyDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="cancelPolicy">Limit anulowania (godziny przed wizytą)</Label>
+            <Label htmlFor="cancelPolicy">{t("settingsModule.cancellationLimit")}</Label>
             <Select
               value={formData.cancellationPolicyHours.toString()}
               onValueChange={(v) => setFormData({ ...formData, cancellationPolicyHours: parseInt(v) })}
@@ -343,16 +340,16 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="0">Brak limitu (zawsze można anulować)</SelectItem>
-                <SelectItem value="2">2 godziny przed</SelectItem>
-                <SelectItem value="4">4 godziny przed</SelectItem>
-                <SelectItem value="12">12 godzin przed</SelectItem>
-                <SelectItem value="24">24 godziny przed</SelectItem>
-                <SelectItem value="48">48 godzin przed</SelectItem>
+                <SelectItem value="0">{t("settingsModule.noLimitCancel")}</SelectItem>
+                <SelectItem value="2">2 {t("settingsModule.hoursBefore")}</SelectItem>
+                <SelectItem value="4">4 {t("settingsModule.hoursBefore")}</SelectItem>
+                <SelectItem value="12">12 {t("settingsModule.hoursBefore12")}</SelectItem>
+                <SelectItem value="24">24 {t("settingsModule.hoursBefore")}</SelectItem>
+                <SelectItem value="48">48 {t("settingsModule.hoursBefore12")}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Klienci mogą anulować wizytę do {formData.cancellationPolicyHours} godzin przed terminem
+              {t("settingsModule.clientsCanCancel", { hours: formData.cancellationPolicyHours })}
             </p>
           </div>
         </CardContent>
@@ -363,15 +360,15 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-primary" />
-            Dodatkowe opcje
+            {t("settingsModule.additionalOptions")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Automatyczne potwierdzanie rezerwacji</Label>
+              <Label>{t("settingsModule.autoConfirmBookings")}</Label>
               <p className="text-xs text-muted-foreground">
-                Rezerwacje są automatycznie potwierdzane bez Twojej akceptacji
+                {t("settingsModule.autoConfirmDesc")}
               </p>
             </div>
             <Switch
@@ -382,9 +379,9 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Wymagaj potwierdzenia telefonicznego</Label>
+              <Label>{t("settingsModule.requirePhoneConfirm")}</Label>
               <p className="text-xs text-muted-foreground">
-                Klient musi potwierdzić wizytę telefonicznie
+                {t("settingsModule.requirePhoneConfirmDesc")}
               </p>
             </div>
             <Switch
@@ -402,7 +399,7 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {isSaving ? "Zapisywanie..." : "Zapisz zmiany"}
+          {isSaving ? t("settingsModule.saving") : t("settingsModule.saveChanges")}
         </Button>
       </div>
     </div>

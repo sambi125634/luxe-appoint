@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Bot, Clock, Shield, Zap, ExternalLink, CheckCircle2, AlertCircle, Save, Loader2, Globe } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -29,7 +30,7 @@ interface AutopilotGlobalConfig {
 
 interface ModuleStatus {
   key: string;
-  label: string;
+  labelKey: string;
   icon: React.ReactNode;
   configured: boolean;
   targetTab: string;
@@ -60,6 +61,7 @@ export function AutomationSettings({
   onNavigateToModule,
   isDemo = false,
 }: AutomationSettingsProps) {
+  const { t } = useTranslation();
   const { salonId } = useSalonId();
   const [autopilot, setAutopilot] = useState<AutopilotGlobalConfig>(defaultAutopilotConfig);
   const [autopilotLoading, setAutopilotLoading] = useState(false);
@@ -110,35 +112,35 @@ export function AutomationSettings({
     setModuleStatuses([
       {
         key: "pixel",
-        label: "Meta Pixel",
+        labelKey: "admin.pixel",
         icon: <Zap className="w-4 h-4" />,
         configured: !!(pixelRes.data?.is_active),
         targetTab: "pixel",
       },
       {
         key: "retention",
-        label: "Retencja",
+        labelKey: "admin.retention",
         icon: <Clock className="w-4 h-4" />,
         configured: !!(retentionRes.data && retentionRes.data.length > 0),
         targetTab: "retention",
       },
       {
         key: "referral",
-        label: "Polecenia",
+        labelKey: "admin.referral",
         icon: <ExternalLink className="w-4 h-4" />,
         configured: !!(referralRes.data && referralRes.data.length > 0),
         targetTab: "referral",
       },
       {
         key: "analytics",
-        label: "True Profit",
+        labelKey: "admin.trueProfit",
         icon: <Globe className="w-4 h-4" />,
         configured: false,
         targetTab: "analytics",
       },
       {
         key: "consultation",
-        label: "Konsultacje",
+        labelKey: "admin.consultation",
         icon: <Shield className="w-4 h-4" />,
         configured: false,
         targetTab: "consultation",
@@ -147,11 +149,11 @@ export function AutomationSettings({
   };
 
   const getDemoModuleStatuses = (): ModuleStatus[] => [
-    { key: "pixel", label: "Meta Pixel", icon: <Zap className="w-4 h-4" />, configured: true, targetTab: "pixel" },
-    { key: "retention", label: "Retencja", icon: <Clock className="w-4 h-4" />, configured: true, targetTab: "retention" },
-    { key: "referral", label: "Polecenia", icon: <ExternalLink className="w-4 h-4" />, configured: false, targetTab: "referral" },
-    { key: "analytics", label: "True Profit", icon: <Globe className="w-4 h-4" />, configured: false, targetTab: "analytics" },
-    { key: "consultation", label: "Konsultacje", icon: <Shield className="w-4 h-4" />, configured: true, targetTab: "consultation" },
+    { key: "pixel", labelKey: "admin.pixel", icon: <Zap className="w-4 h-4" />, configured: true, targetTab: "pixel" },
+    { key: "retention", labelKey: "admin.retention", icon: <Clock className="w-4 h-4" />, configured: true, targetTab: "retention" },
+    { key: "referral", labelKey: "admin.referral", icon: <ExternalLink className="w-4 h-4" />, configured: false, targetTab: "referral" },
+    { key: "analytics", labelKey: "admin.trueProfit", icon: <Globe className="w-4 h-4" />, configured: false, targetTab: "analytics" },
+    { key: "consultation", labelKey: "admin.consultation", icon: <Shield className="w-4 h-4" />, configured: true, targetTab: "consultation" },
   ];
 
   const saveAutopilot = async (updates: Partial<AutopilotGlobalConfig>) => {
@@ -190,22 +192,22 @@ export function AutomationSettings({
 
   return (
     <div className="space-y-6">
-      {/* Sekcja 1: Autopilot */}
+      {/* Autopilot */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bot className="w-5 h-5 text-primary" />
-            Autopilot — ustawienia globalne
+            {t("settingsModule.autopilotGlobal")}
           </CardTitle>
           <CardDescription>
-            Kontroluj automatyczne wiadomości (SMS, email, retencja) z jednego miejsca
+            {t("settingsModule.autopilotGlobalDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
           <div className="flex items-center justify-between">
             <div>
-              <Label className="font-medium">Autopilot aktywny</Label>
-              <p className="text-sm text-muted-foreground">Włącz/wyłącz wszystkie automatyzacje</p>
+              <Label className="font-medium">{t("settingsModule.autopilotActive")}</Label>
+              <p className="text-sm text-muted-foreground">{t("settingsModule.autopilotActiveDesc")}</p>
             </div>
             <Switch
               checked={autopilot.isActive}
@@ -218,7 +220,7 @@ export function AutomationSettings({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Godziny ciszy — od</Label>
+              <Label>{t("settingsModule.quietHoursFrom")}</Label>
               <Input
                 type="time"
                 value={autopilot.quietHoursStart}
@@ -227,7 +229,7 @@ export function AutomationSettings({
               />
             </div>
             <div className="space-y-2">
-              <Label>Godziny ciszy — do</Label>
+              <Label>{t("settingsModule.quietHoursTo")}</Label>
               <Input
                 type="time"
                 value={autopilot.quietHoursEnd}
@@ -238,7 +240,7 @@ export function AutomationSettings({
           </div>
 
           <div className="space-y-2">
-            <Label>Max wiadomości na klienta (co ile dni)</Label>
+            <Label>{t("settingsModule.maxMessagesPerClient")}</Label>
             <Select
               value={String(autopilot.maxMessagesPerClientDays)}
               onValueChange={(v) => saveAutopilot({ maxMessagesPerClientDays: Number(v) })}
@@ -246,18 +248,18 @@ export function AutomationSettings({
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="3">Co 3 dni</SelectItem>
-                <SelectItem value="5">Co 5 dni</SelectItem>
-                <SelectItem value="7">Co 7 dni (domyślnie)</SelectItem>
-                <SelectItem value="14">Co 14 dni</SelectItem>
+                <SelectItem value="3">{t("settingsModule.every3Days")}</SelectItem>
+                <SelectItem value="5">{t("settingsModule.every5Days")}</SelectItem>
+                <SelectItem value="7">{t("settingsModule.every7Days")}</SelectItem>
+                <SelectItem value="14">{t("settingsModule.every14Days")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <Label className="font-medium">Sugestie AI</Label>
-              <p className="text-sm text-muted-foreground">AI podpowiada akcje (np. reaktywacja klienta)</p>
+              <Label className="font-medium">{t("settingsModule.aiSuggestions")}</Label>
+              <p className="text-sm text-muted-foreground">{t("settingsModule.aiSuggestionsDesc")}</p>
             </div>
             <Switch
               checked={autopilot.aiSuggestionsEnabled}
@@ -268,35 +270,35 @@ export function AutomationSettings({
         </CardContent>
       </Card>
 
-      {/* Sekcja 2: Domyślne ustawienia */}
+      {/* Default Settings */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Globe className="w-5 h-5 text-primary" />
-            Domyślne ustawienia
+            {t("settingsModule.defaultSettings")}
           </CardTitle>
           <CardDescription>
-            Wartości domyślne dla nowych usług i ustawień
+            {t("settingsModule.defaultSettingsDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Domyślna stawka VAT</Label>
+              <Label>{t("settingsModule.defaultVatRate")}</Label>
               <Select
                 value={String(localSettings.defaultVatRate)}
                 onValueChange={(v) => updateLocal("defaultVatRate", Number(v))}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="0">0% (zwolniony)</SelectItem>
+                  <SelectItem value="0">{t("settingsModule.vatExempt")}</SelectItem>
                   <SelectItem value="8">8%</SelectItem>
-                  <SelectItem value="23">23% (domyślnie)</SelectItem>
+                  <SelectItem value="23">{t("settingsModule.vatDefault")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Strefa czasowa</Label>
+              <Label>{t("settingsModule.timezone")}</Label>
               <Select
                 value={localSettings.timezone}
                 onValueChange={(v) => updateLocal("timezone", v)}
@@ -313,43 +315,43 @@ export function AutomationSettings({
         </CardContent>
       </Card>
 
-      {/* Sekcja 3: RODO */}
+      {/* GDPR */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-primary" />
-            RODO i prywatność
+            {t("settingsModule.gdprPrivacy")}
           </CardTitle>
           <CardDescription>
-            Konfiguracja zgód marketingowych i retencji danych
+            {t("settingsModule.gdprPrivacyDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Tekst zgody marketingowej</Label>
+            <Label>{t("settingsModule.marketingConsentText")}</Label>
             <Textarea
               value={localSettings.gdprConsentText}
               onChange={(e) => updateLocal("gdprConsentText", e.target.value)}
               rows={3}
-              placeholder="Wyrażam zgodę na przetwarzanie moich danych osobowych..."
+              placeholder={t("settingsModule.marketingConsentPlaceholder")}
             />
             <p className="text-xs text-muted-foreground">
-              Wyświetlany klientom przy rejestracji i rezerwacji
+              {t("settingsModule.marketingConsentHint")}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label>Okres przechowywania danych klientów</Label>
+            <Label>{t("settingsModule.dataRetention")}</Label>
             <Select
               value={String(localSettings.dataRetentionYears)}
               onValueChange={(v) => updateLocal("dataRetentionYears", Number(v))}
             >
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">1 rok</SelectItem>
-                <SelectItem value="2">2 lata</SelectItem>
-                <SelectItem value="3">3 lata (domyślnie)</SelectItem>
-                <SelectItem value="5">5 lat</SelectItem>
+                <SelectItem value="1">{t("settingsModule.year1")}</SelectItem>
+                <SelectItem value="2">{t("settingsModule.years2")}</SelectItem>
+                <SelectItem value="3">{t("settingsModule.years3")}</SelectItem>
+                <SelectItem value="5">{t("settingsModule.years5")}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -357,21 +359,21 @@ export function AutomationSettings({
           {hasChanges && (
             <Button onClick={handleSaveDefaults} disabled={isSaving} className="gap-2">
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              Zapisz ustawienia
+              {t("settingsModule.saveSettings")}
             </Button>
           )}
         </CardContent>
       </Card>
 
-      {/* Sekcja 4: Status modułów */}
+      {/* Module Status */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-primary" />
-            Status modułów
+            {t("settingsModule.moduleStatus")}
           </CardTitle>
           <CardDescription>
-            Sprawdź, które moduły wymagają konfiguracji
+            {t("settingsModule.moduleStatusDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -386,12 +388,12 @@ export function AutomationSettings({
                     {mod.icon}
                   </div>
                   <div>
-                    <p className="text-sm font-medium">{mod.label}</p>
+                    <p className="text-sm font-medium">{t(mod.labelKey)}</p>
                     <Badge variant={mod.configured ? "default" : "secondary"} className="text-xs mt-0.5">
                       {mod.configured ? (
-                        <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Skonfigurowany</span>
+                        <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> {t("settingsModule.moduleConfigured")}</span>
                       ) : (
-                        <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Wymaga konfiguracji</span>
+                        <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {t("settingsModule.moduleNeedsConfig")}</span>
                       )}
                     </Badge>
                   </div>
@@ -403,7 +405,7 @@ export function AutomationSettings({
                     onClick={() => onNavigateToModule(mod.targetTab)}
                     className="text-xs"
                   >
-                    Przejdź
+                    {t("settingsModule.goToModule")}
                   </Button>
                 )}
               </div>

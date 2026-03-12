@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Calendar, Zap, Check, X, ExternalLink, Save, Eye, EyeOff, Loader2, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +17,7 @@ interface IntegrationSettingsProps {
 }
 
 export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: IntegrationSettingsProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<IntegrationSettingsType>(settings);
   const [showApiKey, setShowApiKey] = useState(false);
   const [showP24ApiKey, setShowP24ApiKey] = useState(false);
@@ -53,21 +55,21 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
               </div>
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  Przelewy24
+                  {t("settingsModule.przelewy24")}
                   {formData.przelewy24?.enabled && formData.przelewy24?.merchantId ? (
                     <Badge variant="outline" className="text-green-600 border-green-600">
                       <Check className="w-3 h-3 mr-1" />
-                      Skonfigurowany
+                      {t("settingsModule.configured")}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="text-muted-foreground">
                       <X className="w-3 h-3 mr-1" />
-                      Nieskonfigurowany
+                      {t("settingsModule.notConfigured")}
                     </Badge>
                   )}
                 </CardTitle>
                 <CardDescription>
-                  Płatności online - BLIK, przelewy bankowe, karty
+                  {t("settingsModule.p24Description")}
                 </CardDescription>
               </div>
             </div>
@@ -76,9 +78,9 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>Włącz płatności Przelewy24</Label>
+              <Label>{t("settingsModule.enableP24")}</Label>
               <p className="text-xs text-muted-foreground">
-                Umożliw klientom płatność zaliczki przy rezerwacji
+                {t("settingsModule.enableP24Desc")}
               </p>
             </div>
             <Switch
@@ -96,7 +98,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
             <div className="space-y-4 pt-4 border-t">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="p24MerchantId">Merchant ID</Label>
+                  <Label htmlFor="p24MerchantId">{t("settingsModule.merchantId")}</Label>
                   <Input
                     id="p24MerchantId"
                     value={formData.przelewy24?.merchantId || ""}
@@ -110,7 +112,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="p24PosId">POS ID (opcjonalne)</Label>
+                  <Label htmlFor="p24PosId">{t("settingsModule.posId")}</Label>
                   <Input
                     id="p24PosId"
                     value={formData.przelewy24?.posId || ""}
@@ -120,13 +122,13 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
                         przelewy24: { ...formData.przelewy24, posId: e.target.value },
                       })
                     }
-                    placeholder="Zostaw puste = Merchant ID"
+                    placeholder={t("settingsModule.posIdPlaceholder")}
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="p24ApiKey">Klucz API</Label>
+                <Label htmlFor="p24ApiKey">{t("settingsModule.apiKey")}</Label>
                 <div className="relative">
                   <Input
                     id="p24ApiKey"
@@ -138,7 +140,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
                         przelewy24: { ...formData.przelewy24, apiKey: e.target.value },
                       })
                     }
-                    placeholder="Twój klucz API z panelu P24"
+                    placeholder={t("settingsModule.apiKeyP24Placeholder")}
                     className="pr-10"
                   />
                   <Button
@@ -154,7 +156,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="p24CrcKey">Klucz CRC</Label>
+                <Label htmlFor="p24CrcKey">{t("settingsModule.crcKey")}</Label>
                 <div className="relative">
                   <Input
                     id="p24CrcKey"
@@ -166,7 +168,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
                         przelewy24: { ...formData.przelewy24, crcKey: e.target.value },
                       })
                     }
-                    placeholder="Klucz CRC do weryfikacji transakcji"
+                    placeholder={t("settingsModule.crcKeyPlaceholder")}
                     className="pr-10"
                   />
                   <Button
@@ -183,9 +185,9 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Tryb testowy (Sandbox)</Label>
+                  <Label>{t("settingsModule.sandboxMode")}</Label>
                   <p className="text-xs text-muted-foreground">
-                    Używaj środowiska testowego bez prawdziwych płatności
+                    {t("settingsModule.sandboxDesc")}
                   </p>
                 </div>
                 <Switch
@@ -200,12 +202,12 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
               </div>
 
               <div className="p-3 rounded-lg bg-muted/50 text-sm">
-                <p className="font-medium mb-1">Obsługiwane metody płatności:</p>
+                <p className="font-medium mb-1">{t("settingsModule.supportedPaymentMethods")}</p>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1 text-xs">
-                  <li>BLIK - najszybsza płatność mobilna</li>
-                  <li>Przelewy bankowe - wszystkie polskie banki</li>
-                  <li>Karty płatnicze - Visa, Mastercard</li>
-                  <li>Google Pay, Apple Pay</li>
+                  <li>{t("settingsModule.p24Blik")}</li>
+                  <li>{t("settingsModule.p24Transfers")}</li>
+                  <li>{t("settingsModule.p24Cards")}</li>
+                  <li>{t("settingsModule.p24Wallets")}</li>
                 </ul>
               </div>
 
@@ -216,7 +218,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
                   rel="noopener noreferrer"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  Dokumentacja Przelewy24
+                  {t("settingsModule.p24Docs")}
                 </a>
               </Button>
             </div>
@@ -234,21 +236,21 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
               </div>
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  Google Calendar
+                  {t("settingsModule.googleCalendar")}
                   {formData.googleCalendar.enabled ? (
                     <Badge variant="outline" className="text-green-600 border-green-600">
                       <Check className="w-3 h-3 mr-1" />
-                      Połączony
+                      {t("settingsModule.connected")}
                     </Badge>
                   ) : (
                     <Badge variant="outline" className="text-muted-foreground">
                       <X className="w-3 h-3 mr-1" />
-                      Niepołączony
+                      {t("settingsModule.notConnected")}
                     </Badge>
                   )}
                 </CardTitle>
                 <CardDescription>
-                  Synchronizuj wizyty z kalendarzem Google pracowników
+                  {t("settingsModule.gcalDescription")}
                 </CardDescription>
               </div>
             </div>
@@ -258,21 +260,20 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
           {!formData.googleCalendar.enabled ? (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Połącz Google Calendar, aby automatycznie synchronizować wizyty z kalendarzami Twoich pracowników.
-                Każdy pracownik może połączyć swój własny kalendarz Google.
+                {t("settingsModule.gcalConnectDesc")}
               </p>
               <Button onClick={handleGoogleConnect} variant="outline">
                 <Calendar className="w-4 h-4 mr-2" />
-                Połącz Google Calendar
+                {t("settingsModule.connectGcal")}
               </Button>
             </div>
           ) : (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Synchronizuj do Google</Label>
+                  <Label>{t("settingsModule.syncToGoogle")}</Label>
                   <p className="text-xs text-muted-foreground">
-                    Wizyty z Beauty Calendar będą dodawane do Google Calendar
+                    {t("settingsModule.syncToGoogleDesc")}
                   </p>
                 </div>
                 <Switch
@@ -288,9 +289,9 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
 
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Blokuj terminy z Google</Label>
+                  <Label>{t("settingsModule.blockFromGoogle")}</Label>
                   <p className="text-xs text-muted-foreground">
-                    Wydarzenia z Google Calendar będą blokować dostępność w Beauty Calendar
+                    {t("settingsModule.blockFromGoogleDesc")}
                   </p>
                 </div>
                 <Switch
@@ -305,7 +306,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
               </div>
 
               <Button variant="destructive" size="sm" className="mt-4">
-                Rozłącz Google Calendar
+                {t("settingsModule.disconnectGcal")}
               </Button>
             </div>
           )}
@@ -320,7 +321,7 @@ export function IntegrationSettings({ settings, isLoading, isSaving, onSave }: I
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {isSaving ? "Zapisywanie..." : "Zapisz zmiany"}
+          {isSaving ? t("settingsModule.saving") : t("settingsModule.saveChanges")}
         </Button>
       </div>
     </div>

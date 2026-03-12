@@ -29,16 +29,16 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
   const navigate = useNavigate();
 
   type NavItem = { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number };
-  const allSections: { title: string; items: NavItem[] }[] = [
+  const allSections: { titleKey: string; items: NavItem[] }[] = [
     {
-      title: "Codzienna praca",
+      titleKey: "sidebar.dailyWork",
       items: [
         { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
         { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
       ],
     },
     {
-      title: "Klienci",
+      titleKey: "sidebar.clients",
       items: [
         { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
         { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
@@ -46,7 +46,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       ],
     },
     {
-      title: "Marketing & Wzrost",
+      titleKey: "sidebar.marketingGrowth",
       items: [
         { icon: Radar, labelKey: "admin.retention", tab: "retention" },
         { icon: Heart, labelKey: "admin.referral", tab: "referral" },
@@ -56,7 +56,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       ],
     },
     {
-      title: "Zarządzanie",
+      titleKey: "sidebar.management",
       items: [
         { icon: Scissors, labelKey: "admin.services", tab: "services" },
         { icon: Users, labelKey: "admin.staff", tab: "staff" },
@@ -65,14 +65,14 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       ],
     },
     {
-      title: "Finanse",
+      titleKey: "sidebar.finance",
       items: [
         { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
         { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
       ],
     },
     {
-      title: "System",
+      titleKey: "sidebar.system",
       items: [
         { icon: Settings, labelKey: "admin.settings", tab: "settings" },
         { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
@@ -94,7 +94,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    toast.success("Wylogowano pomyślnie");
+    toast.success(t("sidebar.logoutSuccess"));
     navigate("/auth");
   };
 
@@ -109,7 +109,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
           <div>
             <p className="font-serif font-semibold truncate">{displayName}</p>
             <p className="text-xs text-muted-foreground">
-              {userRole === "staff" ? "Pracownik" : userRole === "salon_owner" ? "Właścicielka" : t("admin.profile")}
+              {userRole === "staff" ? t("sidebar.employee") : userRole === "salon_owner" ? t("sidebar.owner") : t("admin.profile")}
             </p>
           </div>
         </Link>
@@ -118,9 +118,9 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
         {visibleSections.map((section) => (
-          <div key={section.title}>
+          <div key={section.titleKey}>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-1">
-              {section.title}
+              {t(section.titleKey)}
             </p>
             <ul className="space-y-1">
               {section.items.map((item) => (
@@ -171,7 +171,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
           <div className="flex-1 min-w-0">
             <p className="font-medium truncate text-sm">{displayName}</p>
             <p className="text-xs text-muted-foreground truncate">
-              {userRole === "staff" ? "Pracownik" : "Administrator"}
+              {userRole === "staff" ? t("sidebar.employee") : t("sidebar.administrator")}
             </p>
           </div>
         </div>
