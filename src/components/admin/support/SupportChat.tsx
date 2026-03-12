@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Bot, Send, Trash2, Loader2, Sparkles } from "lucide-react";
 import { SupportMessage } from "./SupportMessage";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
