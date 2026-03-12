@@ -79,10 +79,18 @@ export interface IntegrationSettings {
   };
 }
 
+export interface AutomationSettings {
+  defaultVatRate: number;
+  timezone: string;
+  gdprConsentText: string;
+  dataRetentionYears: number;
+}
+
 export interface SalonSettings {
   booking: BookingSettings;
   notifications: NotificationSettings;
   integrations: IntegrationSettings;
+  automation: AutomationSettings;
 }
 
 const defaultPrepaymentSettings: PrepaymentSettings = {
@@ -170,12 +178,20 @@ const defaultIntegrationSettings: IntegrationSettings = {
   },
 };
 
+const defaultAutomationSettings: AutomationSettings = {
+  defaultVatRate: 23,
+  timezone: "Europe/Warsaw",
+  gdprConsentText: "Wyrażam zgodę na przetwarzanie moich danych osobowych w celu realizacji usług oraz komunikacji marketingowej.",
+  dataRetentionYears: 3,
+};
+
 export function useSalonSettings() {
   const [profile, setProfile] = useState<SalonProfile | null>(null);
   const [settings, setSettings] = useState<SalonSettings>({
     booking: defaultBookingSettings,
     notifications: defaultNotificationSettings,
     integrations: defaultIntegrationSettings,
+    automation: defaultAutomationSettings,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -214,6 +230,7 @@ export function useSalonSettings() {
             booking: { ...defaultBookingSettings, ...(savedSettings.booking || {}) },
             notifications: { ...defaultNotificationSettings, ...(savedSettings.notifications || {}) },
             integrations: { ...defaultIntegrationSettings, ...(savedSettings.integrations || {}) },
+            automation: { ...defaultAutomationSettings, ...(savedSettings.automation || {}) },
           });
         }
       }
@@ -276,7 +293,7 @@ export function useSalonSettings() {
 
   const updateSettings = async (
     section: keyof SalonSettings,
-    updates: Partial<BookingSettings | NotificationSettings | IntegrationSettings>
+    updates: Partial<BookingSettings | NotificationSettings | IntegrationSettings | AutomationSettings>
   ) => {
     if (!profile?.id) return false;
 

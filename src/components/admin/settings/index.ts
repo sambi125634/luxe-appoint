@@ -3,4 +3,5 @@ export { SalonProfileSettings } from "./SalonProfileSettings";
 export { BookingSettingsPanel } from "./BookingSettingsPanel";
 export { NotificationSettings } from "./NotificationSettings";
 export { IntegrationSettings } from "./IntegrationSettings";
+export { AutomationSettings } from "./AutomationSettings";
 export * from "./types";
