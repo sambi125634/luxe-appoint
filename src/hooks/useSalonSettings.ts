@@ -230,6 +230,7 @@ export function useSalonSettings() {
             booking: { ...defaultBookingSettings, ...(savedSettings.booking || {}) },
             notifications: { ...defaultNotificationSettings, ...(savedSettings.notifications || {}) },
             integrations: { ...defaultIntegrationSettings, ...(savedSettings.integrations || {}) },
+            automation: { ...defaultAutomationSettings, ...(savedSettings.automation || {}) },
           });
         }
       }
