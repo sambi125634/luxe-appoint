@@ -341,7 +341,10 @@
     "logout": "Logout",
     "profile": "Salon profile",
     "loading": "Loading...",
-    "stats": "Statistics"
+    "stats": "Statistics",
+    "trueProfit": "True Profit",
+    "consultation": "Consultations",
+    "retention": "Retention"
   },
   "settings": {
     "salonProfile": "Salon profile",
@@ -1178,10 +1181,6 @@
       "settings": "How to change salon logo?",
       "reports": "How to generate a report?"
     }
-  },
-  "admin": {
-    "trueProfit": "True Profit",
-    "consultation": "Consultations"
   },
   "consultation": {
     "title": "Consultation Cards & Voice Notes",

@@ -1,45 +1,101 @@
 
 
-# Plan: Naprawa panelu admina — brakujące tłumaczenia i przegląd modułów
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Znaleziony krytyczny bug
+### Co już mamy
 
-W plikach `pl.json` i `en.json` klucz `"admin"` jest **zduplikowany** — pojawia się na linii ~330 (z pełną listą 18 tłumaczeń) i ponownie na linii ~1292 (z tylko 2 kluczami: `trueProfit`, `consultation`). W JSON ostatni klucz wygrywa, więc **cały blok tłumaczeń sidebara jest nadpisywany** i pozostają tylko 2 wpisy.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-To powoduje, że `t("admin.dashboard")` zwraca fallback `"admin.dashboard"` zamiast `"Dashboard"`, a etykiety w sidebarze wyświetlają się jako surowe klucze lub są puste.
+### Problem do rozwiązania
 
-## Plan napraw (4 kroki)
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-### Krok 1: Naprawić duplikat klucza `"admin"` w pl.json i en.json
-- Przenieść `trueProfit` i `consultation` do pierwszego bloku `"admin"` (linia ~330)
-- Usunąć drugi blok `"admin"` (linia ~1292)
-- Wynik: sidebar wyświetla poprawne polskie/angielskie nazwy zakładek
+---
 
-### Krok 2: Przegląd każdego modułu w trybie produkcyjnym (bez `isDemo`)
-Moduły, które wymagają weryfikacji poprawnego zachowania w produkcji (empty state lub real data):
-- **Pipeline** — empty state z komunikatem konfiguracji (OK, działa)
-- **Retention** — hookuje się do Supabase, puste dane → powinien wyświetlić KPI z zerami
-- **Pixel** — bez `isDemo` pokazuje setup wizard (OK)
-- **True Profit** — wyświetla szacunkowe dane z ostrzeżeniem (OK)
-- **Consultation** — korzysta z tłumaczeń z klucza `consultation` (OK po naprawie admin)
-- **Referral** — bez `isDemo` wyświetla zera (OK)
-- **Inventory** — sprawdzić czy ma poprawny empty state
-- **Products, Accounting, Conversations, Stats, Support** — zweryfikować brak crashy
+### Plan implementacji
 
-### Krok 3: Weryfikacja, że AdminDashboard renderuje wszystkie 20 modułów
-- Sidebar: 20 elementów w `allNavItems` — potwierdzone identyczne z demo
-- `renderContent()` — potwierdzone, pokrywa wszystkie 20 tabów
-- Filtr staff — ukrywa 5 tabów tylko dla roli `staff`
+#### FAZA 1: Role-based routing po loginie
 
-### Krok 4: Test end-to-end
-- Po naprawie tłumaczeń zweryfikować sidebar w podglądzie na zalogowanym koncie
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-## Zakres zmian
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-| Plik | Zmiana |
-|------|--------|
-| `src/i18n/locales/pl.json` | Scalenie duplikatu `admin` — dodanie `trueProfit`, `consultation` do głównego bloku, usunięcie zdublowanego |
-| `src/i18n/locales/en.json` | Identyczna naprawa |
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-Zmiana dotyczy wyłącznie 2 plików tłumaczeń. Żaden komponent nie wymaga modyfikacji — sidebar i moduły są już poprawnie zaimplementowane.
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+
+#### FAZA 3: Indywidualne kokpity
+
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
