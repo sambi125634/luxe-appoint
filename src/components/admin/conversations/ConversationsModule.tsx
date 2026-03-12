@@ -75,7 +75,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
   "1": [
     {
       id: "m1",
-      ghlMessageId: "ghl_msg_001",
+      externalMessageId: "ext_msg_001",
       direction: "inbound",
       type: "SMS",
       body: "Dzień dobry! Chciałabym potwierdzić wizytę na jutro o 14:00 na manicure hybrydowy.",
