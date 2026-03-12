@@ -1,23 +1,16 @@
 import { useMemo } from "react";
-import { format, subMonths, startOfMonth, parseISO, eachDayOfInterval } from "date-fns";
+import { format, subMonths, startOfMonth, parseISO, eachDayOfInterval, getDay } from "date-fns";
 import { pl } from "date-fns/locale";
-import { TrendingUp, TrendingDown, Minus, BarChart3, Receipt, ShoppingCart, Heart, Clock, Users, Star } from "lucide-react";
 import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
+  TrendingUp, TrendingDown, BarChart3, Receipt, ShoppingCart, Heart,
+  Clock, Users, Star, Percent, AlertTriangle, Scissors, Package
+} from "lucide-react";
+import {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Transaction } from "./types";
 
 interface AccountingChartsProps {
@@ -49,6 +42,8 @@ const CHART_COLORS = [
   "hsl(var(--chart-5))",
 ];
 
+const DAY_NAMES = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
+
 const tooltipStyle = {
   backgroundColor: "hsl(var(--card))",
   border: "1px solid hsl(var(--border))",
@@ -71,6 +66,11 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
     [transactions]
   );
 
+  const cancelledTransactions = useMemo(
+    () => transactions.filter((t) => t.status === "anulowane"),
+    [transactions]
+  );
+
   // === KPI calculations ===
   const totalRevenue = useMemo(
     () => paidTransactions.reduce((s, t) => s + t.grossAmount, 0),
@@ -82,6 +82,33 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
   const totalTips = useMemo(
     () => paidTransactions.reduce((s, t) => s + t.tipAmount, 0),
     [paidTransactions]
+  );
+  const totalDiscounts = useMemo(
+    () => paidTransactions.reduce((s, t) => s + t.discountAmount, 0),
+    [paidTransactions]
+  );
+
+  const servicesRevenue = useMemo(
+    () => paidTransactions.filter((t) => t.itemType === "usługa").reduce((s, t) => s + t.grossAmount, 0),
+    [paidTransactions]
+  );
+  const productsRevenue = useMemo(
+    () => paidTransactions.filter((t) => t.itemType === "produkt").reduce((s, t) => s + t.grossAmount, 0),
+    [paidTransactions]
+  );
+  const servicesPct = totalRevenue > 0 ? ((servicesRevenue / totalRevenue) * 100).toFixed(0) : "0";
+  const productsPct = totalRevenue > 0 ? ((productsRevenue / totalRevenue) * 100).toFixed(0) : "0";
+
+  const uniqueStaffCount = useMemo(() => {
+    const staffIds = new Set(paidTransactions.map((t) => t.staffId).filter(Boolean));
+    return Math.max(staffIds.size, 1);
+  }, [paidTransactions]);
+  const avgPerStaff = totalRevenue / uniqueStaffCount;
+
+  const cancelledCount = cancelledTransactions.length;
+  const cancelledValue = useMemo(
+    () => cancelledTransactions.reduce((s, t) => s + t.grossAmount, 0),
+    [cancelledTransactions]
   );
 
   // === Daily sales trend ===
@@ -157,13 +184,34 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
 
   // === Revenue by staff ===
   const staffRevenue = useMemo(() => {
-    const totals: Record<string, { name: string; total: number }> = {};
+    const totals: Record<string, { name: string; total: number; txCount: number }> = {};
     paidTransactions.forEach((t) => {
       const name = t.staffName || "Nieprzypisany";
-      if (!totals[name]) totals[name] = { name, total: 0 };
+      if (!totals[name]) totals[name] = { name, total: 0, txCount: 0 };
       totals[name].total += t.grossAmount;
+      totals[name].txCount += 1;
     });
     return Object.values(totals).sort((a, b) => b.total - a.total);
+  }, [paidTransactions]);
+
+  // === Staff productivity (revenue per hour — estimated 8h workday) ===
+  const staffProductivity = useMemo(() => {
+    const staffDays: Record<string, Set<string>> = {};
+    const staffTotals: Record<string, number> = {};
+    paidTransactions.forEach((t) => {
+      const name = t.staffName || "Nieprzypisany";
+      if (!staffDays[name]) staffDays[name] = new Set();
+      if (!staffTotals[name]) staffTotals[name] = 0;
+      staffDays[name].add(t.dateTime.split("T")[0]);
+      staffTotals[name] += t.grossAmount;
+    });
+    return Object.entries(staffTotals)
+      .map(([name, total]) => ({
+        name,
+        perHour: Math.round(total / Math.max(staffDays[name].size * 8, 1)),
+        total,
+      }))
+      .sort((a, b) => b.perHour - a.perHour);
   }, [paidTransactions]);
 
   // === Hourly distribution ===
@@ -180,11 +228,93 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
     return Object.entries(hours).map(([h, total]) => ({ hour: `${h}:00`, total }));
   }, [paidTransactions]);
 
+  // === Day of week distribution ===
+  const dayOfWeekData = useMemo(() => {
+    const days: Record<number, number> = {};
+    for (let d = 0; d < 7; d++) days[d] = 0;
+    paidTransactions.forEach((t) => {
+      const dayIndex = getDay(parseISO(t.dateTime));
+      days[dayIndex] += t.grossAmount;
+    });
+    // Reorder: Mon-Sun
+    return [1, 2, 3, 4, 5, 6, 0].map((d) => ({
+      day: DAY_NAMES[d],
+      total: days[d],
+    }));
+  }, [paidTransactions]);
+
+  // === Discount analysis (donut) ===
+  const discountAnalysis = useMemo(() => {
+    let fullPrice = 0;
+    let discounted = 0;
+    let voucherPaid = 0;
+    paidTransactions.forEach((t) => {
+      if (t.paymentMethod === "voucher") {
+        voucherPaid += t.grossAmount;
+      } else if (t.discountAmount > 0) {
+        discounted += t.grossAmount;
+      } else {
+        fullPrice += t.grossAmount;
+      }
+    });
+    return [
+      { name: "Pełna cena", value: fullPrice, color: "hsl(var(--chart-3))" },
+      { name: "Z rabatem", value: discounted, color: "hsl(var(--chart-4))" },
+      { name: "Voucher", value: voucherPaid, color: "hsl(var(--chart-5))" },
+    ].filter((d) => d.value > 0);
+  }, [paidTransactions]);
+
+  // === New vs Returning clients trend ===
+  const clientRetentionTrend = useMemo(() => {
+    const days = eachDayOfInterval({ start: dateRange.from, end: dateRange.to });
+    const seenClients = new Set<string>();
+    return days.map((day) => {
+      const dayStr = format(day, "yyyy-MM-dd");
+      const dayTx = paidTransactions.filter((t) => t.dateTime.split("T")[0] === dayStr);
+      let newClients = 0;
+      let returning = 0;
+      dayTx.forEach((t) => {
+        if (t.clientId) {
+          if (seenClients.has(t.clientId)) {
+            returning++;
+          } else {
+            newClients++;
+            seenClients.add(t.clientId);
+          }
+        }
+      });
+      return { date: format(day, "dd.MM", { locale: pl }), nowi: newClients, powracający: returning };
+    });
+  }, [paidTransactions, dateRange]);
+
+  // === VAT summary table ===
+  const vatSummary = useMemo(() => {
+    const rates: Record<number, { net: number; vat: number; gross: number; count: number }> = {};
+    paidTransactions.forEach((t) => {
+      if (!rates[t.vatRate]) rates[t.vatRate] = { net: 0, vat: 0, gross: 0, count: 0 };
+      rates[t.vatRate].net += t.netAmount;
+      rates[t.vatRate].vat += t.vatAmount;
+      rates[t.vatRate].gross += t.grossAmount;
+      rates[t.vatRate].count += 1;
+    });
+    return Object.entries(rates)
+      .map(([rate, data]) => ({ rate: Number(rate), ...data }))
+      .sort((a, b) => a.rate - b.rate);
+  }, [paidTransactions]);
+
+  const vatTotals = useMemo(
+    () => vatSummary.reduce(
+      (acc, r) => ({ net: acc.net + r.net, vat: acc.vat + r.vat, gross: acc.gross + r.gross, count: acc.count + r.count }),
+      { net: 0, vat: 0, gross: 0, count: 0 }
+    ),
+    [vatSummary]
+  );
+
   const dailyAvg = totalRevenue / Math.max(dailySalesData.length, 1);
 
   return (
     <div className="space-y-6">
-      {/* 6 KPI cards */}
+      {/* ROW 1 KPI — 6 cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <KPICard
           icon={<TrendingUp className="w-4 h-4" />}
@@ -226,6 +356,42 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
           label="Napiwki"
           value={formatCurrency(totalTips)}
           sub="w wybranym okresie"
+        />
+      </div>
+
+      {/* ROW 2 KPI — 4 cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <KPICard
+          icon={<Percent className="w-4 h-4" />}
+          label="Rabaty łącznie"
+          value={formatCurrency(totalDiscounts)}
+          sub="utracony przychód"
+        />
+        <KPICard
+          icon={<Scissors className="w-4 h-4" />}
+          label="Usługi / Produkty"
+          value={`${servicesPct}% / ${productsPct}%`}
+          sub={
+            <span className="text-muted-foreground">
+              {formatCurrency(servicesRevenue)} / {formatCurrency(productsRevenue)}
+            </span>
+          }
+        />
+        <KPICard
+          icon={<Users className="w-4 h-4" />}
+          label="Śr. na pracownika"
+          value={formatCurrency(avgPerStaff)}
+          sub={`${uniqueStaffCount} pracowników`}
+        />
+        <KPICard
+          icon={<AlertTriangle className="w-4 h-4" />}
+          label="Anulowane"
+          value={cancelledCount.toString()}
+          sub={
+            <span className="text-red-500">
+              {formatCurrency(cancelledValue)} stracone
+            </span>
+          }
         />
       </div>
 
@@ -358,6 +524,54 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
           </CardContent>
         </Card>
 
+        {/* Discount Analysis Donut */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Percent className="w-5 h-5" />
+              Analiza rabatów
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={discountAnalysis} cx="50%" cy="50%" innerRadius={55} outerRadius={95} paddingAngle={3} dataKey="value">
+                    {discountAnalysis.map((entry, i) => (
+                      <Cell key={i} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Staff Productivity (per hour) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="w-5 h-5" />
+              Produktywność pracowników (zł/h)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[280px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={staffProductivity} layout="vertical">
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis type="number" tickFormatter={(v) => `${v} zł/h`} tick={tickStyle} />
+                  <YAxis type="category" dataKey="name" width={100} tick={tickStyle} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => `${value} zł/h`} />
+                  <Bar dataKey="perHour" name="Przychód/h" fill="hsl(var(--chart-2))" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Hourly Distribution — full width */}
         <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
@@ -381,6 +595,70 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
           </CardContent>
         </Card>
 
+        {/* Day of Week — full width */}
+        <Card className="col-span-1 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="w-5 h-5" />
+              Przychód wg dnia tygodnia
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={dayOfWeekData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="day" tick={tickStyle} />
+                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
+                  <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
+                  <Bar dataKey="total" name="Przychód" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]}>
+                    {dayOfWeekData.map((entry, i) => {
+                      const max = Math.max(...dayOfWeekData.map((d) => d.total));
+                      const opacity = max > 0 ? 0.4 + (entry.total / max) * 0.6 : 0.5;
+                      return <Cell key={i} fill="hsl(var(--primary))" fillOpacity={opacity} />;
+                    })}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* New vs Returning Clients — full width */}
+        <Card className="col-span-1 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Klienci nowi vs powracający
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={clientRetentionTrend}>
+                  <defs>
+                    <linearGradient id="colorNowi" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--chart-3))" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorPowracajacy" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--chart-4))" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="date" tick={tickStyle} />
+                  <YAxis tick={tickStyle} />
+                  <Tooltip contentStyle={tooltipStyle} />
+                  <Legend />
+                  <Area type="monotone" dataKey="nowi" name="Nowi klienci" stroke="hsl(var(--chart-3))" fillOpacity={1} fill="url(#colorNowi)" stackId="1" />
+                  <Area type="monotone" dataKey="powracający" name="Powracający" stroke="hsl(var(--chart-4))" fillOpacity={1} fill="url(#colorPowracajacy)" stackId="1" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Monthly Comparison — 4 months stacked */}
         <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
@@ -395,10 +673,53 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
                   <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
                   <Legend />
-                  <Bar dataKey="usługi" name="Usługi" stackId="a" fill="hsl(var(--primary))" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="usługi" name="Usługi" stackId="a" fill="hsl(var(--primary))" />
                   <Bar dataKey="produkty" name="Produkty" stackId="a" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* VAT Summary Table — full width */}
+        <Card className="col-span-1 lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Package className="w-5 h-5" />
+              Podsumowanie VAT
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Stawka VAT</TableHead>
+                    <TableHead className="text-right">Liczba transakcji</TableHead>
+                    <TableHead className="text-right">Netto</TableHead>
+                    <TableHead className="text-right">VAT</TableHead>
+                    <TableHead className="text-right">Brutto</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {vatSummary.map((row) => (
+                    <TableRow key={row.rate}>
+                      <TableCell className="font-medium">{row.rate}%</TableCell>
+                      <TableCell className="text-right">{row.count}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(row.net)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(row.vat)}</TableCell>
+                      <TableCell className="text-right">{formatCurrency(row.gross)}</TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow className="font-bold border-t-2">
+                    <TableCell>RAZEM</TableCell>
+                    <TableCell className="text-right">{vatTotals.count}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(vatTotals.net)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(vatTotals.vat)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(vatTotals.gross)}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
