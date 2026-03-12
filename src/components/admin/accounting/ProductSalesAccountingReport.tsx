@@ -98,7 +98,7 @@ const mockProductSales = [
   },
   {
     id: "ps3",
-    date: "2024-01-14",
+    date: ddAgo(1),
     productId: "p3",
     productName: "Olejek do masażu",
     category: "Akcesoria",
