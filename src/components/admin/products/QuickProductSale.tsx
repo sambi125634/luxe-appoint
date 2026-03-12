@@ -214,7 +214,12 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
           {/* Product Selection */}
           <ProductSaleSection cart={cart} onCartChange={setCart} salonId={salonId ?? undefined} />
 
-          {cart.length > 0 && (
+          <Separator />
+
+          {/* Service Selection */}
+          <ServiceSaleSection cart={serviceCart} onCartChange={setServiceCart} />
+
+          {hasItems && (
             <>
               <Separator />
 
@@ -264,7 +269,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{t("products.totalToPay")}</span>
                   <span className="text-2xl font-bold text-primary">
-                    {cartTotal.toLocaleString()} zł
+                    {grandTotal.toLocaleString()} zł
                   </span>
                 </div>
               </div>
@@ -276,7 +281,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel")}
           </Button>
-          <Button onClick={handleComplete} disabled={cart.length === 0} className="gap-2">
+          <Button onClick={handleComplete} disabled={!hasItems} className="gap-2">
             <Receipt className="w-4 h-4" />
             {t("products.completeSale")}
           </Button>
