@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Building2, MapPin, Phone, Mail, Palette, Upload, Save, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,7 @@ interface SalonProfileSettingsProps {
 }
 
 export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: SalonProfileSettingsProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState<Partial<SalonProfile>>({
     name: "",
     description: "",
@@ -59,7 +61,7 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
     return (
       <Card>
         <CardContent className="py-12 text-center text-muted-foreground">
-          <p>Nie znaleziono salonu. Skontaktuj się z administratorem.</p>
+          <p>{t("settingsModule.salonNotFound")}</p>
         </CardContent>
       </Card>
     );
@@ -72,36 +74,36 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Building2 className="w-5 h-5 text-primary" />
-            Informacje o salonie
+            {t("settingsModule.salonInfo")}
           </CardTitle>
           <CardDescription>
-            Podstawowe dane Twojego salonu wyświetlane klientom
+            {t("settingsModule.salonInfoDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="name">Nazwa salonu</Label>
+              <Label htmlFor="name">{t("settingsModule.salonName")}</Label>
               <Input
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nazwa Twojego salonu"
+                placeholder={t("settingsModule.salonNamePlaceholder")}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city">Miasto</Label>
+              <Label htmlFor="city">{t("settingsModule.city")}</Label>
               <Input
                 id="city"
                 value={formData.city || ""}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                placeholder="Miasto"
+                placeholder={t("settingsModule.cityPlaceholder")}
               />
             </div>
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="address">Adres</Label>
+            <Label htmlFor="address">{t("settingsModule.address")}</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
               <Input
@@ -109,18 +111,18 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
                 value={formData.address || ""}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                 className="pl-10"
-                placeholder="ul. Przykładowa 1/2"
+                placeholder={t("settingsModule.addressPlaceholder")}
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Opis salonu</Label>
+            <Label htmlFor="description">{t("settingsModule.salonDescription")}</Label>
             <Textarea
               id="description"
               value={formData.description || ""}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Krótki opis Twojego salonu..."
+              placeholder={t("settingsModule.salonDescriptionPlaceholder")}
               rows={3}
             />
           </div>
@@ -132,16 +134,16 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Phone className="w-5 h-5 text-primary" />
-            Dane kontaktowe
+            {t("settingsModule.contactInfo")}
           </CardTitle>
           <CardDescription>
-            Informacje kontaktowe dla klientów
+            {t("settingsModule.contactInfoDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="phone">Telefon</Label>
+              <Label htmlFor="phone">{t("settingsModule.phone")}</Label>
               <div className="relative">
                 <Phone className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -149,12 +151,12 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
                   value={formData.phone || ""}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="pl-10"
-                  placeholder="+48 500 000 000"
+                  placeholder={t("settingsModule.phonePlaceholder")}
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("settingsModule.email")}</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
                 <Input
@@ -163,7 +165,7 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
                   value={formData.email || ""}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="pl-10"
-                  placeholder="kontakt@salon.pl"
+                  placeholder={t("settingsModule.emailPlaceholder")}
                 />
               </div>
             </div>
@@ -176,15 +178,15 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="w-5 h-5 text-primary" />
-            Branding i wygląd
+            {t("settingsModule.brandingAndAppearance")}
           </CardTitle>
           <CardDescription>
-            Dostosuj wygląd widgetu rezerwacji do swojej marki
+            {t("settingsModule.brandingDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Logo salonu</Label>
+            <Label>{t("settingsModule.salonLogo")}</Label>
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50">
                 {formData.logoUrl ? (
@@ -196,16 +198,16 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
               <div className="space-y-2">
                 <Button variant="outline" size="sm" disabled>
                   <Upload className="w-4 h-4 mr-2" />
-                  Wybierz plik
+                  {t("settingsModule.selectFile")}
                 </Button>
-                <p className="text-xs text-muted-foreground">PNG, JPG do 2MB (wkrótce)</p>
+                <p className="text-xs text-muted-foreground">{t("settingsModule.fileFormat")}</p>
               </div>
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="primaryColor">Kolor główny</Label>
+              <Label htmlFor="primaryColor">{t("settingsModule.primaryColor")}</Label>
               <div className="flex gap-2">
                 <Input
                   type="color"
@@ -222,7 +224,7 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="secondaryColor">Kolor dodatkowy</Label>
+              <Label htmlFor="secondaryColor">{t("settingsModule.secondaryColor")}</Label>
               <div className="flex gap-2">
                 <Input
                   type="color"
@@ -243,7 +245,7 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
           <div className="p-4 rounded-lg border" style={{ 
             background: `linear-gradient(135deg, ${formData.themePrimaryColor}15, ${formData.themeSecondaryColor}15)` 
           }}>
-            <p className="text-sm text-muted-foreground mb-2">Podgląd kolorów:</p>
+            <p className="text-sm text-muted-foreground mb-2">{t("settingsModule.colorPreview")}</p>
             <div className="flex gap-2">
               <div 
                 className="w-8 h-8 rounded-full" 
@@ -265,7 +267,7 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {isSaving ? "Zapisywanie..." : "Zapisz zmiany"}
+          {isSaving ? t("settingsModule.saving") : t("settingsModule.saveChanges")}
         </Button>
       </div>
     </div>

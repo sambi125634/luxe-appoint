@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Building2, Calendar, Bell, Plug, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
@@ -29,17 +30,18 @@ const demoProfile = {
 };
 
 export function SettingsModule({ isDemo = false, onNavigateToModule }: SettingsModuleProps) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
   const { profile: realProfile, settings, isLoading: realLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
   const profile = isDemo ? demoProfile : realProfile;
   const isLoading = isDemo ? false : realLoading;
 
   const tabs = [
-    { id: "profile" as const, label: "Profil salonu", icon: Building2 },
-    { id: "booking" as const, label: "Rezerwacje", icon: Calendar },
-    { id: "notifications" as const, label: "Powiadomienia", icon: Bell },
-    { id: "integrations" as const, label: "Integracje", icon: Plug },
-    { id: "automation" as const, label: "Automatyzacja", icon: Zap },
+    { id: "profile" as const, label: t("settingsModule.salonProfile"), icon: Building2 },
+    { id: "booking" as const, label: t("settingsModule.booking"), icon: Calendar },
+    { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell },
+    { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
+    { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
   ];
 
   return (
