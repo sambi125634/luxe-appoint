@@ -133,7 +133,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m7",
-      ghlMessageId: "ghl_msg_007",
+      externalMessageId: "ext_msg_007",
       direction: "outbound",
       type: "SMS",
       body: "Dzień dobry! Mamy wolne terminy: czwartek 15:00, piątek 11:00 i 16:00, sobota 10:00. Który Pani odpowiada?",
