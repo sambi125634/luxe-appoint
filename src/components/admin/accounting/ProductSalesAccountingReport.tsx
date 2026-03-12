@@ -121,7 +121,7 @@ const mockProductSales = [
   },
   {
     id: "ps4",
-    date: "2024-01-14",
+    date: ddAgo(1),
     productId: "p4",
     productName: "Maska do włosów",
     category: "Pielęgnacja włosów",
