@@ -1,101 +1,73 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Rozbudowa modułu Usługi — pełna funkcjonalność i prezentacja premium
 
-### Co już mamy
+## Diagnoza obecnego stanu
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Po przeanalizowaniu kodu `ServicesManagement.tsx`, `ServiceMediaUpload.tsx`, `useServices.ts` i schematu bazy danych, zidentyfikowałem następujące problemy i braki:
 
-### Problem do rozwiązania
+### Problemy funkcjonalne
+| Problem | Opis |
+|---------|------|
+| **Benefits nie zapisywane** | Pole `benefits` istnieje w DB i hookach, ale brak go w formularzu edycji usługi |
+| **Staff nie linkowany** | `staffIds` w formie, ale `saveService` nie zapisuje do tabeli `staff_services` |
+| **Media jako base64** | Pliki zapisywane jako data URL zamiast uploadu do Supabase Storage — duże payloady, brak trwałości |
+| **Brak potwierdzenia usuwania** | Kliknięcie "Trash" natychmiast usuwa usługę bez AlertDialog |
+| **Brak usuwania kategorii** | Nie ma opcji usunięcia kategorii |
+| **Brak VAT w formie** | Pole `vat_rate` w DB, niewidoczne w edycji |
+| **Brak widoku showcase** | Memory mówi o grid/list toggle, ale nie ma go w obecnym kodzie |
+| **Demo bez mediów** | Demo usługi mają puste `media: []` — brak wizualnego efektu |
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### Braki UX
+- Brak walidacji formularza (można zapisać pustą nazwę)
+- Brak informacji zwrotnej o powodzeniu zapisu
+- Brak podglądu "jak to zobaczy klient" w panelu admina
+- Formularz jest jednym długim scrollem bez organizacji
 
----
+## Proponowane zmiany
 
-### Plan implementacji
+### 1. Formularz usługi — dodać brakujące pola
+- **Benefits**: Tagi z inputem (jak specjalizacje w Staff) — "Dodaj korzyść" + Enter
+- **VAT rate**: Select z opcjami 0% / 8% / 23% (domyślnie 23%)
+- **Walidacja**: Wymagane: nazwa, czas trwania > 0, cena >= 0. Przycisk "Zapisz" nieaktywny gdy brakuje
 
-#### FAZA 1: Role-based routing po loginie
+### 2. Staff linkowanie (staff_services)
+- Przy zapisie usługi: sync `staff_services` — usunąć istniejące wpisy dla tej usługi, dodać nowe na podstawie zaznaczonych pracowników
+- W `useServices` dodać mutację `syncStaffServices`
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 3. Media upload do Supabase Storage
+- Zamiast base64 → upload do `salon-media` bucket, ścieżka `services/{serviceId}/{filename}`
+- Zapisywać w `media` jsonb: `[{id, type, url: "public_url", name}]`
+- W `ServiceMediaUpload`: po wybraniu pliku → upload → zwrócić public URL
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 4. Potwierdzenie usuwania
+- AlertDialog przed usunięciem usługi i kategorii
+- Tekst: "Czy na pewno chcesz usunąć usługę {name}? Tej operacji nie można cofnąć."
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### 5. Usuwanie kategorii
+- Dodać hook `useDeleteCategory` w `useServices.ts`
+- Przycisk "Usuń" w dialogu edycji kategorii
+- Walidacja: ostrzeżenie jeśli kategoria ma przypisane usługi
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### 6. Widok showcase (grid/list toggle)
+- Przełącznik widoku: lista (obecny) vs siatka (karty jak w booking widget)
+- Widok siatki: karty ze zdjęciem, nazwą, ceną, benefits chips — "podgląd oczami klienta"
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### 7. Demo data z mediami i benefits
+- Dodać `benefits` i `image` URLs (Unsplash) do DEMO_SERVICES
+- Demo usługi wyglądają atrakcyjnie bez konieczności uploadu
 
-#### FAZA 3: Indywidualne kokpity
+### 8. Toast po sukcesie
+- Po zapisie usługi/kategorii: toast "Usługa zapisana"
+- Po usunięciu: toast "Usługa usunięta"
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+## Pliki do zmiany
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+| Plik | Zmiana |
+|------|--------|
+| `src/components/admin/ServicesManagement.tsx` | Benefits input, VAT select, walidacja, delete confirmation, showcase toggle, demo data, staff sync, toast feedback |
+| `src/components/admin/ServiceMediaUpload.tsx` | Upload do Supabase Storage zamiast base64 |
+| `src/hooks/useServices.ts` | Dodać `useDeleteCategory`, `useSyncStaffServices` |
 
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+Brak zmian w bazie danych — wszystkie potrzebne kolumny (`benefits`, `vat_rate`, `media`) i tabele (`staff_services`) już istnieją.
 
