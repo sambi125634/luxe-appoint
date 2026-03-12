@@ -465,13 +465,13 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
   // Intro screen with Sakura animation
   if (currentStepId === "intro") {
     return (
-      <div className="relative min-h-[100dvh] w-full overflow-hidden">
+      <div className="relative min-h-[100dvh] max-h-[100dvh] w-full overflow-hidden">
         <SakuraBackground />
         
-        <div className="relative z-20 min-h-[100dvh] flex flex-col items-center justify-center px-4 py-8">
+        <div className="relative z-20 h-[100dvh] flex flex-col items-center justify-center px-4 py-4">
           <div className="w-full max-w-md mx-auto">
             <div 
-              className="flex justify-center mb-6 animate-fade-in"
+              className="flex justify-center mb-4 animate-fade-in"
               style={{ animationDelay: '0.2s' }}
             >
               <Badge 
@@ -484,7 +484,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="flex justify-center mb-8 animate-fade-in"
+              className="flex justify-center mb-6 animate-fade-in"
               style={{ animationDelay: '0.4s' }}
             >
               <div className="relative">
@@ -496,7 +496,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="text-center mb-8 animate-fade-in"
+              className="text-center mb-6 animate-fade-in"
               style={{ animationDelay: '0.6s' }}
             >
               <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-gray-900 via-pink-900 to-violet-900 dark:from-white dark:via-pink-100 dark:to-violet-100 bg-clip-text text-transparent leading-tight">
@@ -508,7 +508,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="flex justify-center gap-8 mb-10 animate-fade-in"
+              className="flex justify-center gap-8 mb-8 animate-fade-in"
               style={{ animationDelay: '0.8s' }}
             >
               {[
@@ -526,7 +526,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="flex flex-col items-center gap-6 animate-fade-in"
+              className="flex flex-col items-center gap-4 animate-fade-in"
               style={{ animationDelay: '1s' }}
             >
               <div className="relative group">
@@ -535,7 +535,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
                 
                 <Button 
                   onClick={handleStartBooking}
-                  className="relative overflow-hidden px-16 py-10 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
+                  className="relative overflow-hidden px-16 py-7 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                   
@@ -558,7 +558,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="mt-12 flex justify-center gap-6 text-xs text-muted-foreground/60 animate-fade-in"
+              className="mt-8 flex justify-center gap-6 text-xs text-muted-foreground/60 animate-fade-in"
               style={{ animationDelay: '1.2s' }}
             >
               <span className="flex items-center gap-1">
