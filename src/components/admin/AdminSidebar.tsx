@@ -22,7 +22,7 @@ interface AdminSidebarProps {
 }
 
 // Tabs restricted from staff
-const OWNER_ONLY_TABS: TabType[] = ["accounting", "pipeline", "settings", "widgets", "stats"];
+const OWNER_ONLY_TABS: TabType[] = ["accounting", "pipeline", "settings", "widgets"];
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
   const { t } = useTranslation();
