@@ -11,7 +11,7 @@ interface RetentionKPIProps {
 export function RetentionKPI({ data }: RetentionKPIProps) {
   const { t } = useTranslation();
   const cards = [
-    { label: t('retention.messagesSent'), value: data.messages_sent, icon: Send, suffix: "", color: "text-blue-600" },
+    { label: t('retention.sentReactivations'), value: data.messages_sent, icon: Send, suffix: "", color: "text-blue-600" },
     { label: t('retention.openRate'), value: data.open_rate, icon: Eye, suffix: "%", color: "text-green-600" },
     { label: t('retention.bookingsFromRetention'), value: data.bookings_from_retention, icon: CalendarCheck, suffix: "", color: "text-primary" },
     { label: t('retention.revenueRecovered'), value: data.revenue_recovered, icon: DollarSign, suffix: " zł", color: "text-amber-600" },

@@ -61,7 +61,7 @@ export function SequenceConfig({ sequences, onToggle, onTemplateChange, readOnly
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm">{label}</span>
                         {seq.trigger_days > 0 && (
-                          <Badge variant="outline" className="text-xs">{seq.trigger_days} {t('retention.days')}</Badge>
+                          <Badge variant="outline" className="text-xs">{seq.trigger_days} {t('retention.daysAgo')}</Badge>
                         )}
                         {seq.include_incentive && (
                           <Badge className="text-xs bg-amber-100 text-amber-800">+ incentive</Badge>
