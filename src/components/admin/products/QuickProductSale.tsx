@@ -40,6 +40,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
   const { salonId: realSalonId } = useSalonId();
   const salonId = isDemo ? DEMO_SALON_ID : realSalonId;
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [serviceCart, setServiceCart] = useState<ServiceCartItem[]>([]);
   const [clientSearch, setClientSearch] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showClientDropdown, setShowClientDropdown] = useState(false);
