@@ -18,12 +18,32 @@ interface AccountingChartsProps {
   dateRange: { from: Date; to: Date };
 }
 
+// Rich luxury palette
+const COLORS = {
+  violet: "#8B5CF6",
+  violetDark: "#6D28D9",
+  burgundy: "#BE185D",
+  burgundyLight: "#F472B6",
+  gold: "#F59E0B",
+  goldLight: "#FCD34D",
+  emerald: "#10B981",
+  emeraldLight: "#6EE7B7",
+  cyan: "#06B6D4",
+  cyanLight: "#67E8F9",
+  rose: "#E91E8C",
+  roseLight: "#F9A8D4",
+  slate: "#64748B",
+  indigo: "#6366F1",
+  indigoLight: "#A5B4FC",
+  amber: "#D97706",
+};
+
 const PAYMENT_COLORS: Record<string, string> = {
-  gotówka: "hsl(var(--chart-1))",
-  karta: "hsl(var(--chart-2))",
-  online: "hsl(var(--chart-3))",
-  voucher: "hsl(var(--chart-4))",
-  depozyt: "hsl(var(--chart-5))",
+  gotówka: COLORS.emerald,
+  karta: COLORS.violet,
+  online: COLORS.cyan,
+  voucher: COLORS.gold,
+  depozyt: COLORS.burgundy,
 };
 
 const PAYMENT_LABELS: Record<string, string> = {
@@ -34,23 +54,20 @@ const PAYMENT_LABELS: Record<string, string> = {
   depozyt: "Depozyt",
 };
 
-const CHART_COLORS = [
-  "hsl(var(--primary))",
-  "hsl(var(--chart-2))",
-  "hsl(var(--chart-3))",
-  "hsl(var(--chart-4))",
-  "hsl(var(--chart-5))",
-];
+const TOP_ITEM_COLORS = [COLORS.violet, COLORS.rose, COLORS.gold, COLORS.emerald, COLORS.cyan];
 
 const DAY_NAMES = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
 
 const tooltipStyle = {
-  backgroundColor: "hsl(var(--card))",
-  border: "1px solid hsl(var(--border))",
-  borderRadius: "8px",
+  backgroundColor: "hsla(var(--card), 0.85)",
+  border: "1px solid hsla(var(--border), 0.5)",
+  borderRadius: "12px",
+  backdropFilter: "blur(12px)",
+  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+  padding: "10px 14px",
 };
 
-const tickStyle = { fill: "hsl(var(--muted-foreground))" };
+const tickStyle = { fill: "hsl(var(--muted-foreground))", fontSize: 12 };
 
 export function AccountingCharts({ transactions, dateRange }: AccountingChartsProps) {
   const formatCurrency = (amount: number) =>
@@ -155,7 +172,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
       .map(([method, total]) => ({
         name: PAYMENT_LABELS[method] || method,
         value: total,
-        color: PAYMENT_COLORS[method] || "hsl(var(--muted))",
+        color: PAYMENT_COLORS[method] || COLORS.slate,
       }))
       .sort((a, b) => b.value - a.value);
   }, [paidTransactions]);
@@ -258,9 +275,9 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
       }
     });
     return [
-      { name: "Pełna cena", value: fullPrice, color: "hsl(var(--chart-3))" },
-      { name: "Z rabatem", value: discounted, color: "hsl(var(--chart-4))" },
-      { name: "Voucher", value: voucherPaid, color: "hsl(var(--chart-5))" },
+      { name: "Pełna cena", value: fullPrice, color: COLORS.emerald },
+      { name: "Z rabatem", value: discounted, color: COLORS.gold },
+      { name: "Voucher", value: voucherPaid, color: COLORS.violet },
     ].filter((d) => d.value > 0);
   }, [paidTransactions]);
 
@@ -312,96 +329,46 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
 
   const dailyAvg = totalRevenue / Math.max(dailySalesData.length, 1);
 
+  // KPI config for colored accents
+  const kpiRow1 = [
+    { icon: <TrendingUp className="w-4 h-4" />, label: "Przychód w okresie", value: formatCurrency(totalRevenue), sub: `${format(dateRange.from, "dd.MM")} – ${format(dateRange.to, "dd.MM.yyyy")}`, accent: COLORS.violet, highlight: true },
+    { icon: revenueChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />, label: "Bieżący miesiąc", value: formatCurrency(currentMonthRevenue), sub: <span className={revenueChange > 0 ? "text-green-500" : revenueChange < 0 ? "text-red-500" : "text-muted-foreground"}>{revenueChange > 0 ? "+" : ""}{revenueChange.toFixed(1)}% vs poprzedni</span>, accent: revenueChange >= 0 ? COLORS.emerald : "#EF4444" },
+    { icon: <BarChart3 className="w-4 h-4" />, label: "Średnia dzienna", value: formatCurrency(dailyAvg), sub: `${dailySalesData.length} dni`, accent: COLORS.cyan },
+    { icon: <Receipt className="w-4 h-4" />, label: "Transakcje", value: transactionCount.toString(), sub: "w wybranym okresie", accent: COLORS.indigo },
+    { icon: <ShoppingCart className="w-4 h-4" />, label: "Średni koszyk", value: formatCurrency(avgBasket), sub: "brutto / transakcja", accent: COLORS.gold },
+    { icon: <Heart className="w-4 h-4" />, label: "Napiwki", value: formatCurrency(totalTips), sub: "w wybranym okresie", accent: COLORS.rose },
+  ];
+
+  const kpiRow2 = [
+    { icon: <Percent className="w-4 h-4" />, label: "Rabaty łącznie", value: formatCurrency(totalDiscounts), sub: "utracony przychód", accent: COLORS.amber },
+    { icon: <Scissors className="w-4 h-4" />, label: "Usługi / Produkty", value: `${servicesPct}% / ${productsPct}%`, sub: <span className="text-muted-foreground">{formatCurrency(servicesRevenue)} / {formatCurrency(productsRevenue)}</span>, accent: COLORS.violet },
+    { icon: <Users className="w-4 h-4" />, label: "Śr. na pracownika", value: formatCurrency(avgPerStaff), sub: `${uniqueStaffCount} pracowników`, accent: COLORS.emerald },
+    { icon: <AlertTriangle className="w-4 h-4" />, label: "Anulowane", value: cancelledCount.toString(), sub: <span className="text-red-500">{formatCurrency(cancelledValue)} stracone</span>, accent: "#EF4444" },
+  ];
+
   return (
     <div className="space-y-6">
       {/* ROW 1 KPI — 6 cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <KPICard
-          icon={<TrendingUp className="w-4 h-4" />}
-          label="Przychód w okresie"
-          value={formatCurrency(totalRevenue)}
-          sub={`${format(dateRange.from, "dd.MM")} – ${format(dateRange.to, "dd.MM.yyyy")}`}
-          highlight
-        />
-        <KPICard
-          icon={revenueChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
-          label="Bieżący miesiąc"
-          value={formatCurrency(currentMonthRevenue)}
-          sub={
-            <span className={revenueChange > 0 ? "text-green-500" : revenueChange < 0 ? "text-red-500" : "text-muted-foreground"}>
-              {revenueChange > 0 ? "+" : ""}{revenueChange.toFixed(1)}% vs poprzedni
-            </span>
-          }
-        />
-        <KPICard
-          icon={<BarChart3 className="w-4 h-4" />}
-          label="Średnia dzienna"
-          value={formatCurrency(dailyAvg)}
-          sub={`${dailySalesData.length} dni`}
-        />
-        <KPICard
-          icon={<Receipt className="w-4 h-4" />}
-          label="Transakcje"
-          value={transactionCount.toString()}
-          sub="w wybranym okresie"
-        />
-        <KPICard
-          icon={<ShoppingCart className="w-4 h-4" />}
-          label="Średni koszyk"
-          value={formatCurrency(avgBasket)}
-          sub="brutto / transakcja"
-        />
-        <KPICard
-          icon={<Heart className="w-4 h-4" />}
-          label="Napiwki"
-          value={formatCurrency(totalTips)}
-          sub="w wybranym okresie"
-        />
+        {kpiRow1.map((kpi, i) => (
+          <KPICard key={i} {...kpi} />
+        ))}
       </div>
 
       {/* ROW 2 KPI — 4 cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPICard
-          icon={<Percent className="w-4 h-4" />}
-          label="Rabaty łącznie"
-          value={formatCurrency(totalDiscounts)}
-          sub="utracony przychód"
-        />
-        <KPICard
-          icon={<Scissors className="w-4 h-4" />}
-          label="Usługi / Produkty"
-          value={`${servicesPct}% / ${productsPct}%`}
-          sub={
-            <span className="text-muted-foreground">
-              {formatCurrency(servicesRevenue)} / {formatCurrency(productsRevenue)}
-            </span>
-          }
-        />
-        <KPICard
-          icon={<Users className="w-4 h-4" />}
-          label="Śr. na pracownika"
-          value={formatCurrency(avgPerStaff)}
-          sub={`${uniqueStaffCount} pracowników`}
-        />
-        <KPICard
-          icon={<AlertTriangle className="w-4 h-4" />}
-          label="Anulowane"
-          value={cancelledCount.toString()}
-          sub={
-            <span className="text-red-500">
-              {formatCurrency(cancelledValue)} stracone
-            </span>
-          }
-        />
+        {kpiRow2.map((kpi, i) => (
+          <KPICard key={i} {...kpi} />
+        ))}
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sales Trend — full width */}
-        <Card className="col-span-1 lg:col-span-2">
+        <Card className="col-span-1 lg:col-span-2 overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
+              <BarChart3 className="w-5 h-5 text-violet-500" />
               Trend sprzedaży
             </CardTitle>
           </CardHeader>
@@ -410,22 +377,22 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={dailySalesData}>
                   <defs>
-                    <linearGradient id="colorUslugi" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    <linearGradient id="gradUslugi" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={COLORS.violet} stopOpacity={0.4} />
+                      <stop offset="100%" stopColor={COLORS.violet} stopOpacity={0.02} />
                     </linearGradient>
-                    <linearGradient id="colorProdukty" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
+                    <linearGradient id="gradProdukty" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={COLORS.rose} stopOpacity={0.35} />
+                      <stop offset="100%" stopColor={COLORS.rose} stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="date" tick={tickStyle} />
-                  <YAxis tickFormatter={(v) => `${v / 1000}k`} tick={tickStyle} />
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
+                  <XAxis dataKey="date" tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={(v) => `${v / 1000}k`} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
                   <Legend />
-                  <Area type="monotone" dataKey="usługi" name="Usługi" stroke="hsl(var(--primary))" fillOpacity={1} fill="url(#colorUslugi)" />
-                  <Area type="monotone" dataKey="produkty" name="Produkty" stroke="hsl(var(--chart-2))" fillOpacity={1} fill="url(#colorProdukty)" />
+                  <Area type="monotone" dataKey="usługi" name="Usługi" stroke={COLORS.violet} strokeWidth={2.5} fillOpacity={1} fill="url(#gradUslugi)" />
+                  <Area type="monotone" dataKey="produkty" name="Produkty" stroke={COLORS.rose} strokeWidth={2.5} fillOpacity={1} fill="url(#gradProdukty)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -441,7 +408,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={paymentDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={2} dataKey="value">
+                  <Pie data={paymentDistribution} cx="50%" cy="50%" innerRadius={55} outerRadius={100} paddingAngle={4} dataKey="value" strokeWidth={2} stroke="hsl(var(--card))">
                     {paymentDistribution.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
@@ -458,7 +425,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Star className="w-5 h-5" />
+              <Star className="w-5 h-5 text-yellow-500" />
               Top 5 usług i produktów
             </CardTitle>
           </CardHeader>
@@ -466,13 +433,21 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topItems} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis type="number" tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
-                  <YAxis type="category" dataKey="name" width={120} tick={tickStyle} />
+                  <defs>
+                    {TOP_ITEM_COLORS.map((color, i) => (
+                      <linearGradient key={i} id={`gradTop${i}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stopColor={color} stopOpacity={0.7} />
+                        <stop offset="100%" stopColor={color} stopOpacity={1} />
+                      </linearGradient>
+                    ))}
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis type="number" tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={120} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="total" name="Przychód" radius={[0, 4, 4, 0]}>
+                  <Bar dataKey="total" name="Przychód" radius={[0, 10, 10, 0]}>
                     {topItems.map((_, i) => (
-                      <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      <Cell key={i} fill={`url(#gradTop${i % TOP_ITEM_COLORS.length})`} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -490,11 +465,17 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryBreakdown} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis type="number" tickFormatter={(v) => `${v / 1000}k`} tick={tickStyle} />
-                  <YAxis type="category" dataKey="category" width={100} tick={tickStyle} />
+                  <defs>
+                    <linearGradient id="gradCategory" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor={COLORS.indigo} stopOpacity={0.6} />
+                      <stop offset="100%" stopColor={COLORS.violet} stopOpacity={1} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis type="number" tickFormatter={(v) => `${v / 1000}k`} tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="category" width={100} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="total" name="Przychód" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="total" name="Przychód" fill="url(#gradCategory)" radius={[0, 10, 10, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -505,7 +486,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
+              <Users className="w-5 h-5 text-emerald-500" />
               Przychód wg pracownika
             </CardTitle>
           </CardHeader>
@@ -513,11 +494,17 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={staffRevenue} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis type="number" tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
-                  <YAxis type="category" dataKey="name" width={100} tick={tickStyle} />
+                  <defs>
+                    <linearGradient id="gradStaff" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor={COLORS.emerald} stopOpacity={0.6} />
+                      <stop offset="100%" stopColor={COLORS.emeraldLight} stopOpacity={1} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis type="number" tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={100} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="total" name="Przychód" fill="hsl(var(--chart-3))" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="total" name="Przychód" fill="url(#gradStaff)" radius={[0, 10, 10, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -528,7 +515,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Percent className="w-5 h-5" />
+              <Percent className="w-5 h-5 text-amber-500" />
               Analiza rabatów
             </CardTitle>
           </CardHeader>
@@ -536,7 +523,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
-                  <Pie data={discountAnalysis} cx="50%" cy="50%" innerRadius={55} outerRadius={95} paddingAngle={3} dataKey="value">
+                  <Pie data={discountAnalysis} cx="50%" cy="50%" innerRadius={50} outerRadius={95} paddingAngle={5} dataKey="value" strokeWidth={2} stroke="hsl(var(--card))">
                     {discountAnalysis.map((entry, i) => (
                       <Cell key={i} fill={entry.color} />
                     ))}
@@ -553,7 +540,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
+              <Clock className="w-5 h-5 text-cyan-500" />
               Produktywność pracowników (zł/h)
             </CardTitle>
           </CardHeader>
@@ -561,11 +548,17 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[280px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={staffProductivity} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis type="number" tickFormatter={(v) => `${v} zł/h`} tick={tickStyle} />
-                  <YAxis type="category" dataKey="name" width={100} tick={tickStyle} />
+                  <defs>
+                    <linearGradient id="gradProductivity" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor={COLORS.cyan} stopOpacity={0.6} />
+                      <stop offset="100%" stopColor={COLORS.cyanLight} stopOpacity={1} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis type="number" tickFormatter={(v) => `${v} zł/h`} tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" width={100} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => `${value} zł/h`} />
-                  <Bar dataKey="perHour" name="Przychód/h" fill="hsl(var(--chart-2))" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="perHour" name="Przychód/h" fill="url(#gradProductivity)" radius={[0, 10, 10, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -576,7 +569,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5" />
+              <Clock className="w-5 h-5 text-indigo-400" />
               Rozkład godzinowy sprzedaży
             </CardTitle>
           </CardHeader>
@@ -584,11 +577,17 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={hourlyData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="hour" tick={tickStyle} />
-                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
+                  <defs>
+                    <linearGradient id="gradHourly" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor={COLORS.violetDark} stopOpacity={0.5} />
+                      <stop offset="100%" stopColor={COLORS.violet} stopOpacity={1} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis dataKey="hour" tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="total" name="Przychód" fill="hsl(var(--chart-4))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="total" name="Przychód" fill="url(#gradHourly)" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -599,7 +598,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
+              <BarChart3 className="w-5 h-5 text-rose-500" />
               Przychód wg dnia tygodnia
             </CardTitle>
           </CardHeader>
@@ -607,15 +606,25 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={dayOfWeekData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="day" tick={tickStyle} />
-                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
+                  <defs>
+                    <linearGradient id="gradDayBest" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor={COLORS.burgundy} stopOpacity={0.5} />
+                      <stop offset="100%" stopColor={COLORS.rose} stopOpacity={1} />
+                    </linearGradient>
+                    <linearGradient id="gradDayNormal" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor={COLORS.burgundy} stopOpacity={0.2} />
+                      <stop offset="100%" stopColor={COLORS.burgundyLight} stopOpacity={0.6} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis dataKey="day" tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="total" name="Przychód" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="total" name="Przychód" radius={[8, 8, 0, 0]}>
                     {dayOfWeekData.map((entry, i) => {
                       const max = Math.max(...dayOfWeekData.map((d) => d.total));
-                      const opacity = max > 0 ? 0.4 + (entry.total / max) * 0.6 : 0.5;
-                      return <Cell key={i} fill="hsl(var(--primary))" fillOpacity={opacity} />;
+                      const isBest = entry.total === max && max > 0;
+                      return <Cell key={i} fill={isBest ? "url(#gradDayBest)" : "url(#gradDayNormal)"} />;
                     })}
                   </Bar>
                 </BarChart>
@@ -628,7 +637,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
+              <Users className="w-5 h-5 text-emerald-500" />
               Klienci nowi vs powracający
             </CardTitle>
           </CardHeader>
@@ -637,22 +646,22 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={clientRetentionTrend}>
                   <defs>
-                    <linearGradient id="colorNowi" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--chart-3))" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="hsl(var(--chart-3))" stopOpacity={0} />
+                    <linearGradient id="gradNowi" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={COLORS.cyan} stopOpacity={0.45} />
+                      <stop offset="100%" stopColor={COLORS.cyan} stopOpacity={0.02} />
                     </linearGradient>
-                    <linearGradient id="colorPowracajacy" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--chart-4))" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="hsl(var(--chart-4))" stopOpacity={0} />
+                    <linearGradient id="gradPowracajacy" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={COLORS.emerald} stopOpacity={0.45} />
+                      <stop offset="100%" stopColor={COLORS.emerald} stopOpacity={0.02} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="date" tick={tickStyle} />
-                  <YAxis tick={tickStyle} />
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis dataKey="date" tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} />
                   <Legend />
-                  <Area type="monotone" dataKey="nowi" name="Nowi klienci" stroke="hsl(var(--chart-3))" fillOpacity={1} fill="url(#colorNowi)" stackId="1" />
-                  <Area type="monotone" dataKey="powracający" name="Powracający" stroke="hsl(var(--chart-4))" fillOpacity={1} fill="url(#colorPowracajacy)" stackId="1" />
+                  <Area type="monotone" dataKey="nowi" name="Nowi klienci" stroke={COLORS.cyan} strokeWidth={2.5} fillOpacity={1} fill="url(#gradNowi)" stackId="1" />
+                  <Area type="monotone" dataKey="powracający" name="Powracający" stroke={COLORS.emerald} strokeWidth={2.5} fillOpacity={1} fill="url(#gradPowracajacy)" stackId="1" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -668,13 +677,23 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
             <div className="h-[250px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyComparison}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="name" tick={tickStyle} />
-                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} />
+                  <defs>
+                    <linearGradient id="gradMonthService" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor={COLORS.violetDark} stopOpacity={0.7} />
+                      <stop offset="100%" stopColor={COLORS.violet} stopOpacity={1} />
+                    </linearGradient>
+                    <linearGradient id="gradMonthProduct" x1="0" y1="1" x2="0" y2="0">
+                      <stop offset="0%" stopColor={COLORS.burgundy} stopOpacity={0.7} />
+                      <stop offset="100%" stopColor={COLORS.rose} stopOpacity={1} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.4} />
+                  <XAxis dataKey="name" tick={tickStyle} axisLine={false} tickLine={false} />
+                  <YAxis tickFormatter={(v) => formatCurrency(v)} tick={tickStyle} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={tooltipStyle} formatter={(value: number) => formatCurrency(value)} />
                   <Legend />
-                  <Bar dataKey="usługi" name="Usługi" stackId="a" fill="hsl(var(--primary))" />
-                  <Bar dataKey="produkty" name="Produkty" stackId="a" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="usługi" name="Usługi" stackId="a" fill="url(#gradMonthService)" radius={[0, 0, 0, 0]} />
+                  <Bar dataKey="produkty" name="Produkty" stackId="a" fill="url(#gradMonthProduct)" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -685,7 +704,7 @@ export function AccountingCharts({ transactions, dateRange }: AccountingChartsPr
         <Card className="col-span-1 lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Package className="w-5 h-5" />
+              <Package className="w-5 h-5 text-slate-400" />
               Podsumowanie VAT
             </CardTitle>
           </CardHeader>
@@ -734,19 +753,32 @@ function KPICard({
   label,
   value,
   sub,
+  accent,
   highlight,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   sub: React.ReactNode;
+  accent?: string;
   highlight?: boolean;
 }) {
   return (
-    <Card className={highlight ? "bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20" : ""}>
+    <Card
+      className={`relative overflow-hidden transition-all hover:shadow-lg ${highlight ? "ring-1 ring-primary/20" : ""}`}
+      style={{ borderLeft: `3px solid ${accent || "hsl(var(--border))"}` }}
+    >
+      {highlight && (
+        <div
+          className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          style={{
+            background: `linear-gradient(135deg, ${COLORS.violet}, ${COLORS.burgundy})`,
+          }}
+        />
+      )}
       <CardHeader className="pb-1 pt-4 px-4">
         <CardTitle className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-          {icon}
+          <span style={{ color: accent }}>{icon}</span>
           {label}
         </CardTitle>
       </CardHeader>
