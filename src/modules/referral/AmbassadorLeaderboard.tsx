@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Crown, Trophy, TrendingUp } from "lucide-react";
@@ -19,36 +20,35 @@ const rankColors = ["text-yellow-500", "text-slate-400", "text-amber-700"];
 const rankBgs = ["from-yellow-500/10 to-yellow-500/5", "from-slate-400/10 to-slate-400/5", "from-amber-700/10 to-amber-700/5"];
 
 export function AmbassadorLeaderboard({ isDemo }: AmbassadorLeaderboardProps) {
+  const { t } = useTranslation();
   const ambassadors = isDemo ? mockAmbassadors : [];
   const totalRevenue = ambassadors.reduce((s, a) => s + a.revenue, 0);
   const totalRewards = ambassadors.reduce((s, a) => s + a.rewardsEarned, 0);
 
   return (
     <div className="space-y-6">
-      {/* Summary */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <TrendingUp className="w-5 h-5 text-green-500 mx-auto mb-1" />
             <p className="text-xl font-bold">{totalRevenue.toLocaleString()} zł</p>
-            <p className="text-xs text-muted-foreground">Łączny przychód z poleceń</p>
+            <p className="text-xs text-muted-foreground">{t("referralModule.totalReferralRevenue")}</p>
           </CardContent>
         </Card>
         <Card className="border-border">
           <CardContent className="p-4 text-center">
             <Crown className="w-5 h-5 text-primary mx-auto mb-1" />
             <p className="text-xl font-bold">{totalRevenue > 0 && totalRewards > 0 ? `${((totalRevenue / totalRewards)).toFixed(1)}x` : "—"}</p>
-            <p className="text-xs text-muted-foreground">ROI (przychód / benefity)</p>
+            <p className="text-xs text-muted-foreground">{t("referralModule.roiLabel")}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Leaderboard */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <Trophy className="w-4 h-4 text-yellow-500" />
-            Top 10 Ambasadorek Salonu
+            {t("referralModule.topAmbassadors")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -66,44 +66,43 @@ export function AmbassadorLeaderboard({ isDemo }: AmbassadorLeaderboardProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-sm truncate">{amb.name}</p>
-                  <p className="text-xs text-muted-foreground">{amb.referrals} poleceń • benefity: {amb.rewardsEarned} zł</p>
+                  <p className="text-xs text-muted-foreground">{amb.referrals} {t("referralModule.referrals")} • {t("referralModule.benefits")}: {amb.rewardsEarned} zł</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-green-600">{amb.revenue.toLocaleString()} zł</p>
-                  <p className="text-xs text-muted-foreground">przychód</p>
+                  <p className="text-xs text-muted-foreground">{t("referralModule.revenueLabel")}</p>
                 </div>
               </motion.div>
             ))}
           </div>
           {ambassadors.length === 0 && (
             <div className="p-8 text-center text-muted-foreground text-sm">
-              Brak ambasadorek. System automatycznie aktywuje klientki po 5. wizycie.
+              {t("referralModule.noAmbassadors")}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Cost breakdown */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Koszt pozyskania vs wartość</CardTitle>
+          <CardTitle className="text-base">{t("referralModule.costVsValue")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Koszt pozyskania z poleceń</span>
+              <span className="text-sm text-muted-foreground">{t("referralModule.acquisitionCost")}</span>
               <Badge variant="outline" className="text-green-600 border-green-200">0 zł</Badge>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Wartość wydanych benefitów</span>
+              <span className="text-sm text-muted-foreground">{t("referralModule.benefitsValue")}</span>
               <span className="text-sm font-medium">{totalRewards.toLocaleString()} zł</span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-muted-foreground">Wartość rezerwacji z poleceń</span>
+              <span className="text-sm text-muted-foreground">{t("referralModule.bookingsValue")}</span>
               <span className="text-sm font-semibold text-green-600">{totalRevenue.toLocaleString()} zł</span>
             </div>
             <div className="border-t border-border pt-3 flex justify-between items-center">
-              <span className="text-sm font-medium">Zysk netto z poleceń</span>
+              <span className="text-sm font-medium">{t("referralModule.netProfit")}</span>
               <span className="text-sm font-bold text-green-600">{(totalRevenue - totalRewards).toLocaleString()} zł</span>
             </div>
           </div>

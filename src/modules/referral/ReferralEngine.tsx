@@ -13,7 +13,6 @@ interface ReferralEngineProps {
   isDemo?: boolean;
 }
 
-// Mock data for demo mode
 const mockStats = {
   totalReferrals: 47,
   totalRevenue: 14200,
@@ -32,16 +31,15 @@ export function ReferralEngine({ isDemo }: ReferralEngineProps) {
 
   return (
     <div className="space-y-6">
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="border-border">
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Users className="w-4 h-4 text-primary" />
-              <span className="text-xs text-muted-foreground">Polecenia</span>
+              <span className="text-xs text-muted-foreground">{t("referralModule.referrals")}</span>
             </div>
             <p className="text-2xl font-bold">{stats.totalReferrals}</p>
-            <p className="text-xs text-muted-foreground">łącznie klientek</p>
+            <p className="text-xs text-muted-foreground">{t("sidebar.clients")}</p>
           </CardContent>
         </Card>
 
@@ -49,10 +47,10 @@ export function ReferralEngine({ isDemo }: ReferralEngineProps) {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <TrendingUp className="w-4 h-4 text-green-500" />
-              <span className="text-xs text-muted-foreground">Przychód</span>
+              <span className="text-xs text-muted-foreground">{t("referralModule.revenueLabel")}</span>
             </div>
             <p className="text-2xl font-bold">{stats.totalRevenue.toLocaleString()} zł</p>
-            <p className="text-xs text-muted-foreground">z poleceń</p>
+            <p className="text-xs text-muted-foreground">{t("referralModule.referrals")}</p>
           </CardContent>
         </Card>
 
@@ -63,7 +61,7 @@ export function ReferralEngine({ isDemo }: ReferralEngineProps) {
               <span className="text-xs text-muted-foreground">ROI</span>
             </div>
             <p className="text-2xl font-bold">{roi}%</p>
-            <p className="text-xs text-muted-foreground">zwrot z benefitów</p>
+            <p className="text-xs text-muted-foreground">{t("referralModule.benefits")}</p>
           </CardContent>
         </Card>
 
@@ -71,36 +69,34 @@ export function ReferralEngine({ isDemo }: ReferralEngineProps) {
           <CardContent className="p-4">
             <div className="flex items-center gap-2 mb-1">
               <Star className="w-4 h-4 text-yellow-500" />
-              <span className="text-xs text-muted-foreground">Opinie</span>
+              <span className="text-xs text-muted-foreground">{t("referralModule.review")}</span>
             </div>
             <p className="text-2xl font-bold">{stats.completedReviews}</p>
-            <p className="text-xs text-green-600 text-xs">+{stats.pendingReviews} oczekujących</p>
+            <p className="text-xs text-green-600 text-xs">+{stats.pendingReviews}</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-4 w-full">
           <TabsTrigger value="overview" className="text-xs sm:text-sm gap-1">
             <Star className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Ciche Fanki</span>
-            <span className="sm:hidden">Fanki</span>
+            <span className="hidden sm:inline">{t("referralModule.silentFansTitle").split("—")[0].trim()}</span>
+            <span className="sm:hidden">{t("referralModule.silentFansTitle").split("—")[0].trim().split(" ").pop()}</span>
           </TabsTrigger>
           <TabsTrigger value="referrals" className="text-xs sm:text-sm gap-1">
             <Link2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Polecenia</span>
-            <span className="sm:hidden">Polec.</span>
+            <span className="hidden sm:inline">{t("referralModule.referrals")}</span>
+            <span className="sm:hidden">{t("referralModule.referrals").substring(0, 5)}</span>
           </TabsTrigger>
           <TabsTrigger value="ambassadors" className="text-xs sm:text-sm gap-1">
             <Users className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Ambasadorki</span>
+            <span className="hidden sm:inline">{t("referralModule.topAmbassadors").replace("Top 10 ", "")}</span>
             <span className="sm:hidden">Top</span>
           </TabsTrigger>
           <TabsTrigger value="stories" className="text-xs sm:text-sm gap-1">
             <MessageSquare className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Stories</span>
-            <span className="sm:hidden">IG</span>
+            <span>Stories</span>
           </TabsTrigger>
         </TabsList>
 

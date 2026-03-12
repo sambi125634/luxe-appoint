@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,25 +24,25 @@ const mockRecentEvents = [
 ];
 
 export function ReferralDashboard({ isDemo }: ReferralDashboardProps) {
+  const { t } = useTranslation();
   const referralCodes = isDemo ? mockReferralCodes : [];
   const recentEvents = isDemo ? mockRecentEvents : [];
 
   const handleCopyLink = (code: string) => {
     navigator.clipboard.writeText(`calendar.beauty-funnels.com/salon/demo?ref=${code}`);
-    toast.success("Link skopiowany do schowka!");
+    toast.success(t("referralModule.linkCopied"));
   };
 
   return (
     <div className="space-y-6">
-      {/* Referral Codes */}
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
               <Link2 className="w-4 h-4" />
-              Kody polecające klientek
+              {t("referralModule.referralCodes")}
             </CardTitle>
-            <Badge variant="outline" className="text-xs">{referralCodes.length} aktywnych</Badge>
+            <Badge variant="outline" className="text-xs">{referralCodes.length} {t("referralModule.active")}</Badge>
           </div>
         </CardHeader>
         <CardContent className="p-0">
@@ -69,13 +70,13 @@ export function ReferralDashboard({ isDemo }: ReferralDashboardProps) {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-semibold text-green-600">{code.revenue.toLocaleString()} zł</p>
-                    <p className="text-xs text-muted-foreground">{code.referrals} poleceń</p>
+                    <p className="text-xs text-muted-foreground">{code.referrals} {t("referralModule.referrals")}</p>
                   </div>
                 </div>
                 <div className="flex gap-2 ml-11">
                   <Badge variant="outline" className="text-xs">
                     <Gift className="w-3 h-3 mr-1" />
-                    {code.rewardType === "discount" ? `-${code.rewardValue} zł` : "Darmowa usługa"}
+                    {code.rewardType === "discount" ? `-${code.rewardValue} zł` : t("referralModule.freeService")}
                   </Badge>
                 </div>
               </motion.div>
@@ -83,18 +84,17 @@ export function ReferralDashboard({ isDemo }: ReferralDashboardProps) {
           </div>
           {referralCodes.length === 0 && (
             <div className="p-8 text-center text-muted-foreground text-sm">
-              Brak aktywnych kodów polecających. System automatycznie wygeneruje kody dla kwalifikujących się klientek.
+              {t("referralModule.noReferralCodes")}
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Recent Events */}
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-base flex items-center gap-2">
             <TrendingUp className="w-4 h-4" />
-            Ostatnie zdarzenia
+            {t("referralModule.recentEvents")}
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">
@@ -111,7 +111,7 @@ export function ReferralDashboard({ isDemo }: ReferralDashboardProps) {
                   <p className="text-xs text-muted-foreground">{event.date}</p>
                 </div>
                 <Badge variant={event.type === "booking" ? "default" : "outline"} className="text-xs">
-                  {event.type === "booking" ? `+${event.revenue} zł` : "Kliknięcie"}
+                  {event.type === "booking" ? `+${event.revenue} zł` : t("referralModule.click")}
                 </Badge>
               </div>
             ))}
@@ -119,10 +119,9 @@ export function ReferralDashboard({ isDemo }: ReferralDashboardProps) {
         </CardContent>
       </Card>
 
-      {/* Referral Message Template */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Wiadomość aktywacyjna (po 5. wizycie)</CardTitle>
+          <CardTitle className="text-base">{t("referralModule.activationMessage")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="p-3 rounded-lg bg-muted/50 border border-border">
