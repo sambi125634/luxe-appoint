@@ -59,7 +59,6 @@ function MobileModule({ tab }: { tab: string }) {
       case "conversations": return <ConversationsModule />;
       case "widgets": return <WidgetsManagement />;
       case "accounting": return <AccountingModule />;
-      case "stats": return <StatsModule />;
       case "settings": return <SettingsModule />;
       case "support": return <SupportModule />;
       default: return <p className="text-center text-muted-foreground py-10">Moduł niedostępny</p>;
