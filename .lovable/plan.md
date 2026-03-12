@@ -1,101 +1,61 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Usunięcie referencji GoHighLevel z frontendu
 
-### Co już mamy
+## Problem
+W wielu miejscach frontendu widoczne sa nazwy "GoHighLevel" / "GHL" -- w konwersacjach, pipeline i ustawieniach integracji. Klienci nie powinni wiedziec o tym systemie zewnetrznym.
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+## Zakres zmian
 
-### Problem do rozwiązania
+### 1. Konwersacje -- usun referencje GHL z UI
+**Pliki:** `ConversationView.tsx`, `ContactsList.tsx`
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+- `ConversationView.tsx` linia 132: zmien "viewProfileInGHL" na "Zobacz profil klientki" (link do profilu w CRM wewnetrznym)
+- `ConversationView.tsx` linia 249: usun caly paragraf `messagesSentViaGHL` -- informacja niepotrzebna
+- `ContactsList.tsx` linia 142-146: usun sekcje "Demo notice" z `demoSyncNote` o synchronizacji z GHL
 
----
+### 2. Pipeline -- usun referencje GHL
+**Pliki:** `ContactDetailModal.tsx`, `PipelineModule.tsx`
 
-### Plan implementacji
+- `ContactDetailModal.tsx` linia 245-247: zmien tekst "Zmiana stage'u aktywuje odpowiedni workflow w GoHighLevel" na "Zmiana etapu aktywuje odpowiedni workflow automatyzacji"
+- `PipelineModule.tsx` linia 179: tekst o konfiguracji CRM -- pozostawic jako ogolny tekst bez nazwy GHL (juz jest ok, nie wspomina GHL)
 
-#### FAZA 1: Role-based routing po loginie
+### 3. Ustawienia integracji -- usun sekcje GHL
+**Plik:** `IntegrationSettings.tsx`
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+- Linie 315-485: usun cala karte "GoHighLevel (GHL)" z ustawien integracji. Klienci nie powinni widziec tej konfiguracji -- bedzie ona robiona przez nas po stronie backendu.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 4. Tlumaczenia -- zaktualizuj i18n
+**Pliki:** `en.json`, `pl.json`
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+- Zmien `conversations.demoSyncNote` -- usun lub zamien na neutralny tekst
+- Zmien `conversations.viewProfileInGHL` → `conversations.viewProfile` = "View profile" / "Zobacz profil"
+- Zmien `conversations.messagesSentViaGHL` → usun lub zamien na "Wiadomosci sa wysylane z Twojego numeru salonu"
+- Zmien `pipeline.demoDescription` -- usun "GoHighLevel", zamien na "W wersji produkcyjnej zmiany synchronizuja sie automatycznie"
+- Zmien `pipeline.stageChangeNote` -- usun "GoHighLevel", zamien na neutralny tekst
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### 5. Typy -- usun prefiksy ghl z typow (wewnetrzna zmiana)
+**Plik:** `conversations/types.ts`
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+- `ghlContactId` → `externalContactId`
+- `ghlConversationId` → `externalConversationId`
+- `ghlMessageId` → `externalMessageId`
 
-#### FAZA 3: Indywidualne kokpity
+Odpowiednio zaktualizowac demo dane w `ConversationsModule.tsx`.
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+### 6. Hook useSalonSettings -- usun typ GHL settings z widocznosci
+Pozostawic w kodzie (potrzebne backendowo), ale ustawienia GHL nie beda widoczne na UI.
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+## Pliki do zmiany
 
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+| Plik | Akcja |
+|------|-------|
+| `src/components/admin/conversations/ConversationView.tsx` | Usun linie GHL |
+| `src/components/admin/conversations/ContactsList.tsx` | Usun demo notice |
+| `src/components/admin/conversations/ConversationsModule.tsx` | Zmien ghl prefiksy |
+| `src/components/admin/conversations/types.ts` | Zmien nazwy pol |
+| `src/components/admin/pipeline/ContactDetailModal.tsx` | Zmien tekst |
+| `src/components/admin/settings/IntegrationSettings.tsx` | Usun karte GHL |
+| `src/i18n/locales/en.json` | Zaktualizuj tlumaczenia |
+| `src/i18n/locales/pl.json` | Zaktualizuj tlumaczenia |
 
