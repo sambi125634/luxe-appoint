@@ -293,7 +293,7 @@ export function useSalonSettings() {
 
   const updateSettings = async (
     section: keyof SalonSettings,
-    updates: Partial<BookingSettings | NotificationSettings | IntegrationSettings>
+    updates: Partial<BookingSettings | NotificationSettings | IntegrationSettings | AutomationSettings>
   ) => {
     if (!profile?.id) return false;
 
