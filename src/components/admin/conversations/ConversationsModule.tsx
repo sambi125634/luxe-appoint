@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 const DEMO_CONTACTS: Contact[] = [
   {
     id: "1",
-    ghlContactId: "ghl_001",
+    externalContactId: "ext_001",
     firstName: "Anna",
     lastName: "Kowalska",
     email: "anna.kowalska@email.pl",
@@ -23,7 +23,7 @@ const DEMO_CONTACTS: Contact[] = [
   },
   {
     id: "2",
-    ghlContactId: "ghl_002",
+    externalContactId: "ext_002",
     firstName: "Maria",
     lastName: "Nowak",
     email: "maria.nowak@gmail.com",
@@ -35,7 +35,7 @@ const DEMO_CONTACTS: Contact[] = [
   },
   {
     id: "3",
-    ghlContactId: "ghl_003",
+    externalContactId: "ext_003",
     firstName: "Ewa",
     lastName: "Wiśniewska",
     email: "ewa.w@firma.pl",
@@ -47,7 +47,7 @@ const DEMO_CONTACTS: Contact[] = [
   },
   {
     id: "4",
-    ghlContactId: "ghl_004",
+    externalContactId: "ext_004",
     firstName: "Katarzyna",
     lastName: "Dąbrowska",
     email: "kasia.d@outlook.com",
@@ -59,7 +59,7 @@ const DEMO_CONTACTS: Contact[] = [
   },
   {
     id: "5",
-    ghlContactId: "ghl_005",
+    externalContactId: "ext_005",
     firstName: "Magdalena",
     lastName: "Zielińska",
     email: "magda.z@wp.pl",
@@ -75,7 +75,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
   "1": [
     {
       id: "m1",
-      ghlMessageId: "ghl_msg_001",
+      externalMessageId: "ext_msg_001",
       direction: "inbound",
       type: "SMS",
       body: "Dzień dobry! Chciałabym potwierdzić wizytę na jutro o 14:00 na manicure hybrydowy.",
@@ -84,7 +84,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m2",
-      ghlMessageId: "ghl_msg_002",
+      externalMessageId: "ext_msg_002",
       direction: "outbound",
       type: "SMS",
       body: "Dzień dobry Pani Anno! Tak, wizyta jest potwierdzona na jutro (wtorek) o godzinie 14:00. Usługa: Manicure hybrydowy. Specjalistka: Karolina. Do zobaczenia! 💅",
@@ -93,7 +93,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m3",
-      ghlMessageId: "ghl_msg_003",
+      externalMessageId: "ext_msg_003",
       direction: "inbound",
       type: "SMS",
       body: "Dziękuję za potwierdzenie wizyty! Do zobaczenia 💕",
@@ -104,7 +104,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
   "2": [
     {
       id: "m4",
-      ghlMessageId: "ghl_msg_004",
+      externalMessageId: "ext_msg_004",
       direction: "outbound",
       type: "SMS",
       body: "Przypominamy o wizycie w Luxury Beauty Spa w środę o 10:00. Usługa: Mezoterapia. Pozdrawiamy!",
@@ -113,7 +113,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m5",
-      ghlMessageId: "ghl_msg_005",
+      externalMessageId: "ext_msg_005",
       direction: "inbound",
       type: "SMS",
       body: "Czy mogę zmienić termin wizyty na piątek?",
@@ -124,7 +124,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
   "3": [
     {
       id: "m6",
-      ghlMessageId: "ghl_msg_006",
+      externalMessageId: "ext_msg_006",
       direction: "inbound",
       type: "SMS",
       body: "Dzień dobry, jakie macie wolne terminy na masaż relaksacyjny w tym tygodniu?",
@@ -133,7 +133,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m7",
-      ghlMessageId: "ghl_msg_007",
+      externalMessageId: "ext_msg_007",
       direction: "outbound",
       type: "SMS",
       body: "Dzień dobry! Mamy wolne terminy: czwartek 15:00, piątek 11:00 i 16:00, sobota 10:00. Który Pani odpowiada?",
@@ -142,7 +142,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m8",
-      ghlMessageId: "ghl_msg_008",
+      externalMessageId: "ext_msg_008",
       direction: "inbound",
       type: "SMS",
       body: "Super, rezerwuję termin na masaż relaksacyjny",

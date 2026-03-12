@@ -243,7 +243,7 @@ export function ContactDetailModal({
               </Button>
               
               <p className="text-xs text-muted-foreground text-center mt-2">
-                Zmiana stage'u aktywuje odpowiedni workflow w GoHighLevel
+                Zmiana etapu aktywuje odpowiedni workflow automatyzacji
               </p>
             </div>
           </TabsContent>

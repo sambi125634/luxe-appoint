@@ -129,7 +129,7 @@ export function ConversationView({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>{t('conversations.viewProfileInGHL')}</DropdownMenuItem>
+              <DropdownMenuItem>{t('conversations.viewProfile')}</DropdownMenuItem>
               <DropdownMenuItem>{t('conversations.addNote')}</DropdownMenuItem>
               <DropdownMenuItem>{t('conversations.createAppointment')}</DropdownMenuItem>
               <DropdownMenuItem className="text-destructive">{t('conversations.blockContact')}</DropdownMenuItem>
@@ -246,7 +246,7 @@ export function ConversationView({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          {t('conversations.messagesSentViaGHL')}
+          {t('conversations.messagesSentFromSalon')}
         </p>
       </div>
     </>

@@ -1,6 +1,6 @@
 export interface Contact {
   id: string;
-  ghlContactId: string;
+  externalContactId: string;
   firstName: string;
   lastName: string;
   email?: string;
@@ -13,7 +13,7 @@ export interface Contact {
 
 export interface Conversation {
   id: string;
-  ghlConversationId: string;
+  externalConversationId: string;
   contact: Contact;
   type: "SMS" | "Email" | "WhatsApp" | "Facebook" | "Instagram";
   lastMessageBody?: string;
@@ -24,7 +24,7 @@ export interface Conversation {
 
 export interface Message {
   id: string;
-  ghlMessageId: string;
+  externalMessageId: string;
   direction: "inbound" | "outbound";
   type: "SMS" | "Email" | "WhatsApp" | "Facebook" | "Instagram";
   body: string;

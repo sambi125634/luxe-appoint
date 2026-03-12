@@ -138,12 +138,6 @@ export function ContactsList({
         </div>
       </ScrollArea>
 
-      {/* Demo notice */}
-      <div className="p-3 border-t border-border bg-muted/30">
-        <p className="text-xs text-center text-muted-foreground">
-          🔗 {t('conversations.demoSyncNote')}
-        </p>
-      </div>
     </>
   );
 }
