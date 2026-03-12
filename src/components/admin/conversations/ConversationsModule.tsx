@@ -47,7 +47,7 @@ const DEMO_CONTACTS: Contact[] = [
   },
   {
     id: "4",
-    ghlContactId: "ghl_004",
+    externalContactId: "ext_004",
     firstName: "Katarzyna",
     lastName: "Dąbrowska",
     email: "kasia.d@outlook.com",
