@@ -79,10 +79,18 @@ export interface IntegrationSettings {
   };
 }
 
+export interface AutomationSettings {
+  defaultVatRate: number;
+  timezone: string;
+  gdprConsentText: string;
+  dataRetentionYears: number;
+}
+
 export interface SalonSettings {
   booking: BookingSettings;
   notifications: NotificationSettings;
   integrations: IntegrationSettings;
+  automation: AutomationSettings;
 }
 
 const defaultPrepaymentSettings: PrepaymentSettings = {
