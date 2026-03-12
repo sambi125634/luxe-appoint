@@ -13,6 +13,8 @@ import { pl } from "date-fns/locale";
 
 export function MobileClients() {
   const { data: clients, isLoading } = useClients();
+  const { data: dbTags } = useClientTags();
+  const availableTags = useMemo(() => dbTags ? tagsToAvailableFormat(dbTags) : [], [dbTags]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "vip" | "problematic" | "recent">("all");
 
