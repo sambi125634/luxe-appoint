@@ -89,7 +89,7 @@ export default function AdminDashboard() {
       case "pipeline": return "Pipeline sprzedażowy";
       case "accounting": return "Księgowość & Raporty";
       case "products": return "Produkty";
-      case "inventory": return "Magazyn & Receptury";
+      
       case "staff": return "Personel";
       case "services": return "Usługi";
       case "time-off": return "Urlopy i dni wolne";
