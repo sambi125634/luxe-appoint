@@ -827,7 +827,7 @@
     "searchPlaceholder": "Search by name, email or service...",
     "filters": "Filters",
     "demoMode": "Demo mode",
-    "demoDescription": "Drag contacts between stages. In production, changes sync with GoHighLevel.",
+    "demoDescription": "Drag contacts between stages. In production, changes sync automatically.",
     "overview": "Overview",
     "changeStage": "Change stage",
     "surveys": "Surveys",
