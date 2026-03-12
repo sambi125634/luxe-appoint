@@ -38,7 +38,6 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
     { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
     { icon: Package, labelKey: "admin.products", tab: "products" },
-    { icon: ScanLine, labelKey: "admin.inventory", tab: "inventory" },
     { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
     { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
     { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
