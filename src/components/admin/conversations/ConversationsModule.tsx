@@ -84,7 +84,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m2",
-      ghlMessageId: "ghl_msg_002",
+      externalMessageId: "ext_msg_002",
       direction: "outbound",
       type: "SMS",
       body: "Dzień dobry Pani Anno! Tak, wizyta jest potwierdzona na jutro (wtorek) o godzinie 14:00. Usługa: Manicure hybrydowy. Specjalistka: Karolina. Do zobaczenia! 💅",
