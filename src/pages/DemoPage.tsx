@@ -11,7 +11,7 @@ import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { WidgetsManagement } from "@/components/admin/widgets";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
-import { StatsModule } from "@/components/admin/StatsModule";
+
 import { SettingsModule } from "@/components/admin/settings";
 import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
