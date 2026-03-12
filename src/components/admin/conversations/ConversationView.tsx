@@ -246,7 +246,7 @@ export function ConversationView({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground mt-2 text-center">
-          {t('conversations.messagesSentViaGHL')}
+          {t('conversations.messagesSentFromSalon')}
         </p>
       </div>
     </>
