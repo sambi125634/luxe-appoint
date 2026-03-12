@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { format } from "date-fns";
+import { useState, useMemo } from "react";
+import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
-import { Download, ToggleLeft, ToggleRight } from "lucide-react";
+import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -24,6 +24,8 @@ import {
 import { Transaction, VatSummary } from "./types";
 import { mockTransactions } from "./mockData";
 import { useTranslation } from "react-i18next";
+import { exportToCSV } from "@/lib/csvExport";
+import { useToast } from "@/hooks/use-toast";
 
 interface SalesVatReportProps {
   dateRange: { from: Date; to: Date };
@@ -31,6 +33,7 @@ interface SalesVatReportProps {
 
 export function SalesVatReport({ dateRange }: SalesVatReportProps) {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const [isDailyView, setIsDailyView] = useState(false);
   const [filterType, setFilterType] = useState<string>("all");
   const [filterVat, setFilterVat] = useState<string>("all");
@@ -45,21 +48,28 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
     }).format(amount);
   };
 
-  // Filter transactions
-  let filteredTransactions = mockTransactions.filter((t) => t.status === "opłacone");
-  
-  if (filterType !== "all") {
-    filteredTransactions = filteredTransactions.filter((t) => t.itemType === filterType);
-  }
-  if (filterVat !== "all") {
-    filteredTransactions = filteredTransactions.filter((t) => t.vatRate === parseInt(filterVat));
-  }
-  if (filterPayment !== "all") {
-    filteredTransactions = filteredTransactions.filter((t) => t.paymentMethod === filterPayment);
-  }
-  if (filterStaff !== "all") {
-    filteredTransactions = filteredTransactions.filter((t) => t.staffId === filterStaff);
-  }
+  // Filter transactions by dateRange first, then by other filters
+  const filteredTransactions = useMemo(() => {
+    let filtered = mockTransactions.filter((tx) => {
+      if (tx.status !== "opłacone") return false;
+      const txDate = new Date(tx.dateTime);
+      return isWithinInterval(txDate, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) });
+    });
+
+    if (filterType !== "all") {
+      filtered = filtered.filter((tx) => tx.itemType === filterType);
+    }
+    if (filterVat !== "all") {
+      filtered = filtered.filter((tx) => tx.vatRate === parseInt(filterVat));
+    }
+    if (filterPayment !== "all") {
+      filtered = filtered.filter((tx) => tx.paymentMethod === filterPayment);
+    }
+    if (filterStaff !== "all") {
+      filtered = filtered.filter((tx) => tx.staffId === filterStaff);
+    }
+    return filtered;
+  }, [dateRange, filterType, filterVat, filterPayment, filterStaff]);
 
   // Calculate totals
   const totalGross = filteredTransactions.reduce((sum, t) => sum + t.grossAmount, 0);
@@ -100,6 +110,38 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
   // Unique staff for filter
   const staffList = [...new Set(mockTransactions.filter((t) => t.staffId).map((t) => ({ id: t.staffId!, name: t.staffName! })))];
   const uniqueStaff = staffList.filter((s, i, arr) => arr.findIndex((x) => x.id === s.id) === i);
+
+  const handleExportCSV = () => {
+    if (filteredTransactions.length === 0) {
+      toast({ title: "Brak danych do eksportu", variant: "destructive" });
+      return;
+    }
+    exportToCSV({
+      filename: "sprzedaz_vat",
+      headers: [
+        "Data", "Godzina", "Typ", "Kategoria", "Nazwa", "Ilość",
+        "Cena jedn. brutto (zł)", "Rabat (zł)", "Netto (zł)", "VAT (zł)",
+        "Stawka VAT (%)", "Brutto (zł)", "Metoda płatności", "Pracownik"
+      ],
+      rows: filteredTransactions.map(tx => [
+        tx.dateTime.split("T")[0],
+        tx.dateTime.split("T")[1]?.substring(0, 5) || "",
+        tx.itemType,
+        tx.itemCategory,
+        tx.itemName,
+        tx.quantity,
+        tx.unitPriceBrutto,
+        tx.discountAmount,
+        Math.round(tx.netAmount * 100) / 100,
+        Math.round(tx.vatAmount * 100) / 100,
+        tx.vatRate,
+        tx.grossAmount,
+        tx.paymentMethod,
+        tx.staffName || ""
+      ])
+    });
+    toast({ title: "Eksport CSV zakończony", description: "Plik został pobrany." });
+  };
 
   return (
     <div className="space-y-6">
@@ -215,7 +257,7 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
           </Label>
         </div>
 
-        <Button variant="outline" size="sm" className="gap-2">
+        <Button variant="outline" size="sm" className="gap-2" onClick={handleExportCSV}>
           <Download className="w-4 h-4" />
           {t('accounting.exportCsv')}
         </Button>
@@ -246,6 +288,13 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
                   <TableCell className="text-right font-medium">{formatCurrency(day.gross)}</TableCell>
                 </TableRow>
               ))}
+              {dailyData.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                    Brak transakcji w wybranym zakresie dat
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         ) : (
@@ -305,6 +354,13 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
                   <TableCell className="text-sm">{tx.staffName || "—"}</TableCell>
                 </TableRow>
               ))}
+              {filteredTransactions.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={14} className="text-center py-8 text-muted-foreground">
+                    Brak transakcji w wybranym zakresie dat
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         )}

@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth, format } from "date-fns";
 import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountingFiltersBar } from "./AccountingFilters";
@@ -19,6 +19,7 @@ import { SectionGuide } from "../SectionGuide";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
+import { exportToCSV } from "@/lib/csvExport";
 
 interface AccountingModuleProps {
   isDemo?: boolean;
@@ -85,16 +86,43 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
   }, [isDemo, dbTransactions, manualTransactions]);
 
   const handleExportCSV = () => {
-    toast({
-      title: t('accounting.exportCsv'),
-      description: t('accounting.canDownloadBelow'),
+    if (transactions.length === 0) {
+      toast({ title: "Brak danych do eksportu", variant: "destructive" });
+      return;
+    }
+    exportToCSV({
+      filename: "raport_ksiegowy",
+      headers: [
+        "Data", "Godzina", "Typ", "Kategoria", "Nazwa", "Ilość",
+        "Cena jedn. brutto (zł)", "Rabat (zł)", "Netto (zł)", "VAT (zł)",
+        "Stawka VAT (%)", "Brutto (zł)", "Metoda płatności", "Pracownik", "Klient", "Napiwek (zł)"
+      ],
+      rows: transactions.map(tx => [
+        tx.dateTime.split("T")[0],
+        tx.dateTime.split("T")[1]?.substring(0, 5) || "",
+        tx.itemType,
+        tx.itemCategory,
+        tx.itemName,
+        tx.quantity,
+        tx.unitPriceBrutto,
+        tx.discountAmount,
+        Math.round(tx.netAmount * 100) / 100,
+        Math.round(tx.vatAmount * 100) / 100,
+        tx.vatRate,
+        tx.grossAmount,
+        tx.paymentMethod,
+        tx.staffName || "",
+        tx.clientName || "",
+        tx.tipAmount
+      ])
     });
+    toast({ title: "Eksport CSV zakończony", description: "Plik został pobrany." });
   };
 
   const handleExportPDF = () => {
     toast({
-      title: t('accounting.exportPdf'),
-      description: t('accounting.canDownloadBelow'),
+      title: "Eksport PDF",
+      description: "Generowanie PDF nie jest jeszcze dostępne. Użyj eksportu CSV.",
     });
   };
 

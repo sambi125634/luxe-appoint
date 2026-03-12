@@ -144,7 +144,7 @@ const mockProductSales = [
   },
   {
     id: "ps5",
-    date: "2024-01-13",
+    date: ddAgo(2),
     productId: "p1",
     productName: "Serum witaminowe C",
     category: "Kosmetyki",

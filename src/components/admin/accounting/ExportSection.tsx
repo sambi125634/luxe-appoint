@@ -23,11 +23,61 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { AccountingExport } from "./types";
-import { mockAccountingExports } from "./mockData";
+import { mockAccountingExports, mockTransactions, mockEmployeeCommissions, mockVouchers } from "./mockData";
 import { useTranslation } from "react-i18next";
+import { exportToCSV } from "@/lib/csvExport";
 
 interface ExportSectionProps {
   dateRange: { from: Date; to: Date };
+}
+
+function generateExportFile(exportType: string, dateRange: { from: Date; to: Date }) {
+  switch (exportType) {
+    case "sprzedaż VAT":
+      exportToCSV({
+        filename: "sprzedaz_vat_eksport",
+        headers: ["Data", "Typ", "Kategoria", "Nazwa", "Ilość", "Netto (zł)", "VAT (zł)", "Stawka VAT (%)", "Brutto (zł)", "Metoda płatności", "Pracownik"],
+        rows: mockTransactions.map(tx => [
+          tx.dateTime.split("T")[0], tx.itemType, tx.itemCategory, tx.itemName, tx.quantity,
+          Math.round(tx.netAmount * 100) / 100, Math.round(tx.vatAmount * 100) / 100,
+          tx.vatRate, tx.grossAmount, tx.paymentMethod, tx.staffName || ""
+        ])
+      });
+      break;
+    case "prowizje":
+      exportToCSV({
+        filename: "prowizje_eksport",
+        headers: ["Pracownik", "Usługi brutto (zł)", "Produkty brutto (zł)", "Napiwki (zł)", "Prowizja od usług (zł)", "Prowizja od produktów (zł)", "Prowizja łącznie (zł)", "Do wypłaty (zł)"],
+        rows: mockEmployeeCommissions.map(ec => [
+          ec.staffName, ec.servicesGross, ec.productsGross, ec.tipsTotal,
+          ec.commissionServices, ec.commissionProducts, ec.totalCommission, ec.totalPayout
+        ])
+      });
+      break;
+    case "vouchery":
+      exportToCSV({
+        filename: "vouchery_eksport",
+        headers: ["Kod", "Typ", "Klient", "Data wydania", "Data ważności", "Wartość oryginalna (zł)", "Pozostała wartość (zł)", "Status"],
+        rows: mockVouchers.map(v => [
+          v.code, v.type, v.clientName || "", v.issueDate, v.expiryDate || "",
+          v.originalValue, v.remainingValue, v.status
+        ])
+      });
+      break;
+    default: // "pełny"
+      exportToCSV({
+        filename: "pelny_raport_eksport",
+        headers: ["Data", "Godzina", "Typ", "Kategoria", "Nazwa", "Ilość", "Netto (zł)", "VAT (zł)", "Stawka VAT (%)", "Brutto (zł)", "Metoda płatności", "Pracownik", "Klient", "Napiwek (zł)"],
+        rows: mockTransactions.map(tx => [
+          tx.dateTime.split("T")[0], tx.dateTime.split("T")[1]?.substring(0, 5) || "",
+          tx.itemType, tx.itemCategory, tx.itemName, tx.quantity,
+          Math.round(tx.netAmount * 100) / 100, Math.round(tx.vatAmount * 100) / 100,
+          tx.vatRate, tx.grossAmount, tx.paymentMethod, tx.staffName || "",
+          tx.clientName || "", tx.tipAmount
+        ])
+      });
+      break;
+  }
 }
 
 export function ExportSection({ dateRange }: ExportSectionProps) {
@@ -40,6 +90,8 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
   const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const handleExport = () => {
+    generateExportFile(exportType, dateRange);
+
     const newExport: AccountingExport = {
       id: `ae${Date.now()}`,
       salonId: "demo",
@@ -58,7 +110,7 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
 
     toast({
       title: t('accounting.reportGenerated'),
-      description: t('accounting.canDownloadBelow'),
+      description: "Plik CSV został pobrany.",
     });
   };
 
@@ -71,6 +123,8 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
       });
       return;
     }
+
+    generateExportFile(exportType, dateRange);
 
     const newExport: AccountingExport = {
       id: `ae${Date.now()}`,
@@ -92,6 +146,14 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
       title: t('accounting.reportSent'),
       description: t('accounting.reportSentTo', { email: accountantEmail }),
     });
+  };
+
+  const handleDownloadExport = (exp: AccountingExport) => {
+    generateExportFile(exp.type, {
+      from: new Date(exp.periodStart),
+      to: new Date(exp.periodEnd),
+    });
+    toast({ title: "Plik pobrany", description: `Raport ${exp.type} został pobrany.` });
   };
 
   const getFormatIcon = (format: string) => {
@@ -240,7 +302,12 @@ export function ExportSection({ dateRange }: ExportSectionProps) {
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm" className="gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="gap-2"
+                    onClick={() => handleDownloadExport(exp)}
+                  >
                     <Download className="w-4 h-4" />
                     {t('accounting.download')}
                   </Button>
