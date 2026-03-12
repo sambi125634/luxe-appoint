@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 const DEMO_CONTACTS: Contact[] = [
   {
     id: "1",
-    ghlContactId: "ghl_001",
+    externalContactId: "ext_001",
     firstName: "Anna",
     lastName: "Kowalska",
     email: "anna.kowalska@email.pl",
