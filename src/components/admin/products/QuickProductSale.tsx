@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { ProductSaleSection, type CartItem } from "./ProductSaleSection";
+import { ServiceSaleSection, type ServiceCartItem } from "./ServiceSaleSection";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
