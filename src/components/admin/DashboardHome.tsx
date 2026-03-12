@@ -333,12 +333,12 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
       <WeeklyBriefWidget isDemo={isDemo} />
 
       {/* AI Revenue Prediction */}
-      <RevenuePredictionCard salonId={salonId ?? undefined} />
+      <RevenuePredictionCard salonId={salonId ?? undefined} isDemo={isDemo} />
 
-      {/* Retention Radar */}
+      {/* Retention Health Board */}
       {(() => {
         const radarData = isDemo ? MOCK_RADAR_CLIENTS : [];
-        return radarData.length > 0 ? <RetentionRadar clients={radarData} compact /> : null;
+        return radarData.length > 0 ? <RetentionHealthBoard clients={radarData} compact /> : null;
       })()}
 
       {/* Bottom section */}

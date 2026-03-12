@@ -39,7 +39,7 @@ export function RetentionDashboard({ salonId, isDemo = false }: RetentionDashboa
 
       {/* Radar + Timeline */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RetentionRadar clients={displayRadar} onClientClick={handleClientClick} />
+        <RetentionHealthBoard clients={displayRadar} onClientClick={handleClientClick} />
         <RetentionTimeline items={displayTimeline} />
       </div>
 

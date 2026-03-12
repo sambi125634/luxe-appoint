@@ -65,13 +65,10 @@ function getEngagement(client: RetentionRadarClient): number {
   return 5 + (hash % 10);
 }
 
-function getInitials(name: string): string {
-  return name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
-}
-
 function ClientCard({ client, zone, onClientClick }: { client: RetentionRadarClient; zone: ZoneConfig; onClientClick?: (c: RetentionRadarClient) => void }) {
   const engagement = getEngagement(client);
-  const tooltip = DEMO_TOOLTIPS[client.name] || DEMO_TOOLTIPS["default"];
+  const fullName = `${client.first_name} ${client.last_name}`;
+  const tooltip = DEMO_TOOLTIPS[fullName] || DEMO_TOOLTIPS["default"];
 
   return (
     <TooltipProvider>
@@ -90,12 +87,12 @@ function ClientCard({ client, zone, onClientClick }: { client: RetentionRadarCli
             <div className="flex items-center gap-2.5 mb-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className={cn("text-xs font-semibold", zone.avatarBg)}>
-                  {getInitials(client.name)}
+                  {client.avatar_initials}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate">{client.name}</p>
-                <p className="text-xs text-muted-foreground">{client.daysSinceVisit} dni temu</p>
+                <p className="text-sm font-medium truncate">{fullName}</p>
+                <p className="text-xs text-muted-foreground">{client.days_inactive} dni temu</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -108,7 +105,7 @@ function ClientCard({ client, zone, onClientClick }: { client: RetentionRadarCli
         </TooltipTrigger>
         <TooltipContent side="top" className="max-w-[200px]">
           <div className="space-y-1 text-xs">
-            <p className="font-semibold">{client.name}</p>
+            <p className="font-semibold">{fullName}</p>
             <p>{tooltip.visits}</p>
             <p>{tooltip.spent}</p>
             <p className="text-muted-foreground">Ulubione: {tooltip.services}</p>
