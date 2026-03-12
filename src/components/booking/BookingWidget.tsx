@@ -526,7 +526,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="flex flex-col items-center gap-6 animate-fade-in"
+              className="flex flex-col items-center gap-4 animate-fade-in"
               style={{ animationDelay: '1s' }}
             >
               <div className="relative group">
