@@ -28,30 +28,66 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const allNavItems: { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number }[] = [
-    { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
-    { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
-    { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
-    { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
-    { icon: Radar, labelKey: "admin.retention", tab: "retention" },
-    { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
-    { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
-    { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
-    { icon: Package, labelKey: "admin.products", tab: "products" },
-    { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
-    { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
-    { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
-    { icon: Heart, labelKey: "admin.referral", tab: "referral" },
-    { icon: Users, labelKey: "admin.staff", tab: "staff" },
-    { icon: Scissors, labelKey: "admin.services", tab: "services" },
-    { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
-    { icon: Settings, labelKey: "admin.settings", tab: "settings" },
-    { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
+  type NavItem = { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number };
+  const allSections: { title: string; items: NavItem[] }[] = [
+    {
+      title: "Codzienna praca",
+      items: [
+        { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
+        { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
+      ],
+    },
+    {
+      title: "Klienci",
+      items: [
+        { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
+        { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
+        { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
+      ],
+    },
+    {
+      title: "Marketing & Wzrost",
+      items: [
+        { icon: Radar, labelKey: "admin.retention", tab: "retention" },
+        { icon: Heart, labelKey: "admin.referral", tab: "referral" },
+        { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
+        { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
+        { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
+      ],
+    },
+    {
+      title: "Zarządzanie",
+      items: [
+        { icon: Scissors, labelKey: "admin.services", tab: "services" },
+        { icon: Users, labelKey: "admin.staff", tab: "staff" },
+        { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
+        { icon: Package, labelKey: "admin.products", tab: "products" },
+      ],
+    },
+    {
+      title: "Finanse",
+      items: [
+        { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
+        { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
+      ],
+    },
+    {
+      title: "System",
+      items: [
+        { icon: Settings, labelKey: "admin.settings", tab: "settings" },
+        { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
+      ],
+    },
   ];
 
-  const navItems = userRole === "staff"
-    ? allNavItems.filter(item => !OWNER_ONLY_TABS.includes(item.tab))
-    : allNavItems;
+  const visibleSections = allSections
+    .map(section => ({
+      ...section,
+      items: userRole === "staff"
+        ? section.items.filter(item => !OWNER_ONLY_TABS.includes(item.tab))
+        : section.items,
+    }))
+    .filter(section => section.items.length > 0);
 
   const displayName = salonName || "Beauty Calendar";
   const initials = displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
