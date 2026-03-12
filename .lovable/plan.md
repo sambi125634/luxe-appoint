@@ -1,101 +1,68 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Naprawa modulu Raporty — eksport danych + spójność danych demo
 
-### Co już mamy
+## Zidentyfikowane problemy
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+1. **Przyciski "Eksport CSV" i "Pobierz PDF" w filtrach globalnych** — pokazują toast "Możesz pobrać poniżej" ale nic nie pobierają
+2. **Przyciski CSV w SalesVatReport i VouchersReport** — nie robią nic (brak onClick / pusty handler)
+3. **Zakładka Eksport** — przycisk "Pobierz" w historii eksportów ma `href="#"`, nie pobiera niczego
+4. **Daty mock danych to styczeń 2024** — ale domyślny zakres filtra to bieżący miesiąc → wykresy i karty KPI pokazują puste/zerowe dane
+5. **DailyCashUp** — nie filtruje po dateRange, zawsze pokazuje wszystkie wpisy
+6. **SalesVatReport** — zawsze używa mockTransactions bezpośrednio, ignoruje dateRange
 
-### Problem do rozwiązania
+## Rozwiązania
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### 1. Zmiana dat mock danych na dynamiczne (bieżący miesiąc)
+**Plik:** `mockData.ts`
 
----
+Zamiast hardcoded dat "2024-01-XX", daty będą generowane dynamicznie relative to `new Date()` (np. dzisiaj, wczoraj, 2 dni temu, itd.). Dzięki temu domyślny filtr (bieżący miesiąc) pokaże dane.
 
-### Plan implementacji
+Dotyczy: `mockTransactions`, `mockDailyClosings`, `mockProductSales` (w ProductSalesAccountingReport), `mockAccountingExports`.
 
-#### FAZA 1: Role-based routing po loginie
+### 2. Globalne przyciski eksportu — faktyczny eksport CSV
+**Plik:** `AccountingModule.tsx`
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+- `handleExportCSV`: zamiast toasta, wywoła `exportToCSV()` z pełnymi danymi transakcji z bieżącego widoku
+- `handleExportPDF`: toast z informacją "PDF w przygotowaniu" (brak natywnego generowania PDF w przeglądarce — zostawiamy jako placeholder z jasnym komunikatem)
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 3. SalesVatReport — dodać działający eksport CSV
+**Plik:** `SalesVatReport.tsx`
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+- Przycisk CSV → wywoła `exportToCSV()` z przefiltrowanymi transakcjami (netto/VAT/brutto per transakcja)
+- Filtrowanie po dateRange (obecnie ignorowane)
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+### 4. VouchersReport — dodać działający eksport CSV
+**Plik:** `VouchersReport.tsx`
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+- Przycisk CSV → wywoła `exportToCSV()` z przefiltrowanymi voucherami
 
-#### FAZA 3: Indywidualne kokpity
+### 5. DailyCashUp — filtrowanie po dateRange + eksport
+**Plik:** `DailyCashUp.tsx`
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+- Filtrować `closings` po `dateRange`
+- Przyciski PDF/CSV per wiersz → wywołać odpowiedni eksport dziennego raportu
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+### 6. ExportSection — faktyczne pobieranie pliku
+**Plik:** `ExportSection.tsx`
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+- Przycisk "Generuj" → generuje CSV/XLSX z mockTransactions i uruchamia download
+- Przycisk "Pobierz" w historii → ponownie generuje i pobiera plik
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+### 7. Weryfikacja spójności danych
+- `mockDailyClosings` sumy (services + products) muszą zgadzać się z sumą transakcji z tego dnia
+- Prowizje (30% od usług, 10% od produktów) muszą się zgadzać z danymi w `mockEmployeeCommissions`
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+## Pliki do zmiany
 
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+| Plik | Zmiana |
+|------|--------|
+| `src/components/admin/accounting/mockData.ts` | Daty dynamiczne (bieżący miesiąc) |
+| `src/components/admin/accounting/AccountingModule.tsx` | Globalny eksport CSV działa |
+| `src/components/admin/accounting/AccountingFilters.tsx` | Przekazanie transactions do eksportu |
+| `src/components/admin/accounting/SalesVatReport.tsx` | Eksport CSV + filtr dateRange |
+| `src/components/admin/accounting/VouchersReport.tsx` | Eksport CSV działa |
+| `src/components/admin/accounting/DailyCashUp.tsx` | Filtr dateRange + eksport per dzień |
+| `src/components/admin/accounting/ExportSection.tsx` | Faktyczny download pliku |
+| `src/components/admin/accounting/ProductSalesAccountingReport.tsx` | Daty dynamiczne w local mock |
 
