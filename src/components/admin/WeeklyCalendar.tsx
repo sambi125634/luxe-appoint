@@ -302,7 +302,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
             start_time: startTime.toISOString(),
             end_time: endTime.toISOString(),
             notes: (appointmentData.notes as string) || null,
-            status: appointmentData.status as string,
+            status: appointmentData.status as "booked" | "cancelled" | "completed" | "confirmed" | "no_show",
           })
           .eq("id", editingAppointment.id);
         if (error) throw error;
