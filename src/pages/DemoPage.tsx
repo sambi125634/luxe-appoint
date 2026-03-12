@@ -49,7 +49,7 @@ export default function DemoPage() {
       case "stats": return t("admin.stats");
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
-      case "inventory": return "Magazyn & Receptury";
+      
       case "pixel": return "Meta Pixel & CRM Sync";
       case "analytics": return "True Profit Analytics";
       case "consultation": return "Karty konsultacyjne";
@@ -87,8 +87,6 @@ export default function DemoPage() {
           return <AccountingModule isDemo={true} />;
         case "products":
           return <ProductsModule isDemo />;
-        case "inventory":
-          return <InventoryDashboard isDemo />;
         case "support":
           return <SupportModule />;
         case "retention":

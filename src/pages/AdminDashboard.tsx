@@ -22,7 +22,7 @@ import { SettingsModule } from "@/components/admin/settings";
 import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { RetentionDashboard } from "@/modules/retention";
-import { InventoryDashboard } from "@/modules/inventory";
+
 import { PixelDashboard } from "@/modules/pixel";
 import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
@@ -89,7 +89,7 @@ export default function AdminDashboard() {
       case "pipeline": return "Pipeline sprzedażowy";
       case "accounting": return "Księgowość & Raporty";
       case "products": return "Produkty";
-      case "inventory": return "Magazyn & Receptury";
+      
       case "staff": return "Personel";
       case "services": return "Usługi";
       case "time-off": return "Urlopy i dni wolne";
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
       case "pipeline": return <PipelineModule />;
       case "accounting": return <AccountingModule />;
       case "products": return <ProductsModule />;
-      case "inventory": return <InventoryDashboard />;
+      
       case "services": return <ServicesManagement />;
       case "staff": return <StaffManagement />;
       case "time-off": return <TimeOffManagement />;
