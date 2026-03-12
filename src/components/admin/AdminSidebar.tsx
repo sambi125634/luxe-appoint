@@ -117,37 +117,44 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
 
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
-        <ul className="space-y-1">
-          {navItems.map((item) => (
-            <li key={item.tab}>
-              <button
-                onClick={() => {
-                  onTabChange(item.tab);
-                  onClose?.();
-                }}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                  activeTab === item.tab
-                    ? "bg-primary text-primary-foreground shadow-soft" 
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                <span className="flex-1 text-left">{t(item.labelKey)}</span>
-                {item.badge && item.badge > 0 && (
-                  <span className={cn(
-                    "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
-                    activeTab === item.tab 
-                      ? "bg-primary-foreground/20 text-primary-foreground" 
-                      : "bg-secondary text-secondary-foreground"
-                  )}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
+        {visibleSections.map((section) => (
+          <div key={section.title}>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-1">
+              {section.title}
+            </p>
+            <ul className="space-y-1">
+              {section.items.map((item) => (
+                <li key={item.tab}>
+                  <button
+                    onClick={() => {
+                      onTabChange(item.tab);
+                      onClose?.();
+                    }}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                      activeTab === item.tab
+                        ? "bg-primary text-primary-foreground shadow-soft" 
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="flex-1 text-left">{t(item.labelKey)}</span>
+                    {item.badge && item.badge > 0 && (
+                      <span className={cn(
+                        "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
+                        activeTab === item.tab 
+                          ? "bg-primary-foreground/20 text-primary-foreground" 
+                          : "bg-secondary text-secondary-foreground"
+                      )}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       {/* Language Switcher */}

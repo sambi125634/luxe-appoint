@@ -22,6 +22,23 @@ interface MenuItem {
 
 const menuSections: { title: string; items: MenuItem[] }[] = [
   {
+    title: "Klienci",
+    items: [
+      { icon: MessageSquare, label: "Konwersacje", description: "Wiadomości", tab: "conversations", color: "bg-teal-500/10 text-teal-600" },
+      { icon: ClipboardList, label: "Konsultacje", description: "Karty konsultacyjne", tab: "consultation", color: "bg-rose-500/10 text-rose-600" },
+    ],
+  },
+  {
+    title: "Marketing & Wzrost",
+    items: [
+      { icon: Radar, label: "Retencja", description: "Odzyskiwanie klientów", tab: "retention", color: "bg-red-500/10 text-red-600" },
+      { icon: Heart, label: "Polecenia", description: "Program poleceń", tab: "referral", color: "bg-pink-500/10 text-pink-600" },
+      { icon: Workflow, label: "Pipeline", description: "Lejek sprzedażowy", tab: "pipeline", color: "bg-purple-500/10 text-purple-600", ownerOnly: true },
+      { icon: Zap, label: "Meta Pixel", description: "Tracking reklam", tab: "pixel", color: "bg-blue-500/10 text-blue-600" },
+      { icon: Code, label: "Widgety", description: "Osadzanie rezerwacji", tab: "widgets", color: "bg-indigo-500/10 text-indigo-600", ownerOnly: true },
+    ],
+  },
+  {
     title: "Zarządzanie",
     items: [
       { icon: Scissors, label: "Usługi", description: "Kategorie i cennik", tab: "services", color: "bg-pink-500/10 text-pink-600" },
@@ -31,18 +48,10 @@ const menuSections: { title: string; items: MenuItem[] }[] = [
     ],
   },
   {
-    title: "Sprzedaż",
+    title: "Finanse",
     items: [
-      { icon: Workflow, label: "Pipeline", description: "Lejek sprzedażowy", tab: "pipeline", color: "bg-purple-500/10 text-purple-600", ownerOnly: true },
-      { icon: MessageSquare, label: "Konwersacje", description: "Wiadomości", tab: "conversations", color: "bg-teal-500/10 text-teal-600" },
-      { icon: Code, label: "Widgety", description: "Osadzanie rezerwacji", tab: "widgets", color: "bg-indigo-500/10 text-indigo-600", ownerOnly: true },
-    ],
-  },
-  {
-    title: "Raporty",
-    items: [
-      { icon: Calculator, label: "Księgowość", description: "Raporty finansowe", tab: "accounting", color: "bg-amber-500/10 text-amber-600", ownerOnly: true },
-      { icon: BarChart3, label: "Statystyki", description: "Analityka biznesowa", tab: "stats", color: "bg-cyan-500/10 text-cyan-600", ownerOnly: true },
+      { icon: Calculator, label: "Raporty", description: "Raporty finansowe", tab: "accounting", color: "bg-amber-500/10 text-amber-600", ownerOnly: true },
+      { icon: TrendingUp, label: "True Profit", description: "Rzeczywisty zysk", tab: "analytics", color: "bg-cyan-500/10 text-cyan-600" },
     ],
   },
   {
