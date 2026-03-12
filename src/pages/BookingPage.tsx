@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+
 import { Sparkles, MapPin, Phone, Clock, Loader2 } from "lucide-react";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { BookingWidget as WidgetConfig, mockWidgets } from "@/components/admin/widgets/types";
