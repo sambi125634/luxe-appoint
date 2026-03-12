@@ -846,7 +846,7 @@
     "changeStageInPipeline": "Change stage in pipeline",
     "current": "Current",
     "saveStageChange": "Save stage change",
-    "stageChangeNote": "Stage change activates the corresponding workflow in GoHighLevel",
+    "stageChangeNote": "Stage change activates the corresponding automation workflow",
     "surveyAfterVisit": "Survey after visit",
     "didVisitHappen": "Did the visit happen?",
     "yesHappened": "Yes, it happened",
