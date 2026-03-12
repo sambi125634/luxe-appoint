@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { TodayProfitCard } from './TodayProfitCard';
 import { MonthlyProfitCard } from './MonthlyProfitCard';
@@ -12,15 +13,13 @@ import { getDemoTrueProfitData } from './demoTrueProfitData';
 import { AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-interface Props {
-  isDemo?: boolean;
-}
+interface Props { isDemo?: boolean; }
 
 export function TrueProfitDashboard({ isDemo }: Props) {
+  const { t } = useTranslation();
   const liveProfit = useTrueProfit();
   const profit = isDemo ? getDemoTrueProfitData() : liveProfit;
   const [showSetup, setShowSetup] = useState(false);
-
   const showEstimateWarning = !isDemo && (!profit.hasMaterialData || !profit.hasStaffRates);
 
   return (
@@ -29,48 +28,29 @@ export function TrueProfitDashboard({ isDemo }: Props) {
         <Alert className="border-amber-500/50 bg-amber-500/10">
           <AlertTriangle className="h-4 w-4 text-amber-500" />
           <AlertDescription className="text-sm">
-            True Profit wyświetlany jest jako <strong>szacunkowy</strong>
-            {!profit.hasMaterialData && ' (brak kosztów materiałów)'}
-            {!profit.hasStaffRates && ' (domyślna stawka pracownika 35 zł/h)'}.{' '}
-            <button onClick={() => setShowSetup(true)} className="underline font-medium text-foreground">
-              Skonfiguruj dane
-            </button>
+            {t('trueProfit.estimateWarning')}
+            {!profit.hasMaterialData && ` ${t('trueProfit.noMaterialData')}`}
+            {!profit.hasStaffRates && ` ${t('trueProfit.defaultStaffRate')}`}.{' '}
+            <button onClick={() => setShowSetup(true)} className="underline font-medium text-foreground">{t('trueProfit.configureData')}</button>
           </AlertDescription>
         </Alert>
       )}
-
       {showSetup && <ProfitSetupWizard onClose={() => setShowSetup(false)} />}
-
-      {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TodayProfitCard summary={profit.todaySummary} bestService={profit.bestServiceToday} />
-        <MonthlyProfitCard
-          summary={profit.monthlySummary}
-          monthChange={profit.monthOverMonthChange}
-        />
+        <MonthlyProfitCard summary={profit.monthlySummary} monthChange={profit.monthOverMonthChange} />
       </div>
-
-      {/* Tabbed content */}
       <Tabs defaultValue="services" className="w-full">
         <TabsList className="w-full flex overflow-x-auto">
-          <TabsTrigger value="services" className="flex-1 min-w-0">Ranking usług</TabsTrigger>
-          <TabsTrigger value="clients" className="flex-1 min-w-0">Ranking klientek</TabsTrigger>
-          <TabsTrigger value="forecast" className="flex-1 min-w-0">Prognoza</TabsTrigger>
-          <TabsTrigger value="benchmarks" className="flex-1 min-w-0">Benchmarki</TabsTrigger>
+          <TabsTrigger value="services" className="flex-1 min-w-0">{t('trueProfit.servicesTab')}</TabsTrigger>
+          <TabsTrigger value="clients" className="flex-1 min-w-0">{t('trueProfit.clientsTab')}</TabsTrigger>
+          <TabsTrigger value="forecast" className="flex-1 min-w-0">{t('trueProfit.forecastTab')}</TabsTrigger>
+          <TabsTrigger value="benchmarks" className="flex-1 min-w-0">{t('trueProfit.benchmarksTab')}</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="services">
-          <ServiceProfitRanking services={profit.serviceProfits} hasMaterialData={profit.hasMaterialData} />
-        </TabsContent>
-        <TabsContent value="clients">
-          <ClientLTVRanking clients={profit.clientLTVs} />
-        </TabsContent>
-        <TabsContent value="forecast">
-          <CashflowForecast monthlySummary={profit.monthlySummary} />
-        </TabsContent>
-        <TabsContent value="benchmarks">
-          <IndustryBenchmarks summary={profit.monthlySummary} />
-        </TabsContent>
+        <TabsContent value="services"><ServiceProfitRanking services={profit.serviceProfits} hasMaterialData={profit.hasMaterialData} /></TabsContent>
+        <TabsContent value="clients"><ClientLTVRanking clients={profit.clientLTVs} /></TabsContent>
+        <TabsContent value="forecast"><CashflowForecast monthlySummary={profit.monthlySummary} /></TabsContent>
+        <TabsContent value="benchmarks"><IndustryBenchmarks summary={profit.monthlySummary} /></TabsContent>
       </Tabs>
     </div>
   );
