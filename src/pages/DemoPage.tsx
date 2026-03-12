@@ -74,8 +74,6 @@ export default function DemoPage() {
           return <StaffManagement isDemo={true} />;
         case "time-off":
           return <TimeOffManagement isDemo={true} />;
-        case "stats":
-          return <StatsModule isDemo={true} />;
         case "settings":
           return <SettingsModule isDemo />;
         case "conversations":
