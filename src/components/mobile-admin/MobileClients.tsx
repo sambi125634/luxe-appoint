@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { useClients } from "@/hooks/useClients";
+import { useClientTags, tagsToAvailableFormat } from "@/hooks/useClientTags";
 import { format } from "date-fns";
 import { pl } from "date-fns/locale";
 
