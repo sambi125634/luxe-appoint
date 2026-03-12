@@ -1,66 +1,101 @@
 
 
-# Plan: Prognozy AI z danymi demo + Przeprojektowanie Radaru Retencji
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Problem 1: Prognozy AI — same zera w demo
+### Co już mamy
 
-`RevenuePredictionCard` nie ma prop `isDemo` — zawsze wywołuje edge function `ai-revenue-predictor`. W demo `salonId` jest null/demo → brak danych → "Brak danych do analizy" lub zera.
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-### Rozwiązanie
-1. Dodać prop `isDemo` do `RevenuePredictionCard`
-2. Gdy `isDemo=true`, zwracać mock data zamiast wywoływać edge function:
-   - Dziś: 2 350 zł, Tydzień: 14 800 zł, Miesiąc: 58 500 zł
-   - Trend: +12% vs poprzedni miesiąc (zielona strzałka w górę)
-   - Pewność: "Wysoka" (zielony badge)
-   - Potwierdzone: 8 200 zł
-   - Insights: 2 realistyczne spostrzeżenia AI
-   - Najlepsze dni: Wtorek, Czwartek, Piątek
-3. Dodać mini wykres słupkowy pod prognozami (7 słupków = ostatnie 7 dni, dane mock)
-4. Przekazać `isDemo` z `DashboardHome` do karty
+### Problem do rozwiązania
 
-## Problem 2: Radar Retencji — kompletne przeprojektowanie
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-Obecny bąbelkowy radar z koncentrycznymi kółkami jest nieintuicyjny. Zastąpić nowoczesnym "Health Board" z 4 kolumnami.
+---
 
-### Nowy komponent `RetentionHealthBoard`
-Zastąpi `RetentionRadar` w dashboardzie retencji (i w kompaktowym widoku na home).
+### Plan implementacji
 
-**Layout:**
-```text
-┌──────────────────────────────────────────────────────────┐
-│  Retencja: 73% ↗ +5pp   [===========○        ]          │
-│  vs poprzedni miesiąc           circular progress        │
-├──────────┬──────────┬──────────┬──────────────────────────┤
-│ 💚 Aktyw │ 🟡 Uwaga │ 🟠 Ryzyk │ 🔴 Utracone            │
-│   (5)    │   (4)    │   (3)    │   (3)                   │
-│ ──────── │ ──────── │ ──────── │ ────────                │
-│ [AK]     │ [AL]     │ [NW]     │ [IW]                   │
-│ Anna K.  │ Agn. L.  │ Nat. W.  │ Izab. W.               │
-│ 5 dni    │ 35 dni   │ 65 dni   │ 95 dni                 │
-│ ▓▓▓▓▓░░  │ ▓▓▓░░░░  │ ▓▓░░░░░  │ ▓░░░░░░               │
-│          │          │          │ [📩 Win-back]           │
-└──────────┴──────────┴──────────┴──────────────────────────┘
-```
+#### FAZA 1: Role-based routing po loginie
 
-**Szczegóły implementacji:**
-- 4 kolumny z kolorowymi paskami na górze (gradient zielony→czerwony)
-- Każda karta klienta: awatar (inicjały w kółku), imię+nazwisko, "X dni temu", mini progress bar (engagement)
-- Tooltip przy hover: historia wizyt, łączna kwota, preferowane usługi (mock data)
-- Kolumny "Ryzyko" i "Utracone": subtelne pulsujące obramowanie (`animate-pulse` border)
-- Na górze: "Retencja: 73% ↗ +5pp vs poprzedni miesiąc" z animated circular progress (framer-motion)
-- Przycisk "Wyślij kampanię win-back" przy sekcji Utracone (nieaktywny w demo, `opacity-50 cursor-not-allowed`)
-- **Responsywność**: na `<lg` kolumny zamieniają się w Tabs (4 zakładki)
-- Zachować istniejące mock data z `MOCK_RADAR_CLIENTS`
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### Pliki do zmiany/utworzenia
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-| Plik | Akcja |
-|------|-------|
-| `src/components/admin/dashboard/RevenuePredictionCard.tsx` | Dodać `isDemo`, mock data, mini bar chart |
-| `src/components/admin/DashboardHome.tsx` | Przekazać `isDemo` do RevenuePredictionCard |
-| `src/modules/retention/RetentionHealthBoard.tsx` | **Nowy** — nowoczesna wizualizacja 4-kolumnowa |
-| `src/modules/retention/RetentionDashboard.tsx` | Import `RetentionHealthBoard` zamiast `RetentionRadar` |
-| `src/components/admin/DashboardHome.tsx` | Kompaktowy health board zamiast compact radar |
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-Istniejący `RetentionRadar.tsx` pozostanie w projekcie (nie usuwamy), ale nie będzie importowany.
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+
+#### FAZA 3: Indywidualne kokpity
+
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
