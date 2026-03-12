@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +14,7 @@ interface AudienceMappingsProps {
 }
 
 export function AudienceMappings({ isDemo }: AudienceMappingsProps) {
+  const { t } = useTranslation();
   const [mappings, setMappings] = useState<AudienceMapping[]>(isDemo ? MOCK_MAPPINGS : []);
 
   const handleAutoCreate = () => {
@@ -23,7 +25,7 @@ export function AudienceMappings({ isDemo }: AudienceMappingsProps) {
       created_at: new Date().toISOString(),
     }));
     setMappings(newMappings);
-    toast.success("Utworzono 5 rekomendowanych audiences");
+    toast.success(t("pixel.createdAudiences"));
   };
 
   const toggleExclusion = (id: string) => {
@@ -34,33 +36,29 @@ export function AudienceMappings({ isDemo }: AudienceMappingsProps) {
 
   return (
     <div className="space-y-4">
-      {/* Auto-create button */}
       {mappings.length === 0 && (
         <Card className="border-dashed border-primary/30 bg-primary/5">
           <CardContent className="p-6 text-center space-y-3">
             <Sparkles className="w-8 h-8 text-primary mx-auto" />
-            <p className="font-medium">Nie masz jeszcze żadnych mapowań</p>
-            <p className="text-sm text-muted-foreground">
-              Automatycznie utwórz 5 rekomendowanych Custom Audiences w Meta jednym kliknięciem.
-            </p>
+            <p className="font-medium">{t("pixel.noMappings")}</p>
+            <p className="text-sm text-muted-foreground">{t("pixel.autoCreateDesc")}</p>
             <Button onClick={handleAutoCreate}>
               <Plus className="w-4 h-4 mr-2" />
-              Auto-utwórz recommended
+              {t("pixel.autoCreate")}
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Mappings list */}
       {mappings.length > 0 && (
         <>
           <div className="flex items-center justify-between">
             <h3 className="font-medium text-sm text-muted-foreground">
-              {mappings.length} mapowań aktywnych
+              {mappings.length} {t("pixel.mappingsActive")}
             </h3>
             <Button variant="outline" size="sm" onClick={handleAutoCreate}>
               <Plus className="w-4 h-4 mr-1" />
-              Dodaj mapowanie
+              {t("pixel.addMapping")}
             </Button>
           </div>
 
@@ -69,32 +67,19 @@ export function AudienceMappings({ isDemo }: AudienceMappingsProps) {
               <Card key={mapping.id} className={mapping.is_exclusion ? "border-destructive/30 bg-destructive/5" : ""}>
                 <CardContent className="p-4">
                   <div className="flex items-center gap-3">
-                    {/* Tag */}
-                    <Badge variant="outline" className="shrink-0">
-                      {mapping.tag_name}
-                    </Badge>
-
+                    <Badge variant="outline" className="shrink-0">{mapping.tag_name}</Badge>
                     <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
-
-                    {/* Audience */}
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">{mapping.audience_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {mapping.audience_id || "Zostanie utworzone przy pierwszej synchronizacji"}
+                        {mapping.audience_id || t("pixel.willBeCreated")}
                       </p>
                     </div>
-
-                    {/* Exclusion toggle */}
                     <div className="flex items-center gap-2 shrink-0">
-                      {mapping.is_exclusion && (
-                        <ShieldBan className="w-4 h-4 text-destructive" />
-                      )}
-                      <Switch
-                        checked={mapping.is_exclusion}
-                        onCheckedChange={() => toggleExclusion(mapping.id)}
-                      />
+                      {mapping.is_exclusion && <ShieldBan className="w-4 h-4 text-destructive" />}
+                      <Switch checked={mapping.is_exclusion} onCheckedChange={() => toggleExclusion(mapping.id)} />
                       <span className="text-xs text-muted-foreground w-16">
-                        {mapping.is_exclusion ? "Wyklucz" : "Dodaj"}
+                        {mapping.is_exclusion ? t("pixel.exclude") : t("pixel.include")}
                       </span>
                     </div>
                   </div>
@@ -105,40 +90,35 @@ export function AudienceMappings({ isDemo }: AudienceMappingsProps) {
         </>
       )}
 
-      {/* Exclusion rules info */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
             <ShieldBan className="w-4 h-4" />
-            Automatyczne wykluczenia
+            {t("pixel.autoExclusions")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <div className="flex items-start gap-2">
             <Badge variant="destructive" className="text-xs shrink-0">obecna-klientka-aktywna</Badge>
-            <span>→ Wyklucz z kampanii prospectingowych (nie płać za kogoś kto już jest)</span>
+            <span>{t("pixel.exclusionActive")}</span>
           </div>
           <div className="flex items-start gap-2">
             <Badge variant="destructive" className="text-xs shrink-0">no-show-recydywista</Badge>
-            <span>→ Wyklucz z kampanii reaktywacyjnych (3+ no-show = oszczędność budżetu)</span>
+            <span>{t("pixel.exclusionNoShow")}</span>
           </div>
           <div className="flex items-start gap-2">
             <Badge variant="destructive" className="text-xs shrink-0">opt-out</Badge>
-            <span>→ Wyklucz ze wszystkich kampanii</span>
+            <span>{t("pixel.exclusionOptOut")}</span>
           </div>
         </CardContent>
       </Card>
 
-      {/* Lookalike info */}
       <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
         <CardContent className="p-4 flex items-start gap-3">
           <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
           <div className="text-sm">
-            <p className="font-medium text-blue-900 dark:text-blue-200">Lookalike Audiences</p>
-            <p className="text-blue-700 dark:text-blue-400 mt-1">
-              Gdy Custom Audience osiągnie min. 100 osób, możesz utworzyć na jej podstawie 
-              <strong> Lookalike Audience</strong> w Meta Ads Manager → Audiences → Create → Lookalike.
-            </p>
+            <p className="font-medium text-blue-900 dark:text-blue-200">{t("pixel.lookalikeTitle")}</p>
+            <p className="text-blue-700 dark:text-blue-400 mt-1">{t("pixel.lookalikeDesc")}</p>
           </div>
         </CardContent>
       </Card>
