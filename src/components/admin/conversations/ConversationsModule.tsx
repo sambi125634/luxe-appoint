@@ -104,7 +104,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
   "2": [
     {
       id: "m4",
-      ghlMessageId: "ghl_msg_004",
+      externalMessageId: "ext_msg_004",
       direction: "outbound",
       type: "SMS",
       body: "Przypominamy o wizycie w Luxury Beauty Spa w środę o 10:00. Usługa: Mezoterapia. Pozdrawiamy!",
