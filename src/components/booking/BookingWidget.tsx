@@ -471,7 +471,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
         <div className="relative z-20 h-[100dvh] flex flex-col items-center justify-center px-4 py-4">
           <div className="w-full max-w-md mx-auto">
             <div 
-              className="flex justify-center mb-6 animate-fade-in"
+              className="flex justify-center mb-4 animate-fade-in"
               style={{ animationDelay: '0.2s' }}
             >
               <Badge 
