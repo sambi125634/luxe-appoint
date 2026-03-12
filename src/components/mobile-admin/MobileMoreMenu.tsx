@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import {
-  Scissors, Users, CalendarOff, BarChart3, Calculator, Code,
+  Scissors, Users, CalendarOff, Calculator, Code,
   Package, MessageSquare, Workflow, Settings, HelpCircle, LogOut,
-  Sparkles, ChevronRight, User
+  Sparkles, ChevronRight, User, Radar, Heart, Zap, TrendingUp, ClipboardList
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
