@@ -115,6 +115,17 @@ export default function BookingPage() {
     );
   }
 
+  // On intro step, render widget full-screen without header/footer
+  if (isIntro) {
+    return (
+      <BookingWidget 
+        widgetConfig={widgetConfig} 
+        salonId={salonInfo.id} 
+        onStepChange={(stepId) => setIsIntro(stepId === "intro")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -155,7 +166,11 @@ export default function BookingPage() {
 
       {/* Booking Widget */}
       <main className="container mx-auto px-4 py-12">
-        <BookingWidget widgetConfig={widgetConfig} salonId={salonInfo.id} />
+        <BookingWidget 
+          widgetConfig={widgetConfig} 
+          salonId={salonInfo.id} 
+          onStepChange={(stepId) => setIsIntro(stepId === "intro")}
+        />
       </main>
 
       {/* Footer */}
