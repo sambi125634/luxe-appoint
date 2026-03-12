@@ -41,11 +41,18 @@ interface ProductSalesAccountingReportProps {
   dateRange: { from: Date; to: Date };
 }
 
-// Mock data for product sales
+// Mock data for product sales — dates relative to today
+const today = new Date();
+const ddAgo = (daysAgo: number) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().split("T")[0];
+};
+
 const mockProductSales = [
   {
     id: "ps1",
-    date: "2024-01-15",
+    date: ddAgo(0),
     productId: "p1",
     productName: "Serum witaminowe C",
     category: "Kosmetyki",
