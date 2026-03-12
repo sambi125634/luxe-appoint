@@ -18,6 +18,7 @@ interface SalonInfo {
 
 export default function BookingPage() {
   const { slug } = useParams();
+  const [isIntro, setIsIntro] = useState(true);
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
   const [salonInfo, setSalonInfo] = useState<SalonInfo | null>(null);
   const [loading, setLoading] = useState(true);
