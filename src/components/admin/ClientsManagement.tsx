@@ -192,14 +192,24 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     needsFollowup: false
   });
 
-  const availableTags = [
-    { id: "vip", label: t('clients.tagLabels.vip'), color: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" },
-    { id: "new", label: t('clients.tagLabels.new'), color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200" },
-    { id: "regular", label: t('clients.tagLabels.regular'), color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200" },
-    { id: "problematic", label: t('clients.tagLabels.problematic'), color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200" },
-    { id: "friday-lover", label: t('clients.tagLabels.fridayLover'), color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200" },
-    { id: "evening", label: t('clients.tagLabels.evening'), color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200" },
-  ];
+  // DB-driven tags
+  const { data: dbTags } = useClientTags();
+  const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
+
+  const availableTags = useMemo(() => {
+    if (!dbTags || dbTags.length === 0) {
+      // Fallback for demo mode
+      return [
+        { id: "vip", label: t('clients.tagLabels.vip'), color: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200" },
+        { id: "new", label: t('clients.tagLabels.new'), color: "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200" },
+        { id: "regular", label: t('clients.tagLabels.regular'), color: "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200" },
+        { id: "problematic", label: t('clients.tagLabels.problematic'), color: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200" },
+        { id: "friday-lover", label: t('clients.tagLabels.fridayLover'), color: "bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-200" },
+        { id: "evening", label: t('clients.tagLabels.evening'), color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200" },
+      ];
+    }
+    return tagsToAvailableFormat(dbTags);
+  }, [dbTags, t]);
 
   const availableCategories = useMemo(() => {
     const categories = new Set<string>();
