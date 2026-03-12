@@ -40,6 +40,22 @@ export function useServiceCategories() {
   });
 }
 
+export function useStaffServices(serviceId?: string) {
+  return useQuery({
+    queryKey: ["staff-services", serviceId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("staff_services")
+        .select("staff_id")
+        .eq("service_id", serviceId!);
+
+      if (error) throw error;
+      return data.map(ss => ss.staff_id);
+    },
+    enabled: !!serviceId,
+  });
+}
+
 export function useCreateService() {
   const { salonId } = useSalonId();
   const queryClient = useQueryClient();
@@ -53,6 +69,7 @@ export function useCreateService() {
       description?: string;
       media?: import("@/integrations/supabase/types").Json;
       benefits?: import("@/integrations/supabase/types").Json;
+      vat_rate?: number;
     }) => {
       const { data, error } = await supabase
         .from("services")
@@ -83,6 +100,7 @@ export function useUpdateService() {
       description?: string;
       media?: import("@/integrations/supabase/types").Json;
       benefits?: import("@/integrations/supabase/types").Json;
+      vat_rate?: number;
     }) => {
       const { data, error } = await supabase
         .from("services")
@@ -158,6 +176,54 @@ export function useUpdateCategory() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["service-categories", salonId] });
+    },
+  });
+}
+
+export function useDeleteCategory() {
+  const { salonId } = useSalonId();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("service_categories")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["service-categories", salonId] });
+      queryClient.invalidateQueries({ queryKey: ["services", salonId] });
+    },
+  });
+}
+
+export function useSyncStaffServices() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ serviceId, staffIds }: { serviceId: string; staffIds: string[] }) => {
+      // Delete existing
+      const { error: deleteError } = await supabase
+        .from("staff_services")
+        .delete()
+        .eq("service_id", serviceId);
+
+      if (deleteError) throw deleteError;
+
+      // Insert new
+      if (staffIds.length > 0) {
+        const { error: insertError } = await supabase
+          .from("staff_services")
+          .insert(staffIds.map(staffId => ({ staff_id: staffId, service_id: serviceId })));
+
+        if (insertError) throw insertError;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["staff-services"] });
     },
   });
 }
