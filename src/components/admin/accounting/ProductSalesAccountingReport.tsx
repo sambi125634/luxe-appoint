@@ -75,7 +75,7 @@ const mockProductSales = [
   },
   {
     id: "ps2",
-    date: "2024-01-15",
+    date: ddAgo(0),
     productId: "p2",
     productName: "Krem nawilżający premium",
     category: "Kosmetyki",
