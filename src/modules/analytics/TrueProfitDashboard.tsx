@@ -8,6 +8,7 @@ import { CashflowForecast } from './CashflowForecast';
 import { IndustryBenchmarks } from './IndustryBenchmarks';
 import { ProfitSetupWizard } from './ProfitSetupWizard';
 import { useTrueProfit } from '@/hooks/useTrueProfit';
+import { getDemoTrueProfitData } from './demoTrueProfitData';
 import { AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
@@ -16,10 +17,11 @@ interface Props {
 }
 
 export function TrueProfitDashboard({ isDemo }: Props) {
-  const profit = useTrueProfit();
+  const liveProfit = useTrueProfit();
+  const profit = isDemo ? getDemoTrueProfitData() : liveProfit;
   const [showSetup, setShowSetup] = useState(false);
 
-  const showEstimateWarning = !profit.hasMaterialData || !profit.hasStaffRates;
+  const showEstimateWarning = !isDemo && (!profit.hasMaterialData || !profit.hasStaffRates);
 
   return (
     <div className="space-y-6">
