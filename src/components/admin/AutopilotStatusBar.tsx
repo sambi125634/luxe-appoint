@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Bot, Pause, Play, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AutopilotActionLog } from "./AutopilotActionLog";
@@ -13,6 +14,7 @@ interface AutopilotStatusBarProps {
 }
 
 export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) {
+  const { t } = useTranslation();
   const [logOpen, setLogOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -28,9 +30,9 @@ export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) 
           style={{ background: "linear-gradient(135deg, #1A1A2E 0%, #4a4a6a 100%)" }}
         >
           <Pause className="w-4 h-4" />
-          <span className="font-medium">Autopilot wstrzymany</span>
+          <span className="font-medium">{t('autopilot.paused')}</span>
           <span className="opacity-70">·</span>
-          <span className="opacity-70">Wszystkie automatyczne akcje są spauzowane</span>
+          <span className="opacity-70">{t('autopilot.allPaused')}</span>
           <Button
             variant="ghost"
             size="sm"
@@ -38,7 +40,7 @@ export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) 
             onClick={() => setIsPaused(false)}
           >
             <Play className="w-3 h-3" />
-            Wznów
+            {t('autopilot.resume')}
           </Button>
         </div>
         <AutopilotActionLog
@@ -58,14 +60,14 @@ export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) 
         style={{ background: "linear-gradient(135deg, #1A1A2E 0%, #E91E8C 100%)" }}
       >
         <Bot className="w-4 h-4 flex-shrink-0" />
-        <span className="font-medium hidden sm:inline">Autopilot aktywny</span>
+        <span className="font-medium hidden sm:inline">{t('autopilot.active')}</span>
         <span className="opacity-70 hidden sm:inline">·</span>
         <span className="hidden sm:inline">
-          Dziś zadziałał {stats.actions_today}×
+          {t('autopilot.todayActions', { count: stats.actions_today })}
         </span>
         <span className="opacity-70">·</span>
         <span>
-          Odzyskano <strong>{stats.revenue_today} zł</strong>
+          {t('autopilot.recovered')} <strong>{stats.revenue_today} zł</strong>
         </span>
         <Button
           variant="ghost"
@@ -73,7 +75,7 @@ export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) 
           className="h-6 text-xs text-white hover:text-white hover:bg-white/20 gap-1"
           onClick={() => setLogOpen(true)}
         >
-          Zobacz akcje
+          {t('autopilot.viewActions')}
           <ChevronRight className="w-3 h-3" />
         </Button>
 
@@ -85,7 +87,7 @@ export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) 
             onClick={() => setIsPaused(true)}
           >
             <Pause className="w-3 h-3" />
-            Pauzuj
+            {t('autopilot.pause')}
           </Button>
         )}
       </div>
