@@ -956,7 +956,7 @@
     "changeStageInPipeline": "Zmień stage w pipeline",
     "current": "Aktualny",
     "saveStageChange": "Zapisz zmianę stage'u",
-    "stageChangeNote": "Zmiana stage'u aktywuje odpowiedni workflow w GoHighLevel",
+    "stageChangeNote": "Zmiana etapu aktywuje odpowiedni workflow automatyzacji",
     "surveyAfterVisit": "Ankieta po wizycie",
     "didVisitHappen": "Czy wizyta się odbyła?",
     "yesHappened": "Tak, odbyła się",
