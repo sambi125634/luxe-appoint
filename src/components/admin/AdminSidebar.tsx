@@ -28,30 +28,66 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const allNavItems: { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number }[] = [
-    { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
-    { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
-    { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
-    { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
-    { icon: Radar, labelKey: "admin.retention", tab: "retention" },
-    { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
-    { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
-    { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
-    { icon: Package, labelKey: "admin.products", tab: "products" },
-    { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
-    { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
-    { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
-    { icon: Heart, labelKey: "admin.referral", tab: "referral" },
-    { icon: Users, labelKey: "admin.staff", tab: "staff" },
-    { icon: Scissors, labelKey: "admin.services", tab: "services" },
-    { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
-    { icon: Settings, labelKey: "admin.settings", tab: "settings" },
-    { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
+  type NavItem = { icon: typeof Calendar; labelKey: string; tab: TabType; badge?: number };
+  const allSections: { title: string; items: NavItem[] }[] = [
+    {
+      title: "Codzienna praca",
+      items: [
+        { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
+        { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
+      ],
+    },
+    {
+      title: "Klienci",
+      items: [
+        { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
+        { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
+        { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
+      ],
+    },
+    {
+      title: "Marketing & Wzrost",
+      items: [
+        { icon: Radar, labelKey: "admin.retention", tab: "retention" },
+        { icon: Heart, labelKey: "admin.referral", tab: "referral" },
+        { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
+        { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
+        { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
+      ],
+    },
+    {
+      title: "Zarządzanie",
+      items: [
+        { icon: Scissors, labelKey: "admin.services", tab: "services" },
+        { icon: Users, labelKey: "admin.staff", tab: "staff" },
+        { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
+        { icon: Package, labelKey: "admin.products", tab: "products" },
+      ],
+    },
+    {
+      title: "Finanse",
+      items: [
+        { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
+        { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
+      ],
+    },
+    {
+      title: "System",
+      items: [
+        { icon: Settings, labelKey: "admin.settings", tab: "settings" },
+        { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
+      ],
+    },
   ];
 
-  const navItems = userRole === "staff"
-    ? allNavItems.filter(item => !OWNER_ONLY_TABS.includes(item.tab))
-    : allNavItems;
+  const visibleSections = allSections
+    .map(section => ({
+      ...section,
+      items: userRole === "staff"
+        ? section.items.filter(item => !OWNER_ONLY_TABS.includes(item.tab))
+        : section.items,
+    }))
+    .filter(section => section.items.length > 0);
 
   const displayName = salonName || "Beauty Calendar";
   const initials = displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
@@ -81,37 +117,44 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
 
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
-        <ul className="space-y-1">
-          {navItems.map((item) => (
-            <li key={item.tab}>
-              <button
-                onClick={() => {
-                  onTabChange(item.tab);
-                  onClose?.();
-                }}
-                className={cn(
-                  "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                  activeTab === item.tab
-                    ? "bg-primary text-primary-foreground shadow-soft" 
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                <span className="flex-1 text-left">{t(item.labelKey)}</span>
-                {item.badge && item.badge > 0 && (
-                  <span className={cn(
-                    "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
-                    activeTab === item.tab 
-                      ? "bg-primary-foreground/20 text-primary-foreground" 
-                      : "bg-secondary text-secondary-foreground"
-                  )}>
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
+        {visibleSections.map((section) => (
+          <div key={section.title}>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-1">
+              {section.title}
+            </p>
+            <ul className="space-y-1">
+              {section.items.map((item) => (
+                <li key={item.tab}>
+                  <button
+                    onClick={() => {
+                      onTabChange(item.tab);
+                      onClose?.();
+                    }}
+                    className={cn(
+                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                      activeTab === item.tab
+                        ? "bg-primary text-primary-foreground shadow-soft" 
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="flex-1 text-left">{t(item.labelKey)}</span>
+                    {item.badge && item.badge > 0 && (
+                      <span className={cn(
+                        "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
+                        activeTab === item.tab 
+                          ? "bg-primary-foreground/20 text-primary-foreground" 
+                          : "bg-secondary text-secondary-foreground"
+                      )}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       {/* Language Switcher */}
