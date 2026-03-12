@@ -45,7 +45,6 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Users, labelKey: "admin.staff", tab: "staff" },
     { icon: Scissors, labelKey: "admin.services", tab: "services" },
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
-    { icon: BarChart3, labelKey: "admin.stats", tab: "stats" },
     { icon: Settings, labelKey: "admin.settings", tab: "settings" },
     { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
   ];

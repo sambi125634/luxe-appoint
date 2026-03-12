@@ -260,6 +260,14 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
           <VouchersReport dateRange={filters.dateRange} />
         </TabsContent>
 
+        <TabsContent value="occupancy" className="mt-6">
+          <OccupancyReport />
+        </TabsContent>
+
+        <TabsContent value="noshows" className="mt-6">
+          <NoShowsReport />
+        </TabsContent>
+
         <TabsContent value="export" className="mt-6">
           <ExportSection dateRange={filters.dateRange} />
         </TabsContent>
