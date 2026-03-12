@@ -9,351 +9,212 @@ const d = (daysAgo: number, time: string = "12:00:00") => {
 };
 const dd = (daysAgo: number) => format(subDays(today, daysAgo), "yyyy-MM-dd");
 
-export const mockTransactions: Transaction[] = [
-  {
-    id: "t1",
-    salonId: "demo",
-    dateTime: d(0, "09:30:00"),
-    clientId: "c1",
-    clientName: "Anna Kowalska",
-    staffId: "s1",
-    staffName: "Maria Kowalczyk",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Twarz",
-    itemName: "Mezoterapia twarzy",
-    quantity: 1,
-    unitPriceBrutto: 350,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 284.55,
-    vatAmount: 65.45,
-    grossAmount: 350,
-    paymentMethod: "karta",
-    tipAmount: 30,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t2",
-    salonId: "demo",
-    dateTime: d(0, "11:00:00"),
-    clientId: "c2",
-    clientName: "Katarzyna Nowak",
-    staffId: "s2",
-    staffName: "Aleksandra Wiśniewska",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Ciało",
-    itemName: "Masaż relaksacyjny 60min",
-    quantity: 1,
-    unitPriceBrutto: 200,
-    discountAmount: 20,
-    vatRate: 8,
-    netAmount: 166.67,
-    vatAmount: 13.33,
-    grossAmount: 180,
-    paymentMethod: "gotówka",
-    tipAmount: 20,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t3",
-    salonId: "demo",
-    dateTime: d(0, "13:30:00"),
-    clientId: "c3",
-    clientName: "Magdalena Wiśniewska",
-    staffId: "s1",
-    staffName: "Maria Kowalczyk",
-    locationId: null,
-    itemType: "produkt",
-    itemCategory: "Kosmetyki",
-    itemName: "Serum witaminowe C",
-    quantity: 2,
-    unitPriceBrutto: 120,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 195.12,
-    vatAmount: 44.88,
-    grossAmount: 240,
-    paymentMethod: "karta",
-    tipAmount: 0,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t4",
-    salonId: "demo",
-    dateTime: d(0, "15:00:00"),
-    clientId: "c4",
-    clientName: "Joanna Lewandowska",
-    staffId: "s3",
-    staffName: "Natalia Kamińska",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Twarz",
-    itemName: "Peeling kawitacyjny",
-    quantity: 1,
-    unitPriceBrutto: 150,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 121.95,
-    vatAmount: 28.05,
-    grossAmount: 150,
-    paymentMethod: "online",
-    tipAmount: 15,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t5",
-    salonId: "demo",
-    dateTime: d(0, "16:30:00"),
-    clientId: "c5",
-    clientName: "Ewa Dąbrowska",
-    staffId: "s2",
-    staffName: "Aleksandra Wiśniewska",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Depilacja",
-    itemName: "Depilacja laserowa - nogi",
-    quantity: 1,
-    unitPriceBrutto: 450,
-    discountAmount: 50,
-    vatRate: 23,
-    netAmount: 325.20,
-    vatAmount: 74.80,
-    grossAmount: 400,
-    paymentMethod: "voucher",
-    tipAmount: 0,
-    relatedVoucherId: "v1",
-    status: "opłacone"
-  },
-  {
-    id: "t6",
-    salonId: "demo",
-    dateTime: d(1, "10:00:00"),
-    clientId: "c6",
-    clientName: "Monika Zielińska",
-    staffId: "s1",
-    staffName: "Maria Kowalczyk",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Twarz",
-    itemName: "Oczyszczanie manualne",
-    quantity: 1,
-    unitPriceBrutto: 180,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 146.34,
-    vatAmount: 33.66,
-    grossAmount: 180,
-    paymentMethod: "gotówka",
-    tipAmount: 20,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t7",
-    salonId: "demo",
-    dateTime: d(1, "12:00:00"),
-    clientId: "c7",
-    clientName: "Agnieszka Szymańska",
-    staffId: "s3",
-    staffName: "Natalia Kamińska",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Ciało",
-    itemName: "Drenaż limfatyczny",
-    quantity: 1,
-    unitPriceBrutto: 280,
-    discountAmount: 0,
-    vatRate: 8,
-    netAmount: 259.26,
-    vatAmount: 20.74,
-    grossAmount: 280,
-    paymentMethod: "karta",
-    tipAmount: 30,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t8",
-    salonId: "demo",
-    dateTime: d(1, "14:30:00"),
-    clientId: "c8",
-    clientName: "Barbara Woźniak",
-    staffId: "s2",
-    staffName: "Aleksandra Wiśniewska",
-    locationId: null,
-    itemType: "produkt",
-    itemCategory: "Kosmetyki",
-    itemName: "Krem nawilżający premium",
-    quantity: 1,
-    unitPriceBrutto: 189,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 153.66,
-    vatAmount: 35.34,
-    grossAmount: 189,
-    paymentMethod: "karta",
-    tipAmount: 0,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t9",
-    salonId: "demo",
-    dateTime: d(2, "09:00:00"),
-    clientId: "c9",
-    clientName: "Dorota Kaczmarek",
-    staffId: "s1",
-    staffName: "Maria Kowalczyk",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Twarz",
-    itemName: "Lifting RF twarzy",
-    quantity: 1,
-    unitPriceBrutto: 500,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 406.50,
-    vatAmount: 93.50,
-    grossAmount: 500,
-    paymentMethod: "karta",
-    tipAmount: 50,
-    relatedVoucherId: null,
-    status: "opłacone"
-  },
-  {
-    id: "t10",
-    salonId: "demo",
-    dateTime: d(2, "11:30:00"),
-    clientId: "c10",
-    clientName: "Patrycja Piotrowska",
-    staffId: "s2",
-    staffName: "Aleksandra Wiśniewska",
-    locationId: null,
-    itemType: "usługa",
-    itemCategory: "Depilacja",
-    itemName: "Depilacja woskiem - bikini",
-    quantity: 1,
-    unitPriceBrutto: 120,
-    discountAmount: 0,
-    vatRate: 23,
-    netAmount: 97.56,
-    vatAmount: 22.44,
-    grossAmount: 120,
-    paymentMethod: "gotówka",
-    tipAmount: 10,
-    relatedVoucherId: null,
-    status: "opłacone"
-  }
+// Deterministic pseudo-random number generator (seed-based for stable renders)
+function seededRandom(seed: number) {
+  let s = seed;
+  return () => {
+    s = (s * 16807 + 0) % 2147483647;
+    return (s - 1) / 2147483646;
+  };
+}
+
+const rand = seededRandom(42);
+const pick = <T>(arr: T[]): T => arr[Math.floor(rand() * arr.length)];
+const randBetween = (min: number, max: number) => Math.floor(rand() * (max - min + 1)) + min;
+
+// Data pools
+const staffPool = [
+  { id: "s1", name: "Maria Kowalczyk" },
+  { id: "s2", name: "Aleksandra Wiśniewska" },
+  { id: "s3", name: "Natalia Kamińska" },
 ];
 
-export const mockDailyClosings: DailyClosing[] = [
-  {
-    id: "dc1",
-    salonId: "demo",
-    date: dd(0),
-    totalServicesGross: 1080,
-    totalProductsGross: 240,
-    totalTips: 65,
-    cashGross: 180,
-    cardGross: 590,
-    onlineGross: 150,
-    voucherGross: 400,
-    depositGross: 0,
-    expectedCashInDrawer: 245,
-    actualCashInDrawer: null,
-    cashDifference: null,
-    closedByUserId: null,
-    closedByUserName: null,
-    closedAt: null,
-    status: "otwarte"
-  },
-  {
-    id: "dc2",
-    salonId: "demo",
-    date: dd(1),
-    totalServicesGross: 460,
-    totalProductsGross: 189,
-    totalTips: 50,
-    cashGross: 200,
-    cardGross: 449,
-    onlineGross: 0,
-    voucherGross: 0,
-    depositGross: 0,
-    expectedCashInDrawer: 250,
-    actualCashInDrawer: 248,
-    cashDifference: -2,
-    closedByUserId: "u1",
-    closedByUserName: "Admin",
-    closedAt: d(1, "21:30:00"),
-    status: "zamknięte"
-  },
-  {
-    id: "dc3",
-    salonId: "demo",
-    date: dd(2),
-    totalServicesGross: 620,
-    totalProductsGross: 0,
-    totalTips: 60,
-    cashGross: 130,
-    cardGross: 490,
-    onlineGross: 0,
-    voucherGross: 0,
-    depositGross: 0,
-    expectedCashInDrawer: 190,
-    actualCashInDrawer: 190,
-    cashDifference: 0,
-    closedByUserId: "u1",
-    closedByUserName: "Admin",
-    closedAt: d(2, "20:45:00"),
-    status: "zamknięte"
-  },
-  {
-    id: "dc4",
-    salonId: "demo",
-    date: dd(3),
-    totalServicesGross: 890,
-    totalProductsGross: 320,
-    totalTips: 85,
-    cashGross: 410,
-    cardGross: 680,
-    onlineGross: 120,
-    voucherGross: 0,
-    depositGross: 0,
-    expectedCashInDrawer: 495,
-    actualCashInDrawer: 500,
-    cashDifference: 5,
-    closedByUserId: "u1",
-    closedByUserName: "Admin",
-    closedAt: d(3, "21:00:00"),
-    status: "zamknięte"
-  },
-  {
-    id: "dc5",
-    salonId: "demo",
-    date: dd(4),
-    totalServicesGross: 1250,
-    totalProductsGross: 156,
-    totalTips: 120,
-    cashGross: 520,
-    cardGross: 756,
-    onlineGross: 130,
-    voucherGross: 0,
-    depositGross: 0,
-    expectedCashInDrawer: 640,
-    actualCashInDrawer: 635,
-    cashDifference: -5,
-    closedByUserId: "u1",
-    closedByUserName: "Admin",
-    closedAt: d(4, "21:15:00"),
-    status: "zamknięte"
-  }
+const clientPool = [
+  { id: "c1", name: "Anna Kowalska" },
+  { id: "c2", name: "Katarzyna Nowak" },
+  { id: "c3", name: "Magdalena Wiśniewska" },
+  { id: "c4", name: "Joanna Lewandowska" },
+  { id: "c5", name: "Ewa Dąbrowska" },
+  { id: "c6", name: "Monika Zielińska" },
+  { id: "c7", name: "Agnieszka Szymańska" },
+  { id: "c8", name: "Barbara Woźniak" },
+  { id: "c9", name: "Dorota Kaczmarek" },
+  { id: "c10", name: "Patrycja Piotrowska" },
+  { id: "c11", name: "Karolina Jankowska" },
+  { id: "c12", name: "Izabela Mazur" },
+  { id: "c13", name: "Sylwia Krawczyk" },
+  { id: "c14", name: "Justyna Wójcik" },
+  { id: "c15", name: "Renata Kubiak" },
+  { id: "c16", name: "Marta Pawlak" },
+  { id: "c17", name: "Beata Michalska" },
+  { id: "c18", name: "Paulina Adamczyk" },
+  { id: "c19", name: "Weronika Stępień" },
+  { id: "c20", name: "Natalia Głowacka" },
 ];
+
+interface ServiceItem {
+  category: string;
+  name: string;
+  price: number;
+  vatRate: number;
+  type: "usługa" | "produkt";
+}
+
+const serviceItems: ServiceItem[] = [
+  { category: "Twarz", name: "Mezoterapia twarzy", price: 350, vatRate: 23, type: "usługa" },
+  { category: "Twarz", name: "Peeling kawitacyjny", price: 150, vatRate: 23, type: "usługa" },
+  { category: "Twarz", name: "Oczyszczanie manualne", price: 180, vatRate: 23, type: "usługa" },
+  { category: "Twarz", name: "Lifting RF twarzy", price: 500, vatRate: 23, type: "usługa" },
+  { category: "Twarz", name: "Mikrodermabrazja", price: 200, vatRate: 23, type: "usługa" },
+  { category: "Ciało", name: "Masaż relaksacyjny 60min", price: 200, vatRate: 8, type: "usługa" },
+  { category: "Ciało", name: "Drenaż limfatyczny", price: 280, vatRate: 8, type: "usługa" },
+  { category: "Ciało", name: "Masaż gorącymi kamieniami", price: 250, vatRate: 8, type: "usługa" },
+  { category: "Ciało", name: "Body wrapping", price: 220, vatRate: 8, type: "usługa" },
+  { category: "Depilacja", name: "Depilacja laserowa - nogi", price: 450, vatRate: 23, type: "usługa" },
+  { category: "Depilacja", name: "Depilacja woskiem - bikini", price: 120, vatRate: 23, type: "usługa" },
+  { category: "Depilacja", name: "Depilacja laserowa - pachy", price: 180, vatRate: 23, type: "usługa" },
+  { category: "Paznokcie", name: "Manicure hybrydowy", price: 130, vatRate: 23, type: "usługa" },
+  { category: "Paznokcie", name: "Pedicure spa", price: 160, vatRate: 23, type: "usługa" },
+  { category: "Brwi & Rzęsy", name: "Laminacja brwi", price: 140, vatRate: 23, type: "usługa" },
+  { category: "Brwi & Rzęsy", name: "Przedłużanie rzęs 1:1", price: 250, vatRate: 23, type: "usługa" },
+];
+
+const productItems: ServiceItem[] = [
+  { category: "Kosmetyki", name: "Serum witaminowe C", price: 120, vatRate: 23, type: "produkt" },
+  { category: "Kosmetyki", name: "Krem nawilżający premium", price: 189, vatRate: 23, type: "produkt" },
+  { category: "Kosmetyki", name: "Tonik oczyszczający", price: 65, vatRate: 23, type: "produkt" },
+  { category: "Kosmetyki", name: "Maska algowa", price: 45, vatRate: 23, type: "produkt" },
+  { category: "Pielęgnacja", name: "Olejek do ciała", price: 85, vatRate: 23, type: "produkt" },
+  { category: "Pielęgnacja", name: "Peeling cukrowy", price: 55, vatRate: 23, type: "produkt" },
+  { category: "Pielęgnacja", name: "Odżywka do paznokci", price: 35, vatRate: 23, type: "produkt" },
+];
+
+const paymentMethods: Transaction["paymentMethod"][] = ["gotówka", "karta", "online", "voucher"];
+const hours = ["09:00:00", "09:30:00", "10:00:00", "10:30:00", "11:00:00", "11:30:00", "12:00:00", "12:30:00", "13:00:00", "13:30:00", "14:00:00", "14:30:00", "15:00:00", "15:30:00", "16:00:00", "16:30:00", "17:00:00", "17:30:00", "18:00:00", "18:30:00"];
+
+// Generate ~150 transactions over 90 days
+function generateTransactions(): Transaction[] {
+  const transactions: Transaction[] = [];
+  let txId = 1;
+
+  for (let daysAgo = 0; daysAgo <= 89; daysAgo++) {
+    const date = subDays(today, daysAgo);
+    const dayOfWeek = date.getDay(); // 0=Sun, 6=Sat
+
+    // Skip Sundays
+    if (dayOfWeek === 0) continue;
+
+    // Determine number of transactions: weekends (Sat) slightly less, weekdays vary
+    let txCount: number;
+    if (dayOfWeek === 6) {
+      txCount = randBetween(1, 3); // Saturday: fewer
+    } else if (dayOfWeek === 5 || dayOfWeek === 4) {
+      txCount = randBetween(2, 4); // Thu-Fri: busier
+    } else {
+      txCount = randBetween(1, 3); // Mon-Wed: moderate
+    }
+
+    for (let i = 0; i < txCount; i++) {
+      const isProduct = rand() < 0.2; // 20% product sales
+      const item = isProduct ? pick(productItems) : pick(serviceItems);
+      const staff = pick(staffPool);
+      const client = pick(clientPool);
+      const time = pick(hours);
+      const quantity = isProduct ? randBetween(1, 3) : 1;
+      const hasDiscount = rand() < 0.12;
+      const discountAmount = hasDiscount ? Math.round(item.price * 0.1) : 0;
+      const grossAmount = item.price * quantity - discountAmount;
+      const netAmount = grossAmount / (1 + item.vatRate / 100);
+      const vatAmount = grossAmount - netAmount;
+      const hasTip = !isProduct && rand() < 0.4;
+      const tipAmount = hasTip ? pick([10, 15, 20, 25, 30, 40, 50]) : 0;
+      const isCancelled = rand() < 0.04; // ~4% cancelled
+      const method = pick(paymentMethods);
+
+      transactions.push({
+        id: `t${txId++}`,
+        salonId: "demo",
+        dateTime: d(daysAgo, time),
+        clientId: client.id,
+        clientName: client.name,
+        staffId: staff.id,
+        staffName: staff.name,
+        locationId: null,
+        itemType: item.type,
+        itemCategory: item.category,
+        itemName: item.name,
+        quantity,
+        unitPriceBrutto: item.price,
+        discountAmount,
+        vatRate: item.vatRate,
+        netAmount: Math.round(netAmount * 100) / 100,
+        vatAmount: Math.round(vatAmount * 100) / 100,
+        grossAmount,
+        paymentMethod: method,
+        tipAmount,
+        relatedVoucherId: method === "voucher" ? "v1" : null,
+        status: isCancelled ? "anulowane" : "opłacone",
+      });
+    }
+  }
+
+  return transactions;
+}
+
+export const mockTransactions: Transaction[] = generateTransactions();
+
+// Generate daily closings from transactions
+function generateDailyClosings(): DailyClosing[] {
+  const closings: DailyClosing[] = [];
+  const byDate = new Map<string, Transaction[]>();
+
+  for (const tx of mockTransactions) {
+    const date = tx.dateTime.split("T")[0];
+    if (!byDate.has(date)) byDate.set(date, []);
+    byDate.get(date)!.push(tx);
+  }
+
+  let dcId = 1;
+  const sortedDates = [...byDate.keys()].sort().reverse();
+
+  for (const date of sortedDates) {
+    const txs = byDate.get(date)!.filter(t => t.status === "opłacone");
+    const servicesGross = txs.filter(t => t.itemType === "usługa").reduce((s, t) => s + t.grossAmount, 0);
+    const productsGross = txs.filter(t => t.itemType === "produkt").reduce((s, t) => s + t.grossAmount, 0);
+    const tips = txs.reduce((s, t) => s + t.tipAmount, 0);
+    const cash = txs.filter(t => t.paymentMethod === "gotówka").reduce((s, t) => s + t.grossAmount, 0);
+    const card = txs.filter(t => t.paymentMethod === "karta").reduce((s, t) => s + t.grossAmount, 0);
+    const online = txs.filter(t => t.paymentMethod === "online").reduce((s, t) => s + t.grossAmount, 0);
+    const voucher = txs.filter(t => t.paymentMethod === "voucher").reduce((s, t) => s + t.grossAmount, 0);
+    const daysAgo = Math.round((today.getTime() - new Date(date).getTime()) / 86400000);
+    const isClosed = daysAgo > 0;
+
+    closings.push({
+      id: `dc${dcId++}`,
+      salonId: "demo",
+      date,
+      totalServicesGross: servicesGross,
+      totalProductsGross: productsGross,
+      totalTips: tips,
+      cashGross: cash,
+      cardGross: card,
+      onlineGross: online,
+      voucherGross: voucher,
+      depositGross: 0,
+      expectedCashInDrawer: cash + tips,
+      actualCashInDrawer: isClosed ? cash + tips + (rand() > 0.5 ? randBetween(-5, 5) : 0) : null,
+      cashDifference: isClosed ? randBetween(-5, 5) : null,
+      closedByUserId: isClosed ? "u1" : null,
+      closedByUserName: isClosed ? "Admin" : null,
+      closedAt: isClosed ? `${date}T21:00:00` : null,
+      status: isClosed ? "zamknięte" : "otwarte",
+    });
+  }
+
+  return closings;
+}
+
+export const mockDailyClosings: DailyClosing[] = generateDailyClosings();
 
 export const mockEmployeeCommissions: EmployeeCommission[] = [
   {
@@ -499,38 +360,25 @@ export const mockAccountingExports: AccountingExport[] = [
     salonId: "demo",
     generatedByUserId: "u1",
     generatedByUserName: "Admin",
-    generatedAt: d(1, "18:30:00"),
-    periodStart: dd(14),
-    periodEnd: dd(1),
-    type: "sprzedaż VAT",
+    generatedAt: d(2, "14:00:00"),
+    periodStart: dd(30),
+    periodEnd: dd(0),
+    type: "pełny",
     format: "csv",
-    targetEmail: "ksiegowosc@salon.pl",
-    downloadUrl: "#"
+    targetEmail: "salon@example.com",
+    downloadUrl: null
   },
   {
     id: "ae2",
     salonId: "demo",
     generatedByUserId: "u1",
     generatedByUserName: "Admin",
-    generatedAt: d(5, "12:00:00"),
-    periodStart: dd(15),
-    periodEnd: dd(5),
-    type: "prowizje",
-    format: "xlsx",
-    targetEmail: null,
-    downloadUrl: "#"
-  },
-  {
-    id: "ae3",
-    salonId: "demo",
-    generatedByUserId: "u1",
-    generatedByUserName: "Admin",
-    generatedAt: d(30, "09:00:00"),
+    generatedAt: d(7, "10:30:00"),
     periodStart: dd(60),
     periodEnd: dd(30),
-    type: "pełny",
-    format: "csv",
-    targetEmail: "ksiegowosc@salon.pl",
-    downloadUrl: "#"
+    type: "sprzedaż VAT",
+    format: "xlsx",
+    targetEmail: "ksiegowosc@example.com",
+    downloadUrl: null
   }
 ];

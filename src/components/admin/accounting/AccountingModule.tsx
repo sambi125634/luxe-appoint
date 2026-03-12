@@ -81,9 +81,12 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
   });
 
   const transactions = useMemo(() => {
-    if (isDemo) return mockTransactions;
-    return [...(dbTransactions || []), ...manualTransactions];
-  }, [isDemo, dbTransactions, manualTransactions]);
+    const source = isDemo ? mockTransactions : [...(dbTransactions || []), ...manualTransactions];
+    return source.filter(t => {
+      const txDate = new Date(t.dateTime);
+      return txDate >= filters.dateRange.from && txDate <= filters.dateRange.to;
+    });
+  }, [isDemo, dbTransactions, manualTransactions, filters.dateRange]);
 
   const handleExportCSV = () => {
     if (transactions.length === 0) {
