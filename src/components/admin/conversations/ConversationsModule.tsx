@@ -142,7 +142,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m8",
-      ghlMessageId: "ghl_msg_008",
+      externalMessageId: "ext_msg_008",
       direction: "inbound",
       type: "SMS",
       body: "Super, rezerwuję termin na masaż relaksacyjny",
