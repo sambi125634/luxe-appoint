@@ -142,6 +142,17 @@ const guideContent: Record<string, SectionGuideConfig> = {
     ],
     painPoint: "Wiesz ile produktów zostało na półce i kiedy zamówić kolejną dostawę. Żadnych niespodzianek przy inwentaryzacji.",
   },
+  recipes: {
+    goal: "Przypisz produkty zużywane przy każdej usłudze — system automatycznie policzy koszt materiałów i pokaże Twój realny zysk (True Profit) z każdego zabiegu.",
+    steps: [
+      "Wybierz usługę z listy po lewej stronie",
+      "Dodaj produkty zużywane podczas zabiegu — np. baza, lakier, olejek",
+      "Podaj ilość i jednostkę (szt, ml, g) dla każdego składnika",
+      "System automatycznie obliczy koszt materiałów na podstawie cen zakupu z katalogu produktów",
+      "Sprawdź kartę True Profit — zobaczysz realną marżę po odjęciu kosztów materiałów",
+    ],
+    painPoint: "Wiesz ile naprawdę zarabiasz na każdym zabiegu — nie cenę brutto, a realny zysk po odjęciu kosztów produktów. To jest Twoja prawdziwa marża.",
+  },
   support: {
     goal: "AI Asystent zna całą platformę Beauty Calendar. Zapytaj o cokolwiek — konfigurację, funkcje, rozwiązanie problemu.",
     steps: [
