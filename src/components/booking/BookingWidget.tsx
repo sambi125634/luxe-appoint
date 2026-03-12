@@ -508,7 +508,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="flex justify-center gap-8 mb-10 animate-fade-in"
+              className="flex justify-center gap-8 mb-8 animate-fade-in"
               style={{ animationDelay: '0.8s' }}
             >
               {[
