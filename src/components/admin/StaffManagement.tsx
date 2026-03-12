@@ -319,7 +319,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         if (avatarFile && staffId) {
           avatarUrl = await uploadAvatar(staffId);
           if (avatarUrl) {
-            await supabase.from("staff_members").update({ avatar_url: avatarUrl } as Record<string, unknown>).eq("id", staffId);
+            await supabase.from("staff_members").update({ avatar_url: avatarUrl } as never).eq("id", staffId);
           }
         }
       }
