@@ -12,10 +12,8 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { QuickProductSale } from "./products/QuickProductSale";
-import { RetentionRadar } from "@/modules/retention/RetentionRadar";
+import { RetentionHealthBoard } from "@/modules/retention/RetentionHealthBoard";
 import { MOCK_RADAR_CLIENTS } from "@/modules/retention/mock-data";
-import { useRetentionRadar } from "@/hooks/useRetention";
-// Note: useRetentionRadar used for production mode
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
 import { WeeklyBriefWidget } from "./dashboard/WeeklyBriefWidget";
