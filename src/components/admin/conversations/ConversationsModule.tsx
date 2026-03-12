@@ -23,7 +23,7 @@ const DEMO_CONTACTS: Contact[] = [
   },
   {
     id: "2",
-    ghlContactId: "ghl_002",
+    externalContactId: "ext_002",
     firstName: "Maria",
     lastName: "Nowak",
     email: "maria.nowak@gmail.com",
