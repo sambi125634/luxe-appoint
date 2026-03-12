@@ -127,7 +127,7 @@ export function ProductSaleSection({ cart, onCartChange, salonId, className }: P
           className="pl-9"
         />
 
-        {showProductPicker && searchQuery && (
+        {showProductPicker && (
           <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
             <ScrollArea className="max-h-48">
               {isLoading ? (

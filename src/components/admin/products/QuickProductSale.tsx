@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { ProductSaleSection, type CartItem } from "./ProductSaleSection";
+import { ServiceSaleSection, type ServiceCartItem } from "./ServiceSaleSection";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -39,6 +40,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
   const { salonId: realSalonId } = useSalonId();
   const salonId = isDemo ? DEMO_SALON_ID : realSalonId;
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [serviceCart, setServiceCart] = useState<ServiceCartItem[]>([]);
   const [clientSearch, setClientSearch] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showClientDropdown, setShowClientDropdown] = useState(false);
@@ -85,8 +87,16 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
     0
   );
 
+  const serviceTotal = serviceCart.reduce(
+    (sum, item) => sum + item.service.price * item.quantity,
+    0
+  );
+
+  const grandTotal = cartTotal + serviceTotal;
+  const hasItems = cart.length > 0 || serviceCart.length > 0;
+
   const handleComplete = () => {
-    if (cart.length === 0) {
+    if (!hasItems) {
       toast({
         title: t("products.emptyCart"),
         description: t("products.addProductsFirst"),
@@ -99,16 +109,17 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
       cart,
       clientId: selectedClient?.id,
       paymentMethod,
-      total: cartTotal,
+      total: grandTotal,
     });
 
     toast({
       title: t("products.saleCompleted"),
-      description: `${t("products.total")}: ${cartTotal.toLocaleString()} zł`,
+      description: `${t("products.total")}: ${grandTotal.toLocaleString()} zł`,
     });
 
     // Reset form
     setCart([]);
+    setServiceCart([]);
     setSelectedClient(null);
     setClientSearch("");
     setPaymentMethod("cash");
@@ -203,7 +214,12 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
           {/* Product Selection */}
           <ProductSaleSection cart={cart} onCartChange={setCart} salonId={salonId ?? undefined} />
 
-          {cart.length > 0 && (
+          <Separator />
+
+          {/* Service Selection */}
+          <ServiceSaleSection cart={serviceCart} onCartChange={setServiceCart} />
+
+          {hasItems && (
             <>
               <Separator />
 
@@ -253,7 +269,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{t("products.totalToPay")}</span>
                   <span className="text-2xl font-bold text-primary">
-                    {cartTotal.toLocaleString()} zł
+                    {grandTotal.toLocaleString()} zł
                   </span>
                 </div>
               </div>
@@ -265,7 +281,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t("common.cancel")}
           </Button>
-          <Button onClick={handleComplete} disabled={cart.length === 0} className="gap-2">
+          <Button onClick={handleComplete} disabled={!hasItems} className="gap-2">
             <Receipt className="w-4 h-4" />
             {t("products.completeSale")}
           </Button>
