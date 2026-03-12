@@ -30,6 +30,7 @@ const stepIdToName: Record<string, string> = {
 interface BookingWidgetProps {
   widgetConfig?: WidgetConfig | null;
   salonId?: string;
+  onStepChange?: (stepId: string) => void;
 }
 
 interface Service {
