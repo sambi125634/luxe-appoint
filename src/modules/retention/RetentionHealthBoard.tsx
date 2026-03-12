@@ -48,19 +48,21 @@ const DEMO_TOOLTIPS: Record<string, { visits: string; spent: string; services: s
 function classifyClients(clients: RetentionRadarClient[]): Record<ZoneKey, RetentionRadarClient[]> {
   const result: Record<ZoneKey, RetentionRadarClient[]> = { active: [], attention: [], risk: [], lost: [] };
   for (const c of clients) {
-    if (c.zone === "green") result.active.push(c);
-    else if (c.zone === "yellow") result.attention.push(c);
-    else if (c.zone === "orange") result.risk.push(c);
+    if (c.risk_zone === "green") result.active.push(c);
+    else if (c.risk_zone === "yellow") result.attention.push(c);
+    else if (c.risk_zone === "orange") result.risk.push(c);
     else result.lost.push(c);
   }
   return result;
 }
 
+// Use seeded pseudo-random based on client id for stable values
 function getEngagement(client: RetentionRadarClient): number {
-  if (client.zone === "green") return 70 + Math.floor(Math.random() * 30);
-  if (client.zone === "yellow") return 40 + Math.floor(Math.random() * 30);
-  if (client.zone === "orange") return 15 + Math.floor(Math.random() * 25);
-  return Math.floor(Math.random() * 15);
+  const hash = client.id.charCodeAt(0) + client.id.charCodeAt(1);
+  if (client.risk_zone === "green") return 70 + (hash % 30);
+  if (client.risk_zone === "yellow") return 40 + (hash % 30);
+  if (client.risk_zone === "orange") return 15 + (hash % 25);
+  return 5 + (hash % 10);
 }
 
 function getInitials(name: string): string {
