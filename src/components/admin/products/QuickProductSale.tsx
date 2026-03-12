@@ -87,8 +87,16 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
     0
   );
 
+  const serviceTotal = serviceCart.reduce(
+    (sum, item) => sum + item.service.price * item.quantity,
+    0
+  );
+
+  const grandTotal = cartTotal + serviceTotal;
+  const hasItems = cart.length > 0 || serviceCart.length > 0;
+
   const handleComplete = () => {
-    if (cart.length === 0) {
+    if (!hasItems) {
       toast({
         title: t("products.emptyCart"),
         description: t("products.addProductsFirst"),
@@ -101,16 +109,17 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
       cart,
       clientId: selectedClient?.id,
       paymentMethod,
-      total: cartTotal,
+      total: grandTotal,
     });
 
     toast({
       title: t("products.saleCompleted"),
-      description: `${t("products.total")}: ${cartTotal.toLocaleString()} zł`,
+      description: `${t("products.total")}: ${grandTotal.toLocaleString()} zł`,
     });
 
     // Reset form
     setCart([]);
+    setServiceCart([]);
     setSelectedClient(null);
     setClientSearch("");
     setPaymentMethod("cash");
