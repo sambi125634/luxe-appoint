@@ -26,12 +26,28 @@ export interface BookingWidget {
   
   // Prepayment settings per widget
   prepayment?: WidgetPrepayment;
+
+  // Advanced settings
+  advancedSettings?: WidgetAdvancedSettings;
   
   // Tracking
   createdAt: Date;
   updatedAt: Date;
   viewCount: number;
   bookingCount: number;
+}
+
+export interface WidgetAdvancedSettings {
+  // Thank you page
+  thankYouText?: string;
+  redirectUrl?: string;
+  // Social proof
+  socialProofEnabled: boolean;
+  socialProofText?: string;
+  // Booking limits
+  minAdvanceHours: number;
+  maxAdvanceDays: number;
+  maxTotalBookings?: number;
 }
 
 export interface WidgetPrepayment {
