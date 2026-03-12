@@ -301,7 +301,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           bio: form.bio || null, specializations: form.specializations, started_at: form.started_at || null,
         };
         if (avatarUrl) updateData.avatar_url = avatarUrl;
-        const { error } = await supabase.from("staff_members").update(updateData).eq("id", editingStaff.id);
+        const { error } = await supabase.from("staff_members").update(updateData as never).eq("id", editingStaff.id);
         if (error) throw error;
       } else {
         const insertData: Record<string, unknown> = {
