@@ -12,7 +12,11 @@ import {
   GripVertical,
   Plus,
   Trash2,
-  CreditCard
+  CreditCard,
+  Settings,
+  BarChart3,
+  Upload,
+  Flame
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,13 +25,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   Select,
@@ -41,6 +45,7 @@ import {
   WidgetStep, 
   FormFieldConfig,
   WidgetPrepayment,
+  WidgetAdvancedSettings,
   defaultWidgetTheme,
   defaultFormFields,
   defaultWidgetSteps 
@@ -66,6 +71,40 @@ const mockServices = [
   { id: "9", name: "Przedłużanie rzęs 1:1", category: "Brwi i rzęsy", price: 350 },
 ];
 
+// Mock funnel data for analytics
+const mockFunnelData = [
+  { step: "Wyświetlenia", value: 1250, color: "hsl(var(--muted-foreground))" },
+  { step: "Kliknięcia", value: 834, color: "hsl(var(--primary))" },
+  { step: "Formularz", value: 421, color: "hsl(var(--accent-foreground))" },
+  { step: "Rezerwacje", value: 89, color: "hsl(var(--primary))" },
+];
+
+const mockTrafficSources = [
+  { source: "Instagram", visits: 456, bookings: 34 },
+  { source: "Facebook Ads", visits: 312, bookings: 28 },
+  { source: "Google", visits: 234, bookings: 15 },
+  { source: "Bezpośredni link", visits: 178, bookings: 12 },
+  { source: "Polecenie", visits: 70, bookings: 0 },
+];
+
+const defaultAdvancedSettings: WidgetAdvancedSettings = {
+  socialProofEnabled: false,
+  socialProofText: "🔥 {count} osób rezerwowało dziś",
+  minAdvanceHours: 2,
+  maxAdvanceDays: 60,
+  thankYouText: "Dziękujemy za rezerwację! Potwierdzenie wysłaliśmy na e-mail.",
+  redirectUrl: "",
+};
+
+const fontOptions = [
+  { value: "Inter", label: "Inter" },
+  { value: "Playfair Display", label: "Playfair Display" },
+  { value: "Lato", label: "Lato" },
+  { value: "Poppins", label: "Poppins" },
+  { value: "Montserrat", label: "Montserrat" },
+  { value: "DM Sans", label: "DM Sans" },
+];
+
 export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorProps) {
   const isNew = !widget;
   
@@ -89,6 +128,7 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
         requireForHighRisk: false,
         requireForNewClients: false,
       },
+      advancedSettings: { ...defaultAdvancedSettings },
       viewCount: 0,
       bookingCount: 0,
       createdAt: new Date(),
@@ -97,6 +137,17 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
   });
 
   const [activeTab, setActiveTab] = useState("basic");
+  const [showCustomFieldModal, setShowCustomFieldModal] = useState(false);
+  const [newField, setNewField] = useState<Partial<FormFieldConfig>>({
+    name: "",
+    label: "",
+    type: "text",
+    required: false,
+    enabled: true,
+    placeholder: "",
+    options: [],
+  });
+  const [newFieldOption, setNewFieldOption] = useState("");
 
   const handleSave = () => {
     if (!formData.name || !formData.slug) {
@@ -105,28 +156,38 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
     onSave(formData as BookingWidget);
   };
 
-  const updateField = (field: string, value: any) => {
+  const updateField = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const updateTheme = (field: string, value: any) => {
+  const updateTheme = (field: string, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       theme: { ...prev.theme!, [field]: value }
     }));
   };
 
-  const updatePrepayment = (field: keyof WidgetPrepayment, value: any) => {
+  const updatePrepayment = (field: keyof WidgetPrepayment, value: unknown) => {
     setFormData(prev => ({
       ...prev,
       prepayment: { ...prev.prepayment!, [field]: value }
     }));
   };
 
+  const updateAdvanced = (field: keyof WidgetAdvancedSettings, value: unknown) => {
+    setFormData(prev => ({
+      ...prev,
+      advancedSettings: { 
+        ...(prev.advancedSettings || defaultAdvancedSettings), 
+        [field]: value 
+      }
+    }));
+  };
+
   const toggleService = (serviceId: string) => {
     const current = formData.services || [];
     if (current.includes(serviceId)) {
-      updateField('services', current.filter(id => id !== serviceId));
+      updateField('services', current.filter((id: string) => id !== serviceId));
     } else {
       updateField('services', [...current, serviceId]);
     }
@@ -143,7 +204,6 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
     const steps = [...(formData.steps || [])];
     const [movedStep] = steps.splice(fromIndex, 1);
     steps.splice(toIndex, 0, movedStep);
-    // Update order values
     const reorderedSteps = steps.map((s, i) => ({ ...s, order: i }));
     updateField('steps', reorderedSteps);
   };
@@ -155,6 +215,30 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
     updateField('formFields', fields.map(f => 
       f.id === fieldId ? { ...f, enabled: !f.enabled } : f
     ));
+  };
+
+  const removeCustomField = (fieldId: string) => {
+    const fields = formData.formFields || [];
+    updateField('formFields', fields.filter(f => f.id !== fieldId));
+  };
+
+  const addCustomField = () => {
+    if (!newField.label || !newField.name) return;
+    const id = `custom_${Date.now()}`;
+    const field: FormFieldConfig = {
+      id,
+      name: newField.name || id,
+      label: newField.label || "",
+      type: (newField.type as FormFieldConfig["type"]) || "text",
+      required: newField.required || false,
+      enabled: true,
+      placeholder: newField.placeholder || "",
+      options: newField.type === "select" ? newField.options : undefined,
+    };
+    updateField('formFields', [...(formData.formFields || []), field]);
+    setShowCustomFieldModal(false);
+    setNewField({ name: "", label: "", type: "text", required: false, enabled: true, placeholder: "", options: [] });
+    setNewFieldOption("");
   };
 
   const generateSlug = (name: string) => {
@@ -174,7 +258,6 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
 
   const [showPreview, setShowPreview] = useState(true);
 
-  // Generate preview styles based on theme
   const previewStyles = {
     '--preview-primary': formData.theme?.primaryColor || '#7c3aed',
     '--preview-secondary': formData.theme?.secondaryColor || '#a78bfa',
@@ -191,6 +274,20 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
     }
   };
 
+  const advanced = formData.advancedSettings || defaultAdvancedSettings;
+
+  const tabs = [
+    { id: "basic", icon: Sparkles, label: "Podstawowe" },
+    { id: "services", icon: ListChecks, label: "Usługi" },
+    { id: "steps", icon: ChevronRight, label: "Kroki" },
+    { id: "form", icon: FormInput, label: "Formularz" },
+    { id: "theme", icon: Palette, label: "Wygląd" },
+    { id: "payment", icon: CreditCard, label: "Płatności" },
+    { id: "promo", icon: Tag, label: "Promocja" },
+    { id: "advanced", icon: Settings, label: "Zaawansowane" },
+    { id: "analytics", icon: BarChart3, label: "Analityka" },
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={() => onClose()}>
       <DialogContent className="max-w-6xl max-h-[90vh] p-0 overflow-hidden">
@@ -205,15 +302,7 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
           {/* Sidebar */}
           <div className="lg:w-48 border-b lg:border-b-0 lg:border-r border-border p-2 lg:p-4">
             <nav className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible">
-              {[
-                { id: "basic", icon: Sparkles, label: "Podstawowe" },
-                { id: "services", icon: ListChecks, label: "Usługi" },
-                { id: "steps", icon: ChevronRight, label: "Kroki" },
-                { id: "form", icon: FormInput, label: "Formularz" },
-                { id: "theme", icon: Palette, label: "Wygląd" },
-                { id: "payment", icon: CreditCard, label: "Płatności" },
-                { id: "promo", icon: Tag, label: "Promocja" },
-              ].map(tab => (
+              {tabs.map(tab => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -408,36 +497,58 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                   Wybierz pola formularza klienta
                 </p>
                 <div className="space-y-2">
-                  {formData.formFields?.map(field => (
-                    <div
-                      key={field.id}
-                      className={`flex items-center gap-3 p-3 rounded-lg border ${
-                        field.enabled ? 'border-border' : 'border-border/50 opacity-50'
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{field.label}</span>
-                          {field.required && (
-                            <Badge variant="outline" className="text-xs">
-                              Wymagane
-                            </Badge>
-                          )}
+                  {formData.formFields?.map(field => {
+                    const isCustom = field.id.startsWith("custom_");
+                    return (
+                      <div
+                        key={field.id}
+                        className={`flex items-center gap-3 p-3 rounded-lg border ${
+                          field.enabled ? 'border-border' : 'border-border/50 opacity-50'
+                        }`}
+                      >
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{field.label}</span>
+                            {field.required && (
+                              <Badge variant="outline" className="text-xs">
+                                Wymagane
+                              </Badge>
+                            )}
+                            {isCustom && (
+                              <Badge variant="secondary" className="text-xs">
+                                Własne
+                              </Badge>
+                            )}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {field.type}{field.options ? ` (${field.options.length} opcji)` : ""}
+                          </span>
                         </div>
-                        <span className="text-sm text-muted-foreground">
-                          {field.type}
-                        </span>
+                        {isCustom && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-destructive hover:text-destructive"
+                            onClick={() => removeCustomField(field.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Switch
+                          checked={field.enabled}
+                          onCheckedChange={() => toggleFormField(field.id)}
+                          disabled={field.required && !isCustom}
+                        />
                       </div>
-                      <Switch
-                        checked={field.enabled}
-                        onCheckedChange={() => toggleFormField(field.id)}
-                        disabled={field.required}
-                      />
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
-                <Button variant="outline" className="gap-2 w-full">
+                <Button 
+                  variant="outline" 
+                  className="gap-2 w-full"
+                  onClick={() => setShowCustomFieldModal(true)}
+                >
                   <Plus className="w-4 h-4" />
                   Dodaj własne pole
                 </Button>
@@ -484,6 +595,42 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Kolor tła</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="color"
+                      className="w-12 h-10 p-1"
+                      value={formData.theme?.backgroundColor || "#ffffff"}
+                      onChange={(e) => updateTheme('backgroundColor', e.target.value)}
+                    />
+                    <Input
+                      value={formData.theme?.backgroundColor || "#ffffff"}
+                      onChange={(e) => updateTheme('backgroundColor', e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Czcionka</Label>
+                  <Select
+                    value={formData.theme?.fontFamily || "Inter"}
+                    onValueChange={(v) => updateTheme('fontFamily', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fontOptions.map(font => (
+                        <SelectItem key={font.value} value={font.value}>
+                          <span style={{ fontFamily: font.value }}>{font.label}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
                   <Label>Zaokrąglenie rogów</Label>
                   <Select
                     value={formData.theme?.borderRadius || "lg"}
@@ -523,6 +670,28 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     onCheckedChange={(v) => updateTheme('showLogo', v)}
                   />
                 </div>
+
+                {formData.theme?.showLogo && (
+                  <div className="space-y-2">
+                    <Label>URL logo</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={formData.theme?.logoUrl || ""}
+                        onChange={(e) => updateTheme('logoUrl', e.target.value)}
+                        placeholder="https://example.com/logo.png"
+                        className="flex-1"
+                      />
+                      <Button variant="outline" size="icon" className="shrink-0">
+                        <Upload className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    {formData.theme?.logoUrl && (
+                      <div className="w-16 h-16 rounded-lg border border-border overflow-hidden bg-muted">
+                        <img src={formData.theme.logoUrl} alt="Logo" className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
                   <div>
@@ -704,6 +873,232 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                 )}
               </div>
             )}
+
+            {/* Advanced Settings */}
+            {activeTab === "advanced" && (
+              <div className="space-y-6">
+                {/* Thank You Page */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    Strona potwierdzenia
+                  </h4>
+                  <div className="space-y-2">
+                    <Label>Tekst podziękowania</Label>
+                    <Textarea
+                      value={advanced.thankYouText || ""}
+                      onChange={(e) => updateAdvanced('thankYouText', e.target.value)}
+                      placeholder="Dziękujemy za rezerwację!"
+                      rows={3}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Przekierowanie po rezerwacji (opcjonalnie)</Label>
+                    <Input
+                      value={advanced.redirectUrl || ""}
+                      onChange={(e) => updateAdvanced('redirectUrl', e.target.value)}
+                      placeholder="https://twojsalon.pl/dziekujemy"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Zostaw puste, aby pokazać domyślną stronę potwierdzenia
+                    </p>
+                  </div>
+                </div>
+
+                {/* Social Proof */}
+                <div className="border-t border-border pt-6 space-y-4">
+                  <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-lg border border-orange-500/20">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-full bg-orange-500/20">
+                        <Flame className="w-5 h-5 text-orange-500" />
+                      </div>
+                      <div>
+                        <Label className="text-base font-semibold">Social Proof</Label>
+                        <p className="text-sm text-muted-foreground">
+                          Pokaż badge z liczbą rezerwacji
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      checked={advanced.socialProofEnabled || false}
+                      onCheckedChange={(v) => updateAdvanced('socialProofEnabled', v)}
+                    />
+                  </div>
+                  {advanced.socialProofEnabled && (
+                    <div className="space-y-2">
+                      <Label>Tekst badge</Label>
+                      <Input
+                        value={advanced.socialProofText || ""}
+                        onChange={(e) => updateAdvanced('socialProofText', e.target.value)}
+                        placeholder="🔥 {count} osób rezerwowało dziś"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Użyj {"{count}"} aby wstawić liczbę rezerwacji
+                      </p>
+                      {/* Preview */}
+                      <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-sm">
+                        <Flame className="w-3.5 h-3.5 text-orange-500" />
+                        <span className="text-orange-700 dark:text-orange-300 font-medium">
+                          {(advanced.socialProofText || "🔥 {count} osób rezerwowało dziś").replace("{count}", "12")}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Booking Time Window */}
+                <div className="border-t border-border pt-6 space-y-4">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Settings className="w-4 h-4 text-primary" />
+                    Okno czasowe rezerwacji
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Min. wyprzedzenie (godziny)</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={advanced.minAdvanceHours || 2}
+                        onChange={(e) => updateAdvanced('minAdvanceHours', parseInt(e.target.value) || 0)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Klient musi rezerwować min. X godzin wcześniej
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Max. horyzont (dni)</Label>
+                      <Input
+                        type="number"
+                        min={1}
+                        value={advanced.maxAdvanceDays || 60}
+                        onChange={(e) => updateAdvanced('maxAdvanceDays', parseInt(e.target.value) || 30)}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Jak daleko w przyszłość można rezerwować
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Booking Limit */}
+                <div className="border-t border-border pt-6 space-y-4">
+                  <h4 className="font-semibold">Limit rezerwacji</h4>
+                  <div className="space-y-2">
+                    <Label>Max. liczba rezerwacji z tego widgetu</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={advanced.maxTotalBookings || ""}
+                      onChange={(e) => updateAdvanced('maxTotalBookings', e.target.value ? parseInt(e.target.value) : undefined)}
+                      placeholder="Bez limitu"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Zostaw puste = bez limitu. Idealne do kampanii z ograniczoną liczbą miejsc.
+                    </p>
+                  </div>
+                  {advanced.maxTotalBookings && (formData.bookingCount || 0) > 0 && (
+                    <div className="p-3 bg-muted/50 rounded-lg">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Wykorzystanie</span>
+                        <span className="font-medium">{formData.bookingCount || 0} / {advanced.maxTotalBookings}</span>
+                      </div>
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-primary rounded-full transition-all"
+                          style={{ width: `${Math.min(((formData.bookingCount || 0) / advanced.maxTotalBookings) * 100, 100)}%` }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Analytics */}
+            {activeTab === "analytics" && (
+              <div className="space-y-6">
+                {/* Conversion Rate */}
+                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold text-primary">
+                      {((mockFunnelData[3].value / mockFunnelData[0].value) * 100).toFixed(1)}%
+                    </p>
+                    <p className="text-xs text-muted-foreground">Konwersja</p>
+                  </div>
+                  <div className="h-12 w-px bg-border" />
+                  <div className="flex-1 grid grid-cols-2 gap-2">
+                    <div className="text-center">
+                      <p className="text-lg font-semibold">{formData.viewCount || mockFunnelData[0].value}</p>
+                      <p className="text-xs text-muted-foreground">Wyświetleń</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-lg font-semibold">{formData.bookingCount || mockFunnelData[3].value}</p>
+                      <p className="text-xs text-muted-foreground">Rezerwacji</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Funnel */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold">Lejek konwersji</h4>
+                  {mockFunnelData.map((item, i) => {
+                    const prevValue = i > 0 ? mockFunnelData[i - 1].value : item.value;
+                    const dropOff = i > 0 ? ((1 - item.value / prevValue) * 100).toFixed(0) : null;
+                    const widthPct = (item.value / mockFunnelData[0].value) * 100;
+                    return (
+                      <div key={item.step} className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>{item.step}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{item.value}</span>
+                            {dropOff && (
+                              <span className="text-xs text-destructive">-{dropOff}%</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="h-3 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full rounded-full transition-all"
+                            style={{ 
+                              width: `${widthPct}%`,
+                              backgroundColor: `hsl(var(--primary))`,
+                              opacity: 0.4 + (i / mockFunnelData.length) * 0.6,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Traffic Sources */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold">Źródła ruchu</h4>
+                  <div className="space-y-2">
+                    {mockTrafficSources.map(source => (
+                      <div key={source.source} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-sm">{source.source}</p>
+                          <p className="text-xs text-muted-foreground">{source.visits} wizyt</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-sm">{source.bookings} rez.</p>
+                          <p className="text-xs text-muted-foreground">
+                            {source.visits > 0 ? ((source.bookings / source.visits) * 100).toFixed(1) : 0}% konw.
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="p-3 bg-muted/50 rounded-lg text-center">
+                  <p className="text-xs text-muted-foreground">
+                    Dane analityczne — podgląd demonstracyjny. Dane rzeczywiste pojawią się po uruchomieniu widgetu.
+                  </p>
+                </div>
+              </div>
+            )}
           </ScrollArea>
 
           {/* Live Preview Panel */}
@@ -726,12 +1121,32 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
               <ScrollArea className="flex-1 p-3">
                 <div 
                   className={`bg-background border border-border ${getBorderRadiusClass()} overflow-hidden shadow-lg`}
-                  style={previewStyles}
+                  style={{
+                    ...previewStyles,
+                    backgroundColor: formData.theme?.backgroundColor || '#ffffff',
+                    fontFamily: formData.theme?.fontFamily || 'Inter',
+                  }}
                 >
+                  {/* Social Proof Badge */}
+                  {advanced.socialProofEnabled && (
+                    <div className="px-3 pt-3">
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-orange-500/10 border border-orange-500/20 rounded-full text-[10px]">
+                        <Flame className="w-3 h-3 text-orange-500" />
+                        <span className="text-orange-700 dark:text-orange-300 font-medium">
+                          {(advanced.socialProofText || "🔥 {count} osób rezerwowało dziś").replace("{count}", "12")}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Header */}
                   {formData.theme?.showLogo && (
                     <div className="p-3 border-b border-border flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/20" />
+                      {formData.theme?.logoUrl ? (
+                        <img src={formData.theme.logoUrl} alt="Logo" className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-primary/20" />
+                      )}
                       <span className="text-xs font-medium">Demo Salon</span>
                     </div>
                   )}
@@ -746,7 +1161,7 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     </h3>
                   </div>
 
-                  {/* Steps Preview - Show actual step order */}
+                  {/* Steps Preview */}
                   <div className="p-3 space-y-2">
                     <p className="text-[10px] text-muted-foreground mb-2">Kolejność kroków:</p>
                     <div className="space-y-1.5">
@@ -835,13 +1250,140 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                 Podgląd
               </Button>
             )}
-            <Button variant="luxury" className="gap-2" onClick={handleSave}>
+            <Button className="gap-2" onClick={handleSave}>
               <Save className="w-4 h-4" />
               {isNew ? "Utwórz widget" : "Zapisz zmiany"}
             </Button>
           </div>
         </div>
       </DialogContent>
+
+      {/* Custom Field Modal */}
+      <Dialog open={showCustomFieldModal} onOpenChange={setShowCustomFieldModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Dodaj własne pole</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Etykieta pola</Label>
+              <Input
+                value={newField.label || ""}
+                onChange={(e) => {
+                  setNewField(prev => ({ 
+                    ...prev, 
+                    label: e.target.value,
+                    name: e.target.value.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+                  }));
+                }}
+                placeholder="np. Rodzaj skóry"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Typ pola</Label>
+              <Select
+                value={newField.type || "text"}
+                onValueChange={(v) => setNewField(prev => ({ ...prev, type: v as FormFieldConfig["type"] }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="text">Tekst</SelectItem>
+                  <SelectItem value="textarea">Tekst (długi)</SelectItem>
+                  <SelectItem value="email">Email</SelectItem>
+                  <SelectItem value="phone">Telefon</SelectItem>
+                  <SelectItem value="select">Lista wyboru</SelectItem>
+                  <SelectItem value="checkbox">Checkbox</SelectItem>
+                  <SelectItem value="date">Data</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {newField.type === "select" && (
+              <div className="space-y-2">
+                <Label>Opcje</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newFieldOption}
+                    onChange={(e) => setNewFieldOption(e.target.value)}
+                    placeholder="Dodaj opcję..."
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && newFieldOption.trim()) {
+                        e.preventDefault();
+                        setNewField(prev => ({
+                          ...prev,
+                          options: [...(prev.options || []), newFieldOption.trim()],
+                        }));
+                        setNewFieldOption("");
+                      }
+                    }}
+                  />
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      if (newFieldOption.trim()) {
+                        setNewField(prev => ({
+                          ...prev,
+                          options: [...(prev.options || []), newFieldOption.trim()],
+                        }));
+                        setNewFieldOption("");
+                      }
+                    }}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+                {newField.options && newField.options.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {newField.options.map((opt, i) => (
+                      <Badge key={i} variant="secondary" className="gap-1">
+                        {opt}
+                        <button
+                          onClick={() => setNewField(prev => ({
+                            ...prev,
+                            options: prev.options?.filter((_, idx) => idx !== i),
+                          }))}
+                          className="ml-0.5 hover:text-destructive"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Placeholder</Label>
+              <Input
+                value={newField.placeholder || ""}
+                onChange={(e) => setNewField(prev => ({ ...prev, placeholder: e.target.value }))}
+                placeholder="Tekst podpowiedzi..."
+              />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Checkbox
+                checked={newField.required || false}
+                onCheckedChange={(v) => setNewField(prev => ({ ...prev, required: !!v }))}
+              />
+              <Label>Pole wymagane</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setShowCustomFieldModal(false)}>
+              Anuluj
+            </Button>
+            <Button onClick={addCustomField} disabled={!newField.label}>
+              <Plus className="w-4 h-4 mr-2" />
+              Dodaj pole
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 }

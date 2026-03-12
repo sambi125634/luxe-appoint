@@ -1,72 +1,101 @@
 
 
-# Plan: Widget Editor — brakujące funkcje dla efektu WOW
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Co już jest (7 zakładek)
-Podstawowe, Usługi, Kroki (drag-and-drop), Formularz, Wygląd, Płatności, Promocja
+### Co już mamy
 
-## Co brakuje — analiza
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-### 1. **Przycisk "Dodaj własne pole" nie działa** (linia 440)
-Button jest renderowany ale nic nie robi — `onClick` nie jest podpięty. Właścicielka salonu nie może dodać np. "Rodzaj skóry", "Preferowany terapeuta".
+### Problem do rozwiązania
 
-### 2. **Brak uploadu logo**
-Toggle "Pokaż logo" istnieje, ale nie ma pola do wgrania pliku. Widget zawsze pokazuje placeholder.
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-### 3. **Brak wyboru czcionki**
-`fontFamily` jest w typach (`WidgetTheme.fontFamily`) ale nie ma UI do wyboru. Salon premium chce dopasować font do swojego brandingu.
+---
 
-### 4. **Brak koloru tła**
-`backgroundColor` jest w typach ale nie ma inputa w zakładce Wygląd.
+### Plan implementacji
 
-### 5. **Brak ustawień potwierdzenia / Thank You**
-Po rezerwacji — brak opcji: tekst podziękowania, redirect URL, social share buttons.
+#### FAZA 1: Role-based routing po loginie
 
-### 6. **Brak limitu rezerwacji per widget**
-Np. "Max 50 rezerwacji z tego widgetu" — kluczowe dla kampanii z limitem.
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### 7. **Brak ustawień okna czasowego**
-Np. "Rezerwacje min. 24h wcześniej", "Max 30 dni do przodu" — per widget, nie globalnie.
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-### 8. **Brak social proof**
-Badge "🔥 12 osób rezerwowało dziś" — zwiększa konwersję.
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-### 9. **Brak tab Analytics w edytorze**
-Konwersja, funnel drop-off per krok — właścicielka chce wiedzieć gdzie klienci rezygnują.
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## Proponowane zmiany
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-### A. Naprawić "Dodaj własne pole" (Formularz)
-- Modal z: nazwa pola, typ (text/select/checkbox/date), wymagane?, placeholder, opcje (dla select)
-- Nowe pole dodaje się do listy z możliwością usunięcia
+#### FAZA 3: Indywidualne kokpity
 
-### B. Nowa zakładka "Zaawansowane" (ikona: Settings)
-Zbierze:
-- Upload logo (file input + preview)
-- Wybór czcionki (Inter, Playfair Display, Lato, Poppins, Montserrat)
-- Kolor tła widgetu
-- Tekst potwierdzenia po rezerwacji
-- URL przekierowania po rezerwacji (opcjonalnie)
-- Social proof badge (toggle + tekst)
-- Min. wyprzedzenie rezerwacji (godziny)
-- Max. horyzont rezerwacji (dni)
-- Limit łącznej liczby rezerwacji
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-### C. Nowa zakładka "Analityka" (ikona: BarChart3)
-- Wykres konwersji (mock data w demo): 100 wyświetleń → 67 kliknięć → 42 formularze → 23 rezerwacje
-- Funnel drop-off per krok (mini bar chart)
-- Conversion rate badge
-- Top źródła ruchu (mock)
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-### D. Ulepszony podgląd na żywo
-- Dodać do preview: badge social proof, logo placeholder, font preview
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-### Pliki do zmiany
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-| Plik | Akcja |
-|------|-------|
-| `src/components/admin/widgets/WidgetEditor.tsx` | Dodać 2 nowe zakładki, naprawić "Dodaj pole", modal custom field |
-| `src/components/admin/widgets/types.ts` | Rozszerzyć `BookingWidget` o nowe pola (thankYouText, redirectUrl, socialProof, bookingLimits) |
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-Bez nowych plików — wszystko w istniejących. Szacunek: ~200 linii nowego kodu.
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
