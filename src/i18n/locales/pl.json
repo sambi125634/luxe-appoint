@@ -1292,10 +1292,6 @@
       "reports": "Jak wygenerować raport?"
     }
   },
-  "admin": {
-    "trueProfit": "True Profit",
-    "consultation": "Konsultacje"
-  },
   "consultation": {
     "title": "Karty konsultacyjne & Voice Notes",
     "subtitle": "Cyfrowe karty, podpisy i notatki głosowe z AI",
