@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 import { Sparkles, MapPin, Phone, Clock, Loader2 } from "lucide-react";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { BookingWidget as WidgetConfig, mockWidgets } from "@/components/admin/widgets/types";
@@ -17,6 +18,7 @@ interface SalonInfo {
 
 export default function BookingPage() {
   const { slug } = useParams();
+  const [isIntro, setIsIntro] = useState(true);
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
   const [salonInfo, setSalonInfo] = useState<SalonInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -113,6 +115,17 @@ export default function BookingPage() {
     );
   }
 
+  // On intro step, render widget full-screen without header/footer
+  if (isIntro) {
+    return (
+      <BookingWidget 
+        widgetConfig={widgetConfig} 
+        salonId={salonInfo.id} 
+        onStepChange={(stepId) => setIsIntro(stepId === "intro")}
+      />
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -153,7 +166,11 @@ export default function BookingPage() {
 
       {/* Booking Widget */}
       <main className="container mx-auto px-4 py-12">
-        <BookingWidget widgetConfig={widgetConfig} salonId={salonInfo.id} />
+        <BookingWidget 
+          widgetConfig={widgetConfig} 
+          salonId={salonInfo.id} 
+          onStepChange={(stepId) => setIsIntro(stepId === "intro")}
+        />
       </main>
 
       {/* Footer */}

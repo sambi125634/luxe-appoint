@@ -30,6 +30,7 @@ const stepIdToName: Record<string, string> = {
 interface BookingWidgetProps {
   widgetConfig?: WidgetConfig | null;
   salonId?: string;
+  onStepChange?: (stepId: string) => void;
 }
 
 interface Service {
@@ -87,7 +88,7 @@ const serviceRecommendations: Record<string, { id: string; name: string; price: 
   ],
 };
 
-export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWidgetProps) {
+export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
@@ -199,6 +200,11 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
   };
 
   const currentStepId = getCurrentStepId(currentStep);
+
+  useEffect(() => {
+    onStepChange?.(currentStepId);
+  }, [currentStepId, onStepChange]);
+
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
