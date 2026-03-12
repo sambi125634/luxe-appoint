@@ -2016,6 +2016,7 @@ export type Database = {
       staff_members: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           color: string | null
           created_at: string
           email: string | null
@@ -2025,11 +2026,14 @@ export type Database = {
           phone: string | null
           role: string | null
           salon_id: string
+          specializations: Json | null
+          started_at: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           color?: string | null
           created_at?: string
           email?: string | null
@@ -2039,11 +2043,14 @@ export type Database = {
           phone?: string | null
           role?: string | null
           salon_id: string
+          specializations?: Json | null
+          started_at?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           color?: string | null
           created_at?: string
           email?: string | null
@@ -2053,6 +2060,8 @@ export type Database = {
           phone?: string | null
           role?: string | null
           salon_id?: string
+          specializations?: Json | null
+          started_at?: string | null
           updated_at?: string
           user_id?: string | null
         }

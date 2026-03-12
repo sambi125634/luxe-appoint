@@ -304,13 +304,14 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         const { error } = await supabase.from("staff_members").update(updateData).eq("id", editingStaff.id);
         if (error) throw error;
       } else {
+        const insertData: Record<string, unknown> = {
+          name: form.name, role: form.role, email: form.email || null, phone: form.phone || null,
+          color: form.color, salon_id: salonId!,
+          bio: form.bio || null, specializations: form.specializations, started_at: form.started_at || null,
+        };
         const { data, error } = await supabase
           .from("staff_members")
-          .insert({
-            name: form.name, role: form.role, email: form.email || null, phone: form.phone || null,
-            color: form.color, salon_id: salonId!,
-            bio: form.bio || null, specializations: form.specializations, started_at: form.started_at || null,
-          } as Record<string, unknown>)
+          .insert(insertData as never)
           .select("id")
           .single();
         if (error) throw error;
