@@ -2602,6 +2602,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      seed_default_client_tags: {
+        Args: { _salon_id: string }
+        Returns: undefined
+      }
       user_belongs_to_salon: {
         Args: { _salon_id: string; _user_id: string }
         Returns: boolean
