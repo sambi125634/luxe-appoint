@@ -153,6 +153,16 @@ const guideContent: Record<string, SectionGuideConfig> = {
     ],
     painPoint: "Wiesz ile naprawdę zarabiasz na każdym zabiegu — nie cenę brutto, a realny zysk po odjęciu kosztów produktów. To jest Twoja prawdziwa marża.",
   },
+  consultation: {
+    goal: "Twórz cyfrowe karty konsultacyjne, zbieraj podpisy RODO i nagrywaj notatki głosowe — wszystko w jednym miejscu zamiast papierowej dokumentacji.",
+    steps: [
+      "Wdróż gotowy szablon karty (np. Twarz, Paznokcie) jednym kliknięciem w zakładce Szablony",
+      "Przejdź do zakładki Karty — wybierz klientkę i szablon, wypełnij kartę konsultacyjną",
+      "Nagraj notatkę głosową (maks. 2 min) — AI automatycznie wyciągnie produkty, tagi i sugestię kolejnej wizyty",
+      "Czerwone flagi (alergie, leki) pojawiają się automatycznie na górze profilu klientki",
+    ],
+    painPoint: "Koniec z papierowymi kartami i zeszytami. Cyfrowa dokumentacja z podpisem RODO, która jest zawsze pod ręką — nawet gdy klientka wraca po roku.",
+  },
   support: {
     goal: "AI Asystent zna całą platformę Beauty Calendar. Zapytaj o cokolwiek — konfigurację, funkcje, rozwiązanie problemu.",
     steps: [

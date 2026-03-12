@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Plus, GripVertical, Trash2, Type, AlignLeft, ListChecks, SlidersHorizontal,
-  Camera, PenTool, ShieldAlert, Sparkles, FileText
+  Camera, PenTool, ShieldAlert, Sparkles, FileText, Info
 } from "lucide-react";
 import { toast } from "sonner";
 import { ConsultationField, useConsultationTemplates, useSaveTemplate } from "@/hooks/useConsultations";
@@ -132,7 +132,7 @@ export function CardBuilder({ isDemo }: Props) {
 
   const deploySystemTemplate = (tpl: (typeof SYSTEM_TEMPLATES)[number]) => {
     if (isDemo) {
-      toast.success(`Demo: Szablon "${tpl.name}" wdrożony!`);
+      toast.success(`Demo: Szablon "${tpl.name}" wdrożony! Przejdź do zakładki Karty, aby go użyć.`);
       return;
     }
     saveTemplate.mutate({ name: tpl.name, fields: tpl.fields as ConsultationField[] });
@@ -159,7 +159,13 @@ export function CardBuilder({ isDemo }: Props) {
             Gotowe szablony (1 klik)
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border border-border">
+            <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+            <p className="text-sm text-muted-foreground">
+              Kliknij aby wdrożyć — szablon pojawi się w zakładce <strong>Karty</strong> do wypełnienia przy kliencie.
+            </p>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {SYSTEM_TEMPLATES.map((tpl) => (
               <Button
@@ -182,6 +188,9 @@ export function CardBuilder({ isDemo }: Props) {
           <CardTitle className="text-lg">
             {editingId ? "Edytuj szablon" : "Stwórz nowy szablon"}
           </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Lub stwórz własny szablon od zera — dodaj pola, ustaw etykiety i zapisz.
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
@@ -253,8 +262,8 @@ export function CardBuilder({ isDemo }: Props) {
         </CardContent>
       </Card>
 
-      {/* Existing templates */}
-      {(isDemo ? SYSTEM_TEMPLATES : templates).length > 0 && (
+      {/* Existing templates — hide in demo to avoid duplication */}
+      {!isDemo && templates.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
@@ -264,10 +273,7 @@ export function CardBuilder({ isDemo }: Props) {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {(isDemo
-                ? SYSTEM_TEMPLATES.map((t, i) => ({ id: `demo-${i}`, name: t.name, fields: t.fields as ConsultationField[], is_system: true, is_active: true, salon_id: "", created_at: "", updated_at: "" }))
-                : templates
-              ).map((tpl) => (
+              {templates.map((tpl) => (
                 <div key={tpl.id} className="flex items-center justify-between p-3 rounded-lg border">
                   <div>
                     <p className="font-medium text-sm">{tpl.name}</p>

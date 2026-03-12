@@ -1,14 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mic, MicOff, Square } from "lucide-react";
+import { Mic, MicOff, Square, Info } from "lucide-react";
 import { useVoiceNotes, useSaveVoiceNote, VoiceNote } from "@/hooks/useConsultations";
 import { useClients } from "@/hooks/useClients";
 import { VoiceNoteCard } from "./VoiceNoteCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
 import { toast } from "sonner";
+
+const DEMO_CLIENTS = [
+  { id: "c1", first_name: "Anna", last_name: "Kowalska" },
+  { id: "c2", first_name: "Maria", last_name: "Nowak" },
+];
 
 const MOCK_VOICE_NOTES: VoiceNote[] = [
   {
@@ -50,6 +55,13 @@ export function VoiceNoteRecorder({ isDemo, clientId }: Props) {
   const [selectedClientId, setSelectedClientId] = useState(clientId || "");
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
   const [timerRef, setTimerRef] = useState<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-select first client in demo mode
+  useEffect(() => {
+    if (isDemo && !selectedClientId) {
+      setSelectedClientId("c1");
+    }
+  }, [isDemo, selectedClientId]);
 
   const displayNotes = isDemo ? MOCK_VOICE_NOTES : voiceNotes;
 
@@ -99,8 +111,6 @@ export function VoiceNoteRecorder({ isDemo, clientId }: Props) {
 
         // Trigger AI transcription
         if (result?.id) {
-          // For now we use browser SpeechRecognition as a fallback
-          // The edge function handles structured extraction
           toast.info("Przetwarzanie AI w toku...");
         }
       };
@@ -160,10 +170,7 @@ export function VoiceNoteRecorder({ isDemo, clientId }: Props) {
             <Select value={selectedClientId} onValueChange={setSelectedClientId}>
               <SelectTrigger><SelectValue placeholder="Wybierz klientkę..." /></SelectTrigger>
               <SelectContent>
-                {(isDemo
-                  ? [{ id: "c1", first_name: "Anna", last_name: "Kowalska" }, { id: "c2", first_name: "Maria", last_name: "Nowak" }]
-                  : clients
-                ).map((c) => (
+                {(isDemo ? DEMO_CLIENTS : clients).map((c) => (
                   <SelectItem key={c.id} value={c.id}>{c.first_name} {c.last_name}</SelectItem>
                 ))}
               </SelectContent>
@@ -204,6 +211,13 @@ export function VoiceNoteRecorder({ isDemo, clientId }: Props) {
             </Button>
             <p className="text-sm text-muted-foreground">
               {isRecording ? "Tap, aby zatrzymać" : "Tap, aby nagrać"}
+            </p>
+          </div>
+
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 border border-border">
+            <Info className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+            <p className="text-sm text-muted-foreground">
+              Nagraj maks. 2 min. AI automatycznie wyciągnie zużyte produkty, tagi klientki i sugestię kolejnej wizyty.
             </p>
           </div>
         </CardContent>
