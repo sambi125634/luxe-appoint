@@ -113,7 +113,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m5",
-      ghlMessageId: "ghl_msg_005",
+      externalMessageId: "ext_msg_005",
       direction: "inbound",
       type: "SMS",
       body: "Czy mogę zmienić termin wizyty na piątek?",
