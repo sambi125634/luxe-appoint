@@ -694,6 +694,13 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
       </div>
 
       {renderClientDialog()}
+      {dbTags && (
+        <TagManagementDialog
+          open={isTagManagementOpen}
+          onOpenChange={setIsTagManagementOpen}
+          tags={dbTags}
+        />
+      )}
     </Dialog>
   );
 }

@@ -140,6 +140,23 @@ export function MobileClients() {
                         Ostatnia wizyta: {format(new Date(client.last_visit_at), "d MMM", { locale: pl })}
                       </p>
                     )}
+                    {client.tags && client.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-0.5 mt-0.5">
+                        {client.tags.slice(0, 2).map(tagId => {
+                          const tag = availableTags.find(t => t.id === tagId);
+                          return tag ? (
+                            <Badge key={tagId} variant="secondary" className={cn("text-[9px] px-1 py-0 h-4", tag.color)}>
+                              {tag.label}
+                            </Badge>
+                          ) : null;
+                        })}
+                        {client.tags.length > 2 && (
+                          <Badge variant="secondary" className="text-[9px] px-1 py-0 h-4">
+                            +{client.tags.length - 2}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Quick actions */}
