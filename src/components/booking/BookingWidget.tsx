@@ -535,7 +535,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
                 
                 <Button 
                   onClick={handleStartBooking}
-                  className="relative overflow-hidden px-16 py-10 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
+                  className="relative overflow-hidden px-16 py-7 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                   
