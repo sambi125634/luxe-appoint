@@ -1,103 +1,75 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Activity, Users, Zap, TrendingUp, AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
+import { Zap, Users, ExternalLink, Info } from "lucide-react";
 import { MOCK_HEALTH } from "./mock-data";
-import { PixelHealthScore } from "./types";
 
 interface PixelHealthDashboardProps {
   isDemo?: boolean;
 }
 
-const scoreConfig: Record<PixelHealthScore, { label: string; color: string; icon: typeof CheckCircle2 }> = {
-  excellent: { label: "Doskonały", color: "text-green-500", icon: CheckCircle2 },
-  good: { label: "Dobry", color: "text-yellow-500", icon: AlertTriangle },
-  poor: { label: "Słaby", color: "text-destructive", icon: XCircle },
-};
-
 export function PixelHealthDashboard({ isDemo }: PixelHealthDashboardProps) {
   const health = MOCK_HEALTH;
-  const config = scoreConfig[health.score];
-  const ScoreIcon = config.icon;
 
   return (
     <div className="space-y-4">
-      {/* Overall score */}
-      <Card className="border-primary/20">
+      {/* Status card */}
+      <Card>
         <CardContent className="p-6">
-          <div className="flex items-center gap-4">
-            <div className={`w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center`}>
-              <ScoreIcon className={`w-8 h-8 ${config.color}`} />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <Zap className="w-5 h-5 text-primary" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm text-muted-foreground">Jakość Pixela</p>
-              <p className={`text-2xl font-bold ${config.color}`}>{config.label}</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Event Match Quality: {health.eventMatchQuality}%
-              </p>
+            <div>
+              <p className="font-medium">Status Pixela</p>
+              <Badge variant="outline" className="text-green-600 border-green-300 mt-0.5">
+                Aktywny
+              </Badge>
             </div>
           </div>
-          <Progress value={health.eventMatchQuality} className="mt-4 h-2" />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <Zap className="w-4 h-4 text-primary mx-auto mb-1" />
+              <p className="text-2xl font-bold">{health.eventsLast30d}</p>
+              <p className="text-xs text-muted-foreground">Eventów CAPI (30 dni)</p>
+            </div>
+            <div className="text-center p-3 rounded-lg bg-muted/50">
+              <Users className="w-4 h-4 text-primary mx-auto mb-1" />
+              <p className="text-2xl font-bold">{health.audiences.length}</p>
+              <p className="text-xs text-muted-foreground">Custom Audiences</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Stats grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Zap className="w-5 h-5 text-primary mx-auto mb-1" />
-            <p className="text-2xl font-bold">{health.eventsLast30d}</p>
-            <p className="text-xs text-muted-foreground">Eventów (30 dni)</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Users className="w-5 h-5 text-primary mx-auto mb-1" />
-            <p className="text-2xl font-bold">{health.audiences.length}</p>
-            <p className="text-xs text-muted-foreground">Custom Audiences</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Audiences */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">Custom Audiences</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {health.audiences.map((aud) => (
-            <div key={aud.name} className="flex items-center justify-between">
-              <div className="flex items-center gap-2 min-w-0">
-                <Users className="w-4 h-4 text-muted-foreground shrink-0" />
-                <span className="text-sm truncate">{aud.name}</span>
-                {aud.isExclusion && (
-                  <Badge variant="destructive" className="text-xs shrink-0">Exclude</Badge>
-                )}
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-sm font-medium">{aud.size}</p>
-                <p className="text-xs text-muted-foreground">osób</p>
-              </div>
-            </div>
-          ))}
+      {/* Info: Event Match Quality */}
+      <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
+        <CardContent className="p-4 flex items-start gap-3">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-blue-900 dark:text-blue-200">Event Match Quality & Health</p>
+            <p className="text-blue-700 dark:text-blue-400 mt-1">
+              Pełne dane o jakości dopasowania eventów (EMQ), deduplikacji i diagnostyce znajdziesz 
+              w <strong>Meta Events Manager</strong> → zakładka Pixel → Diagnostyka.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Recommendations */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm flex items-center gap-2">
-            <TrendingUp className="w-4 h-4" />
-            Rekomendacje
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {health.recommendations.map((rec, i) => (
-            <div key={i} className="flex items-start gap-2 text-sm">
-              <Activity className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-              <span>{rec}</span>
-            </div>
-          ))}
+      {/* Info: Attribution / ROAS */}
+      <Card className="border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+        <CardContent className="p-4 flex items-start gap-3">
+          <ExternalLink className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-amber-900 dark:text-amber-200">ROAS i Atrybucja</p>
+            <p className="text-amber-700 dark:text-amber-400 mt-1">
+              Dane o atrybucji kampanii i ROAS są dostępne wyłącznie w <strong>Meta Ads Manager</strong>. 
+              Eventy wysłane przez CAPI z tego systemu automatycznie trafiają do Twoich kampanii i wpływają na optymalizację.
+            </p>
+            <p className="text-amber-700 dark:text-amber-400 mt-2">
+              💡 <strong>Tip:</strong> Dodaj parametry UTM do linków w reklamach, aby śledzić źródło rezerwacji bezpośrednio w tym systemie.
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

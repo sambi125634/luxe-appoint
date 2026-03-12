@@ -128,6 +128,20 @@ export function AudienceMappings({ isDemo }: AudienceMappingsProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Lookalike info */}
+      <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
+        <CardContent className="p-4 flex items-start gap-3">
+          <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+          <div className="text-sm">
+            <p className="font-medium text-blue-900 dark:text-blue-200">Lookalike Audiences</p>
+            <p className="text-blue-700 dark:text-blue-400 mt-1">
+              Gdy Custom Audience osiągnie min. 100 osób, możesz utworzyć na jej podstawie 
+              <strong> Lookalike Audience</strong> w Meta Ads Manager → Audiences → Create → Lookalike.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
