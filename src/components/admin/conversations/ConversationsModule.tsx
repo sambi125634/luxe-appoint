@@ -93,7 +93,7 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
     },
     {
       id: "m3",
-      ghlMessageId: "ghl_msg_003",
+      externalMessageId: "ext_msg_003",
       direction: "inbound",
       type: "SMS",
       body: "Dziękuję za potwierdzenie wizyty! Do zobaczenia 💕",
