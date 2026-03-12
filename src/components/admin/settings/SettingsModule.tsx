@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Building2, Calendar, Bell, Plug } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
+import { AutomationSettings } from "./AutomationSettings";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 import { SectionGuide } from "../SectionGuide";
 
 interface SettingsModuleProps {
   isDemo?: boolean;
+  onNavigateToModule?: (tabId: string) => void;
 }
 
 const demoProfile = {
@@ -26,7 +28,7 @@ const demoProfile = {
   themeSecondaryColor: "#1a1a2e",
 };
 
-export function SettingsModule({ isDemo = false }: SettingsModuleProps) {
+export function SettingsModule({ isDemo = false, onNavigateToModule }: SettingsModuleProps) {
   const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
   const { profile: realProfile, settings, isLoading: realLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
   const profile = isDemo ? demoProfile : realProfile;
@@ -37,13 +39,14 @@ export function SettingsModule({ isDemo = false }: SettingsModuleProps) {
     { id: "booking" as const, label: "Rezerwacje", icon: Calendar },
     { id: "notifications" as const, label: "Powiadomienia", icon: Bell },
     { id: "integrations" as const, label: "Integracje", icon: Plug },
+    { id: "automation" as const, label: "Automatyzacja", icon: Zap },
   ];
 
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 h-auto gap-2 bg-transparent p-0">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -89,6 +92,16 @@ export function SettingsModule({ isDemo = false }: SettingsModuleProps) {
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={(updates) => updateSettings("integrations", updates)}
+            />
+          </TabsContent>
+          <TabsContent value="automation" className="m-0">
+            <AutomationSettings
+              settings={settings.automation}
+              isLoading={isLoading}
+              isSaving={isSaving}
+              onSave={(updates) => updateSettings("automation", updates)}
+              onNavigateToModule={onNavigateToModule}
+              isDemo={isDemo}
             />
           </TabsContent>
         </div>
