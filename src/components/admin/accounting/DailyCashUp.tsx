@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { format } from "date-fns";
+import { useState, useMemo } from "react";
+import { format, isWithinInterval, startOfDay, endOfDay } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { Eye, FileText, Download, Lock, LockOpen, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,8 @@ import { mockDailyClosings } from "./mockData";
 import { DailyCashUpDetail } from "./DailyCashUpDetail";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { exportToCSV } from "@/lib/csvExport";
+import { useToast } from "@/hooks/use-toast";
 
 interface DailyCashUpProps {
   dateRange: { from: Date; to: Date };
@@ -24,6 +26,7 @@ interface DailyCashUpProps {
 
 export function DailyCashUp({ dateRange }: DailyCashUpProps) {
   const { t, i18n } = useTranslation();
+  const { toast } = useToast();
   const [selectedDay, setSelectedDay] = useState<DailyClosing | null>(null);
   const [closings, setClosings] = useState<DailyClosing[]>(mockDailyClosings);
   const dateLocale = i18n.language === 'pl' ? pl : enUS;
@@ -34,6 +37,14 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
       currency: "PLN",
     }).format(amount);
   };
+
+  // Filter closings by dateRange
+  const filteredClosings = useMemo(() => {
+    return closings.filter(day => {
+      const dayDate = new Date(day.date);
+      return isWithinInterval(dayDate, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) });
+    });
+  }, [closings, dateRange]);
 
   const handleCloseDay = (dayId: string, actualCash: number) => {
     setClosings((prev) =>
@@ -53,7 +64,7 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
     setSelectedDay(null);
   };
 
-  const totalStats = closings.reduce(
+  const totalStats = filteredClosings.reduce(
     (acc, day) => ({
       services: acc.services + day.totalServicesGross,
       products: acc.products + day.totalProductsGross,
@@ -64,6 +75,32 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
     }),
     { services: 0, products: 0, tips: 0, cash: 0, card: 0, online: 0 }
   );
+
+  const handleExportDayCSV = (day: DailyClosing) => {
+    exportToCSV({
+      filename: `raport_dzienny_${day.date}`,
+      headers: [
+        "Data", "Usługi brutto (zł)", "Produkty brutto (zł)", "Napiwki (zł)",
+        "Gotówka (zł)", "Karta (zł)", "Online (zł)", "Voucher (zł)",
+        "Oczekiwana gotówka (zł)", "Faktyczna gotówka (zł)", "Różnica (zł)", "Status"
+      ],
+      rows: [[
+        day.date,
+        day.totalServicesGross,
+        day.totalProductsGross,
+        day.totalTips,
+        day.cashGross,
+        day.cardGross,
+        day.onlineGross,
+        day.voucherGross,
+        day.expectedCashInDrawer,
+        day.actualCashInDrawer ?? "",
+        day.cashDifference ?? "",
+        day.status
+      ]]
+    });
+    toast({ title: "Eksport CSV zakończony", description: `Raport dzienny z ${day.date} pobrany.` });
+  };
 
   if (selectedDay) {
     return (
@@ -124,7 +161,7 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {closings.map((day) => (
+            {filteredClosings.map((day) => (
               <TableRow key={day.id} className="hover:bg-muted/30">
                 <TableCell className="font-medium">
                   {format(new Date(day.date), "EEEE, dd MMM", { locale: dateLocale })}
@@ -178,16 +215,25 @@ export function DailyCashUp({ dateRange }: DailyCashUpProps) {
                     >
                       <Eye className="w-4 h-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" title="PDF">
-                      <FileText className="w-4 h-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" title="CSV">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      title="CSV"
+                      onClick={() => handleExportDayCSV(day)}
+                    >
                       <Download className="w-4 h-4" />
                     </Button>
                   </div>
                 </TableCell>
               </TableRow>
             ))}
+            {filteredClosings.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={11} className="text-center py-8 text-muted-foreground">
+                  Brak raportów dziennych w wybranym zakresie dat
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

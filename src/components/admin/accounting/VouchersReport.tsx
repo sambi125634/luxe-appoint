@@ -23,6 +23,8 @@ import { Voucher } from "./types";
 import { mockVouchers } from "./mockData";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
+import { exportToCSV } from "@/lib/csvExport";
+import { useToast } from "@/hooks/use-toast";
 
 interface VouchersReportProps {
   dateRange: { from: Date; to: Date };
@@ -30,6 +32,7 @@ interface VouchersReportProps {
 
 export function VouchersReport({ dateRange }: VouchersReportProps) {
   const { t } = useTranslation();
+  const { toast } = useToast();
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterExpiring, setFilterExpiring] = useState<boolean>(false);
@@ -115,6 +118,31 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
     return days;
   };
 
+  const handleExportCSV = () => {
+    if (filteredVouchers.length === 0) {
+      toast({ title: "Brak danych do eksportu", variant: "destructive" });
+      return;
+    }
+    exportToCSV({
+      filename: "vouchery_raport",
+      headers: [
+        "Kod", "Typ", "Klient", "Data wydania", "Data ważności",
+        "Wartość oryginalna (zł)", "Pozostała wartość (zł)", "Status"
+      ],
+      rows: filteredVouchers.map(v => [
+        v.code,
+        v.type,
+        v.clientName || "",
+        v.issueDate,
+        v.expiryDate || "",
+        v.originalValue,
+        v.remainingValue,
+        v.status
+      ])
+    });
+    toast({ title: "Eksport CSV zakończony", description: "Plik został pobrany." });
+  };
+
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
@@ -184,7 +212,7 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
 
         <div className="flex-1" />
 
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className="gap-2" onClick={handleExportCSV}>
           <Download className="w-4 h-4" />
           {t('accounting.exportCsvVouchers')}
         </Button>

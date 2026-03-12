@@ -41,11 +41,18 @@ interface ProductSalesAccountingReportProps {
   dateRange: { from: Date; to: Date };
 }
 
-// Mock data for product sales
+// Mock data for product sales — dates relative to today
+const today = new Date();
+const ddAgo = (daysAgo: number) => {
+  const d = new Date(today);
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().split("T")[0];
+};
+
 const mockProductSales = [
   {
     id: "ps1",
-    date: "2024-01-15",
+    date: ddAgo(0),
     productId: "p1",
     productName: "Serum witaminowe C",
     category: "Kosmetyki",
@@ -68,7 +75,7 @@ const mockProductSales = [
   },
   {
     id: "ps2",
-    date: "2024-01-15",
+    date: ddAgo(0),
     productId: "p2",
     productName: "Krem nawilżający premium",
     category: "Kosmetyki",
@@ -91,7 +98,7 @@ const mockProductSales = [
   },
   {
     id: "ps3",
-    date: "2024-01-14",
+    date: ddAgo(1),
     productId: "p3",
     productName: "Olejek do masażu",
     category: "Akcesoria",
@@ -114,7 +121,7 @@ const mockProductSales = [
   },
   {
     id: "ps4",
-    date: "2024-01-14",
+    date: ddAgo(1),
     productId: "p4",
     productName: "Maska do włosów",
     category: "Pielęgnacja włosów",
@@ -137,7 +144,7 @@ const mockProductSales = [
   },
   {
     id: "ps5",
-    date: "2024-01-13",
+    date: ddAgo(2),
     productId: "p1",
     productName: "Serum witaminowe C",
     category: "Kosmetyki",
