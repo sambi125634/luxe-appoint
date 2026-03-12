@@ -24,7 +24,7 @@ import { useStockAlerts } from "@/hooks/useStockAlerts";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, subWeeks, subMonths } from "date-fns";
-import { pl } from "date-fns/locale";
+import { pl, enUS } from "date-fns/locale";
 
 interface DashboardHomeProps {
   onNavigate?: (tab: string) => void;
@@ -53,6 +53,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
   const [quickSaleOpen, setQuickSaleOpen] = useState(false);
   const { salonId, isLoading: salonLoading } = useSalonId();
   const { alerts: stockAlerts, topSelling } = useStockAlerts(isDemo ? undefined : (salonId ?? undefined));
+  const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const today = new Date();
   const todayStart = startOfDay(today).toISOString();
@@ -170,7 +171,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
 
       const grouped: Record<string, { name: string; count: number; revenue: number }> = {};
       for (const a of data ?? []) {
-        const name = (a.services as { name: string } | null)?.name ?? "Nieznana";
+        const name = (a.services as { name: string } | null)?.name ?? t('dashboardExtra.service');
         if (!grouped[a.service_id]) grouped[a.service_id] = { name, count: 0, revenue: 0 };
         grouped[a.service_id].count++;
         grouped[a.service_id].revenue += Number(a.price ?? 0);
@@ -196,7 +197,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
 
       const grouped: Record<string, { name: string; appointments: number; revenue: number }> = {};
       for (const a of data ?? []) {
-        const name = (a.staff_members as { name: string } | null)?.name ?? "Nieznany";
+        const name = (a.staff_members as { name: string } | null)?.name ?? t('dashboardExtra.employee');
         if (!grouped[a.staff_id]) grouped[a.staff_id] = { name, appointments: 0, revenue: 0 };
         grouped[a.staff_id].appointments++;
         grouped[a.staff_id].revenue += Number(a.price ?? 0);
@@ -238,7 +239,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
           </Button>
           <Badge variant="outline" className="gap-1">
             <Calendar className="w-3 h-3" />
-            {format(today, "EEEE, d MMMM", { locale: pl })}
+            {format(today, "EEEE, d MMMM", { locale: dateLocale })}
           </Badge>
         </div>
       </div>
@@ -316,12 +317,12 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
               {(monthlyNoShows?.current ?? 0) <= (monthlyNoShows?.previous ?? 0) ? (
                 <span className="text-xs text-green-600 flex items-center gap-1">
                   <ArrowDownRight className="w-3 h-3" />
-                  Lepiej niż poprzedni miesiąc
+                  {t('dashboardExtra.betterThanLastMonth')}
                 </span>
               ) : (
                 <span className="text-xs text-red-600 flex items-center gap-1">
                   <ArrowUpRight className="w-3 h-3" />
-                  Więcej niż poprzedni miesiąc
+                  {t('dashboardExtra.worseThanLastMonth')}
                 </span>
               )}
             </div>
@@ -359,11 +360,11 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
             ) : todayAppointments.length === 0 ? (
               <div className="text-center py-12">
                 <Calendar className="w-12 h-12 mx-auto text-muted-foreground/40 mb-3" />
-                <p className="text-muted-foreground font-medium">Brak wizyt na dziś</p>
-                <p className="text-sm text-muted-foreground mt-1">Dodaj wizytę w kalendarzu lub poczekaj na rezerwację online</p>
+                <p className="text-muted-foreground font-medium">{t('dashboardExtra.noAppointmentsToday')}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t('dashboardExtra.addAppointmentHint')}</p>
                 <Button variant="outline" size="sm" className="mt-4 gap-2" onClick={() => handleNavigate("calendar")}>
                   <Plus className="w-4 h-4" />
-                  Otwórz kalendarz
+                  {t('dashboardExtra.openCalendar')}
                 </Button>
               </div>
             ) : (
@@ -390,9 +391,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
                         </div>
                         <div className="h-10 w-px bg-border" />
                         <div>
-                          <div className="font-medium">{client ? `${client.first_name} ${client.last_name}` : "Klient"}</div>
+                          <div className="font-medium">{client ? `${client.first_name} ${client.last_name}` : t('dashboardExtra.client')}</div>
                           <div className="text-sm text-muted-foreground">
-                            {service?.name ?? "Usługa"} • {staff?.name ?? "Pracownik"}
+                            {service?.name ?? t('dashboardExtra.service')} • {staff?.name ?? t('dashboardExtra.employee')}
                           </div>
                         </div>
                       </div>
@@ -444,9 +445,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
             <CardContent className="space-y-4">
               {topServices.length === 0 ? (
                 <div className="text-center py-6">
-                  <p className="text-sm text-muted-foreground">Brak danych — dodaj usługi i zacznij przyjmować wizyty</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboardExtra.noDataServices')}</p>
                   <Button variant="ghost" size="sm" className="mt-2" onClick={() => handleNavigate("services")}>
-                    Dodaj usługi
+                    {t('dashboardExtra.addServices')}
                   </Button>
                 </div>
               ) : (
@@ -485,9 +486,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
             <CardContent className="space-y-3">
               {topStaff.length === 0 ? (
                 <div className="text-center py-6">
-                  <p className="text-sm text-muted-foreground">Brak danych — dodaj pracowników i zacznij przyjmować wizyty</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboardExtra.noDataStaff')}</p>
                   <Button variant="ghost" size="sm" className="mt-2" onClick={() => handleNavigate("staff")}>
-                    Dodaj pracowników
+                    {t('dashboardExtra.addStaff')}
                   </Button>
                 </div>
               ) : (

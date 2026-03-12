@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   ChevronDown, ChevronUp, TrendingUp, TrendingDown,
   Mail, Sparkles, AlertTriangle, Bot, Calendar,
@@ -19,6 +20,7 @@ interface WeeklyBriefWidgetProps {
 }
 
 export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBriefWidgetProps) {
+  const { t } = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const { salonId } = useSalonId();
   const { data: brief, isLoading } = useLatestBrief(isDemo ? "demo" : salonId ?? undefined, isDemo);
@@ -28,9 +30,9 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
     if (!salonId && !isDemo) return;
     try {
       await generateBrief.mutateAsync({ salonId: salonId! });
-      toast.success("Brief wygenerowany!");
+      toast.success(t('weeklyBrief.briefGenerated'));
     } catch {
-      toast.error("Nie udało się wygenerować briefu");
+      toast.error(t('weeklyBrief.briefError'));
     }
   };
 
@@ -49,7 +51,7 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
         <CardContent className="py-8 text-center">
           <Bot className="w-10 h-10 mx-auto text-muted-foreground/40 mb-3" />
           <p className="text-sm text-muted-foreground mb-3">
-            Brak tygodniowego briefu. Wygeneruj pierwszy raport!
+            {t('weeklyBrief.noBrief')}
           </p>
           {!isDemo && (
             <Button
@@ -59,7 +61,7 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
               className="gap-2"
             >
               <RefreshCw className={cn("w-4 h-4", generateBrief.isPending && "animate-spin")} />
-              Wygeneruj brief
+              {t('weeklyBrief.generateBrief')}
             </Button>
           )}
         </CardContent>
@@ -69,7 +71,6 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
 
   return (
     <Card className="overflow-hidden">
-      {/* Header - always visible */}
       <CardHeader
         className="cursor-pointer hover:bg-muted/30 transition-colors pb-3"
         onClick={() => setExpanded(!expanded)}
@@ -81,58 +82,43 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
             </div>
             <div>
               <CardTitle className="text-base font-serif">
-                Tygodniowy Brief
+                {t('weeklyBrief.title')}
               </CardTitle>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Tydzień od {brief.week_start}
+                {t('weeklyBrief.weekFrom')} {brief.week_start}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             {brief.email_sent_at && (
               <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">
-                Wysłano
+                {t('weeklyBrief.sent')}
               </Badge>
             )}
             {expanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
           </div>
         </div>
 
-        {/* Compact KPI row - always visible */}
         <div className="flex items-center gap-4 mt-3 text-sm">
-          <KPIChip
-            label="wizyt"
-            value={brief.appointments_count}
-            change={brief.appointments_change_pct}
-          />
-          <KPIChip
-            label="zł"
-            value={brief.revenue}
-            change={brief.revenue_change_pct}
-          />
-          <KPIChip
-            label="obłożenie"
-            value={`${brief.occupancy_pct}%`}
-          />
+          <KPIChip label={t('weeklyBrief.appointments')} value={brief.appointments_count} change={brief.appointments_change_pct} />
+          <KPIChip label="zł" value={brief.revenue} change={brief.revenue_change_pct} />
+          <KPIChip label={t('weeklyBrief.occupancy')} value={`${brief.occupancy_pct}%`} />
         </div>
       </CardHeader>
 
-      {/* Expanded content */}
       {expanded && (
         <CardContent className="pt-0 space-y-4 animate-in fade-in-0 slide-in-from-top-2 duration-200">
-          {/* AI Narrative */}
           {brief.ai_narrative && (
             <div className="p-3 rounded-lg bg-muted/50 text-sm leading-relaxed">
               {brief.ai_narrative}
             </div>
           )}
 
-          {/* Autopilot Actions */}
           {brief.autopilot_actions.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
                 <Bot className="w-3.5 h-3.5" />
-                Autopilot zadziałał
+                {t('weeklyBrief.autopilotActed')}
               </h4>
               <div className="space-y-1.5">
                 {brief.autopilot_actions.map((action, i) => (
@@ -145,7 +131,6 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
             </div>
           )}
 
-          {/* Top Action */}
           {brief.ai_top_action && (
             <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
               <div className="flex items-start gap-2">
@@ -162,7 +147,6 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
             </div>
           )}
 
-          {/* Warning */}
           {brief.ai_warning && (
             <div className={cn(
               "p-3 rounded-lg border",
@@ -190,12 +174,11 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
             </div>
           )}
 
-          {/* Footer actions */}
           <div className="flex items-center justify-between pt-2 border-t border-border">
             {onShowHistory && (
               <Button variant="ghost" size="sm" className="text-xs gap-1.5" onClick={onShowHistory}>
                 <History className="w-3.5 h-3.5" />
-                Historia briefów
+                {t('weeklyBrief.briefHistory')}
               </Button>
             )}
             {!isDemo && (
@@ -207,7 +190,7 @@ export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBrief
                 disabled={generateBrief.isPending}
               >
                 <RefreshCw className={cn("w-3.5 h-3.5", generateBrief.isPending && "animate-spin")} />
-                Odśwież
+                {t('weeklyBrief.refresh')}
               </Button>
             )}
           </div>
