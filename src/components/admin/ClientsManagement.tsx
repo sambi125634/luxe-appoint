@@ -609,12 +609,18 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               )}
             </p>
           </div>
-          <DialogTrigger asChild>
-            <Button type="button" onClick={openNewClient} className="gap-2">
-              <Plus className="w-4 h-4" />
-              {t('clients.addClient')}
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsTagManagementOpen(true)} className="gap-2">
+              <Tag className="w-4 h-4" />
+              Zarządzaj tagami
             </Button>
-          </DialogTrigger>
+            <DialogTrigger asChild>
+              <Button type="button" onClick={openNewClient} className="gap-2">
+                <Plus className="w-4 h-4" />
+                {t('clients.addClient')}
+              </Button>
+            </DialogTrigger>
+          </div>
         </div>
 
         {/* Main view tabs */}
