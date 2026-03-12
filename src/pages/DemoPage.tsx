@@ -11,7 +11,7 @@ import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { WidgetsManagement } from "@/components/admin/widgets";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
-import { StatsModule } from "@/components/admin/StatsModule";
+
 import { SettingsModule } from "@/components/admin/settings";
 import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
@@ -46,7 +46,6 @@ export default function DemoPage() {
       case "staff": return t("admin.staff");
       case "services": return t("admin.services");
       case "time-off": return t("timeOff.title");
-      case "stats": return t("admin.stats");
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
       
@@ -75,8 +74,6 @@ export default function DemoPage() {
           return <StaffManagement isDemo={true} />;
         case "time-off":
           return <TimeOffManagement isDemo={true} />;
-        case "stats":
-          return <StatsModule isDemo={true} />;
         case "settings":
           return <SettingsModule isDemo />;
         case "conversations":

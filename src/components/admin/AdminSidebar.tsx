@@ -11,7 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "stats" | "settings" | "support" | "retention" | "pixel" | "analytics" | "consultation" | "referral";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "settings" | "support" | "retention" | "pixel" | "analytics" | "consultation" | "referral";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -22,7 +22,7 @@ interface AdminSidebarProps {
 }
 
 // Tabs restricted from staff
-const OWNER_ONLY_TABS: TabType[] = ["accounting", "pipeline", "settings", "widgets", "stats"];
+const OWNER_ONLY_TABS: TabType[] = ["accounting", "pipeline", "settings", "widgets"];
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
   const { t } = useTranslation();
@@ -45,7 +45,6 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     { icon: Users, labelKey: "admin.staff", tab: "staff" },
     { icon: Scissors, labelKey: "admin.services", tab: "services" },
     { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
-    { icon: BarChart3, labelKey: "admin.stats", tab: "stats" },
     { icon: Settings, labelKey: "admin.settings", tab: "settings" },
     { icon: HelpCircle, labelKey: "admin.support", tab: "support" },
   ];

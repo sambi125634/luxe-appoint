@@ -20,7 +20,7 @@ const PipelineModule = lazy(() => import("@/components/admin/pipeline/PipelineMo
 const ConversationsModule = lazy(() => import("@/components/admin/conversations/ConversationsModule").then(m => ({ default: m.ConversationsModule })));
 const WidgetsManagement = lazy(() => import("@/components/admin/widgets/WidgetsManagement").then(m => ({ default: m.WidgetsManagement })));
 const AccountingModule = lazy(() => import("@/components/admin/accounting/AccountingModule").then(m => ({ default: m.AccountingModule })));
-const StatsModule = lazy(() => import("@/components/admin/StatsModule").then(m => ({ default: m.StatsModule })));
+
 const SettingsModule = lazy(() => import("@/components/admin/settings/SettingsModule").then(m => ({ default: m.SettingsModule })));
 const SupportModule = lazy(() => import("@/components/admin/support/SupportModule").then(m => ({ default: m.SupportModule })));
 
@@ -59,7 +59,6 @@ function MobileModule({ tab }: { tab: string }) {
       case "conversations": return <ConversationsModule />;
       case "widgets": return <WidgetsManagement />;
       case "accounting": return <AccountingModule />;
-      case "stats": return <StatsModule />;
       case "settings": return <SettingsModule />;
       case "support": return <SupportModule />;
       default: return <p className="text-center text-muted-foreground py-10">Moduł niedostępny</p>;

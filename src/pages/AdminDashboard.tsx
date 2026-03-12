@@ -13,7 +13,7 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
-import { StatsModule } from "@/components/admin/StatsModule";
+
 import { ConversationsModule } from "@/components/admin/conversations/ConversationsModule";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
@@ -93,7 +93,6 @@ export default function AdminDashboard() {
       case "staff": return "Personel";
       case "services": return "Usługi";
       case "time-off": return "Urlopy i dni wolne";
-      case "stats": return "Statystyki";
       case "settings": return "Ustawienia";
       case "support": return "Pomoc & AI Asystent";
       case "retention": return "Retencja klientek";
@@ -119,7 +118,6 @@ export default function AdminDashboard() {
       case "services": return <ServicesManagement />;
       case "staff": return <StaffManagement />;
       case "time-off": return <TimeOffManagement />;
-      case "stats": return <StatsModule />;
       case "settings": return <SettingsModule />;
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard />;
