@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Settings, Users, Zap, Activity, Target, TrendingUp } from "lucide-react";
+import { Settings, Users, Zap, Activity } from "lucide-react";
 import { PixelSetupWizard } from "./PixelSetupWizard";
 import { AudienceMappings } from "./AudienceMappings";
 import { PixelHealthDashboard } from "./PixelHealthDashboard";
 import { PixelEventsLog } from "./PixelEventsLog";
-import { LookalikeEngine } from "./LookalikeEngine";
-import { PixelAttribution } from "./PixelAttribution";
 import { toast } from "sonner";
 
 interface PixelDashboardProps {
@@ -37,11 +35,11 @@ export function PixelDashboard({ isDemo }: PixelDashboardProps) {
           }}
         />
       ) : (
-        <Tabs defaultValue="health" className="space-y-4">
+        <Tabs defaultValue="overview" className="space-y-4">
           <TabsList className="flex flex-wrap h-auto gap-1">
-            <TabsTrigger value="health" className="gap-1.5 text-xs">
+            <TabsTrigger value="overview" className="gap-1.5 text-xs">
               <Activity className="w-3.5 h-3.5" />
-              Health
+              Przegląd
             </TabsTrigger>
             <TabsTrigger value="audiences" className="gap-1.5 text-xs">
               <Users className="w-3.5 h-3.5" />
@@ -49,15 +47,7 @@ export function PixelDashboard({ isDemo }: PixelDashboardProps) {
             </TabsTrigger>
             <TabsTrigger value="events" className="gap-1.5 text-xs">
               <Zap className="w-3.5 h-3.5" />
-              Zdarzenia
-            </TabsTrigger>
-            <TabsTrigger value="lookalike" className="gap-1.5 text-xs">
-              <TrendingUp className="w-3.5 h-3.5" />
-              Lookalike
-            </TabsTrigger>
-            <TabsTrigger value="attribution" className="gap-1.5 text-xs">
-              <Target className="w-3.5 h-3.5" />
-              ROAS
+              Zdarzenia CAPI
             </TabsTrigger>
             <TabsTrigger value="setup" className="gap-1.5 text-xs">
               <Settings className="w-3.5 h-3.5" />
@@ -65,7 +55,7 @@ export function PixelDashboard({ isDemo }: PixelDashboardProps) {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="health">
+          <TabsContent value="overview">
             <PixelHealthDashboard isDemo={isDemo} />
           </TabsContent>
           <TabsContent value="audiences">
@@ -73,12 +63,6 @@ export function PixelDashboard({ isDemo }: PixelDashboardProps) {
           </TabsContent>
           <TabsContent value="events">
             <PixelEventsLog isDemo={isDemo} />
-          </TabsContent>
-          <TabsContent value="lookalike">
-            <LookalikeEngine isDemo={isDemo} />
-          </TabsContent>
-          <TabsContent value="attribution">
-            <PixelAttribution isDemo={isDemo} />
           </TabsContent>
           <TabsContent value="setup">
             <PixelSetupWizard isDemo={isDemo} onComplete={() => toast.success("Konfiguracja zapisana")} />
