@@ -1,10 +1,10 @@
 import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useTranslation } from "react-i18next";
 
 interface SetupChecklistProps {
   salonId: string;
@@ -13,13 +13,15 @@ interface SetupChecklistProps {
 
 interface ChecklistItem {
   id: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
   completed: boolean;
   tab: string;
 }
 
 export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
+  const { t } = useTranslation();
+
   const { data: checklist = [], isLoading } = useQuery({
     queryKey: ["setup-checklist", salonId],
     queryFn: async () => {
@@ -42,55 +44,13 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
       const hasSalonData = !!(salon?.name && salon?.address && salon?.phone);
 
       const items: ChecklistItem[] = [
-        {
-          id: "salon",
-          label: "Dane salonu",
-          description: "Nazwa, adres, telefon i branding",
-          completed: hasSalonData,
-          tab: "settings",
-        },
-        {
-          id: "hours",
-          label: "Godziny pracy",
-          description: "Ustaw dostępność zespołu",
-          completed: (workingHoursCount ?? 0) > 0,
-          tab: "staff",
-        },
-        {
-          id: "services",
-          label: "Usługi",
-          description: "Dodaj cennik i czas trwania zabiegów",
-          completed: (servicesCount ?? 0) > 0,
-          tab: "services",
-        },
-        {
-          id: "staff",
-          label: "Pracownicy",
-          description: "Dodaj członków zespołu",
-          completed: (staffCount ?? 0) > 0,
-          tab: "staff",
-        },
-        {
-          id: "client",
-          label: "Pierwszy klient",
-          description: "Dodaj klienta ręcznie lub poczekaj na rezerwację",
-          completed: (clientsCount ?? 0) > 0,
-          tab: "clients",
-        },
-        {
-          id: "appointment",
-          label: "Pierwsza wizyta",
-          description: "Utwórz wizytę w kalendarzu",
-          completed: (appointmentsCount ?? 0) > 0,
-          tab: "calendar",
-        },
-        {
-          id: "widget",
-          label: "Widget rezerwacji",
-          description: "Osadź widget na swojej stronie www",
-          completed: false, // Will track via salon settings later
-          tab: "widgets",
-        },
+        { id: "salon", labelKey: "setupChecklist.salonData", descKey: "setupChecklist.salonDataDesc", completed: hasSalonData, tab: "settings" },
+        { id: "hours", labelKey: "setupChecklist.workingHours", descKey: "setupChecklist.workingHoursDesc", completed: (workingHoursCount ?? 0) > 0, tab: "staff" },
+        { id: "services", labelKey: "setupChecklist.services", descKey: "setupChecklist.servicesDesc", completed: (servicesCount ?? 0) > 0, tab: "services" },
+        { id: "staff", labelKey: "setupChecklist.staff", descKey: "setupChecklist.staffDesc", completed: (staffCount ?? 0) > 0, tab: "staff" },
+        { id: "client", labelKey: "setupChecklist.firstClient", descKey: "setupChecklist.firstClientDesc", completed: (clientsCount ?? 0) > 0, tab: "clients" },
+        { id: "appointment", labelKey: "setupChecklist.firstAppointment", descKey: "setupChecklist.firstAppointmentDesc", completed: (appointmentsCount ?? 0) > 0, tab: "calendar" },
+        { id: "widget", labelKey: "setupChecklist.bookingWidget", descKey: "setupChecklist.bookingWidgetDesc", completed: false, tab: "widgets" },
       ];
 
       return items;
@@ -104,16 +64,15 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
   const totalCount = checklist.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  // Hide when everything is done
   if (completedCount === totalCount) return null;
 
   return (
     <Card className="border-primary/20 bg-primary/5">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-serif">Konfiguracja salonu</CardTitle>
+          <CardTitle className="text-lg font-serif">{t('setupChecklist.title')}</CardTitle>
           <span className="text-sm text-muted-foreground">
-            {completedCount}/{totalCount} gotowe
+            {completedCount}/{totalCount} {t('setupChecklist.done')}
           </span>
         </div>
         <Progress value={progress} className="h-2 mt-2" />
@@ -126,9 +85,7 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
               onClick={() => !item.completed && onNavigate(item.tab)}
               className={cn(
                 "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
-                item.completed
-                  ? "bg-primary/5 opacity-60"
-                  : "hover:bg-muted cursor-pointer"
+                item.completed ? "bg-primary/5 opacity-60" : "hover:bg-muted cursor-pointer"
               )}
               disabled={item.completed}
             >
@@ -139,9 +96,9 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
               )}
               <div className="flex-1 min-w-0">
                 <p className={cn("text-sm font-medium", item.completed && "line-through")}>
-                  {item.label}
+                  {t(item.labelKey)}
                 </p>
-                <p className="text-xs text-muted-foreground">{item.description}</p>
+                <p className="text-xs text-muted-foreground">{t(item.descKey)}</p>
               </div>
               {!item.completed && (
                 <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />

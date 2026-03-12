@@ -1,21 +1,24 @@
 import { Sparkles, Heart, Scissors, Stethoscope, Footprints, Leaf } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const audiences = [
-  { icon: Sparkles, label: "Salony kosmetyczne" },
-  { icon: Heart, label: "Studia manicure" },
-  { icon: Scissors, label: "Salony fryzjerskie" },
-  { icon: Stethoscope, label: "Kliniki medycyny estetycznej" },
-  { icon: Footprints, label: "Gabinety podologiczne" },
-  { icon: Leaf, label: "Spa i wellness" }
+  { icon: Sparkles, key: "beautySalons" },
+  { icon: Heart, key: "nailStudios" },
+  { icon: Scissors, key: "hairSalons" },
+  { icon: Stethoscope, key: "aestheticClinics" },
+  { icon: Footprints, key: "podology" },
+  { icon: Leaf, key: "spaWellness" }
 ];
 
 const TargetAudienceSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-20 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Stworzone dla
+            {t('landing.targetAudience.title')}
           </h2>
         </div>
         
@@ -29,7 +32,7 @@ const TargetAudienceSection = () => {
                 <audience.icon className="w-7 h-7 text-gold" />
               </div>
               <span className="text-sm font-medium text-foreground">
-                {audience.label}
+                {t(`landing.targetAudience.${audience.key}`)}
               </span>
             </div>
           ))}
