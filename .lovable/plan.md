@@ -1,45 +1,101 @@
 
 
-# Plan: Ulepszenie Pipeline — wizualizacja + SectionGuide + raporty zależne od timeRange
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Problem
-1. **Board**: Scrollbar na dole jest nieintuicyjny — użytkownik nie widzi, że są kolejne stage'e w prawo.
-2. **Brak SectionGuide**: Pipeline nie ma przewodnika wyjaśniającego cel sekcji (inne zakładki go mają).
-3. **Raporty**: Zmiana timeRange (7d / 30d / 90d) nie wpływa na dane — zawsze te same liczby.
+### Co już mamy
 
-## Rozwiązania
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-### 1. Animowana nawigacja pipeline board
-Dodać nad board'em **animowany pasek wizualny** ze stage'ami jako mini-krokami połączonymi strzałkami, w kolorze ciemnofioletowym z efektem pulsowania/przepływu (gradient animation). Kliknięcie w stage scrolluje do odpowiedniej kolumny.
+### Problem do rozwiązania
 
-Dodatkowo: przy pierwszym załadowaniu board automatycznie robi wolny auto-scroll w prawo i z powrotem (jedno przejście, ~4s), aby użytkownik zobaczył pełną ścieżkę.
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-**Plik:** `PipelineModule.tsx` — dodać komponent `PipelineStageNav` nad `ScrollArea` + logikę auto-scroll z `useEffect` + `useRef`.
+---
 
-### 2. SectionGuide dla Pipeline
-Dodać `<SectionGuide sectionKey="pipeline" />` na górze zakładki board (już jest w empty state, ale brakuje go w widoku z danymi).
+### Plan implementacji
 
-Dodać tłumaczenia `sectionGuide.pipeline.*` w `pl.json` i `en.json`.
+#### FAZA 1: Role-based routing po loginie
 
-**Pliki:** `PipelineModule.tsx`, `pl.json`, `en.json`
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### 3. Raporty zależne od timeRange
-Zamienić statyczne mock dane na funkcje generujące dane proporcjonalnie do wybranego zakresu czasu. Mnożniki:
-- 7d: ~0.15x bazowych wartości
-- 30d: 1x (baza)
-- 90d: ~2.8x
-- all: ~4x
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-Dane KPI, funnelData, conversionData, stageValueData i timeMetrics będą obliczane przez `useMemo(timeRange)` z lekkim randomem seed'owanym per zakres, aby wyglądały realistycznie i różniły się między sobą.
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-**Plik:** `PipelineReports.tsx`
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## Pliki do zmiany
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-| Plik | Zmiana |
-|------|--------|
-| `src/components/admin/pipeline/PipelineModule.tsx` | Auto-scroll, animowany pasek stage'ów, SectionGuide |
-| `src/components/admin/pipeline/PipelineReports.tsx` | Dane dynamiczne wg timeRange |
-| `src/i18n/locales/pl.json` | Tłumaczenia sectionGuide.pipeline |
-| `src/i18n/locales/en.json` | Tłumaczenia sectionGuide.pipeline |
+#### FAZA 3: Indywidualne kokpity
+
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
