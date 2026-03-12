@@ -46,7 +46,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
 
   return (
     <div className="space-y-6">
-      <SectionGuide sectionKey="products" />
+      <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as ProductTab)}>
         <TabsList className="bg-muted/50 p-1 h-auto flex-wrap">
           {tabs.map((tab) => (
