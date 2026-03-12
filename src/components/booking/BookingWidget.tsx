@@ -200,6 +200,11 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   };
 
   const currentStepId = getCurrentStepId(currentStep);
+
+  useEffect(() => {
+    onStepChange?.(currentStepId);
+  }, [currentStepId, onStepChange]);
+
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
