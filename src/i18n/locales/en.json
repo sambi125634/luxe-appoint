@@ -922,7 +922,7 @@
     "createAppointment": "Create appointment",
     "blockContact": "Block contact",
     "writeMessage": "Write a message...",
-    "messagesSentViaGHL": "Messages are sent via GoHighLevel"
+    "messagesSentFromSalon": "Messages are sent from your salon's number"
   },
   "widgets": {
     "title": "Booking widgets",
