@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   TrendingUp,
   TrendingDown,
@@ -25,55 +25,141 @@ import {
 import { cn } from "@/lib/utils";
 import { defaultPipelineStages } from "./types";
 
-// Mock data for reports
-const conversionData = [
-  { from: 'reserved', to: 'visit-1-done', rate: 78, count: 156, avgDays: 3.2 },
-  { from: 'reserved', to: 'no-show', rate: 22, count: 44, avgDays: 0 },
-  { from: 'visit-1-done', to: 'between-1-2', rate: 95, count: 148, avgDays: 0.5 },
-  { from: 'between-1-2', to: 'visit-2-done', rate: 85, count: 126, avgDays: 21.4 },
-  { from: 'between-1-2', to: 'no-show', rate: 15, count: 22, avgDays: 0 },
-  { from: 'visit-2-done', to: 'between-2-3', rate: 92, count: 116, avgDays: 0.5 },
-  { from: 'between-2-3', to: 'visit-3-done', rate: 88, count: 102, avgDays: 24.1 },
-  { from: 'visit-3-done', to: 'between-3-4', rate: 90, count: 92, avgDays: 0.5 },
-  { from: 'between-3-4', to: 'visit-4-done', rate: 91, count: 84, avgDays: 22.8 },
-  { from: 'visit-4-done', to: 'between-4-5', rate: 93, count: 78, avgDays: 0.5 },
-  { from: 'between-4-5', to: 'visit-5-done', rate: 94, count: 73, avgDays: 21.2 },
-  { from: 'visit-5-done', to: 'completed', rate: 100, count: 73, avgDays: 0.5 },
-];
-
-const stageValueData = defaultPipelineStages.map((stage, idx) => ({
-  stageId: stage.id,
-  stageName: stage.name,
-  stageColor: stage.color,
-  contactsCount: Math.max(0, 50 - idx * 4 + Math.floor(Math.random() * 10)),
-  totalValue: Math.max(0, (50 - idx * 4) * 850 + Math.floor(Math.random() * 5000)),
-  avgValue: 850 + Math.floor(Math.random() * 200),
-}));
-
-const funnelData = [
-  { stage: 'Zarezerwowane', count: 200, percent: 100, value: 170000 },
-  { stage: 'Wizyta 1 ✓', count: 156, percent: 78, value: 132600 },
-  { stage: 'Wizyta 2 ✓', count: 126, percent: 63, value: 107100 },
-  { stage: 'Wizyta 3 ✓', count: 102, percent: 51, value: 86700 },
-  { stage: 'Wizyta 4 ✓', count: 84, percent: 42, value: 71400 },
-  { stage: 'Wizyta 5 ✓', count: 73, percent: 36.5, value: 62050 },
-  { stage: 'Ukończone', count: 73, percent: 36.5, value: 62050 },
-];
-
-const timeMetrics = {
-  avgTotalDays: 93.4,
-  avgDaysBetweenVisits: 22.3,
-  fastestCompletion: 68,
-  slowestCompletion: 142,
+// Multipliers per time range for realistic scaling
+const timeRangeMultipliers: Record<string, number> = {
+  "7d": 0.15,
+  "30d": 1,
+  "90d": 2.8,
+  "all": 4.2,
 };
+
+// Seeded pseudo-random for stable values per range
+function seededRandom(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
+
+function generateReportData(timeRange: string) {
+  const mult = timeRangeMultipliers[timeRange] || 1;
+  const seed = timeRange === "7d" ? 7 : timeRange === "30d" ? 30 : timeRange === "90d" ? 90 : 365;
+
+  // Base counts for 30d
+  const baseTotal = 200;
+  const total = Math.round(baseTotal * mult);
+
+  const conversionRates = [78, 95, 85, 92, 88, 90, 91, 93, 94, 100];
+  const noShowRates = [22, 0, 15, 0, 0, 0, 0, 0, 0, 0];
+  
+  // Slight variation per time range
+  const rateVariation = (idx: number) => {
+    const v = seededRandom(seed * 100 + idx) * 4 - 2; // -2 to +2
+    return Math.round(v * 10) / 10;
+  };
+
+  // Funnel
+  const funnelStages = ['Zarezerwowane', 'Wizyta 1 ✓', 'Wizyta 2 ✓', 'Wizyta 3 ✓', 'Wizyta 4 ✓', 'Wizyta 5 ✓', 'Ukończone'];
+  const funnelCounts = [total];
+  const funnelRates = [78, 81, 81, 82, 87, 100]; // pass-through rates
+  for (let i = 0; i < funnelRates.length; i++) {
+    const rate = Math.min(100, Math.max(50, funnelRates[i] + rateVariation(i)));
+    funnelCounts.push(Math.round(funnelCounts[i] * rate / 100));
+  }
+
+  const avgValue = 850;
+  const funnelData = funnelStages.map((stage, idx) => ({
+    stage,
+    count: funnelCounts[idx],
+    percent: Math.round((funnelCounts[idx] / total) * 1000) / 10,
+    value: funnelCounts[idx] * avgValue,
+  }));
+
+  // Conversion data
+  const conversionPairs = [
+    { from: 'reserved', to: 'visit-1-done' },
+    { from: 'reserved', to: 'no-show' },
+    { from: 'visit-1-done', to: 'between-1-2' },
+    { from: 'between-1-2', to: 'visit-2-done' },
+    { from: 'between-1-2', to: 'no-show' },
+    { from: 'visit-2-done', to: 'between-2-3' },
+    { from: 'between-2-3', to: 'visit-3-done' },
+    { from: 'visit-3-done', to: 'between-3-4' },
+    { from: 'between-3-4', to: 'visit-4-done' },
+    { from: 'visit-4-done', to: 'between-4-5' },
+    { from: 'between-4-5', to: 'visit-5-done' },
+    { from: 'visit-5-done', to: 'completed' },
+  ];
+
+  const avgDaysBase = [3.2, 0, 0.5, 21.4, 0, 0.5, 24.1, 0.5, 22.8, 0.5, 21.2, 0.5];
+  const ratesBase = [78, 22, 95, 85, 15, 92, 88, 90, 91, 93, 94, 100];
+
+  const conversionData = conversionPairs.map((pair, idx) => {
+    const rate = Math.min(100, Math.max(0, Math.round(ratesBase[idx] + rateVariation(idx + 20))));
+    const count = Math.round(total * (rate / 100) * mult / mult); // scale count by mult but rate stays %
+    return {
+      from: pair.from,
+      to: pair.to,
+      rate,
+      count: Math.round(funnelCounts[0] * ratesBase[idx] / 100 * (1 + rateVariation(idx + 50) / 100)),
+      avgDays: avgDaysBase[idx] > 0 ? Math.round((avgDaysBase[idx] + rateVariation(idx + 30)) * 10) / 10 : 0,
+    };
+  });
+
+  // Stage value data
+  const stageValueData = defaultPipelineStages.map((stage, idx) => {
+    const contactsCount = Math.max(0, Math.round((50 - idx * 4 + seededRandom(seed * 10 + idx) * 10) * mult));
+    const av = 850 + Math.round(seededRandom(seed * 20 + idx) * 200);
+    return {
+      stageId: stage.id,
+      stageName: stage.name,
+      stageColor: stage.color,
+      contactsCount,
+      totalValue: contactsCount * av,
+      avgValue: av,
+    };
+  });
+
+  // Time metrics
+  const timeMetrics = {
+    avgTotalDays: Math.round((93.4 + rateVariation(100) * 3) * 10) / 10,
+    avgDaysBetweenVisits: Math.round((22.3 + rateVariation(101)) * 10) / 10,
+    fastestCompletion: Math.round(68 + rateVariation(102) * 5),
+    slowestCompletion: Math.round(142 + rateVariation(103) * 10),
+  };
+
+  // KPI
+  const completedValue = funnelCounts[funnelCounts.length - 1] * avgValue;
+  const overallConversion = Math.round((funnelCounts[funnelCounts.length - 1] / total) * 1000) / 10;
+  const noShowRate = Math.round((conversionData.filter(c => c.to === 'no-show').reduce((a, c) => a + c.rate, 0) / 2) * 10) / 10;
+  const kpiDelta = {
+    conversion: Math.round(rateVariation(200) * 10) / 10,
+    value: Math.round(completedValue * 0.18 / 1000),
+    noShow: Math.round(rateVariation(201) * 10) / 10,
+  };
+
+  return {
+    funnelData,
+    conversionData,
+    stageValueData,
+    timeMetrics,
+    kpi: {
+      overallConversion,
+      completedValue,
+      noShowRate,
+      delta: kpiDelta,
+    },
+    total,
+  };
+}
 
 export function PipelineReports() {
   const [timeRange, setTimeRange] = useState("30d");
-  
+
+  const data = useMemo(() => generateReportData(timeRange), [timeRange]);
+
   const getStageName = (stageId: string) => {
     return defaultPipelineStages.find(s => s.id === stageId)?.name || stageId;
   };
-  
+
   const getStageColor = (stageId: string) => {
     return defaultPipelineStages.find(s => s.id === stageId)?.color || 'bg-gray-500';
   };
@@ -113,13 +199,13 @@ export function PipelineReports() {
                 <TrendingUp className="w-5 h-5 text-green-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">36.5%</p>
+                <p className="text-2xl font-bold">{data.kpi.overallConversion}%</p>
                 <p className="text-xs text-muted-foreground">Konwersja całkowita</p>
               </div>
             </div>
             <div className="mt-2 flex items-center gap-1 text-xs text-green-500">
               <TrendingUp className="w-3 h-3" />
-              <span>+2.3% vs poprzedni okres</span>
+              <span>{data.kpi.delta.conversion > 0 ? '+' : ''}{data.kpi.delta.conversion}% vs poprzedni okres</span>
             </div>
           </CardContent>
         </Card>
@@ -131,12 +217,12 @@ export function PipelineReports() {
                 <Clock className="w-5 h-5 text-blue-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{timeMetrics.avgTotalDays} <span className="text-sm font-normal">dni</span></p>
+                <p className="text-2xl font-bold">{data.timeMetrics.avgTotalDays} <span className="text-sm font-normal">dni</span></p>
                 <p className="text-xs text-muted-foreground">Śr. czas ukończenia</p>
               </div>
             </div>
             <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-              <span>Min: {timeMetrics.fastestCompletion}d • Max: {timeMetrics.slowestCompletion}d</span>
+              <span>Min: {data.timeMetrics.fastestCompletion}d • Max: {data.timeMetrics.slowestCompletion}d</span>
             </div>
           </CardContent>
         </Card>
@@ -148,13 +234,13 @@ export function PipelineReports() {
                 <DollarSign className="w-5 h-5 text-amber-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">62k <span className="text-sm font-normal">zł</span></p>
+                <p className="text-2xl font-bold">{Math.round(data.kpi.completedValue / 1000)}k <span className="text-sm font-normal">zł</span></p>
                 <p className="text-xs text-muted-foreground">Wartość ukończonych</p>
               </div>
             </div>
             <div className="mt-2 flex items-center gap-1 text-xs text-green-500">
               <TrendingUp className="w-3 h-3" />
-              <span>+12.4k vs poprzedni okres</span>
+              <span>+{data.kpi.delta.value}k vs poprzedni okres</span>
             </div>
           </CardContent>
         </Card>
@@ -166,13 +252,13 @@ export function PipelineReports() {
                 <Users className="w-5 h-5 text-red-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold">22%</p>
+                <p className="text-2xl font-bold">{data.kpi.noShowRate}%</p>
                 <p className="text-xs text-muted-foreground">Wskaźnik no-show</p>
               </div>
             </div>
             <div className="mt-2 flex items-center gap-1 text-xs text-red-500">
               <TrendingDown className="w-3 h-3" />
-              <span>-3.1% vs poprzedni okres</span>
+              <span>{data.kpi.delta.noShow}% vs poprzedni okres</span>
             </div>
           </CardContent>
         </Card>
@@ -207,7 +293,7 @@ export function PipelineReports() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {funnelData.map((item, idx) => (
+                {data.funnelData.map((item, idx) => (
                   <div key={item.stage} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium">{item.stage}</span>
@@ -220,23 +306,25 @@ export function PipelineReports() {
                       </div>
                     </div>
                     <div className="relative">
-                      <Progress 
-                        value={item.percent} 
+                      <Progress
+                        value={item.percent}
                         className="h-8"
                       />
-                      <div 
+                      <div
                         className="absolute inset-y-0 left-0 flex items-center pl-3 text-xs font-medium text-primary-foreground"
                         style={{ width: `${Math.max(item.percent, 15)}%` }}
                       >
                         {item.count} osób
                       </div>
                     </div>
-                    {idx < funnelData.length - 1 && (
+                    {idx < data.funnelData.length - 1 && (
                       <div className="flex items-center justify-center py-1">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <ArrowRight className="w-3 h-3" />
                           <span>
-                            {idx === 0 ? '78%' : Math.round((funnelData[idx + 1].count / item.count) * 100)}% przechodzi dalej
+                            {data.funnelData[idx + 1].count > 0
+                              ? Math.round((data.funnelData[idx + 1].count / item.count) * 100)
+                              : 0}% przechodzi dalej
                           </span>
                         </div>
                       </div>
@@ -256,8 +344,8 @@ export function PipelineReports() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {conversionData.filter(c => c.to !== 'no-show').map((conversion) => (
-                  <div 
+                {data.conversionData.filter(c => c.to !== 'no-show').map((conversion) => (
+                  <div
                     key={`${conversion.from}-${conversion.to}`}
                     className="glass-card p-3 flex items-center gap-3"
                   >
@@ -270,7 +358,7 @@ export function PipelineReports() {
                         {getStageName(conversion.to)}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center gap-4 text-sm">
                       <div className="text-right">
                         <p className="font-semibold text-green-500">{conversion.rate}%</p>
@@ -288,7 +376,7 @@ export function PipelineReports() {
                   </div>
                 ))}
               </div>
-              
+
               {/* No-show breakdown */}
               <div className="mt-6 pt-4 border-t border-border">
                 <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
@@ -296,8 +384,8 @@ export function PipelineReports() {
                   Utracone kontakty (no-show)
                 </h4>
                 <div className="space-y-2">
-                  {conversionData.filter(c => c.to === 'no-show').map((conversion) => (
-                    <div 
+                  {data.conversionData.filter(c => c.to === 'no-show').map((conversion) => (
+                    <div
                       key={`${conversion.from}-noshow`}
                       className="flex items-center justify-between p-2 bg-red-500/5 rounded-lg"
                     >
@@ -332,9 +420,9 @@ export function PipelineReports() {
                 <div className="glass-card p-4">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-medium">Średni cykl życia klienta</span>
-                    <Badge>{timeMetrics.avgTotalDays} dni</Badge>
+                    <Badge>{data.timeMetrics.avgTotalDays} dni</Badge>
                   </div>
-                  
+
                   <div className="relative">
                     <div className="absolute top-4 left-0 right-0 h-1 bg-muted rounded" />
                     <div className="flex justify-between relative">
@@ -351,7 +439,7 @@ export function PipelineReports() {
                           <span className="text-xs text-muted-foreground mt-2">{label}</span>
                           {idx > 0 && (
                             <span className="text-xs font-medium mt-1">
-                              ~{Math.round(timeMetrics.avgDaysBetweenVisits)}d
+                              ~{Math.round(data.timeMetrics.avgDaysBetweenVisits)}d
                             </span>
                           )}
                         </div>
@@ -367,7 +455,7 @@ export function PipelineReports() {
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Średni</span>
-                        <span className="font-medium">3.2 dni</span>
+                        <span className="font-medium">{data.conversionData[0]?.avgDays || 3.2} dni</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Mediana</span>
@@ -379,26 +467,19 @@ export function PipelineReports() {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="glass-card p-4">
                     <h4 className="font-medium text-sm mb-3">Czas między wizytami</h4>
                     <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Wizyta 1 → 2</span>
-                        <span className="font-medium">21.4 dni</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Wizyta 2 → 3</span>
-                        <span className="font-medium">24.1 dni</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Wizyta 3 → 4</span>
-                        <span className="font-medium">22.8 dni</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">Wizyta 4 → 5</span>
-                        <span className="font-medium">21.2 dni</span>
-                      </div>
+                      {data.conversionData
+                        .filter(c => c.avgDays > 1 && c.to !== 'no-show')
+                        .slice(0, 4)
+                        .map((c, idx) => (
+                          <div key={idx} className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">{getStageName(c.from)} → {getStageName(c.to)}</span>
+                            <span className="font-medium">{c.avgDays} dni</span>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>
@@ -410,7 +491,7 @@ export function PipelineReports() {
                     Rekomendacja
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    Średni czas między wizytą 2 a 3 (24.1 dni) jest najdłuższy. 
+                    Średni czas między wizytą 2 a 3 jest najdłuższy w pipeline.
                     Rozważ dodatkowy follow-up w tym okresie, aby zwiększyć retencję.
                   </p>
                 </div>
@@ -427,8 +508,8 @@ export function PipelineReports() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {stageValueData.filter(s => s.contactsCount > 0).map((stage) => (
-                  <div 
+                {data.stageValueData.filter(s => s.contactsCount > 0).map((stage) => (
+                  <div
                     key={stage.stageId}
                     className="glass-card p-3"
                   >
@@ -439,7 +520,7 @@ export function PipelineReports() {
                       </div>
                       <Badge variant="outline">{stage.contactsCount} kontaktów</Badge>
                     </div>
-                    
+
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground text-xs">Wartość całkowita</p>
@@ -452,37 +533,39 @@ export function PipelineReports() {
                       <div>
                         <p className="text-muted-foreground text-xs">% całości pipeline</p>
                         <p className="font-medium">
-                          {Math.round((stage.totalValue / stageValueData.reduce((acc, s) => acc + s.totalValue, 0)) * 100)}%
+                          {Math.round((stage.totalValue / Math.max(1, data.stageValueData.reduce((acc, s) => acc + s.totalValue, 0))) * 100)}%
                         </p>
                       </div>
                     </div>
-                    
-                    <Progress 
-                      value={(stage.totalValue / Math.max(...stageValueData.map(s => s.totalValue))) * 100} 
+
+                    <Progress
+                      value={(stage.totalValue / Math.max(1, Math.max(...data.stageValueData.map(s => s.totalValue)))) * 100}
                       className="h-1.5 mt-2"
                     />
                   </div>
                 ))}
               </div>
-              
+
               {/* Summary */}
               <div className="mt-6 pt-4 border-t border-border">
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="text-center">
                     <p className="text-2xl font-bold text-primary">
-                      {stageValueData.reduce((acc, s) => acc + s.totalValue, 0).toLocaleString()} zł
+                      {data.stageValueData.reduce((acc, s) => acc + s.totalValue, 0).toLocaleString()} zł
                     </p>
                     <p className="text-xs text-muted-foreground">Całkowita wartość pipeline</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold">
-                      {Math.round(stageValueData.reduce((acc, s) => acc + s.avgValue, 0) / stageValueData.length).toLocaleString()} zł
+                      {data.stageValueData.length > 0
+                        ? Math.round(data.stageValueData.reduce((acc, s) => acc + s.avgValue, 0) / data.stageValueData.length).toLocaleString()
+                        : 0} zł
                     </p>
                     <p className="text-xs text-muted-foreground">Średnia wartość pakietu</p>
                   </div>
                   <div className="text-center">
                     <p className="text-2xl font-bold text-green-500">
-                      62,050 zł
+                      {data.kpi.completedValue.toLocaleString()} zł
                     </p>
                     <p className="text-xs text-muted-foreground">Wartość ukończonych</p>
                   </div>

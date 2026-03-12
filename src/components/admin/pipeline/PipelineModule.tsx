@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { 
   Filter, 
@@ -19,6 +19,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { PipelineColumn } from "./PipelineColumn";
 import { ContactDetailModal } from "./ContactDetailModal";
 import { PipelineReports } from "./PipelineReports";
+import { PipelineStageNav } from "./PipelineStageNav";
 import { SectionGuide } from "../SectionGuide";
 import {
   PipelineContact,
@@ -37,6 +38,40 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<PipelineContact | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false);
+
+  // Auto-scroll on first load to reveal all columns
+  useEffect(() => {
+    if (hasAutoScrolled.current || contacts.length === 0) return;
+    hasAutoScrolled.current = true;
+
+    const timer = setTimeout(() => {
+      const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement | null;
+      if (!viewport) return;
+
+      const maxScroll = viewport.scrollWidth - viewport.clientWidth;
+      if (maxScroll <= 0) return;
+
+      // Scroll right over 2s
+      viewport.scrollTo({ left: maxScroll, behavior: 'smooth' });
+
+      // Scroll back after 2.5s
+      setTimeout(() => {
+        viewport.scrollTo({ left: 0, behavior: 'smooth' });
+      }, 2500);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [contacts.length]);
+
+  // Handle stage nav click — scroll to column
+  const handleStageNavClick = (_stageId: string, index: number) => {
+    const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement | null;
+    if (!viewport) return;
+    const columnWidth = 280 + 16; // w-[280px] + gap-4
+    viewport.scrollTo({ left: index * columnWidth, behavior: 'smooth' });
+  };
   
   // Filter contacts by search query
   const filteredContacts = contacts.filter(contact => {
@@ -202,6 +237,12 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
       </TabsList>
 
       <TabsContent value="board" className="space-y-4">
+        {/* Section Guide */}
+        <SectionGuide sectionKey="pipeline" />
+
+        {/* Animated Stage Navigation */}
+        <PipelineStageNav onStageClick={handleStageNavClick} />
+
         {/* Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="glass-card p-4">
@@ -280,7 +321,7 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
         )}
         
         {/* Pipeline Board */}
-        <ScrollArea className="w-full">
+        <ScrollArea className="w-full" ref={scrollRef}>
           <div 
             className="flex gap-4 pb-4"
             onDragLeave={handleDragLeave}
