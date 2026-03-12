@@ -1,4 +1,5 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
+import { Card, CardContent } from "@/components/ui/card";
 import { Send, Eye, CalendarCheck, DollarSign, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { RetentionKPIData } from "./types";
@@ -8,12 +9,13 @@ interface RetentionKPIProps {
 }
 
 export function RetentionKPI({ data }: RetentionKPIProps) {
+  const { t } = useTranslation();
   const cards = [
-    { label: "Wysłane reaktywacje", value: data.messages_sent, icon: Send, suffix: "", color: "text-blue-600" },
-    { label: "Wskaźnik otwarć", value: data.open_rate, icon: Eye, suffix: "%", color: "text-green-600" },
-    { label: "Rezerwacje z retencji", value: data.bookings_from_retention, icon: CalendarCheck, suffix: "", color: "text-primary" },
-    { label: "Przychód odzyskany", value: data.revenue_recovered, icon: DollarSign, suffix: " zł", color: "text-amber-600" },
-    { label: "Klientki w kampanii", value: data.clients_in_campaign, icon: Users, suffix: "", color: "text-red-600" },
+    { label: t('retention.sentReactivations'), value: data.messages_sent, icon: Send, suffix: "", color: "text-blue-600" },
+    { label: t('retention.openRate'), value: data.open_rate, icon: Eye, suffix: "%", color: "text-green-600" },
+    { label: t('retention.bookingsFromRetention'), value: data.bookings_from_retention, icon: CalendarCheck, suffix: "", color: "text-primary" },
+    { label: t('retention.revenueRecovered'), value: data.revenue_recovered, icon: DollarSign, suffix: " zł", color: "text-amber-600" },
+    { label: t('retention.clientsInCampaign'), value: data.clients_in_campaign, icon: Users, suffix: "", color: "text-red-600" },
   ];
 
   return (
