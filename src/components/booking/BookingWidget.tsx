@@ -465,7 +465,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
   // Intro screen with Sakura animation
   if (currentStepId === "intro") {
     return (
-      <div className="relative min-h-[100dvh] w-full overflow-hidden">
+      <div className="relative min-h-[100dvh] max-h-[100dvh] w-full overflow-hidden">
         <SakuraBackground />
         
         <div className="relative z-20 min-h-[100dvh] flex flex-col items-center justify-center px-4 py-8">
