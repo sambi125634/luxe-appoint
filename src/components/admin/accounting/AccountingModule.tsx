@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { startOfMonth, endOfMonth, format } from "date-fns";
-import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText } from "lucide-react";
+import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText, PieChart, UserX } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountingFiltersBar } from "./AccountingFilters";
 import { AccountingCharts } from "./AccountingCharts";
