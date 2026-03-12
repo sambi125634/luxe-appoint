@@ -1,101 +1,44 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Uatrakcyjnienie wizualne wykresów w Raportach
 
-### Co już mamy
+## Problem
+Wykresy są monotonne — dominują płaskie prostokątne słupki w kolorach czarnym/fioletowym. Brakuje wizualnego zróżnicowania i "wow" efektu.
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+## Rozwiązania
 
-### Problem do rozwiązania
+### 1. Bogatsza paleta kolorów
+Zamiast powtarzającego się `hsl(var(--primary))` (fiolet) na większości wykresów, użyć pełnej palety luxury:
+- **Fiolet** (primary), **Burgund** (secondary/345°), **Złoto** (accent/45°), **Szmaragd** (#10B981), **Róż** (#E91E8C), **Cyjan** (#06B6D4)
+- Każdy wykres dostaje swój unikalny gradient zamiast płaskiego koloru
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### 2. Gradienty na słupkach i area
+- Każdy `<Bar>` dostaje `<linearGradient>` (dół→góra) zamiast flat fill
+- Słupki godzinowe/dzienne — gradient od ciemnego u podstawy do jasnego na górze
+- Area charts — bogatsze gradient fills z wyraźniejszymi kolorami
 
----
+### 3. Zaokrąglone słupki
+- Zwiększyć `radius` na `[8, 8, 0, 0]` (vertical) i `[0, 8, 8, 0]` (horizontal) — bardziej miękki, nowoczesny wygląd
 
-### Plan implementacji
+### 4. KPI cards — glassmorphism + kolorowe ikony
+- Każda KPI card dostaje delikatny kolorowy akcent (lewą borderkę lub gradient tło)
+- Ikony w kolorach odpowiadających ich funkcji (zielony dla przychodu, złoty dla napiwków, czerwony dla anulowanych)
+- Highlight card (przychód) z gradientem violet→burgundy
 
-#### FAZA 1: Role-based routing po loginie
+### 5. Wykresy kołowe — lepsze proporcje i kolory
+- Pie/Donut: shadow effect, jaśniejsze kolory, labels z procentami
+- Większy paddingAngle (4-5px) dla czytelności
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 6. CartesianGrid — subtelniejsza siatka
+- Zmiana z `strokeDasharray="3 3"` na lżejszą siatkę lub usunięcie pionowych linii
+- Horizontal-only grid dla czystszego wyglądu
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+### 7. Tooltip — glassmorphism
+- Tooltip z backdrop-blur, delikatnym cieniem i zaokrągleniem — spójny z luxury aesthetic
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+## Plik do zmiany
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
-
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
-
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+| Plik | Zmiana |
+|------|--------|
+| `src/components/admin/accounting/AccountingCharts.tsx` | Nowa paleta, gradienty SVG, zaokrąglone słupki, kolorowe KPI cards, ulepszone tooltips |
 
