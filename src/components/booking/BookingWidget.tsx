@@ -496,7 +496,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId }: BookingWid
             </div>
 
             <div 
-              className="text-center mb-8 animate-fade-in"
+              className="text-center mb-6 animate-fade-in"
               style={{ animationDelay: '0.6s' }}
             >
               <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-gray-900 via-pink-900 to-violet-900 dark:from-white dark:via-pink-100 dark:to-violet-100 bg-clip-text text-transparent leading-tight">
