@@ -7,7 +7,7 @@ import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
 import { ProductSalesReport } from "./ProductSalesReport";
 import { SuppliersManagement } from "./SuppliersManagement";
-import { ServiceRecipes } from "@/modules/inventory/ServiceRecipes";
+import ServiceRecipes from "@/modules/inventory/ServiceRecipes";
 import InventoryStats from "@/modules/inventory/InventoryStats";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useProducts } from "@/hooks/useProducts";
