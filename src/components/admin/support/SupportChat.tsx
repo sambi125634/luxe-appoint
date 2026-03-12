@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Bot, Send, Trash2, Loader2, Sparkles } from "lucide-react";
 import { SupportMessage } from "./SupportMessage";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   role: "user" | "assistant";
@@ -46,82 +47,146 @@ export function SupportChat({ initialMessage, onMessageSent }: SupportChatProps)
   const sendMessage = async (messageText: string) => {
     if (!messageText.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: messageText.trim() };
+    const trimmedMessage = messageText.trim();
+    const userMessage: Message = { role: "user", content: trimmedMessage };
     setMessages(prev => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
 
     let assistantContent = "";
 
+    const upsertAssistantMessage = (nextChunk: string) => {
+      assistantContent += nextChunk;
+      setMessages(prev => {
+        const lastMessage = prev[prev.length - 1];
+        if (lastMessage?.role === "assistant") {
+          const next = [...prev];
+          next[next.length - 1] = { ...lastMessage, content: assistantContent };
+          return next;
+        }
+        return [...prev, { role: "assistant", content: assistantContent }];
+      });
+    };
+
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/support-chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ 
-          messages: [...messages.filter(m => m.role !== "assistant" || messages.indexOf(m) !== 0), userMessage]
+        body: JSON.stringify({
+          messages: [...messages.slice(1), userMessage],
         }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Błąd połączenia");
+        let errorMessage = "Błąd połączenia z AI";
+        try {
+          const errorData = await response.json();
+          if (typeof errorData?.error === "string") {
+            errorMessage = errorData.error;
+          }
+        } catch {
+          const text = await response.text();
+          if (text) errorMessage = text;
+        }
+        throw new Error(errorMessage);
       }
 
-      if (!response.body) throw new Error("Brak odpowiedzi");
+      if (!response.body) {
+        throw new Error("Brak odpowiedzi z AI");
+      }
+
+      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let buffer = "";
+      let textBuffer = "";
+      let streamDone = false;
 
-      // Add initial assistant message placeholder
-      setMessages(prev => [...prev, { role: "assistant", content: "" }]);
-
-      while (true) {
+      while (!streamDone) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
+        textBuffer += decoder.decode(value, { stream: true });
 
-        const lines = buffer.split("\n");
-        // Keep last potentially incomplete line in buffer
-        buffer = lines.pop() || "";
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
 
-        for (const rawLine of lines) {
-          const line = rawLine.replace(/\r$/, "");
-          
-          // Skip SSE comments and empty lines
+          if (line.endsWith("\r")) line = line.slice(0, -1);
           if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
+          if (!line.startsWith("data:")) continue;
 
-          const jsonStr = line.slice(6).trim();
+          const jsonStr = line.slice(5).trim();
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+
+            if (typeof content === "string" && content.length > 0) {
+              upsertAssistantMessage(content);
+            } else if (Array.isArray(content)) {
+              for (const part of content) {
+                if (part?.type === "text" && typeof part.text === "string") {
+                  upsertAssistantMessage(part.text);
+                }
+              }
+            }
+          } catch {
+            textBuffer = `${line}\n${textBuffer}`;
+            break;
+          }
+        }
+      }
+
+      if (textBuffer.trim()) {
+        for (const raw of textBuffer.split("\n")) {
+          let line = raw;
+          if (!line) continue;
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data:")) continue;
+
+          const jsonStr = line.slice(5).trim();
           if (jsonStr === "[DONE]") continue;
 
           try {
             const parsed = JSON.parse(jsonStr);
             const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              assistantContent += content;
-              setMessages(prev => 
-                prev.map((m, i) => 
-                  i === prev.length - 1 ? { ...m, content: assistantContent } : m
-                )
-              );
+            if (typeof content === "string" && content.length > 0) {
+              upsertAssistantMessage(content);
             }
           } catch {
-            // Skip unparseable lines
+            // Ignorujemy niedomknięte fragmenty JSON na końcu strumienia
           }
         }
+      }
+
+      if (!assistantContent.trim()) {
+        throw new Error("AI nie zwróciło treści odpowiedzi. Spróbuj ponownie.");
       }
     } catch (error) {
       console.error("Chat error:", error);
       toast.error(error instanceof Error ? error.message : "Błąd połączenia z AI");
-      setMessages(prev => [
-        ...prev,
-        { role: "assistant", content: "Przepraszam, wystąpił błąd. Spróbuj ponownie lub skontaktuj się z support@beautyfunnel.pl" }
-      ]);
+      setMessages(prev => {
+        const hasEmptyAssistantAtEnd = prev[prev.length - 1]?.role === "assistant" && !prev[prev.length - 1]?.content;
+        const cleaned = hasEmptyAssistantAtEnd ? prev.slice(0, -1) : prev;
+        return [
+          ...cleaned,
+          { role: "assistant", content: "Przepraszam, wystąpił błąd. Spróbuj ponownie lub skontaktuj się z support@beautyfunnel.pl" },
+        ];
+      });
     } finally {
       setIsLoading(false);
     }
