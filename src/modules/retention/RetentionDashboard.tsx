@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RetentionRadar } from "./RetentionRadar";
+import { RetentionHealthBoard } from "./RetentionHealthBoard";
 import { RetentionTimeline } from "./RetentionTimeline";
 import { RetentionKPI } from "./RetentionKPI";
 import { SequenceConfig } from "./SequenceConfig";
