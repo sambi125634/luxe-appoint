@@ -1,101 +1,78 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Audyt: Ustawienia vs konfiguracja w modułach
 
-### Co już mamy
+## Co jest obecnie w zakładce Ustawienia
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+| Tab | Pokrywa |
+|-----|---------|
+| Profil salonu | Nazwa, opis, adres, telefon, email, logo, kolory motywu |
+| Rezerwacje | Okno rezerwacji, sloty, bufor, zaliczki, polityka anulowania, auto-confirm |
+| Powiadomienia | Email (potwierdzenie + przypomnienie), SMS (SMSAPI.pl BYOP), szablony |
+| Integracje | Przelewy24, Google Calendar |
 
-### Problem do rozwiązania
+## Moduły z WŁASNĄ konfiguracją (poza Ustawieniami)
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+| Moduł | Gdzie się konfiguruje | Czego dotyczy |
+|-------|----------------------|---------------|
+| **Autopilot** | `autopilot_config` — panel w module | Godziny ciszy, trigger days retencji, max wiadomości/klienta, AI suggestions |
+| **Meta Pixel** | `pixel_config` — PixelSetupWizard | Pixel ID, access token, ad account ID, sync interval |
+| **Retencja** | `retention_sequences` — SequenceConfig | Sekwencje wiadomości, trigger days, szablony, incentives |
+| **Polecenia (Referral)** | W module — ReferralEngine | Typ nagrody, kwoty, kody |
+| **Konsultacje** | W module — CardBuilder | Szablony kart konsultacyjnych |
+| **Widgety** | W module — WidgetEditor | Konfiguracja per widget |
+| **True Profit** | W module — ProfitSetupWizard | Koszty stałe, czynsz, media |
 
----
+## Co BRAKUJE w Ustawieniach (powinno tam być)
 
-### Plan implementacji
+1. **Autopilot — ustawienia globalne** — godziny ciszy (20:00-08:00), max wiadomości na klient/tydzień, włącznik AI suggestions. To są cross-cutting concerns wpływające na SMS, email, retencję.
+2. **Domyślna stawka VAT** — brak globalnego ustawienia; każda usługa ma swoją, ale nie ma default.
+3. **Strefa czasowa / format daty** — zakładany jest PL, ale brak jawnego ustawienia.
+4. **RODO / zgody marketingowe** — brak panelu do konfiguracji tekstu zgody, retention policy danych.
+5. **Link do konfiguracji modułów** — użytkownik nie wie, że Pixel czy Retencja mają własne ustawienia do skonfigurowania.
 
-#### FAZA 1: Role-based routing po loginie
+## Proponowany plan
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### Dodać 5. tab: "Automatyzacja" do SettingsModule
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+Nowa zakładka zbierająca cross-cutting settings, które wpływają na wiele modułów:
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+**Sekcja 1 — Autopilot (globalne)**
+- Switch: Autopilot aktywny/wstrzymany
+- Godziny ciszy: start/end (time input)
+- Max wiadomości na klienta (dni): select 3/5/7/14
+- AI suggestions: switch
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+**Sekcja 2 — Domyślne ustawienia**
+- Domyślna stawka VAT: select 0%/8%/23%
+- Strefa czasowa: select (domyślnie Europe/Warsaw)
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+**Sekcja 3 — RODO i prywatność**
+- Tekst zgody marketingowej (textarea)
+- Okres przechowywania danych klientów: select 1/2/3/5 lat
 
-#### FAZA 3: Indywidualne kokpity
+**Sekcja 4 — Status modułów (read-only hub)**
+- Lista modułów z ikoną statusu (skonfigurowany / wymaga konfiguracji)
+- Przycisk "Przejdź do konfiguracji" → zmienia tab na dany moduł
+- Moduły: Pixel, Retencja, Polecenia, True Profit, Konsultacje
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+### Zmiany w plikach
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+| Plik | Zmiana |
+|------|--------|
+| `src/components/admin/settings/AutomationSettings.tsx` | **Nowy** — panel z sekcjami Autopilot, Defaults, RODO, Module Hub |
+| `src/components/admin/settings/SettingsModule.tsx` | Dodać 5. tab "Automatyzacja" z ikoną `Zap` |
+| `src/components/admin/settings/types.ts` | Dodać `"automation"` do `SettingsTabType` |
+| `src/hooks/useSalonSettings.ts` | Dodać `AutomationSettings` interface i pola: `defaultVatRate`, `timezone`, `gdprConsentText`, `dataRetentionYears` do `SalonSettings` |
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+### Logika Module Hub
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+Komponent wyświetli karty z ikonami dla każdego modułu wymagającego konfiguracji. Kliknięcie "Przejdź" wywołuje `onTabChange` z parent `AdminDashboard`, przekierowując do odpowiedniego modułu. Status (skonfigurowany/nie) będzie sprawdzany na podstawie:
+- Pixel: czy `pixel_config` istnieje i `is_active`
+- Retencja: czy `retention_sequences` count > 0
+- True Profit: czy koszty stałe zostały uzupełnione
+- Referral: czy kody poleceń istnieją
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+### Brak zmian w bazie danych
+Wszystkie nowe pola (`defaultVatRate`, `timezone`, `gdprConsentText`, `dataRetentionYears`) będą przechowywane w istniejącej kolumnie `settings` JSONB w tabeli `salons`. Autopilot config już ma własną tabelę.
 
