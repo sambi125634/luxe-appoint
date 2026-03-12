@@ -197,41 +197,42 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
 
       {/* Main Content with Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-flex">
+        <TabsList className="flex w-full overflow-x-auto lg:w-auto lg:inline-flex">
           <TabsTrigger value="charts" className="gap-2">
             <BarChart3 className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.charts')}</span>
-            <span className="sm:hidden">{t('accounting.charts')}</span>
+            <span>{t('accounting.charts')}</span>
           </TabsTrigger>
           <TabsTrigger value="daily" className="gap-2">
             <Calculator className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.dailyReport')}</span>
-            <span className="sm:hidden">{t('accounting.dailyReport')}</span>
+            <span>{t('accounting.dailyReport')}</span>
           </TabsTrigger>
           <TabsTrigger value="sales" className="gap-2">
             <Receipt className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.salesVat')}</span>
-            <span className="sm:hidden">{t('accounting.salesVat')}</span>
+            <span>{t('accounting.salesVat')}</span>
           </TabsTrigger>
           <TabsTrigger value="products" className="gap-2">
             <Package className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.productSales.title')}</span>
-            <span className="sm:hidden">{t('accounting.productSales.title')}</span>
+            <span>{t('accounting.productSales.title')}</span>
           </TabsTrigger>
           <TabsTrigger value="commissions" className="gap-2">
             <Users className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.commissions')}</span>
-            <span className="sm:hidden">{t('accounting.commissions')}</span>
+            <span>{t('accounting.commissions')}</span>
           </TabsTrigger>
           <TabsTrigger value="vouchers" className="gap-2">
             <Ticket className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.vouchers')}</span>
-            <span className="sm:hidden">{t('accounting.vouchers')}</span>
+            <span>{t('accounting.vouchers')}</span>
+          </TabsTrigger>
+          <TabsTrigger value="occupancy" className="gap-2">
+            <PieChart className="w-4 h-4 hidden sm:inline" />
+            <span>Obłożenie</span>
+          </TabsTrigger>
+          <TabsTrigger value="noshows" className="gap-2">
+            <UserX className="w-4 h-4 hidden sm:inline" />
+            <span>No-shows</span>
           </TabsTrigger>
           <TabsTrigger value="export" className="gap-2">
             <Download className="w-4 h-4 hidden sm:inline" />
-            <span className="hidden sm:inline">{t('accounting.export')}</span>
-            <span className="sm:hidden">{t('accounting.export')}</span>
+            <span>{t('accounting.export')}</span>
           </TabsTrigger>
         </TabsList>
 
