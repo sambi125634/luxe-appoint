@@ -1,71 +1,101 @@
 
 
-# Plan: Rozbudowa dashboardu Raporty — dodatkowe wykresy i statystyki
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Obecny stan
-Dashboard ma 6 KPI + 7 wykresów. Solidna baza, ale brakuje analiz, które naprawdę odróżnią nas od konkurencji (Booksy, Fresha, Vagaro — żaden z nich nie oferuje tak głębokiej analityki w jednym miejscu).
+### Co już mamy
 
-## Nowe elementy (9 dodatkowych wizualizacji)
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-### Nowe KPI (rozszerzenie do 2 rzędów — 6+4 = 10 KPI)
-1. **Rabaty łącznie** — ile przychodu "ucieka" na zniżkach
-2. **Usługi / Produkty split** — % podziału przychodu
-3. **Średnia transakcja na pracownika** — efektywność zespołu
-4. **Anulowane transakcje** — liczba + wartość stracona
+### Problem do rozwiązania
 
-### Nowe wykresy
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-5. **Dzień tygodnia — heatmap** (bar chart, pon-nd) — kiedy salon zarabia najwięcej. Pomaga planować promocje i grafik.
+---
 
-6. **Analiza rabatów** (donut chart) — podział: pełna cena vs rabat vs voucher. Pokazuje ile przychodu traci się na zniżkach — żaden konkurent tego nie robi.
+### Plan implementacji
 
-7. **Produktywność pracowników** (grouped bar) — przychód/godz. pracy per pracownik. Nie tylko "kto zarobił ile", ale "kto zarabia najefektywniej".
+#### FAZA 1: Role-based routing po loginie
 
-8. **Klienci powracający vs nowi** (stacked area) — trend dzień po dniu. Kluczowy insight retencyjny.
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-9. **Tabela podsumowania VAT** — mini-tabela ze stawkami VAT, netto, VAT, brutto. Gotowe dane dla księgowej.
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-### Rozszerzenie istniejących
-- **KPI cards**: dodanie mini-trendów (strzałki up/down porównanie z poprzednim okresem)
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-## Układ wizualny
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-```text
-ROW 1 KPI: [Przychód] [Bieżący msc] [Śr. dzienna] [Transakcje] [Śr. koszyk] [Napiwki]
-ROW 2 KPI: [Rabaty Σ] [Usługi/Prod %] [Śr./pracow.] [Anulowane]
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-FULL WIDTH: Trend sprzedaży (area — istniejący)
+#### FAZA 3: Indywidualne kokpity
 
-2-COL: [Metody płatności (pie)]     [Top 5 usług/produktów (bar)]
-2-COL: [Sprzedaż wg kategorii]      [Przychód wg pracownika]
-2-COL: [Analiza rabatów (donut)]     [Produktywność pracowników (grouped bar)]
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
 
-FULL WIDTH: Rozkład godzinowy (istniejący)
-FULL WIDTH: Przychód wg dnia tygodnia (bar pon-nd)
-FULL WIDTH: Klienci powracający vs nowi (stacked area)
-FULL WIDTH: Porównanie miesięczne 4 msc (istniejący)
-FULL WIDTH: Tabela VAT (mini-table)
-```
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
 
-## Dlaczego te, a nie inne
+#### FAZA 4: Aplikacja mobilna (PWA)
 
-| Wizualizacja | Przewaga nad konkurencją |
-|---|---|
-| Rabaty donut | Booksy/Fresha nie pokazują ile tracisz na zniżkach |
-| Produktywność/godz. | Vagaro pokazuje przychód, nie efektywność godzinową |
-| Dzień tygodnia | Żaden konkurent nie podpowiada "kiedy warto otworzyć" |
-| Nowi vs powracający | Retencja w raporcie finansowym — unikalny insight |
-| Tabela VAT | Gotowe dane do przekazania księgowej — oszczędność czasu |
-| Anulowane KPI | Booksy nie pokazuje "ile stracono" — tylko historię |
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
 
-## Dane
-Wszystkie obliczenia z istniejących `transactions` (mockData). Nowe pola: `discountAmount`, `status`, `clientId`, `staffName` — już dostępne w typie `Transaction`. Dla "nowi vs powracający" — liczymy unikalne `clientId` per dzień (pierwszy dzień pojawienia się = nowy).
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
 
-## Plik do zmiany
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
 
-| Plik | Zmiana |
-|------|--------|
-| `src/components/admin/accounting/AccountingCharts.tsx` | +4 KPI, +5 nowych wykresów/tabel, rozszerzenie layoutu |
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
 
-Mock data i typy pozostają bez zmian — wszystkie dane są już dostępne.
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
