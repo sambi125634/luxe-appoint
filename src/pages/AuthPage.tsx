@@ -58,6 +58,8 @@ export default function AuthPage() {
   const [signupPhone, setSignupPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [rodoConsent, setRodoConsent] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
 
   const loginSchema = z.object({
     email: z.string().trim().email(t("auth.loginError")),
