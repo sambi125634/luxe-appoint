@@ -98,10 +98,10 @@ serve(async (req) => {
     // Stage 2: AI extraction with real data
     const systemPrompt = hasScrapedData
       ? `Jesteś asystentem AI specjalizującym się w ekstrakcji danych salonów beauty w Polsce.
-Otrzymasz PRAWDZIWĄ treść stron internetowych salonu. Twoim zadaniem jest WYODRĘBNIĆ wszystkie dane, NIE generować wymyślonych.
+Otrzymasz PRAWDZIWĄ treść stron internetowych salonu. Twoim zadaniem jest WYODRĘBNIĆ dane, NIE generować wymyślonych.
 
 ZASADY:
-- Wyodrębnij KAŻDĄ usługę wymienioną na stronie — nie pomijaj żadnej
+- Wyodrębnij MAKSYMALNIE 80 najważniejszych usług (jeśli jest ich więcej, wybierz najczęściej oferowane)
 - Zachowaj DOKŁADNE nazwy usług jak na stronie
 - Zachowaj DOKŁADNE ceny jak na stronie (w PLN)
 - Jeśli czas trwania nie jest podany, oszacuj go na podstawie typu usługi
