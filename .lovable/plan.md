@@ -1,101 +1,47 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: 3D Kalendarz — sloty wypełniające się same
 
-### Co już mamy
+## Koncept
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+Zamiast abstrakcyjnego kryształu — **3D siatka kalendarza** z blokami wizyt, które animują się "same się wypełniając". Dream outcome klientki: "Twój grafik sam się zapełnia".
 
-### Problem do rozwiązania
+## Scena w `Hero3DScene.tsx` (pełna przebudowa)
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### Elementy 3D:
 
----
+1. **Siatka kalendarza (5 kolumn × 6 wierszy)**
+   - Kolumny = dni tygodnia (Pon–Pt), wiersze = godziny
+   - Każda komórka to `RoundedBox` (drei) z zaokrąglonymi rogami
+   - Siatka lekko nachylona w perspektywie (obrócona ~15° na osi X i ~10° na Y) — efekt "floating dashboard"
 
-### Plan implementacji
+2. **Animowane sloty wizyt**
+   - Co 1-2 sekundy nowy slot "wskakuje" z animacją scale 0→1 + glow pulse
+   - Sloty mają różne kolory z palety beauty (róż, fiolet, złoto, lavender)
+   - Różne wysokości (1-3 rzędy) = różne długości zabiegów
+   - Po wypełnieniu ~70% siatki — reset i zapełnianie od nowa (loop)
 
-#### FAZA 1: Role-based routing po loginie
+3. **Particle sparkles**
+   - Każdy nowo pojawiający się slot emituje burst drobnych świecących cząsteczek
+   - Sparkles (drei) jako ambient tło — zostają
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+4. **Glow effect**
+   - Wypełnione sloty mają delikatne emissive glow
+   - Cała siatka ma subtle bloom (pointLight za siatką)
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+5. **Mouse parallax**
+   - Cała grupa (siatka + sloty) delikatnie podąża za kursorem myszy (lerp)
+   - Daje poczucie głębi i interaktywności
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### Technikalia:
+- `RoundedBox` z drei dla komórek i slotów
+- `useFrame` do animacji pojawiania się slotów (timer-based)
+- `Float` z drei dla lewitacji całej siatki
+- `meshPhysicalMaterial` z transmission/iridescence na slotach dla efektu "glass card"
+- Kolory slotów: `#E91E8C` (pink), `#7c3aed` (violet), `#d4a843` (gold), `#c084fc` (lavender)
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+## Plik do przebudowy
+- `src/components/landing/Hero3DScene.tsx` — pełna przebudowa
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
-
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+Żadne inne pliki nie wymagają zmian — `NewHeroSection.tsx` już renderuje scenę jako tło.
 
