@@ -55,6 +55,7 @@ export default function AuthPage() {
   const [loginPassword, setLoginPassword] = useState("");
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
+  const [signupPhone, setSignupPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
 
@@ -68,6 +69,7 @@ export default function AuthPage() {
     password: z.string().min(6, t("auth.signupError")),
     firstName: z.string().trim().min(2, t("auth.signupError")).max(50),
     lastName: z.string().trim().min(2, t("auth.signupError")).max(50),
+    phone: z.string().trim().min(9, "Podaj poprawny numer telefonu"),
   });
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function AuthPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validation = signupSchema.safeParse({ email: signupEmail, password: signupPassword, firstName, lastName });
+    const validation = signupSchema.safeParse({ email: signupEmail, password: signupPassword, firstName, lastName, phone: signupPhone });
     if (!validation.success) {
       toast.error(validation.error.errors[0].message);
       return;
@@ -131,7 +133,7 @@ export default function AuthPage() {
       password: signupPassword,
       options: {
         emailRedirectTo: redirectUrl,
-        data: { first_name: firstName.trim(), last_name: lastName.trim() },
+        data: { first_name: firstName.trim(), last_name: lastName.trim(), phone: signupPhone.trim() },
       },
     });
     if (error) {
@@ -221,6 +223,10 @@ export default function AuthPage() {
                     <Label htmlFor="last-name">{t("auth.lastName")}</Label>
                     <Input id="last-name" placeholder="Kowalska" value={lastName} onChange={(e) => setLastName(e.target.value)} required disabled={isLoading} />
                   </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-phone">Telefon</Label>
+                  <Input id="signup-phone" type="tel" placeholder="+48 500 600 700" value={signupPhone} onChange={(e) => setSignupPhone(e.target.value)} required disabled={isLoading} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">{t("auth.email")}</Label>

@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import {
   Loader2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles,
   CheckCircle2, Upload, Instagram, Globe, Rocket, Bot, Code2,
-  Mail, FileText, PartyPopper, Users, Scissors, Building2,
+  Mail, FileText, PartyPopper, Users, Scissors, Building2, MapPin, Link2,
 } from "lucide-react";
 import { Confetti } from "@/components/booking/Confetti";
 import { cn } from "@/lib/utils";
@@ -171,6 +171,8 @@ interface ScanResult {
   description: string;
   avg_rating: number;
   existing_reviews_count: number;
+  address?: string;
+  phone?: string;
 }
 
 interface CsvRow {
@@ -195,7 +197,9 @@ export default function OnboardingPage() {
   const [salonCity, setSalonCity] = useState("");
   const [salonType, setSalonType] = useState("multi");
   const [teamSize, setTeamSize] = useState("1");
-  const [socialUrl, setSocialUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [googleMapsUrl, setGoogleMapsUrl] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
 
   // Step 2 — AI Scan
   const [scanning, setScanning] = useState(false);
@@ -266,7 +270,7 @@ export default function OnboardingPage() {
       const { error } = await supabase.from("salons").update({
         name: salonName.trim(), city: salonCity.trim() || null,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
-        social_url: socialUrl.trim() || null, onboarding_step: 1,
+        social_url: instagramUrl.trim() || websiteUrl.trim() || null, onboarding_step: 1,
       }).eq("id", createdSalonId);
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
     } else {
@@ -275,7 +279,7 @@ export default function OnboardingPage() {
         name: salonName.trim(), slug, city: salonCity.trim() || null,
         owner_id: userId, onboarding_step: 1, onboarding_completed: false,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
-        social_url: socialUrl.trim() || null,
+        social_url: instagramUrl.trim() || websiteUrl.trim() || null,
       }).select("id, slug").single();
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
       setCreatedSalonId(salon.id);
@@ -302,7 +306,8 @@ export default function OnboardingPage() {
     setSaving(false);
 
     // If social URL provided, go to AI scan, otherwise skip to step 2 (autopilot, which is step index 2)
-    if (socialUrl.trim()) {
+    const hasUrls = !!(instagramUrl.trim() || googleMapsUrl.trim() || websiteUrl.trim());
+    if (hasUrls) {
       setStep(1);
       startAiScan();
     } else {
@@ -343,8 +348,9 @@ export default function OnboardingPage() {
     }
 
     try {
+      const scanUrls = [instagramUrl, googleMapsUrl, websiteUrl].filter(u => u.trim());
       const { data, error } = await supabase.functions.invoke("ai-profile-scanner", {
-        body: { url: socialUrl, salon_type: salonType },
+        body: { urls: scanUrls, salon_type: salonType },
       });
 
       if (error || !data?.success) {
@@ -388,8 +394,13 @@ export default function OnboardingPage() {
       );
     }
 
-    if (scanResult.description) {
-      await supabase.from("salons").update({ description: scanResult.description }).eq("id", createdSalonId);
+    // Save description, address, phone from scan
+    const salonUpdate: Record<string, string | null> = {};
+    if (scanResult.description) salonUpdate.description = scanResult.description;
+    if (scanResult.address) salonUpdate.address = scanResult.address;
+    if (scanResult.phone) salonUpdate.phone = scanResult.phone;
+    if (Object.keys(salonUpdate).length > 0) {
+      await supabase.from("salons").update(salonUpdate).eq("id", createdSalonId);
     }
 
     setSaving(false);
@@ -569,21 +580,36 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
+                <div className="space-y-3 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#E91E8C]" />
-                    <Label className="text-sm font-semibold">Profil Instagram lub Google Maps</Label>
+                    <Label className="text-sm font-semibold">AI Scan — uzupełni dane za Ciebie</Label>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Oszczędź 10 minut — AI uzupełni dane za Ciebie!
+                    Podaj minimum 1 link. Im więcej, tym dokładniejszy profil.
                   </p>
-                  <Input value={socialUrl} onChange={e => setSocialUrl(e.target.value)}
-                    placeholder="https://instagram.com/twojsalon lub link Google Maps" />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Instagram className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <Input value={instagramUrl} onChange={e => setInstagramUrl(e.target.value)}
+                        placeholder="https://instagram.com/twojsalon" className="text-sm" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <Input value={googleMapsUrl} onChange={e => setGoogleMapsUrl(e.target.value)}
+                        placeholder="Link do wizytówki Google Maps" className="text-sm" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <Input value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
+                        placeholder="Strona www, Booksy lub inny cennik" className="text-sm" />
+                    </div>
+                  </div>
                 </div>
 
                 <Button onClick={handleSaveSalon} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
                   {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
-                  {socialUrl.trim() ? "Dalej — AI przeskanuje profil" : "Dalej"}
+                  {(instagramUrl.trim() || googleMapsUrl.trim() || websiteUrl.trim()) ? "Dalej — AI przeskanuje profil" : "Dalej"}
                 </Button>
               </CardContent>
             </Card>
@@ -692,7 +718,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(socialUrl ? 1 : 0)} size="sm">
+                  <Button variant="outline" onClick={() => setStep((instagramUrl || googleMapsUrl || websiteUrl) ? 1 : 0)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
                   <Button onClick={handleActivateAutopilot} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
