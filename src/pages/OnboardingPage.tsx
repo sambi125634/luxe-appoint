@@ -394,8 +394,13 @@ export default function OnboardingPage() {
       );
     }
 
-    if (scanResult.description) {
-      await supabase.from("salons").update({ description: scanResult.description }).eq("id", createdSalonId);
+    // Save description, address, phone from scan
+    const salonUpdate: Record<string, string | null> = {};
+    if (scanResult.description) salonUpdate.description = scanResult.description;
+    if (scanResult.address) salonUpdate.address = scanResult.address;
+    if (scanResult.phone) salonUpdate.phone = scanResult.phone;
+    if (Object.keys(salonUpdate).length > 0) {
+      await supabase.from("salons").update(salonUpdate).eq("id", createdSalonId);
     }
 
     setSaving(false);
