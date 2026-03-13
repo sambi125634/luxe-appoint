@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import {
   Loader2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles,
   CheckCircle2, Upload, Instagram, Globe, Rocket, Bot, Code2,
-  Mail, FileText, PartyPopper, Users, Scissors, Building2,
+  Mail, FileText, PartyPopper, Users, Scissors, Building2, MapPin, Link2,
 } from "lucide-react";
 import { Confetti } from "@/components/booking/Confetti";
 import { cn } from "@/lib/utils";
