@@ -283,9 +283,21 @@ export default function OnboardingPage() {
 
       // Create owner as staff member
       const ownerName = `${userMeta.first_name ?? ''} ${userMeta.last_name ?? ''}`.trim() || salonName.trim();
-      await supabase.from("staff_members").insert({
+      const { data: staffMember } = await supabase.from("staff_members").insert({
         salon_id: salon.id, name: ownerName, user_id: userId, role: "owner",
-      });
+      }).select("id").single();
+
+      // Create default working hours (Mon-Fri 9:00-17:00) for the owner
+      if (staffMember) {
+        const defaultHours = [1, 2, 3, 4, 5].map(day => ({
+          staff_id: staffMember.id,
+          day_of_week: day,
+          start_time: "09:00",
+          end_time: "17:00",
+          is_working: true,
+        }));
+        await supabase.from("working_hours").insert(defaultHours);
+      }
     }
     setSaving(false);
 
@@ -295,9 +307,10 @@ export default function OnboardingPage() {
       startAiScan();
     } else {
       setScanSkipped(true);
-      // Save default services from template
-      if (createdSalonId) {
-        await saveDefaultServices();
+      // Save default services from template — use salon.id directly since state may not be updated yet
+      const salonIdForServices = createdSalonId ?? (await supabase.from("salons").select("id").eq("owner_id", userId).single()).data?.id;
+      if (salonIdForServices) {
+        await saveDefaultServices(salonIdForServices);
       }
       setStep(2);
     }
