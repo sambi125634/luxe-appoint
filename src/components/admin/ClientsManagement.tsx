@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { 
   Search, Plus, Phone, Mail, Calendar, Clock, 
   Star, AlertTriangle, Edit2, Trash2, User,
-  History, StickyNote, Tag, Users, FolderOpen
+  History, StickyNote, Tag, Users, FolderOpen, Upload
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ClientRiskBadge } from "./ClientRiskBadge";
-import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup } from "./clients";
+import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup, ClientCSVImport } from "./clients";
 import { TagManagementDialog } from "./clients/TagManagementDialog";
 import { SectionGuide } from "./SectionGuide";
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
@@ -195,6 +195,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   // DB-driven tags
   const { data: dbTags } = useClientTags();
   const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
+  const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
 
   const availableTags = useMemo(() => {
     if (!dbTags || dbTags.length === 0) {
@@ -579,15 +580,22 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
             </p>
-            <DialogTrigger asChild>
-              <Button type="button" onClick={openNewClient} className="gap-2">
-                <Plus className="w-4 h-4" />
-                {t('clients.addClient')}
+            <div className="flex gap-2">
+              <DialogTrigger asChild>
+                <Button type="button" onClick={openNewClient} className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  {t('clients.addClient')}
+                </Button>
+              </DialogTrigger>
+              <Button variant="outline" onClick={() => setIsCSVImportOpen(true)} className="gap-2">
+                <Upload className="w-4 h-4" />
+                Import CSV
               </Button>
-            </DialogTrigger>
+            </div>
           </div>
         </div>
         {renderClientDialog()}
+        <ClientCSVImport open={isCSVImportOpen} onOpenChange={setIsCSVImportOpen} isDemo={isDemo} />
       </Dialog>
     );
   }
@@ -620,6 +628,10 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
                 {t('clients.addClient')}
               </Button>
             </DialogTrigger>
+            <Button variant="outline" onClick={() => setIsCSVImportOpen(true)} className="gap-2">
+              <Upload className="w-4 h-4" />
+              Import CSV
+            </Button>
           </div>
         </div>
 
@@ -701,6 +713,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
           tags={dbTags}
         />
       )}
+      <ClientCSVImport open={isCSVImportOpen} onOpenChange={setIsCSVImportOpen} isDemo={isDemo} />
     </Dialog>
   );
 }
