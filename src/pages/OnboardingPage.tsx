@@ -713,7 +713,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(socialUrl ? 1 : 0)} size="sm">
+                  <Button variant="outline" onClick={() => setStep((instagramUrl || googleMapsUrl || websiteUrl) ? 1 : 0)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
                   <Button onClick={handleActivateAutopilot} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
