@@ -69,6 +69,12 @@ export interface IntegrationSettings {
     apiKey: string;
     senderName: string;
   };
+  whatsapp: {
+    enabled: boolean;
+    provider: 'twilio' | '360dialog' | '';
+    apiKey: string;
+    phoneNumberId: string;
+  };
   przelewy24: {
     enabled: boolean;
     merchantId: string;
