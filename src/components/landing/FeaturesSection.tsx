@@ -25,7 +25,11 @@ import {
   Percent,
   Globe,
   Palette,
-  Code
+  Code,
+  Bot,
+  Brain,
+  Target,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
