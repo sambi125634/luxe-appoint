@@ -133,7 +133,7 @@ Wygeneruj co najmniej 20 usług z cenami typowymi dla polskiego rynku.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },

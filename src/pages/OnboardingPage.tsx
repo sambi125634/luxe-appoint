@@ -474,22 +474,37 @@ export default function OnboardingPage() {
     setSaving(true);
 
     // Group services by category
+    // Group services by category
     const grouped: Record<string, ScannedService[]> = {};
     scanResult.services.forEach(s => {
       if (!grouped[s.category]) grouped[s.category] = [];
       grouped[s.category].push(s);
     });
 
+    // Batch insert: create all categories first, then all services at once
+    const categoryEntries = Object.keys(grouped);
+    const categoryInserts = categoryEntries.map((name, idx) => ({
+      salon_id: createdSalonId, name, sort_order: idx,
+    }));
+    const { data: createdCategories } = await supabase.from("service_categories")
+      .insert(categoryInserts).select("id, name");
+
+    if (!createdCategories) { toast.error("Błąd tworzenia kategorii"); setSaving(false); return; }
+
+    const categoryMap = new Map(createdCategories.map(c => [c.name, c.id]));
+    const allServicesInsert = scanResult.services
+      .filter(s => categoryMap.has(s.category))
+      .map(s => ({
+        salon_id: createdSalonId!, category_id: categoryMap.get(s.category)!,
+        name: s.name, duration: s.duration, price: s.price,
+      }));
+
     const allServiceIds: string[] = [];
-    let i = 0;
-    for (const [catName, services] of Object.entries(grouped)) {
-      const { data: cat } = await supabase.from("service_categories")
-        .insert({ salon_id: createdSalonId, name: catName, sort_order: i++ }).select("id").single();
-      if (!cat) continue;
-      const { data: insertedServices } = await supabase.from("services").insert(
-        services.map(s => ({ salon_id: createdSalonId!, category_id: cat.id, name: s.name, duration: s.duration, price: s.price }))
-      ).select("id");
-      if (insertedServices) allServiceIds.push(...insertedServices.map(s => s.id));
+    // Insert in chunks of 50 to avoid payload limits
+    for (let i = 0; i < allServicesInsert.length; i += 50) {
+      const chunk = allServicesInsert.slice(i, i + 50);
+      const { data: inserted } = await supabase.from("services").insert(chunk).select("id");
+      if (inserted) allServiceIds.push(...inserted.map(s => s.id));
     }
 
     // Auto-assign all services to owner staff
