@@ -86,7 +86,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
                 className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Wypróbuj za darmo
+                  Załóż konto za darmo
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-shimmer opacity-0 group-hover:opacity-20" />
