@@ -7,7 +7,9 @@ import {
   useDemoAutopilotStats,
   useDemoAutopilotActions,
 } from "@/hooks/useAutopilot";
-import { MOCK_TODAY_STATS } from "@/lib/autopilot-engine";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface AutopilotStatusBarProps {
   isDemo?: boolean;
@@ -17,11 +19,41 @@ export function AutopilotStatusBar({ isDemo = false }: AutopilotStatusBarProps) 
   const { t } = useTranslation();
   const [logOpen, setLogOpen] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const { salonId } = useSalonId();
 
   const { todayStats } = useDemoAutopilotStats();
   const demoActions = useDemoAutopilotActions();
 
-  const stats = isDemo ? todayStats : MOCK_TODAY_STATS;
+  // Fetch real autopilot stats for production mode
+  const { data: realStats } = useQuery({
+    queryKey: ["autopilot-real-stats", salonId],
+    queryFn: async () => {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      const { data, error } = await supabase
+        .from("autopilot_actions")
+        .select("id, type, metadata")
+        .eq("salon_id", salonId!)
+        .gte("created_at", todayStart.toISOString())
+        .eq("status", "executed");
+      if (error) throw error;
+      const actions = data ?? [];
+      const revenue = actions.reduce((sum, a) => {
+        const meta = a.metadata as Record<string, number> | null;
+        return sum + (meta?.revenue_recovered ?? 0);
+      }, 0);
+      return { actions_today: actions.length, revenue_today: revenue };
+    },
+    enabled: !isDemo && !!salonId,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const stats = isDemo ? todayStats : realStats;
+
+  // In production mode, hide the bar if there are no actions today
+  if (!isDemo && (!stats || (stats.actions_today === 0 && stats.revenue_today === 0))) {
+    return null;
+  }
 
   if (isPaused) {
     return (

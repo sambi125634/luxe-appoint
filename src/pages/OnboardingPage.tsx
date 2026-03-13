@@ -316,8 +316,8 @@ export default function OnboardingPage() {
     }
   };
 
-  const saveDefaultServices = async () => {
-    const salonId = createdSalonId;
+  const saveDefaultServices = async (salonIdOverride?: string) => {
+    const salonId = salonIdOverride ?? createdSalonId;
     if (!salonId) return;
     const template = SERVICE_TEMPLATES[salonType] ?? SERVICE_TEMPLATES.multi;
     for (let i = 0; i < template.length; i++) {

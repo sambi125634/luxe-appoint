@@ -31,15 +31,22 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
         { count: staffCount },
         { count: clientsCount },
         { count: appointmentsCount },
-        { count: workingHoursCount },
       ] = await Promise.all([
         supabase.from("salons").select("name, address, phone").eq("id", salonId).single(),
         supabase.from("services").select("*", { count: "exact", head: true }).eq("salon_id", salonId),
         supabase.from("staff_members").select("*", { count: "exact", head: true }).eq("salon_id", salonId),
         supabase.from("clients").select("*", { count: "exact", head: true }).eq("salon_id", salonId),
         supabase.from("appointments").select("*", { count: "exact", head: true }).eq("salon_id", salonId),
-        supabase.from("working_hours").select("*", { count: "exact", head: true }),
       ]);
+
+      // Query working_hours through staff_members of this salon
+      const { data: salonStaff } = await supabase.from("staff_members").select("id").eq("salon_id", salonId);
+      const staffIds = (salonStaff ?? []).map(s => s.id);
+      let workingHoursCount = 0;
+      if (staffIds.length > 0) {
+        const { count } = await supabase.from("working_hours").select("*", { count: "exact", head: true }).in("staff_id", staffIds);
+        workingHoursCount = count ?? 0;
+      }
 
       const hasSalonData = !!(salon?.name && salon?.address && salon?.phone);
 
