@@ -1,101 +1,55 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Ulepszenie rejestracji + AI onboarding scanner
 
-### Co już mamy
+## Zmiany
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+### 1. Rejestracja — dodać pole telefonu (`AuthPage.tsx`)
+- Dodać pole `phone` w formularzu rejestracji (między nazwiskiem a emailem)
+- Zapisywać phone w `user_metadata` przy `signUp`
+- Zaktualizować `handle_new_user` trigger aby zapisywał phone do `profiles.phone`
+- Walidacja: zod schema z `phone: z.string().min(9)`
 
-### Problem do rozwiązania
+### 2. AI Scanner — głęboki research zamiast generowania (`ai-profile-scanner/index.ts`)
+Obecny problem: AI "generuje realistyczne dane" zamiast je faktycznie wyciągać. Prompt mówi "wygeneruj realistyczne dane" — to dlatego zwraca tylko 7 usług.
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+Nowe podejście — **dwuetapowy scan**:
+- **Etap 1**: Użyć modelu z web search capability (Perplexity `sonar`) lub Firecrawl do pobrania realnej zawartości strony/profilu
+- **Etap 2**: AI analizuje pobrane dane i ekstrahuje wszystkie usługi
 
----
+Konkretnie:
+- Edge function przyjmuje `url` + opcjonalnie `website_url` (strona www) i `booksy_url`
+- Dla każdego URL: fetch realnej treści strony (Firecrawl lub prosty fetch + HTML parse)
+- Przekazać scrapowaną treść do AI z promptem "wyodrębnij WSZYSTKIE usługi z tego tekstu"
+- Model: `google/gemini-2.5-pro` (lepszy reasoning, duży context window na dużo treści)
+- Prompt zmieniony z "wygeneruj" na "wyodrębnij dokładnie te usługi, które są wymienione"
 
-### Plan implementacji
+### 3. Onboarding Step 0 — multiple URLs (`OnboardingPage.tsx`)
+- Zamiast jednego pola `socialUrl` → trzy opcjonalne pola:
+  - Instagram URL
+  - Google Maps URL  
+  - Strona www / Booksy URL
+- Wystarczy wypełnić minimum jedno
+- Wszystkie przekazywane do edge function
 
-#### FAZA 1: Role-based routing po loginie
+### 4. Edge function — Firecrawl scraping
+- Użyć Firecrawl connector do scrapowania stron (wymaga połączenia connectora)
+- Alternatywa: prosty `fetch` + ekstrakcja tekstu z HTML (bez connectora, ale mniej niezawodne)
+- Scrapowany tekst trafia do AI jako context
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 5. Scan result — również adres, telefon salonu
+- AI wyciąga też: adres, telefon, logo URL
+- Zapisywane do `salons` table (address, phone)
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+## Pliki do edycji
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+| Plik | Zmiana |
+|------|--------|
+| `src/pages/AuthPage.tsx` | Dodać pole phone w signup |
+| `src/pages/OnboardingPage.tsx` | Multi-URL input, przekazywanie do scannera |
+| `supabase/functions/ai-profile-scanner/index.ts` | Scraping + deep extraction prompt |
+| Migration | Update `handle_new_user` trigger — zapisywać phone |
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
-
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
-
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+## Pytanie do decyzji
+Firecrawl connector jest dostępny i daje najlepsze wyniki scrapowania. Alternatywą jest prosty fetch. Rekomenduję Firecrawl — czy podłączyć?
 
