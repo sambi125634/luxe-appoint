@@ -13,9 +13,9 @@ import { getDemoTrueProfitData } from './demoTrueProfitData';
 import { AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
-interface Props { isDemo?: boolean; }
+interface Props { isDemo?: boolean; onNavigate?: (tab: string) => void; }
 
-export function TrueProfitDashboard({ isDemo }: Props) {
+export function TrueProfitDashboard({ isDemo, onNavigate }: Props) {
   const { t } = useTranslation();
   const liveProfit = useTrueProfit();
   const profit = isDemo ? getDemoTrueProfitData() : liveProfit;
