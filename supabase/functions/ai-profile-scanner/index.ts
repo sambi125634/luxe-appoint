@@ -116,11 +116,11 @@ Wygeneruj co najmniej 15-25 usług typowych dla tego typu salonu z realistycznym
 Odpowiedz używając tool call "extract_salon_data".`;
 
     const userPrompt = hasScrapedData
-      ? `Wyodrębnij WSZYSTKIE usługi i dane z poniższej treści strony salonu beauty.
-Pamiętaj: chcę KAŻDĄ usługę, nawet jeśli jest ich 100+. Nie pomijaj żadnej.
+      ? `Wyodrębnij usługi i dane z poniższej treści strony salonu beauty.
+Maksymalnie 80 najważniejszych usług. Grupuj je w logiczne kategorie.
 
 TREŚĆ STRON:
-${scrapedContent.slice(0, 60000)}`
+${scrapedContent.slice(0, 30000)}`
       : `Wygeneruj dane dla salonu beauty typu "${salonTypeHint}" na podstawie tych URL: ${urlList.join(", ")}
 Wygeneruj co najmniej 20 usług z cenami typowymi dla polskiego rynku.`;
 
