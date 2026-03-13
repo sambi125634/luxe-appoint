@@ -39,8 +39,8 @@ const features = [
   {
     id: "revenue",
     icon: TrendingUp,
-    title: "Revenue Predictor",
-    subtitle: "Prognoza przychodów",
+    title: "Prognoza Kasy",
+    subtitle: "Wiesz ile zarobisz w piątek",
     description: "Wiesz ile zarobisz zanim miesiąc się skończy. AI analizuje trendy, sezonowość i historię rezerwacji.",
     stat: "94%",
     statLabel: "dokładność prognoz",
