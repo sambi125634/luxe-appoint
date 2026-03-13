@@ -25,8 +25,14 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         <Hero3DScene />
       </Suspense>
 
-      {/* Gradient overlay for readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent z-[1]" />
+      {/* Gradient overlays for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20 z-[1]" />
+      {/* Radial gradient — centrum czytelne, boki z 3D */}
+      <div className="absolute inset-0 z-[1]" style={{
+        background: "radial-gradient(ellipse 60% 70% at 50% 50%, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 60%, transparent 100%)"
+      }} />
+      {/* Mobile extra dark overlay */}
+      <div className="absolute inset-0 bg-background/50 md:bg-transparent z-[1]" />
 
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
