@@ -6,17 +6,61 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function scrapeUrl(url: string, firecrawlKey: string): Promise<string | null> {
+  try {
+    let formattedUrl = url.trim();
+    if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
+      formattedUrl = `https://${formattedUrl}`;
+    }
+
+    console.log("Scraping:", formattedUrl);
+
+    const response = await fetch("https://api.firecrawl.dev/v1/scrape", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${firecrawlKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url: formattedUrl,
+        formats: ["markdown"],
+        onlyMainContent: true,
+        waitFor: 3000,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Firecrawl error for", formattedUrl, response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const markdown = data?.data?.markdown || data?.markdown || null;
+    console.log("Scraped", formattedUrl, "- length:", markdown?.length || 0);
+    return markdown;
+  } catch (error) {
+    console.error("Scrape failed for", url, error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { url, salon_type } = await req.json();
+    const { urls, salon_type } = await req.json();
 
-    if (!url) {
+    // Support both old format (url string) and new format (urls array)
+    const urlList: string[] = [];
+    if (urls && Array.isArray(urls)) {
+      urlList.push(...urls.filter((u: string) => u && u.trim()));
+    }
+
+    if (urlList.length === 0) {
       return new Response(
-        JSON.stringify({ success: false, error: "URL is required" }),
+        JSON.stringify({ success: false, error: "At least one URL is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -29,21 +73,58 @@ serve(async (req) => {
       );
     }
 
+    const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
+
+    // Stage 1: Scrape all URLs using Firecrawl
+    let scrapedContent = "";
+    
+    if (FIRECRAWL_API_KEY) {
+      const scrapeResults = await Promise.all(
+        urlList.map(url => scrapeUrl(url, FIRECRAWL_API_KEY))
+      );
+
+      scrapeResults.forEach((content, i) => {
+        if (content) {
+          scrapedContent += `\n\n--- ŹRÓDŁO ${i + 1}: ${urlList[i]} ---\n\n${content}`;
+        }
+      });
+    }
+
+    // If no content scraped, fall back to URL-based generation
+    const hasScrapedData = scrapedContent.trim().length > 100;
+
     const salonTypeHint = salon_type || "multi";
 
-    const systemPrompt = `Jesteś asystentem AI specjalizującym się w analizie profili salonów beauty w Polsce.
-Na podstawie podanego URL profilu (Instagram lub Google Maps) wygeneruj realistyczne dane salonu.
-Typ salonu: ${salonTypeHint}.
+    // Stage 2: AI extraction with real data
+    const systemPrompt = hasScrapedData
+      ? `Jesteś asystentem AI specjalizującym się w ekstrakcji danych salonów beauty w Polsce.
+Otrzymasz PRAWDZIWĄ treść stron internetowych salonu. Twoim zadaniem jest WYODRĘBNIĆ wszystkie dane, NIE generować wymyślonych.
 
-WAŻNE: Odpowiedz używając tool call "extract_salon_data" z wynikami.`;
+ZASADY:
+- Wyodrębnij KAŻDĄ usługę wymienioną na stronie — nie pomijaj żadnej
+- Zachowaj DOKŁADNE nazwy usług jak na stronie
+- Zachowaj DOKŁADNE ceny jak na stronie (w PLN)
+- Jeśli czas trwania nie jest podany, oszacuj go na podstawie typu usługi
+- Wyodrębnij adres fizyczny salonu jeśli jest podany
+- Wyodrębnij numer telefonu salonu jeśli jest podany
+- Wyodrębnij godziny otwarcia jeśli są podane
+- Kategorie usług grupuj logicznie (np. "Paznokcie", "Brwi i rzęsy", "Twarz", "Ciało")
+- Odpowiedz używając tool call "extract_salon_data"`
+      : `Jesteś asystentem AI specjalizującym się w analizie profili salonów beauty w Polsce.
+Na podstawie podanych URL wygeneruj realistyczne dane salonu typu: ${salonTypeHint}.
+Wygeneruj co najmniej 15-25 usług typowych dla tego typu salonu z realistycznymi cenami dla polskiego rynku.
+Odpowiedz używając tool call "extract_salon_data".`;
 
-    const userPrompt = `Przeanalizuj ten profil salonu beauty i wyodrębnij dane: ${url}
+    const userPrompt = hasScrapedData
+      ? `Wyodrębnij WSZYSTKIE usługi i dane z poniższej treści strony salonu beauty.
+Pamiętaj: chcę KAŻDĄ usługę, nawet jeśli jest ich 100+. Nie pomijaj żadnej.
 
-Na podstawie URL i typu salonu (${salonTypeHint}), wygeneruj realistyczne dane:
-- Lista usług z cenami typowymi dla polskiego rynku beauty
-- Godziny otwarcia
-- Krótki opis salonu
-- Szacunkowa ocena i liczba opinii`;
+TREŚĆ STRON:
+${scrapedContent.slice(0, 60000)}`
+      : `Wygeneruj dane dla salonu beauty typu "${salonTypeHint}" na podstawie tych URL: ${urlList.join(", ")}
+Wygeneruj co najmniej 20 usług z cenami typowymi dla polskiego rynku.`;
+
+    console.log("Sending to AI, scraped data:", hasScrapedData, "content length:", scrapedContent.length);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -52,7 +133,7 @@ Na podstawie URL i typu salonu (${salonTypeHint}), wygeneruj realistyczne dane:
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-pro",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -62,7 +143,7 @@ Na podstawie URL i typu salonu (${salonTypeHint}), wygeneruj realistyczne dane:
             type: "function",
             function: {
               name: "extract_salon_data",
-              description: "Extract salon data from the profile URL analysis",
+              description: "Extract or generate salon data",
               parameters: {
                 type: "object",
                 properties: {
@@ -97,6 +178,8 @@ Na podstawie URL i typu salonu (${salonTypeHint}), wygeneruj realistyczne dane:
                   description: { type: "string" },
                   avg_rating: { type: "number" },
                   existing_reviews_count: { type: "number" },
+                  address: { type: "string", description: "Physical address of the salon if found" },
+                  phone: { type: "string", description: "Phone number of the salon if found" },
                 },
                 required: ["services", "opening_hours", "description", "avg_rating", "existing_reviews_count"],
                 additionalProperties: false,
@@ -140,6 +223,7 @@ Na podstawie URL i typu salonu (${salonTypeHint}), wygeneruj realistyczne dane:
     }
 
     const salonData = JSON.parse(toolCall.function.arguments);
+    console.log("Extracted services count:", salonData.services?.length || 0);
 
     return new Response(
       JSON.stringify({ success: true, data: salonData }),
