@@ -628,6 +628,10 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
                 {t('clients.addClient')}
               </Button>
             </DialogTrigger>
+            <Button variant="outline" onClick={() => setIsCSVImportOpen(true)} className="gap-2">
+              <Upload className="w-4 h-4" />
+              Import CSV
+            </Button>
           </div>
         </div>
 
