@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ClientRiskBadge } from "./ClientRiskBadge";
-import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup } from "./clients";
+import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup, ClientCSVImport } from "./clients";
 import { TagManagementDialog } from "./clients/TagManagementDialog";
 import { SectionGuide } from "./SectionGuide";
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
