@@ -25,11 +25,28 @@ import {
   Percent,
   Globe,
   Palette,
-  Code
+  Code,
+  Bot,
+  Brain,
+  Target,
+  Sparkles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const featureTabs = [
+  {
+    id: "ai-autopilot",
+    icon: Bot,
+    title: "🤖 AI Autopilot",
+    features: [
+      { text: "Wypełniacz Luk — AI sugeruje klientkom wolne terminy", icon: Brain },
+      { text: "Radar Odejść — wykrywa ryzykownych klientów zanim odejdą", icon: Target },
+      { text: "Prognoza Kasy — wiesz ile zarobisz w piątek", icon: TrendingUp },
+      { text: "Dynamiczne Ceny — optymalizacja cennika w czasie rzeczywistym", icon: DollarSign },
+      { text: "Automatyczne reaktywacje — AI kontaktuje klientki które dawno nie były", icon: Sparkles },
+    ],
+    mockup: "ai-autopilot",
+  },
   {
     id: "calendar",
     icon: Calendar,
@@ -346,8 +363,36 @@ const WidgetsMockupPreview = () => (
   </div>
 );
 
+const AIAutopilotMockupPreview = () => (
+  <div className="bg-card rounded-lg shadow-lg overflow-hidden border border-border">
+    <div className="bg-primary/10 px-4 py-3 flex items-center justify-between border-b border-border">
+      <span className="font-semibold text-sm">AI Autopilot</span>
+      <div className="flex items-center gap-1 text-emerald-600 text-xs">
+        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span>Aktywny</span>
+      </div>
+    </div>
+    <div className="p-4 space-y-3">
+      {[
+        { action: "Wypełniono lukę 14:00–15:00", client: "Anna K.", time: "2 min temu", color: "bg-violet-500" },
+        { action: "Wysłano przypomnienie", client: "Maria N.", time: "15 min temu", color: "bg-emerald-500" },
+        { action: "Wykryto ryzyko odejścia", client: "Kasia W.", time: "1h temu", color: "bg-amber-500" },
+      ].map((item, i) => (
+        <div key={i} className="flex items-center gap-3 p-2 rounded-lg bg-muted/30">
+          <div className={cn("w-2 h-10 rounded-full", item.color)} />
+          <div className="flex-1">
+            <div className="font-medium text-sm">{item.action}</div>
+            <div className="text-xs text-muted-foreground">{item.client} · {item.time}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 const getMockupComponent = (mockupId: string) => {
   switch (mockupId) {
+    case "ai-autopilot": return <AIAutopilotMockupPreview />;
     case "calendar": return <CalendarMockupPreview />;
     case "clients": return <ClientsMockupPreview />;
     case "services": return <ServicesMockupPreview />;

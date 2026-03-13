@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { Star, ChevronLeft, ChevronRight, Quote } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const testimonials = [
@@ -42,26 +41,44 @@ const testimonials = [
   },
 ];
 
+const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] }) => (
+  <div className="glass-card-elevated p-6 lg:p-8 h-full flex flex-col">
+    <Quote className="w-8 h-8 text-primary/20 mb-4 shrink-0" />
+    
+    {/* Stars */}
+    <div className="flex gap-1 mb-4">
+      {[...Array(testimonial.rating)].map((_, i) => (
+        <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+      ))}
+    </div>
+
+    {/* Content */}
+    <blockquote className="text-base lg:text-lg leading-relaxed mb-6 flex-grow font-serif italic">
+      "{testimonial.content}"
+    </blockquote>
+
+    {/* Author */}
+    <div className="flex items-center gap-3 mt-auto">
+      <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
+        {testimonial.avatar}
+      </div>
+      <div>
+        <div className="font-semibold">{testimonial.author}</div>
+        <div className="text-sm text-muted-foreground">
+          {testimonial.role}, {testimonial.location}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 export const TestimonialsSection = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  const goToNext = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setActiveIndex((prev) => (prev + 1) % testimonials.length);
-    setTimeout(() => setIsAnimating(false), 500);
-  };
-
-  const goToPrev = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-    setTimeout(() => setIsAnimating(false), 500);
-  };
 
   useEffect(() => {
-    const timer = setInterval(goToNext, 6000);
+    const timer = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
     return () => clearInterval(timer);
   }, []);
 
@@ -79,87 +96,31 @@ export const TestimonialsSection = () => {
           </p>
         </div>
 
-        {/* Testimonial carousel */}
-        <div className="max-w-4xl mx-auto">
-          <div className="relative">
-            {/* Quote icon */}
-            <Quote className="absolute -top-6 -left-6 w-16 h-16 text-primary/10" />
-            
-            {/* Main testimonial */}
-            <div className="glass-card-elevated p-8 lg:p-12">
-              <div className={cn(
-                "transition-all duration-500",
-                isAnimating ? "opacity-0 translate-y-4" : "opacity-100 translate-y-0"
-              )}>
-                {/* Stars */}
-                <div className="flex gap-1 mb-6">
-                  {[...Array(testimonials[activeIndex].rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-accent text-accent" />
-                  ))}
-                </div>
+        {/* Desktop: 3-column grid (show first 3) */}
+        <div className="hidden lg:grid lg:grid-cols-3 gap-6">
+          {testimonials.slice(0, 3).map((testimonial) => (
+            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+          ))}
+        </div>
 
-                {/* Content */}
-                <blockquote className="text-xl lg:text-2xl leading-relaxed mb-8 font-serif italic">
-                  "{testimonials[activeIndex].content}"
-                </blockquote>
-
-                {/* Author */}
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-bold">
-                    {testimonials[activeIndex].avatar}
-                  </div>
-                  <div>
-                    <div className="font-semibold text-lg">
-                      {testimonials[activeIndex].author}
-                    </div>
-                    <div className="text-muted-foreground">
-                      {testimonials[activeIndex].role}, {testimonials[activeIndex].location}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Navigation */}
-            <div className="flex items-center justify-center gap-4 mt-8">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={goToPrev}
-                className="rounded-full"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </Button>
-              
-              {/* Dots */}
-              <div className="flex gap-2">
-                {testimonials.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => {
-                      setIsAnimating(true);
-                      setActiveIndex(index);
-                      setTimeout(() => setIsAnimating(false), 500);
-                    }}
-                    className={cn(
-                      "w-2 h-2 rounded-full transition-all",
-                      activeIndex === index
-                        ? "w-8 bg-primary"
-                        : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
-                    )}
-                  />
-                ))}
-              </div>
-
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={goToNext}
-                className="rounded-full"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </Button>
-            </div>
+        {/* Mobile: Single card carousel */}
+        <div className="lg:hidden max-w-xl mx-auto">
+          <TestimonialCard testimonial={testimonials[activeIndex]} />
+          
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mt-6">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setActiveIndex(index)}
+                className={cn(
+                  "w-2 h-2 rounded-full transition-all",
+                  activeIndex === index
+                    ? "w-8 bg-primary"
+                    : "bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                )}
+              />
+            ))}
           </div>
         </div>
       </div>

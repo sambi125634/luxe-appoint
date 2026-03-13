@@ -59,9 +59,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             {/* Headline */}
             <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-                Twój salon zasługuje na kalendarz,{" "}
+                Twój system rezerwacji pracuje za Ciebie 24/7.{" "}
                 <span className="text-gradient-luxury">
-                  który myśli jak właściciel
+                  I nie bierze prowizji od Twoich klientek.
                 </span>
               </h1>
             </div>
@@ -71,8 +71,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 animate-fade-in"
               style={{ animationDelay: '0.3s' }}
             >
-              Pierwszy system rezerwacji z wbudowaną sztuczną inteligencją. 
-              Przewiduje przychody, eliminuje no-showy i wypełnia luki w grafiku — automatycznie.
+              Pierwszy system z AI, który przewiduje przychody, eliminuje no-showy 
+              i wypełnia luki w grafiku — automatycznie. Za 0% prowizji.
             </p>
 
             {/* CTAs */}
@@ -86,7 +86,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
                 className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Wypróbuj za darmo
+                  Załóż konto za darmo
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-shimmer opacity-0 group-hover:opacity-20" />
@@ -126,7 +126,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               {[
                 "Bez karty kredytowej",
                 "Gotowe w 5 minut",
-                "14 dni za darmo"
+                "0% prowizji — zawsze"
               ].map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
