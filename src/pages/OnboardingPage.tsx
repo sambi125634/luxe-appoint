@@ -279,7 +279,7 @@ export default function OnboardingPage() {
         name: salonName.trim(), slug, city: salonCity.trim() || null,
         owner_id: userId, onboarding_step: 1, onboarding_completed: false,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
-        social_url: socialUrl.trim() || null,
+        social_url: instagramUrl.trim() || websiteUrl.trim() || null,
       }).select("id, slug").single();
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
       setCreatedSalonId(salon.id);
