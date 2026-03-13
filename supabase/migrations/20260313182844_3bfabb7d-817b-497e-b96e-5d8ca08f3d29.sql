@@ -1,0 +1,1 @@
+ALTER TABLE public.salons ADD COLUMN client_sources jsonb DEFAULT '[]'::jsonb;
