@@ -61,8 +61,8 @@ const features = [
   {
     id: "instagram",
     icon: Instagram,
-    title: "Instagram Booking",
-    subtitle: "Link rezerwacyjny na Instagram",
+    title: "Rezerwacja z IG",
+    subtitle: "1 link, klientka rezerwuje",
     description: "Jeden link w bio, który śledzi konwersje z social media. Zobacz dokładnie, które posty przynoszą rezerwacje.",
     stat: "ROI",
     statLabel: "z Instagrama wreszcie mierzalne",

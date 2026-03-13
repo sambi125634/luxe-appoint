@@ -126,7 +126,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               {[
                 "Bez karty kredytowej",
                 "Gotowe w 5 minut",
-                "14 dni za darmo"
+                "0% prowizji — zawsze"
               ].map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">

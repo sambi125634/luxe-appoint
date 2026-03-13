@@ -3,13 +3,6 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const problems = [
   {
-    icon: Phone,
-    title: "Telefon dzwoni w trakcie zabiegu",
-    description: "Klientka na fotelu, telefon dzwoni. Przepraszasz, przerywasz zabieg, zapisujesz na kartce... i gubisz kartkę następnego dnia.",
-    color: "text-rose-500",
-    bgColor: "bg-rose-500/10",
-  },
-  {
     icon: UserX,
     title: "Kolejny no-show bez uprzedzenia",
     description: (
@@ -21,22 +14,29 @@ const problems = [
     bgColor: "bg-orange-500/10",
   },
   {
+    icon: Wrench,
+    title: "System jak z lat 90-tych",
+    description: (
+      <>
+        System jak z lat 90-tych. <strong className="text-red-600">Płacisz 35–45% prowizji</strong> za klientkę, którą sama pozyskałaś. Przy zabiegu za 200 zł to nawet 90 zł dla platformy.
+      </>
+    ),
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+  },
+  {
+    icon: Phone,
+    title: "Telefon dzwoni w trakcie zabiegu",
+    description: "Klientka na fotelu, telefon dzwoni. Przepraszasz, przerywasz zabieg, zapisujesz na kartce... i gubisz kartkę następnego dnia.",
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
+  },
+  {
     icon: BarChart3,
     title: '"Ile zarobiłam w tym miesiącu?"',
     description: "Przekopujesz zeszyty, Excele, aplikacje. Po godzinie wciąż nie wiesz, czy salon zarabia, czy dokładasz do interesu.",
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
-  },
-  {
-    icon: Wrench,
-    title: "System jak z lat 90-tych",
-    description: (
-      <>
-        System jak z lat 90-tych. <strong className="text-red-600">Płacisz 45% prowizji</strong> za klienta, którego sama pozyskałaś. Koniec z tym.
-      </>
-    ),
-    color: "text-red-500",
-    bgColor: "bg-red-500/10",
   },
 ];
 

@@ -52,7 +52,7 @@ export const TransformationSection = () => {
             <span className="text-gradient-luxury">pracował za Ciebie?</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Beauty Calendar to nie kolejny system rezerwacji. To Twój cyfrowy asystent, który nigdy nie śpi.
+            Beauty Calendar to nie narzędzie do klikania. To autopilot, który sam wypełnia kalendarz, reaktywuje klientki i wysyła reklamy — bez Twojego udziału.
           </p>
         </div>
 

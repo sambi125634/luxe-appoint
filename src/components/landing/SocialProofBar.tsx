@@ -73,16 +73,6 @@ export const SocialProofBar = () => {
           ))}
         </div>
         
-        {/* Optional: Logo carousel placeholder */}
-        <div className="mt-12 flex items-center justify-center gap-8 opacity-50">
-          {[1, 2, 3, 4, 5].map((_, i) => (
-            <div 
-              key={i} 
-              className="w-24 h-8 bg-foreground/10 rounded animate-pulse"
-              style={{ animationDelay: `${i * 0.2}s` }}
-            />
-          ))}
-        </div>
       </div>
     </section>
   );
