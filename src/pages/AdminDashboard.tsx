@@ -122,7 +122,7 @@ export default function AdminDashboard() {
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard />;
       case "pixel": return <PixelDashboard />;
-      case "analytics": return <TrueProfitDashboard />;
+      case "analytics": return <TrueProfitDashboard onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
       default: return null;
