@@ -197,7 +197,9 @@ export default function OnboardingPage() {
   const [salonCity, setSalonCity] = useState("");
   const [salonType, setSalonType] = useState("multi");
   const [teamSize, setTeamSize] = useState("1");
-  const [socialUrl, setSocialUrl] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [googleMapsUrl, setGoogleMapsUrl] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
 
   // Step 2 — AI Scan
   const [scanning, setScanning] = useState(false);
