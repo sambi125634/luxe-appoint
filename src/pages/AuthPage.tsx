@@ -154,6 +154,32 @@ export default function AuthPage() {
     );
   }
 
+  if (showEmailConfirmation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+        <Card className="w-full max-w-md border-border/50 shadow-xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+              <Mail className="w-10 h-10 text-primary" />
+            </div>
+            <CardTitle className="font-serif text-xl">Sprawdź swoją skrzynkę email</CardTitle>
+            <CardDescription className="text-base">
+              Wysłaliśmy link aktywacyjny na adres <strong>{signupEmail}</strong>. Kliknij link w wiadomości, aby aktywować konto.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-3 bg-muted rounded-lg text-sm text-muted-foreground text-center">
+              Nie widzisz wiadomości? Sprawdź folder spam lub poczekaj kilka minut.
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => setShowEmailConfirmation(false)}>
+              Wróć do logowania
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
       <Card className="w-full max-w-md border-border/50 shadow-xl relative">
