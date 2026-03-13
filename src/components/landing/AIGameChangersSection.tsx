@@ -28,8 +28,8 @@ const features = [
   {
     id: "risk-score",
     icon: Target,
-    title: "Client Risk Score",
-    subtitle: "Scoring ryzyka klientów",
+    title: "Radar Odejść",
+    subtitle: "Wiesz zanim odejdzie",
     description: "System analizuje historię: no-showy, odwołania, spóźnienia. Automatycznie wymaga przedpłaty od ryzykownych klientów.",
     stat: "-67%",
     statLabel: "redukcja no-showów",
