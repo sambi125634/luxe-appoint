@@ -23,7 +23,7 @@ const STEPS = [
   { title: "O salonie", emoji: "🏢", icon: Building2 },
   { title: "AI Skan", emoji: "🔍", icon: Sparkles },
   { title: "Autopilot", emoji: "🤖", icon: Bot },
-  { title: "Widget", emoji: "🔗", icon: Code2 },
+  { title: "Twój link", emoji: "🔗", icon: Link2 },
   { title: "Klientki", emoji: "👥", icon: Users },
   { title: "Gotowe!", emoji: "🎉", icon: PartyPopper },
 ];
