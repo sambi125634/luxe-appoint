@@ -306,7 +306,8 @@ export default function OnboardingPage() {
     setSaving(false);
 
     // If social URL provided, go to AI scan, otherwise skip to step 2 (autopilot, which is step index 2)
-    if (socialUrl.trim()) {
+    const hasUrls = !!(instagramUrl.trim() || googleMapsUrl.trim() || websiteUrl.trim());
+    if (hasUrls) {
       setStep(1);
       startAiScan();
     } else {
