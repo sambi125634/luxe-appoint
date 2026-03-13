@@ -270,7 +270,7 @@ export default function OnboardingPage() {
       const { error } = await supabase.from("salons").update({
         name: salonName.trim(), city: salonCity.trim() || null,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
-        social_url: socialUrl.trim() || null, onboarding_step: 1,
+        social_url: instagramUrl.trim() || websiteUrl.trim() || null, onboarding_step: 1,
       }).eq("id", createdSalonId);
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
     } else {
