@@ -284,19 +284,18 @@ const GridLines = () => {
     return positions;
   }, []);
 
+  const geometry = useMemo(() => {
+    const points: THREE.Vector3[] = [];
+    for (const pair of lines) {
+      points.push(new THREE.Vector3(...pair[0]), new THREE.Vector3(...pair[1]));
+    }
+    return new THREE.BufferGeometry().setFromPoints(points);
+  }, [lines]);
+
   return (
-    <>
-      {lines.map((pair, i) => {
-        const geo = new THREE.BufferGeometry().setFromPoints(
-          pair.map(p => new THREE.Vector3(...p))
-        );
-        return (
-          <line key={i} geometry={geo}>
-            <lineBasicMaterial color="#3b2d5e" transparent opacity={0.25} />
-          </line>
-        );
-      })}
-    </>
+    <lineSegments geometry={geometry}>
+      <lineBasicMaterial color="#3b2d5e" transparent opacity={0.25} />
+    </lineSegments>
   );
 };
 
