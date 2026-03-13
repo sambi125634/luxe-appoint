@@ -14,6 +14,7 @@ import { SectionGuide } from "../SectionGuide";
 interface SettingsModuleProps {
   isDemo?: boolean;
   onNavigateToModule?: (tabId: string) => void;
+  initialTab?: string;
 }
 
 const demoProfile = {
