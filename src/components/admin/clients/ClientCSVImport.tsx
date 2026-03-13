@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2, Trash2, X } from "lucide-react";
+import { Upload, Download, FileSpreadsheet, AlertCircle, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useCreateClient } from "@/hooks/useClients";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import * as XLSX from "xlsx";
 
 interface ParsedClient {
   first_name: string;
@@ -39,6 +40,9 @@ Magdalena,Wiśniewska,+48555123456,magda@wp.pl,Wrażliwa skóra,Stały;Wrażliwa
 Ewa,Dąbrowska,+48111222333,ewa.d@email.pl,,,tak,nie
 Zofia,Lewandowska,+48444555666,zofia@gmail.com,Klientka VIP,VIP;Ambasador,tak,tak`;
 
+const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls"];
+const ACCEPTED_MIME = ".csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv";
+
 function parseBool(val: string): boolean {
   const v = val.trim().toLowerCase();
   return ["tak", "yes", "true", "1", "t"].includes(v);
@@ -64,18 +68,13 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
-function parseCSV(text: string): ParsedClient[] {
-  const lines = text.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) return [];
+function rowsToClients(headers: string[], rows: string[][]): ParsedClient[] {
+  const mappedHeaders = headers.map(h => HEADER_MAP[h.trim().toLowerCase()] || null);
 
-  const rawHeaders = parseCSVLine(lines[0]);
-  const mappedHeaders = rawHeaders.map(h => HEADER_MAP[h.trim().toLowerCase()] || null);
-
-  return lines.slice(1).map(line => {
-    const values = parseCSVLine(line);
+  return rows.map(values => {
     const row: Record<string, string> = {};
     mappedHeaders.forEach((key, i) => {
-      if (key && values[i] !== undefined) row[key] = values[i];
+      if (key && values[i] !== undefined) row[key] = String(values[i]).trim();
     });
 
     const errors: string[] = [];
@@ -96,6 +95,28 @@ function parseCSV(text: string): ParsedClient[] {
       errors,
     };
   });
+}
+
+function parseCSVText(text: string): ParsedClient[] {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) return [];
+  const headers = parseCSVLine(lines[0]);
+  const rows = lines.slice(1).map(line => parseCSVLine(line));
+  return rowsToClients(headers, rows);
+}
+
+function parseXLSXBuffer(buffer: ArrayBuffer): ParsedClient[] {
+  const workbook = XLSX.read(buffer, { type: "array" });
+  const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+  const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(firstSheet, { header: 1 }) as unknown[][];
+  
+  if (jsonData.length < 2) return [];
+  const headers = (jsonData[0] as unknown[]).map(h => String(h ?? ""));
+  const rows = jsonData.slice(1)
+    .filter(row => (row as unknown[]).some(cell => cell !== null && cell !== undefined && String(cell).trim() !== ""))
+    .map(row => (row as unknown[]).map(cell => String(cell ?? "")));
+  
+  return rowsToClients(headers, rows);
 }
 
 interface ClientCSVImportProps {
@@ -135,23 +156,45 @@ export function ClientCSVImport({ open, onOpenChange, isDemo }: ClientCSVImportP
     URL.revokeObjectURL(url);
   };
 
-  const handleFile = (file: File) => {
-    if (!file.name.toLowerCase().endsWith(".csv")) {
-      toast({ title: "Błąd", description: "Wybierz plik CSV", variant: "destructive" });
+  const processResults = (clients: ParsedClient[], fileName: string) => {
+    if (clients.length === 0) {
+      toast({ title: "Błąd", description: "Plik jest pusty lub ma nieprawidłowy format", variant: "destructive" });
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target?.result as string;
-      const clients = parseCSV(text);
-      if (clients.length === 0) {
-        toast({ title: "Błąd", description: "Plik jest pusty lub ma nieprawidłowy format", variant: "destructive" });
-        return;
-      }
-      setParsedClients(clients);
-      setStep("preview");
-    };
-    reader.readAsText(file, "UTF-8");
+    setParsedClients(clients);
+    setStep("preview");
+  };
+
+  const handleFile = (file: File) => {
+    const ext = file.name.toLowerCase().substring(file.name.lastIndexOf("."));
+    if (!ACCEPTED_EXTENSIONS.includes(ext)) {
+      toast({ 
+        title: "Nieobsługiwany format", 
+        description: "Obsługiwane formaty: CSV, XLSX, XLS", 
+        variant: "destructive" 
+      });
+      return;
+    }
+
+    if (ext === ".csv") {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        processResults(parseCSVText(text), file.name);
+      };
+      reader.readAsText(file, "UTF-8");
+    } else {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const buffer = e.target?.result as ArrayBuffer;
+        try {
+          processResults(parseXLSXBuffer(buffer), file.name);
+        } catch {
+          toast({ title: "Błąd", description: "Nie udało się odczytać pliku Excel", variant: "destructive" });
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
   };
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -217,7 +260,7 @@ export function ClientCSVImport({ open, onOpenChange, isDemo }: ClientCSVImportP
         <DialogHeader>
           <DialogTitle className="font-serif flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5" />
-            Import klientów z CSV
+            Import klientów
           </DialogTitle>
         </DialogHeader>
 
@@ -230,12 +273,12 @@ export function ClientCSVImport({ open, onOpenChange, isDemo }: ClientCSVImportP
               className="border-2 border-dashed border-muted-foreground/30 rounded-xl p-10 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
             >
               <Upload className="w-10 h-10 mx-auto text-muted-foreground/50 mb-3" />
-              <p className="font-medium">Przeciągnij plik CSV tutaj</p>
-              <p className="text-sm text-muted-foreground mt-1">lub kliknij, aby wybrać plik</p>
+              <p className="font-medium">Przeciągnij plik tutaj</p>
+              <p className="text-sm text-muted-foreground mt-1">CSV, XLSX lub XLS — lub kliknij, aby wybrać</p>
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".csv"
+                accept={ACCEPTED_MIME}
                 onChange={handleFileInput}
                 className="hidden"
               />
