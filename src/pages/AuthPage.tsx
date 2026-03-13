@@ -69,6 +69,7 @@ export default function AuthPage() {
     password: z.string().min(6, t("auth.signupError")),
     firstName: z.string().trim().min(2, t("auth.signupError")).max(50),
     lastName: z.string().trim().min(2, t("auth.signupError")).max(50),
+    phone: z.string().trim().min(9, "Podaj poprawny numer telefonu"),
   });
 
   useEffect(() => {
