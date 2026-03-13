@@ -2,6 +2,8 @@ import { Bot, Shield, TrendingUp, Zap, Check, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import AuroraBackground from "./AuroraBackground";
 
 const solutions = [
   {
@@ -38,15 +40,35 @@ const solutions = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.6,
+      ease: "easeOut" as const,
+    },
+  }),
+};
+
 export const TransformationSection = () => {
   return (
     <section className="py-20 lg:py-32 relative overflow-hidden">
-      {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-b from-muted/20 via-background to-background" />
-      
+      <AuroraBackground variant="violet" />
+
       <div className="container relative z-10">
         {/* Section header */}
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             A gdyby Twój kalendarz{" "}
             <span className="text-gradient-luxury">pracował za Ciebie?</span>
@@ -54,58 +76,68 @@ export const TransformationSection = () => {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Beauty Calendar to nie narzędzie do klikania. To autopilot, który sam wypełnia kalendarz, reaktywuje klientki i wysyła reklamy — bez Twojego udziału.
           </p>
-        </div>
+        </motion.div>
 
         {/* Solutions grid */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8 mb-12">
           {solutions.map((solution, index) => (
-            <Card 
+            <motion.div
               key={index}
-              className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
+              custom={index}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
             >
-              <CardContent className="p-6 lg:p-8">
-                <div className="flex flex-col h-full">
-                  {/* Header with icon and stat */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${solution.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
-                      <solution.icon className="w-7 h-7 text-white" />
+              <Card
+                className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur hover:shadow-glow transition-all duration-500 hover:-translate-y-1 h-full"
+              >
+                <CardContent className="p-6 lg:p-8">
+                  <div className="flex flex-col h-full">
+                    <div className="flex items-start justify-between mb-4">
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${solution.color} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform`}>
+                        <solution.icon className="w-7 h-7 text-white" />
+                      </div>
+                      <div className="text-right">
+                        <div className={`text-2xl font-bold bg-gradient-to-r ${solution.color} bg-clip-text text-transparent`}>
+                          {solution.stat}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {solution.statLabel}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className={`text-2xl font-bold bg-gradient-to-r ${solution.color} bg-clip-text text-transparent`}>
-                        {solution.stat}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {solution.statLabel}
-                      </div>
+
+                    <h3 className="text-xl font-semibold mb-2">
+                      {solution.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed flex-grow">
+                      {solution.description}
+                    </p>
+
+                    <div className="flex items-center gap-2 mt-4 text-sm text-emerald-600">
+                      <Check className="w-4 h-4" />
+                      <span>Działa automatycznie</span>
                     </div>
                   </div>
-                  
-                  {/* Content */}
-                  <h3 className="text-xl font-semibold mb-2">
-                    {solution.title}
-                  </h3>
-                  <p className="text-muted-foreground leading-relaxed flex-grow">
-                    {solution.description}
-                  </p>
-                  
-                  {/* Check indicator */}
-                  <div className="flex items-center gap-2 mt-4 text-sm text-emerald-600">
-                    <Check className="w-4 h-4" />
-                    <span>Działa automatycznie</span>
-                  </div>
-                </div>
-                
-                {/* Hover gradient */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${solution.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-              </CardContent>
-            </Card>
+
+                  <div className={`absolute inset-0 bg-gradient-to-br ${solution.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
         {/* CTA */}
-        <div className="text-center">
-          <Button 
-            size="lg" 
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <Button
+            size="lg"
             asChild
             className="group px-8 py-6 text-lg"
           >
@@ -114,7 +146,7 @@ export const TransformationSection = () => {
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
             </Link>
           </Button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

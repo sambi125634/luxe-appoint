@@ -1,5 +1,7 @@
 import { Phone, UserX, BarChart3, Wrench } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { motion } from "framer-motion";
+import AuroraBackground from "./AuroraBackground";
 
 const problems = [
   {
@@ -40,50 +42,74 @@ const problems = [
   },
 ];
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 40, scale: 0.95 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      delay: i * 0.15,
+      duration: 0.6,
+      ease: "easeOut" as const,
+    },
+  }),
+};
+
 export const ProblemSection = () => {
   return (
-    <section className="py-20 lg:py-32 bg-gradient-to-b from-background to-muted/20">
-      <div className="container">
+    <section className="py-20 lg:py-32 relative overflow-hidden bg-gradient-to-b from-background to-muted/20">
+      <AuroraBackground variant="warm" />
+
+      <div className="container relative z-10">
         {/* Section header */}
-        <div className="text-center mb-16">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.7 }}
+        >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             Znasz to?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Prowadzenie salonu to codzienna walka z chaosem. Znamy ten ból — dlatego stworzyliśmy rozwiązanie.
           </p>
-        </div>
+        </motion.div>
 
         {/* Problem cards */}
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
           {problems.map((problem, index) => (
-            <Card 
+            <motion.div
               key={index}
-              className="group relative overflow-hidden border-border/50 hover:border-border transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              custom={index}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
             >
-              <CardContent className="p-6 lg:p-8">
-                <div className="flex gap-4">
-                  {/* Icon */}
-                  <div className={`shrink-0 w-14 h-14 rounded-xl ${problem.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <problem.icon className={`w-7 h-7 ${problem.color}`} />
+              <Card
+                className="group relative overflow-hidden border-border/50 hover:border-border transition-all duration-300 hover:-translate-y-1 hover:shadow-glow h-full"
+              >
+                <CardContent className="p-6 lg:p-8">
+                  <div className="flex gap-4">
+                    <div className={`shrink-0 w-14 h-14 rounded-xl ${problem.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <problem.icon className={`w-7 h-7 ${problem.color}`} />
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="text-lg lg:text-xl font-semibold">
+                        {problem.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {problem.description}
+                      </p>
+                    </div>
                   </div>
-                  
-                  {/* Content */}
-                  <div className="space-y-2">
-                    <h3 className="text-lg lg:text-xl font-semibold">
-                      {problem.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {problem.description}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Decorative gradient */}
-                <div className={`absolute top-0 right-0 w-32 h-32 ${problem.bgColor} blur-3xl opacity-30 group-hover:opacity-50 transition-opacity`} />
-              </CardContent>
-            </Card>
+                  <div className={`absolute top-0 right-0 w-32 h-32 ${problem.bgColor} blur-3xl opacity-30 group-hover:opacity-50 transition-opacity`} />
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
       </div>

@@ -1,70 +1,101 @@
 
 
-# Plan: Wow-factor design — Hero z 3D i efektami premium
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Cel
-Stworzyć landing page, który wizualnie szokuje — efekt "to jest strona www?!" poprzez 3D scene w hero, interaktywne particle effects i płynne scroll-triggered animacje.
+### Co już mamy
 
-## Podejście techniczne
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-Projekt ma już `framer-motion`. Dodamy `@react-three/fiber@^8.18`, `@react-three/drei@^9.122.0` i `three@^0.166.0` dla sceny 3D w hero.
+### Problem do rozwiązania
 
-## Zmiany
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-### 1. Hero — 3D Floating Crystal/Calendar Scene
-Nowy komponent `src/components/landing/Hero3DScene.tsx` z React Three Fiber:
-- **Floating crystal** (reprezentujący "diament" Beauty Calendar) — powoli rotujący, z iridescent shader (efekt opalizujący fioletowo-różowo-złoty)
-- **Particle field** — setki drobnych cząsteczek unoszących się wokół kryształu, reagujących na ruch myszy (parallax)
-- **Glow ring** — pierścień świetlny pulsujący pod kryształem
-- Scena renderuje się jako tło hero sekcji, treść tekstowa nakłada się z przodu
+---
 
-### 2. Hero — Redesign layoutu
-Przebudowa `NewHeroSection.tsx`:
-- Zamiast grid 2-kolumnowy (tekst + mockup laptopa), full-width hero z 3D sceną jako tło
-- Tekst wyśrodkowany na scenie 3D
-- AnimatedMockup przesuniemy niżej (pod hero) lub do sekcji InteractiveDemo
-- Gradient overlay na 3D scenie zapewniający czytelność tekstu
-- CTA button z glow effect (box-shadow pulsujący)
+### Plan implementacji
 
-### 3. Cursor Trail / Aurora Effect
-Nowy komponent `src/components/landing/AuroraBackground.tsx`:
-- Canvas-based aurora/gradient mesh animacja reagująca na pozycję myszy
-- Używana jako tło kolejnych sekcji (Problem, Transformation) dla spójności
-- Lekki, nie obciąża GPU — tylko gradient shifts
+#### FAZA 1: Role-based routing po loginie
 
-### 4. Scroll-triggered animations (framer-motion)
-Dodanie `motion` wrapperów do sekcji:
-- Każda sekcja wchodzi z `whileInView` animacją (fade + slide + scale)
-- Karty w ProblemSection / TransformationSection — staggered entrance (jedna po drugiej)
-- Liczniki w SocialProofBar — odpalają się gdy sekcja wjedzie w viewport (intersection observer — już częściowo działa)
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-### 5. Navbar — Glass morphism enhancement
-- Mocniejszy backdrop-blur + subtle border-glow gdy scrolled
-- Logo z micro-animation on hover
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
 
-## Pliki do utworzenia
-| Plik | Opis |
-|------|------|
-| `src/components/landing/Hero3DScene.tsx` | Scena R3F z kryształem + particles |
-| `src/components/landing/AuroraBackground.tsx` | Canvas aurora gradient |
+#### FAZA 2: Onboarding wizard (`/onboarding`)
 
-## Pliki do edycji
-| Plik | Opis |
-|------|------|
-| `NewHeroSection.tsx` | Nowy layout z 3D tłem, centered text |
-| `LandingNavbar.tsx` | Enhanced glass effect |
-| `ProblemSection.tsx` | framer-motion stagger |
-| `TransformationSection.tsx` | framer-motion stagger |
-| `SocialProofBar.tsx` | Viewport-triggered counters |
-| `Index.tsx` | Ewentualne zmiany w strukturze |
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
 
-## Zależności do dodania
-```
-@react-three/fiber@^8.18
-@react-three/drei@^9.122.0
-three@^0.166.0
-```
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
 
-## Efekt końcowy
-Użytkownik wchodzi na stronę → widzi pływający, opalizujący kryształ w 3D z cząsteczkami → tekst "0% prowizji" pojawia się płynnie → rusza myszką i particles reagują → scrolluje i każda sekcja wchodzi z animacją → wrażenie: "to nie wygląda jak typowa strona SaaS, to wygląda jak showroom luxury brand".
+#### FAZA 3: Indywidualne kokpity
+
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 
