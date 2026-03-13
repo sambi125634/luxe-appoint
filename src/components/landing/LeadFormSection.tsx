@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { CheckCircle, Loader2, Send } from "lucide-react";
+import { ArrowRight, CheckCircle, Loader2, Send } from "lucide-react";
 
 const LeadFormSection = () => {
   const { t } = useTranslation();
