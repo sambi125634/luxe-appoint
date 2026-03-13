@@ -17,8 +17,8 @@ const features = [
   {
     id: "smart-gap",
     icon: Brain,
-    title: "Smart Gap Filler",
-    subtitle: "Inteligentne wypełnianie luk",
+    title: "Wypełniacz Luk",
+    subtitle: "AI samo dzwoni do klientek",
     description: "Masz 30-minutową przerwę między zabiegami? AI sugeruje klientkom dokładnie ten termin z badge \"Idealny termin\". Wypełnij każdą minutę.",
     stat: "+23%",
     statLabel: "więcej rezerwacji w \"martwych\" godzinach",
