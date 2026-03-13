@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
   Loader2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles,
-  CheckCircle2, Upload, Instagram, Globe, Rocket, Bot, Code2,
+  CheckCircle2, Upload, Instagram, Globe, Rocket, Bot,
   Mail, FileText, PartyPopper, Users, Scissors, Building2, MapPin, Link2,
 } from "lucide-react";
 import { Confetti } from "@/components/booking/Confetti";
