@@ -325,14 +325,29 @@ export default function OnboardingPage() {
     const salonId = salonIdOverride ?? createdSalonId;
     if (!salonId) return;
     const template = SERVICE_TEMPLATES[salonType] ?? SERVICE_TEMPLATES.multi;
+    const allServiceIds: string[] = [];
     for (let i = 0; i < template.length; i++) {
       const cat = template[i];
       const { data: category } = await supabase.from("service_categories")
         .insert({ salon_id: salonId, name: cat.category, sort_order: i }).select("id").single();
       if (!category) continue;
       const services = cat.services.map(s => ({ salon_id: salonId, category_id: category.id, name: s.name, duration: s.duration, price: s.price }));
-      await supabase.from("services").insert(services);
+      const { data: insertedServices } = await supabase.from("services").insert(services).select("id");
+      if (insertedServices) allServiceIds.push(...insertedServices.map(s => s.id));
     }
+    // Auto-assign all services to owner staff member
+    await assignServicesToOwner(salonId, allServiceIds);
+  };
+
+  const assignServicesToOwner = async (salonId: string, serviceIds: string[]) => {
+    if (serviceIds.length === 0) return;
+    const { data: ownerStaff } = await supabase.from("staff_members")
+      .select("id").eq("salon_id", salonId).eq("role", "owner").maybeSingle();
+    if (!ownerStaff) return;
+    const staffServices = serviceIds.map(serviceId => ({
+      staff_id: ownerStaff.id, service_id: serviceId,
+    }));
+    await supabase.from("staff_services").insert(staffServices);
   };
 
   const startAiScan = async () => {
@@ -340,36 +355,43 @@ export default function OnboardingPage() {
     setScanMessageIndex(0);
     setScanPercentage(0);
 
-    // Animate messages
-    for (let i = 0; i < AI_SCAN_MESSAGES.length; i++) {
-      await new Promise(r => setTimeout(r, i === AI_SCAN_MESSAGES.length - 1 ? 500 : 1500));
-      setScanMessageIndex(i);
-      setScanPercentage(Math.min(((i + 1) / AI_SCAN_MESSAGES.length) * 100, 100));
-    }
+    // Run animation and API call in parallel, sync at the end
+    const animationPromise = (async () => {
+      for (let i = 0; i < AI_SCAN_MESSAGES.length - 1; i++) {
+        await new Promise(r => setTimeout(r, 1500));
+        setScanMessageIndex(i);
+        setScanPercentage(Math.min(((i + 1) / AI_SCAN_MESSAGES.length) * 80, 80));
+      }
+    })();
 
-    try {
+    const apiPromise = (async () => {
       const scanUrls = [instagramUrl, googleMapsUrl, websiteUrl].filter(u => u.trim());
       const { data, error } = await supabase.functions.invoke("ai-profile-scanner", {
         body: { urls: scanUrls, salon_type: salonType },
       });
+      return { data, error };
+    })();
 
-      if (error || !data?.success) {
-        toast.error("Nie udało się przeskanować profilu. Kontynuuję z domyślnymi ustawieniami.");
-        setScanSkipped(true);
-        await saveDefaultServices();
-        setScanning(false);
-        goTo(2);
-        return;
-      }
+    // Wait for both
+    const [, apiResult] = await Promise.all([animationPromise, apiPromise]);
 
-      setScanResult(data.data as ScanResult);
-      setScanPercentage(100);
-    } catch {
-      toast.error("Błąd skanowania — kontynuuję z szablonami.");
+    // Show final message
+    setScanMessageIndex(AI_SCAN_MESSAGES.length - 1);
+    setScanPercentage(100);
+    await new Promise(r => setTimeout(r, 500));
+
+    const { data, error } = apiResult;
+
+    if (error || !data?.success) {
+      toast.error("Nie udało się przeskanować profilu. Kontynuuję z domyślnymi ustawieniami.");
       setScanSkipped(true);
-      await saveDefaultServices();
+      await saveDefaultServices(createdSalonId ?? undefined);
+      setScanning(false);
       goTo(2);
+      return;
     }
+
+    setScanResult(data.data as ScanResult);
     setScanning(false);
   };
 
@@ -384,15 +406,20 @@ export default function OnboardingPage() {
       grouped[s.category].push(s);
     });
 
+    const allServiceIds: string[] = [];
     let i = 0;
     for (const [catName, services] of Object.entries(grouped)) {
       const { data: cat } = await supabase.from("service_categories")
         .insert({ salon_id: createdSalonId, name: catName, sort_order: i++ }).select("id").single();
       if (!cat) continue;
-      await supabase.from("services").insert(
+      const { data: insertedServices } = await supabase.from("services").insert(
         services.map(s => ({ salon_id: createdSalonId!, category_id: cat.id, name: s.name, duration: s.duration, price: s.price }))
-      );
+      ).select("id");
+      if (insertedServices) allServiceIds.push(...insertedServices.map(s => s.id));
     }
+
+    // Auto-assign all services to owner staff
+    await assignServicesToOwner(createdSalonId, allServiceIds);
 
     // Save description, address, phone from scan
     const salonUpdate: Record<string, string | null> = {};
@@ -401,6 +428,32 @@ export default function OnboardingPage() {
     if (scanResult.phone) salonUpdate.phone = scanResult.phone;
     if (Object.keys(salonUpdate).length > 0) {
       await supabase.from("salons").update(salonUpdate).eq("id", createdSalonId);
+    }
+
+    // Save opening_hours from scan (override defaults)
+    if (scanResult.opening_hours && Object.keys(scanResult.opening_hours).length > 0) {
+      const dayMap: Record<string, number> = {
+        monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6, sunday: 0,
+        poniedziałek: 1, wtorek: 2, środa: 3, czwartek: 4, piątek: 5, sobota: 6, niedziela: 0,
+      };
+      const { data: ownerStaff } = await supabase.from("staff_members")
+        .select("id").eq("salon_id", createdSalonId).eq("role", "owner").maybeSingle();
+      if (ownerStaff) {
+        // Delete existing defaults first
+        await supabase.from("working_hours").delete().eq("staff_id", ownerStaff.id);
+        const hoursToInsert = Object.entries(scanResult.opening_hours).map(([day, hours]) => {
+          const dayNum = dayMap[day.toLowerCase()];
+          if (dayNum === undefined) return null;
+          const parts = hours.match(/(\d{1,2}):?(\d{2})?\s*[-–]\s*(\d{1,2}):?(\d{2})?/);
+          if (!parts) return { staff_id: ownerStaff.id, day_of_week: dayNum, start_time: "09:00", end_time: "17:00", is_working: false };
+          const start = `${parts[1].padStart(2, '0')}:${parts[2] || '00'}`;
+          const end = `${parts[3].padStart(2, '0')}:${parts[4] || '00'}`;
+          return { staff_id: ownerStaff.id, day_of_week: dayNum, start_time: start, end_time: end, is_working: true };
+        }).filter(Boolean);
+        if (hoursToInsert.length > 0) {
+          await supabase.from("working_hours").insert(hoursToInsert);
+        }
+      }
     }
 
     setSaving(false);

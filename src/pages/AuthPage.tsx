@@ -8,7 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Mail } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
@@ -58,6 +59,8 @@ export default function AuthPage() {
   const [signupPhone, setSignupPhone] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [rodoConsent, setRodoConsent] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
 
   const loginSchema = z.object({
     email: z.string().trim().email(t("auth.loginError")),
@@ -139,7 +142,7 @@ export default function AuthPage() {
     if (error) {
       toast.error(t("auth.signupError"));
     } else {
-      toast.success(t("auth.signupSuccess"));
+      setShowEmailConfirmation(true);
     }
     setIsLoading(false);
   };
@@ -148,6 +151,32 @@ export default function AuthPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (showEmailConfirmation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
+        <Card className="w-full max-w-md border-border/50 shadow-xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
+              <Mail className="w-10 h-10 text-primary" />
+            </div>
+            <CardTitle className="font-serif text-xl">Sprawdź swoją skrzynkę email</CardTitle>
+            <CardDescription className="text-base">
+              Wysłaliśmy link aktywacyjny na adres <strong>{signupEmail}</strong>. Kliknij link w wiadomości, aby aktywować konto.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-3 bg-muted rounded-lg text-sm text-muted-foreground text-center">
+              Nie widzisz wiadomości? Sprawdź folder spam lub poczekaj kilka minut.
+            </div>
+            <Button variant="outline" className="w-full" onClick={() => setShowEmailConfirmation(false)}>
+              Wróć do logowania
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -236,7 +265,17 @@ export default function AuthPage() {
                   <Label htmlFor="signup-password">{t("auth.password")}</Label>
                   <Input id="signup-password" type="password" placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required disabled={isLoading} />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <div className="flex items-start space-x-2">
+                  <Checkbox id="rodo-consent" checked={rodoConsent} onCheckedChange={(v) => setRodoConsent(v === true)} disabled={isLoading} className="mt-0.5" />
+                  <label htmlFor="rodo-consent" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    Akceptuję{" "}
+                    <a href="/regulamin" target="_blank" className="underline text-primary hover:text-primary/80">Regulamin</a>{" "}
+                    i{" "}
+                    <a href="/polityka-prywatnosci" target="_blank" className="underline text-primary hover:text-primary/80">Politykę Prywatności</a>.
+                    Wyrażam zgodę na przetwarzanie moich danych osobowych zgodnie z RODO.
+                  </label>
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading || !rodoConsent}>
                   {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("auth.signingUp")}</>) : t("auth.signupButton")}
                 </Button>
               </form>
