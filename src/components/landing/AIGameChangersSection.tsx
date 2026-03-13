@@ -50,8 +50,8 @@ const features = [
   {
     id: "pricing",
     icon: DollarSign,
-    title: "Optimal Pricing",
-    subtitle: "Dynamiczne ceny",
+    title: "Dynamiczne Ceny",
+    subtitle: "Automatyczna optymalizacja cennika",
     description: "Poniedziałek pusty? Piątek przepełniony? AI sugeruje zniżki off-peak i premium w godzinach szczytu.",
     stat: "+18%",
     statLabel: "przychodu bez dodatkowych klientów",
