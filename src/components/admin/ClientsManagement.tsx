@@ -195,6 +195,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   // DB-driven tags
   const { data: dbTags } = useClientTags();
   const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
+  const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
 
   const availableTags = useMemo(() => {
     if (!dbTags || dbTags.length === 0) {
