@@ -54,10 +54,10 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               {t("nav.features")}
             </button>
             <button 
-              onClick={() => scrollToSection("how-it-works")}
+              onClick={() => scrollToSection("pricing")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
-              {t("nav.howItWorks")}
+              Cennik
             </button>
             <button 
               onClick={() => scrollToSection("demo-preview")}
