@@ -17,7 +17,6 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -28,51 +27,51 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
   };
 
   return (
-    <nav 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "bg-background/90 backdrop-blur-lg shadow-lg border-b border-border/50" 
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        isScrolled
+          ? "bg-background/70 backdrop-blur-2xl shadow-lg border-b border-primary/10"
           : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
-            <Calendar className="h-7 w-7 text-gold" />
+          <a href="/" className="flex items-center gap-2 group">
+            <Calendar className="h-7 w-7 text-gold group-hover:rotate-12 transition-transform duration-300" />
             <span className="text-xl font-bold text-foreground">
               Beauty<span className="text-gold">Calendar</span>
             </span>
           </a>
-          
+
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <button 
+            <button
               onClick={() => scrollToSection("features")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("nav.features")}
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection("pricing")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               Cennik
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection("demo-preview")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("nav.demo")}
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection("faq")}
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("nav.faq")}
             </button>
           </div>
-          
+
           {/* CTA + Language Switcher */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
@@ -82,18 +81,18 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             >
               Panel klienta
             </a>
-            <Button 
+            <Button
               onClick={onScrollToForm}
-              className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white"
+              className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500"
             >
               {t("nav.bookDemo")}
             </Button>
           </div>
-          
+
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
             <LanguageSwitcher variant="compact" />
-            <button 
+            <button
               className="text-foreground p-2"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
@@ -101,46 +100,28 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             </button>
           </div>
         </div>
-        
+
         {/* Mobile menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/50 animate-fade-in">
+          <div className="md:hidden py-4 border-t border-border/50 animate-fade-in bg-background/80 backdrop-blur-xl rounded-b-xl">
             <div className="flex flex-col gap-4">
-              <button 
-                onClick={() => scrollToSection("features")}
-                className="text-left text-muted-foreground hover:text-foreground py-2"
-              >
+              <button onClick={() => scrollToSection("features")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.features")}
               </button>
-              <button 
-                onClick={() => scrollToSection("pricing")}
-                className="text-left text-muted-foreground hover:text-foreground py-2"
-              >
+              <button onClick={() => scrollToSection("pricing")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 Cennik
               </button>
-              <button 
-                onClick={() => scrollToSection("demo-preview")}
-                className="text-left text-muted-foreground hover:text-foreground py-2"
-              >
+              <button onClick={() => scrollToSection("demo-preview")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.demo")}
               </button>
-              <button 
-                onClick={() => scrollToSection("faq")}
-                className="text-left text-muted-foreground hover:text-foreground py-2"
-              >
+              <button onClick={() => scrollToSection("faq")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.faq")}
               </button>
-              <a
-                href="https://admin.beauty-funnels.com/auth"
-                className="text-left text-muted-foreground hover:text-foreground py-2 font-medium"
-              >
+              <a href="https://admin.beauty-funnels.com/auth" className="text-left text-muted-foreground hover:text-foreground py-2 font-medium">
                 Panel klienta
               </a>
-              <Button 
-                onClick={() => {
-                  onScrollToForm();
-                  setIsMobileMenuOpen(false);
-                }}
+              <Button
+                onClick={() => { onScrollToForm(); setIsMobileMenuOpen(false); }}
                 className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2"
               >
                 {t("nav.bookDemo")}
