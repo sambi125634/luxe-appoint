@@ -1,101 +1,60 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Audit: Rejestracja + Onboarding — brakujące elementy
 
-### Co już mamy
+## Znalezione problemy
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+### 1. Brak walidacji emaila po rejestracji — użytkownik utknął
+Po `signUp` użytkownik musi potwierdzić email (auto-confirm jest wyłączone). Ale po kliknięciu linka potwierdzającego wraca na `/auth` i musi się zalogować ręcznie. Brak komunikatu "sprawdź skrzynkę email" — obecny toast "Rejestracja udana" jest niewystarczający.
 
-### Problem do rozwiązania
+**Fix:** Po rejestracji pokazać dedykowany ekran "Sprawdź swoją skrzynkę email" z instrukcjami, zamiast zostawiać użytkownika na formularzu logowania.
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+### 2. `saveDefaultServices()` — brak salonId override w ścieżce scan error
+Linia 359: `await saveDefaultServices()` — gdy scan nie powiedzie się, `createdSalonId` może nie być jeszcze w stanie. Ten sam bug co wcześniej naprawiony, ale niedopatchowany w error path.
 
----
+**Fix:** Przekazać `createdSalonId` jawnie.
 
-### Plan implementacji
+### 3. AI Scan — animacja progresji nie czeka na faktyczny wynik
+Animacja wiadomości (8s) i faktyczny call API biegną równolegle. Jeśli Firecrawl + AI zajmie >8s (co jest prawdopodobne przy scrapowaniu 3 URL), animacja kończy się na "Gotowe!" ale spinner nadal kręci. Jeśli API jest szybsze niż animacja — użytkownik czeka niepotrzebnie.
 
-#### FAZA 1: Role-based routing po loginie
+**Fix:** Zsynchronizować animację z faktycznym postępem API (start → scraping → analyzing → done).
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+### 4. Brak obsługi opening_hours z AI Scan
+AI Scanner zwraca `opening_hours` (godziny otwarcia), ale `handleSaveScanResults` ich nigdy nie zapisuje. Onboarding tworzy domyślne Mon-Fri 9-17, ale jeśli AI znalazło realne godziny (np. Sob 10-16), są ignorowane.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+**Fix:** W `handleSaveScanResults` — jeśli `scanResult.opening_hours` istnieje, zaktualizować `working_hours` dla owner-staff.
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+### 5. Brak staff_services — usługi nie przypisane do pracownika
+Po onboardingu usługi istnieją, staff member istnieje, ale `staff_services` (junction table) jest pusta. Booking widget wymaga powiązania staff↔service aby pokazać dostępność.
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+**Fix:** Po zapisaniu usług, automatycznie przypisać wszystkie do owner-staff.
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+### 6. Brak RODO / regulamin przy rejestracji
+Dla polskiego rynku brak checkboxa RODO/polityka prywatności przy rejestracji. To wymóg prawny.
 
-#### FAZA 3: Indywidualne kokpity
+**Fix:** Dodać checkbox RODO z linkiem do regulaminu.
 
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
+## Plan napraw
 
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
+| # | Problem | Plik | Priorytet |
+|---|---------|------|-----------|
+| 1 | Ekran "sprawdź email" po rejestracji | `AuthPage.tsx` | Wysoki |
+| 2 | saveDefaultServices scan error path | `OnboardingPage.tsx` | Wysoki |
+| 3 | Synchronizacja animacji z API | `OnboardingPage.tsx` | Średni |
+| 4 | Zapis opening_hours z AI Scan | `OnboardingPage.tsx` | Wysoki |
+| 5 | Auto-assign staff_services | `OnboardingPage.tsx` | Krytyczny |
+| 6 | Checkbox RODO przy rejestracji | `AuthPage.tsx` | Wysoki |
 
-#### FAZA 4: Aplikacja mobilna (PWA)
+## Szczegóły implementacji
 
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+**AuthPage.tsx:**
+- Nowy state `showEmailConfirmation` — po udanym signup, zamiast formularza pokazać ekran z ikoną koperty, "Wysłaliśmy link na [email]", przycisk "Otwórz pocztę"
+- Checkbox RODO pod hasłem w formularzu rejestracji
 
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+**OnboardingPage.tsx:**
+- `handleSaveScanResults`: po zapisie usług, pobrać staff_id ownera i wstawić `staff_services` dla wszystkich nowych usług
+- `handleSaveScanResults`: parsować `opening_hours` i update `working_hours` (zamienić domyślne Mon-Fri na realne godziny)
+- `saveDefaultServices`: to samo — po zapisie usług, przypisać do ownera
+- Scan error path linia 359: dodać `createdSalonId` jako argument
+- Animacja: użyć Promise.race / callback pattern zamiast fixed timeoutów
 
