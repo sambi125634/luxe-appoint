@@ -3,9 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Settings, Package, Target, X } from 'lucide-react';
 
-interface Props { onClose: () => void; }
+interface Props { onClose: () => void; onNavigate?: (tab: string) => void; }
 
-export function ProfitSetupWizard({ onClose }: Props) {
+export function ProfitSetupWizard({ onClose, onNavigate }: Props) {
   const { t } = useTranslation();
   return (
     <Card className="border-primary/30">
@@ -15,16 +15,16 @@ export function ProfitSetupWizard({ onClose }: Props) {
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          <StepCard icon={<Settings className="w-5 h-5 text-primary" />} step={1} title={t('trueProfit.setupStep1Title')} description={t('trueProfit.setupStep1Desc')} cta={t('trueProfit.setupStep1Cta')} />
-          <StepCard icon={<Package className="w-5 h-5 text-primary" />} step={2} title={t('trueProfit.setupStep2Title')} description={t('trueProfit.setupStep2Desc')} cta={t('trueProfit.setupStep2Cta')} />
-          <StepCard icon={<Target className="w-5 h-5 text-primary" />} step={3} title={t('trueProfit.setupStep3Title')} description={t('trueProfit.setupStep3Desc')} cta={t('trueProfit.setupStep3Cta')} />
+          <StepCard icon={<Settings className="w-5 h-5 text-primary" />} step={1} title={t('trueProfit.setupStep1Title')} description={t('trueProfit.setupStep1Desc')} cta={t('trueProfit.setupStep1Cta')} onAction={() => onNavigate?.('staff')} />
+          <StepCard icon={<Package className="w-5 h-5 text-primary" />} step={2} title={t('trueProfit.setupStep2Title')} description={t('trueProfit.setupStep2Desc')} cta={t('trueProfit.setupStep2Cta')} onAction={() => onNavigate?.('products')} />
+          <StepCard icon={<Target className="w-5 h-5 text-primary" />} step={3} title={t('trueProfit.setupStep3Title')} description={t('trueProfit.setupStep3Desc')} cta={t('trueProfit.setupStep3Cta')} onAction={() => onNavigate?.('clients')} />
         </div>
       </CardContent>
     </Card>
   );
 }
 
-function StepCard({ icon, step, title, description, cta }: { icon: React.ReactNode; step: number; title: string; description: string; cta: string; }) {
+function StepCard({ icon, step, title, description, cta, onAction }: { icon: React.ReactNode; step: number; title: string; description: string; cta: string; onAction?: () => void; }) {
   return (
     <div className="rounded-lg border border-border p-4 space-y-2">
       <div className="flex items-center gap-2">
@@ -33,7 +33,7 @@ function StepCard({ icon, step, title, description, cta }: { icon: React.ReactNo
       </div>
       <h4 className="font-medium text-sm">{title}</h4>
       <p className="text-xs text-muted-foreground">{description}</p>
-      <Button variant="outline" size="sm" className="w-full text-xs">{cta}</Button>
+      <Button variant="outline" size="sm" className="w-full text-xs" onClick={onAction}>{cta}</Button>
     </div>
   );
 }

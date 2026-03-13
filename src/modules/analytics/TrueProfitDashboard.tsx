@@ -35,7 +35,7 @@ export function TrueProfitDashboard({ isDemo, onNavigate }: Props) {
           </AlertDescription>
         </Alert>
       )}
-      {showSetup && <ProfitSetupWizard onClose={() => setShowSetup(false)} />}
+      {showSetup && <ProfitSetupWizard onClose={() => setShowSetup(false)} onNavigate={onNavigate} />}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <TodayProfitCard summary={profit.todaySummary} bestService={profit.bestServiceToday} />
         <MonthlyProfitCard summary={profit.monthlySummary} monthChange={profit.monthOverMonthChange} />
