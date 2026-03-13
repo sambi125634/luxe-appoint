@@ -171,6 +171,8 @@ interface ScanResult {
   description: string;
   avg_rating: number;
   existing_reviews_count: number;
+  address?: string;
+  phone?: string;
 }
 
 interface CsvRow {
