@@ -645,7 +645,7 @@ export default function OnboardingPage() {
 
   const progress = ((step + 1) / STEPS.length) * 100;
   const bookingUrl = `${window.location.origin}/s/${createdSlug}`;
-  const embedCode = `<iframe src="${bookingUrl}" width="100%" height="700" frameborder="0" style="border-radius:12px;"></iframe>`;
+  
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1A1A2E] to-[#16213E] py-6 px-4 overflow-hidden">
