@@ -328,7 +328,7 @@ export default function OnboardingPage() {
   const saveDefaultServices = async (salonIdOverride?: string) => {
     const salonId = salonIdOverride ?? createdSalonId;
     if (!salonId) return;
-    const template = SERVICE_TEMPLATES[salonType] ?? SERVICE_TEMPLATES.multi;
+    const template = SERVICE_TEMPLATES[salonType || "multi"] ?? SERVICE_TEMPLATES.multi;
     const allServiceIds: string[] = [];
     for (let i = 0; i < template.length; i++) {
       const cat = template[i];
