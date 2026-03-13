@@ -33,6 +33,7 @@ import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("home");
+  const [settingsInitialTab, setSettingsInitialTab] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
