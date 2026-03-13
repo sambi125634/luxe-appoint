@@ -33,6 +33,7 @@ import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>("home");
+  const [settingsInitialTab, setSettingsInitialTab] = useState<string | undefined>();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
@@ -110,7 +111,12 @@ export default function AdminDashboard() {
       case "calendar": return <ScheduleManagement />;
       case "widgets": return <WidgetsManagement />;
       case "clients": return <ClientsManagement />;
-      case "conversations": return <ConversationsModule />;
+      case "conversations": return <ConversationsModule onNavigate={(tab) => {
+        if (tab === "settings") {
+          setSettingsInitialTab("integrations");
+        }
+        setActiveTab(tab as TabType);
+      }} />;
       case "pipeline": return <PipelineModule />;
       case "accounting": return <AccountingModule />;
       case "products": return <ProductsModule />;
@@ -118,7 +124,7 @@ export default function AdminDashboard() {
       case "services": return <ServicesManagement />;
       case "staff": return <StaffManagement />;
       case "time-off": return <TimeOffManagement />;
-      case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} />;
+      case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} initialTab={settingsInitialTab} />;
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard />;
       case "pixel": return <PixelDashboard />;
