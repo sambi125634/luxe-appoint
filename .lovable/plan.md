@@ -1,101 +1,107 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Audyt panelu admin — problemy znalezione po rejestracji nowego użytkownika
 
-### Co już mamy
+## Znalezione bugi i problemy
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+### 1. KRYTYCZNY: `saveDefaultServices()` nie zapisuje usług dla nowych użytkowników (bez social URL)
 
-### Problem do rozwiązania
+**Plik:** `OnboardingPage.tsx`, linia 297-301
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+Gdy użytkownik NIE podaje social URL, kod robi:
+```
+setCreatedSalonId(salon.id);  // ustawia state
+// ...
+if (createdSalonId) {         // sprawdza STARY state (jeszcze null!)
+  await saveDefaultServices();
+}
+```
 
----
+`setCreatedSalonId` jest asynchroniczne (React state) — `createdSalonId` w momencie sprawdzenia jest jeszcze `null`. Efekt: **nowy salon nie ma żadnych usług** po onboardingu (jeśli pominięto AI Scan). Kalendarz i booking widget będą puste.
 
-### Plan implementacji
-
-#### FAZA 1: Role-based routing po loginie
-
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
-
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
-
-#### FAZA 2: Onboarding wizard (`/onboarding`)
-
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
-
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
-
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+**Fix:** Użyć `salon.id` bezpośrednio zamiast `createdSalonId` w warunku i przekazać do `saveDefaultServices`.
 
 ---
 
-### Wymagane zmiany w bazie danych
+### 2. KRYTYCZNY: `SetupChecklist` — `working_hours` query bez filtra salon
 
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+**Plik:** `SetupChecklist.tsx`, linia 41
 
-### Nowe komponenty
+```
+supabase.from("working_hours").select("*", { count: "exact", head: true })
+```
 
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+Brak `.eq("salon_id", salonId)` — ale `working_hours` nie ma `salon_id`, ma `staff_id`. Powinno filtrować przez staff_members tego salonu. Aktualnie: RLS blokuje dane innych salonów, ale nowy salon widzi `workingHoursCount = 0` nawet gdy inne salony je mają (RLS), więc to działa przypadkowo poprawnie. Jednak poprawny query powinien joinować z `staff_members`.
 
-### Kolejność implementacji
+**Fix:** Filtrować working_hours przez staff_id IN (staff danego salonu).
 
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+---
+
+### 3. ŚREDNI: Onboarding nie tworzy working_hours dla owner-staff
+
+Podczas onboardingu tworzony jest `staff_member` dla ownera, ale **nie są tworzone domyślne `working_hours`**. Efekt: kalendarz nie pokaże żadnych dostępnych slotów, booking widget nie pokaże terminów.
+
+**Fix:** Po utworzeniu staff member, wstawić domyślne working_hours (Pon-Pt 9-17).
+
+---
+
+### 4. ŚREDNI: `AutopilotStatusBar` zawsze pokazuje mock dane
+
+**Plik:** `AutopilotStatusBar.tsx`, linia 24
+
+```
+const stats = isDemo ? todayStats : MOCK_TODAY_STATS;
+```
+
+W trybie real (nie demo) i tak używa `MOCK_TODAY_STATS`. Autopilot status bar pokazuje fałszywe dane ("odzyskano X zł") nowemu użytkownikowi.
+
+Linia 98: `actions={isDemo ? demoActions : []}` — w trybie real przekazuje pusty array, ale stats są mock. Sprzeczność.
+
+**Fix:** Gdy `!isDemo`, pobierać prawdziwe dane z bazy lub ukryć bar jeśli brak danych.
+
+---
+
+### 5. ŚREDNI: `DashboardHome` — brak stanu "empty state" dla nowego salonu
+
+Dashboard wyświetla widgety (Revenue Prediction, Weekly Brief, Retention Health, Stock Alerts) nawet gdy salon jest zupełnie pusty. Nowy użytkownik widzi puste karty lub dane z mocków.
+
+**Fix:** Dodać empty state / onboarding CTA gdy salon nie ma jeszcze wizyt/klientów.
+
+---
+
+### 6. NISKI: `hasSalonData` wymaga address i phone — nie zbierane w onboardingu
+
+**Plik:** `SetupChecklist.tsx`, linia 44
+
+```
+const hasSalonData = !!(salon?.name && salon?.address && salon?.phone);
+```
+
+Onboarding zbiera name i city, ale nie address i phone. Checklist "Dane salonu" nigdy nie będzie zaznaczony po onboardingu — zmusza użytkownika do odwiedzenia ustawień.
+
+**Fix:** To jest celowe (prowadzi do Settings), ale warto upewnić się, że Settings > Profil poprawnie zapisuje te pola.
+
+---
+
+### 7. NISKI: Widget booking "widget zainstalowany" — hardcoded `false`
+
+**Plik:** `SetupChecklist.tsx`, linia 53
+
+```
+{ id: "widget", ..., completed: false, tab: "widgets" }
+```
+
+Zawsze niekompletne. Brak mechanizmu śledzenia czy widget został osadzony.
+
+---
+
+## Plan napraw (priorytet)
+
+| # | Problem | Plik | Zmiana |
+|---|---------|------|--------|
+| 1 | Brak usług po onboardingu | `OnboardingPage.tsx` | Przekazać `salon.id` do `saveDefaultServices()` zamiast czekać na state |
+| 2 | Brak working_hours po onboardingu | `OnboardingPage.tsx` | Dodać insert domyślnych working_hours po utworzeniu staff member |
+| 3 | SetupChecklist working_hours | `SetupChecklist.tsx` | Filtrować przez staff_members danego salonu |
+| 4 | AutopilotStatusBar mock dane | `AutopilotStatusBar.tsx` | Ukryć bar lub pokazać real dane w trybie produkcyjnym |
+| 5 | Dashboard empty state | `DashboardHome.tsx` | Dodać empty state widgety dla nowego salonu |
 
