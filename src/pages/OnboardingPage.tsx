@@ -195,8 +195,9 @@ export default function OnboardingPage() {
   // Step 1 — Salon info
   const [salonName, setSalonName] = useState("");
   const [salonCity, setSalonCity] = useState("");
-  const [salonType, setSalonType] = useState("multi");
+  const [salonType, setSalonType] = useState("");
   const [teamSize, setTeamSize] = useState("1");
+  const [clientSources, setClientSources] = useState<string[]>([]);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [googleMapsUrl, setGoogleMapsUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
