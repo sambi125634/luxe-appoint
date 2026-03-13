@@ -174,6 +174,12 @@ const defaultIntegrationSettings: IntegrationSettings = {
     apiKey: "",
     senderName: "",
   },
+  whatsapp: {
+    enabled: false,
+    provider: '',
+    apiKey: "",
+    phoneNumberId: "",
+  },
   przelewy24: {
     enabled: false,
     merchantId: "",
