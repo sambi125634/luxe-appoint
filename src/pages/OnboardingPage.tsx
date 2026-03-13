@@ -325,14 +325,29 @@ export default function OnboardingPage() {
     const salonId = salonIdOverride ?? createdSalonId;
     if (!salonId) return;
     const template = SERVICE_TEMPLATES[salonType] ?? SERVICE_TEMPLATES.multi;
+    const allServiceIds: string[] = [];
     for (let i = 0; i < template.length; i++) {
       const cat = template[i];
       const { data: category } = await supabase.from("service_categories")
         .insert({ salon_id: salonId, name: cat.category, sort_order: i }).select("id").single();
       if (!category) continue;
       const services = cat.services.map(s => ({ salon_id: salonId, category_id: category.id, name: s.name, duration: s.duration, price: s.price }));
-      await supabase.from("services").insert(services);
+      const { data: insertedServices } = await supabase.from("services").insert(services).select("id");
+      if (insertedServices) allServiceIds.push(...insertedServices.map(s => s.id));
     }
+    // Auto-assign all services to owner staff member
+    await assignServicesToOwner(salonId, allServiceIds);
+  };
+
+  const assignServicesToOwner = async (salonId: string, serviceIds: string[]) => {
+    if (serviceIds.length === 0) return;
+    const { data: ownerStaff } = await supabase.from("staff_members")
+      .select("id").eq("salon_id", salonId).eq("role", "owner").maybeSingle();
+    if (!ownerStaff) return;
+    const staffServices = serviceIds.map(serviceId => ({
+      staff_id: ownerStaff.id, service_id: serviceId,
+    }));
+    await supabase.from("staff_services").insert(staffServices);
   };
 
   const startAiScan = async () => {
