@@ -35,6 +35,19 @@ import { cn } from "@/lib/utils";
 
 const featureTabs = [
   {
+    id: "ai-autopilot",
+    icon: Bot,
+    title: "🤖 AI Autopilot",
+    features: [
+      { text: "Wypełniacz Luk — AI sugeruje klientkom wolne terminy", icon: Brain },
+      { text: "Radar Odejść — wykrywa ryzykownych klientów zanim odejdą", icon: Target },
+      { text: "Prognoza Kasy — wiesz ile zarobisz w piątek", icon: TrendingUp },
+      { text: "Dynamiczne Ceny — optymalizacja cennika w czasie rzeczywistym", icon: DollarSign },
+      { text: "Automatyczne reaktywacje — AI kontaktuje klientki które dawno nie były", icon: Sparkles },
+    ],
+    mockup: "ai-autopilot",
+  },
+  {
     id: "calendar",
     icon: Calendar,
     title: "Kalendarz i rezerwacje",
