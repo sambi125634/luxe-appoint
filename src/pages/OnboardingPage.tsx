@@ -348,8 +348,9 @@ export default function OnboardingPage() {
     }
 
     try {
+      const scanUrls = [instagramUrl, googleMapsUrl, websiteUrl].filter(u => u.trim());
       const { data, error } = await supabase.functions.invoke("ai-profile-scanner", {
-        body: { url: socialUrl, salon_type: salonType },
+        body: { urls: scanUrls, salon_type: salonType },
       });
 
       if (error || !data?.success) {
