@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MessageSquarePlus, Settings, ExternalLink } from "lucide-react";
+import { MessageSquarePlus, Settings, ExternalLink, MessageSquare, Phone } from "lucide-react";
 import { ContactsList } from "./ContactsList";
 import { ConversationView } from "./ConversationView";
 import { Contact, Conversation, Message } from "./types";
 import { SectionGuide } from "../SectionGuide";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { useSalonSettings } from "@/hooks/useSalonSettings";
 
 // Demo data - only shown in demo mode
 const DEMO_CONTACTS: Contact[] = [
