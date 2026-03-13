@@ -110,7 +110,7 @@ export default function AdminDashboard() {
       case "calendar": return <ScheduleManagement />;
       case "widgets": return <WidgetsManagement />;
       case "clients": return <ClientsManagement />;
-      case "conversations": return <ConversationsModule />;
+      case "conversations": return <ConversationsModule onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "pipeline": return <PipelineModule />;
       case "accounting": return <AccountingModule />;
       case "products": return <ProductsModule />;

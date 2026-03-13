@@ -30,9 +30,9 @@ const demoProfile = {
   themeSecondaryColor: "#1a1a2e",
 };
 
-export function SettingsModule({ isDemo = false, onNavigateToModule }: SettingsModuleProps) {
+export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab }: SettingsModuleProps) {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<SettingsTabType>("profile");
+  const [activeTab, setActiveTab] = useState<SettingsTabType>((initialTab as SettingsTabType) || "profile");
   const { profile: realProfile, settings, isLoading: realLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
   const profile = isDemo ? demoProfile : realProfile;
   const isLoading = isDemo ? false : realLoading;

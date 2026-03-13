@@ -193,7 +193,7 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
             <p className="text-muted-foreground text-sm mb-4">
               Aby wysyłać wiadomości SMS, e-mail i WhatsApp do klientek, skonfiguruj integrację komunikacyjną w ustawieniach.
             </p>
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={() => onNavigate?.("settings")}>
               <Settings className="w-4 h-4" />
               Przejdź do Ustawień → Integracje
             </Button>
