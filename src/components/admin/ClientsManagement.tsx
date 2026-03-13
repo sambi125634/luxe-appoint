@@ -713,6 +713,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
           tags={dbTags}
         />
       )}
+      <ClientCSVImport open={isCSVImportOpen} onOpenChange={setIsCSVImportOpen} isDemo={isDemo} />
     </Dialog>
   );
 }
