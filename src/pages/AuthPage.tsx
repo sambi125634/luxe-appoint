@@ -141,7 +141,7 @@ export default function AuthPage() {
     if (error) {
       toast.error(t("auth.signupError"));
     } else {
-      toast.success(t("auth.signupSuccess"));
+      setShowEmailConfirmation(true);
     }
     setIsLoading(false);
   };
