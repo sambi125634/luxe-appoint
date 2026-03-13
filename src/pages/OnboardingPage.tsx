@@ -264,6 +264,7 @@ export default function OnboardingPage() {
 
   const handleSaveSalon = async () => {
     if (!salonName.trim()) { toast.error("Podaj nazwę salonu"); return; }
+    if (!salonType) { toast.error("Wybierz typ salonu"); return; }
     if (!userId) return;
     setSaving(true);
 
