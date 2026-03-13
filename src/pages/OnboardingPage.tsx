@@ -290,7 +290,7 @@ export default function OnboardingPage() {
   const [importedCount, setImportedCount] = useState(0);
 
   // Widget tab
-  const [widgetTab, setWidgetTab] = useState("wordpress");
+  
 
   // ---- Auth check & resume ----
   useEffect(() => {
