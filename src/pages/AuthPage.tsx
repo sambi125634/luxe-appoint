@@ -225,6 +225,10 @@ export default function AuthPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
+                  <Label htmlFor="signup-phone">Telefon</Label>
+                  <Input id="signup-phone" type="tel" placeholder="+48 500 600 700" value={signupPhone} onChange={(e) => setSignupPhone(e.target.value)} required disabled={isLoading} />
+                </div>
+                <div className="space-y-2">
                   <Label htmlFor="signup-email">{t("auth.email")}</Label>
                   <Input id="signup-email" type="email" placeholder="twoj@email.pl" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required disabled={isLoading} />
                 </div>
