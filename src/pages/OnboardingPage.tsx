@@ -852,7 +852,7 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 2: Autopilot ===== */}
+          {/* ===== STEP 2: Autopilot (PRO gate) ===== */}
           {step === 2 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
@@ -860,13 +860,17 @@ export default function OnboardingPage() {
                   <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#E91E8C] flex items-center justify-center mb-3">
                     <Bot className="w-8 h-8 text-white" />
                   </div>
-                  <h2 className="text-lg font-bold">Twój Autopilot jest gotowy</h2>
-                  <p className="text-sm text-muted-foreground">Wszystko działa automatycznie od teraz. Możesz cokolwiek wyłączyć.</p>
+                  <h2 className="text-lg font-bold">🔒 Twój Autopilot czeka na aktywację</h2>
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Skonfigurujemy go razem podczas bezpłatnej konsultacji (30 min).
+                    <br />Chcemy mieć pewność że działa idealnie pod Twój salon.
+                  </p>
                 </div>
 
                 <div className="space-y-3">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Co zostanie włączone:</p>
                   {AUTOPILOT_FEATURES.map(f => (
-                    <div key={f.key} className="flex items-center justify-between p-3 rounded-xl border hover:border-[#E91E8C]/30 transition-colors">
+                    <div key={f.key} className="flex items-center justify-between p-3 rounded-xl border border-border/50 bg-muted/30">
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{f.icon}</span>
                         <div>
@@ -874,7 +878,9 @@ export default function OnboardingPage() {
                           <p className="text-xs text-muted-foreground">{f.description}</p>
                         </div>
                       </div>
-                      <Switch checked={autopilotToggles[f.key]} onCheckedChange={v => setAutopilotToggles(prev => ({ ...prev, [f.key]: v }))} />
+                      <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full border border-border flex items-center gap-1">
+                        🔒 PRO
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -883,9 +889,19 @@ export default function OnboardingPage() {
                   <Button variant="outline" onClick={() => setStep((instagramUrl || googleMapsUrl || websiteUrl) ? 1 : 0)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
-                  <Button onClick={handleActivateAutopilot} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
-                    {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Rocket className="mr-2 h-4 w-4" />}
-                    Uruchom Autopilot →
+                  <Button onClick={() => {
+                    // Save autopilot config as pending (not active) and proceed
+                    if (createdSalonId) {
+                      supabase.from("autopilot_config").upsert({
+                        salon_id: createdSalonId,
+                        is_active: false,
+                        ai_suggestions_enabled: false,
+                      });
+                    }
+                    goTo(3);
+                  }} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Umów konsultację i aktywuj Autopilot →
                   </Button>
                 </div>
               </CardContent>
