@@ -32,7 +32,12 @@ const SALON_TYPES = [
   { key: "nails", label: "Paznokcie", emoji: "💅" },
   { key: "hair", label: "Fryzjerstwo", emoji: "💇‍♀️" },
   { key: "cosmetology", label: "Kosmetologia", emoji: "🧴" },
+  { key: "brows_lashes", label: "Brwi i rzęsy", emoji: "🪷" },
   { key: "makeup", label: "Makijaż", emoji: "💄" },
+  { key: "aesthetic_med", label: "Medycyna estetyczna", emoji: "💉" },
+  { key: "spa_massage", label: "Masaż / SPA", emoji: "🧖‍♀️" },
+  { key: "barber", label: "Barber", emoji: "🧔" },
+  { key: "physiotherapy", label: "Fizjoterapia", emoji: "🦴" },
   { key: "multi", label: "Multi / Inne", emoji: "✨" },
 ];
 
