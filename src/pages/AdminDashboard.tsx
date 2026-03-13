@@ -124,7 +124,7 @@ export default function AdminDashboard() {
       case "services": return <ServicesManagement />;
       case "staff": return <StaffManagement />;
       case "time-off": return <TimeOffManagement />;
-      case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} />;
+      case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} initialTab={settingsInitialTab} />;
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard />;
       case "pixel": return <PixelDashboard />;
