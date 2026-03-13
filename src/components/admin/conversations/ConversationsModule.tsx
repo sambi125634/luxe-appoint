@@ -163,6 +163,11 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
   const { t } = useTranslation();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const { settings } = useSalonSettings();
+
+  const smsConfigured = settings.integrations.smsapi?.enabled && !!settings.integrations.smsapi?.apiKey;
+  const whatsappConfigured = settings.integrations.whatsapp?.enabled && !!settings.integrations.whatsapp?.apiKey;
+  const hasAnyChannel = smsConfigured || whatsappConfigured;
 
   const contacts = isDemo ? DEMO_CONTACTS : [];
   const messages = isDemo ? DEMO_MESSAGES : {};
@@ -181,21 +186,49 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
     console.log("Sending message:", { message, type, to: selectedContact });
   };
 
-  // Empty state for production mode
-  if (!isDemo && contacts.length === 0) {
+  // Empty state for production mode — no channels configured
+  if (!isDemo && !hasAnyChannel) {
     return (
       <div className="space-y-6">
         <SectionGuide sectionKey="conversations" />
         <div className="glass-card h-[calc(100vh-14rem)] flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto p-8">
+          <div className="text-center max-w-lg mx-auto p-8">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <MessageSquarePlus className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-serif text-xl font-semibold mb-2">Konwersacje wymagają integracji</h3>
-            <p className="text-muted-foreground text-sm mb-4">
-              Aby wysyłać wiadomości SMS, e-mail i WhatsApp do klientek, skonfiguruj integrację komunikacyjną w ustawieniach.
+            <h3 className="font-serif text-xl font-semibold mb-2">Skonfiguruj kanał komunikacji</h3>
+            <p className="text-muted-foreground text-sm mb-6">
+              Aby wysyłać wiadomości do klientek, skonfiguruj przynajmniej jeden kanał komunikacji w ustawieniach integracji.
             </p>
-            <Button variant="outline" className="gap-2" onClick={() => onNavigate?.("settings")}>
+            
+            <div className="grid gap-3 mb-6">
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border text-left">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+                  <MessageSquare className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">SMS (SMSAPI)</p>
+                  <p className="text-xs text-muted-foreground">Model BYOP — Twój klucz API, Twoje koszty</p>
+                </div>
+                <Badge variant="outline" className="text-muted-foreground flex-shrink-0">
+                  Nieskonfigurowany
+                </Badge>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-lg border border-border text-left">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm">WhatsApp Business</p>
+                  <p className="text-xs text-muted-foreground">Twilio lub 360dialog</p>
+                </div>
+                <Badge variant="outline" className="text-muted-foreground flex-shrink-0">
+                  Nieskonfigurowany
+                </Badge>
+              </div>
+            </div>
+
+            <Button className="gap-2" onClick={() => onNavigate?.("settings")}>
               <Settings className="w-4 h-4" />
               Przejdź do Ustawień → Integracje
             </Button>
