@@ -264,7 +264,17 @@ export default function AuthPage() {
                   <Label htmlFor="signup-password">{t("auth.password")}</Label>
                   <Input id="signup-password" type="password" placeholder="••••••••" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required disabled={isLoading} />
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <div className="flex items-start space-x-2">
+                  <Checkbox id="rodo-consent" checked={rodoConsent} onCheckedChange={(v) => setRodoConsent(v === true)} disabled={isLoading} className="mt-0.5" />
+                  <label htmlFor="rodo-consent" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                    Akceptuję{" "}
+                    <a href="/regulamin" target="_blank" className="underline text-primary hover:text-primary/80">Regulamin</a>{" "}
+                    i{" "}
+                    <a href="/polityka-prywatnosci" target="_blank" className="underline text-primary hover:text-primary/80">Politykę Prywatności</a>.
+                    Wyrażam zgodę na przetwarzanie moich danych osobowych zgodnie z RODO.
+                  </label>
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading || !rodoConsent}>
                   {isLoading ? (<><Loader2 className="mr-2 h-4 w-4 animate-spin" />{t("auth.signingUp")}</>) : t("auth.signupButton")}
                 </Button>
               </form>
