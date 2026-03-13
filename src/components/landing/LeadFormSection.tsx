@@ -117,10 +117,31 @@ const LeadFormSection = () => {
       <div className="absolute inset-0 bg-gradient-to-br from-violet-deep/10 via-background to-gold/10" />
       
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        <div className="max-w-3xl mx-auto text-center mb-8">
+          {/* Primary CTA - PLG */}
+          <div className="mb-10 p-8 glass-card-elevated rounded-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Zacznij za darmo — bez karty kredytowej
+            </h2>
+            <p className="text-muted-foreground text-lg mb-6">
+              Załóż konto w 2 minuty i przekonaj się sama.
+            </p>
+            <Button 
+              size="lg"
+              asChild
+              className="px-10 py-6 text-lg"
+            >
+              <Link to="/auth">
+                Załóż konto za darmo
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </Button>
+          </div>
+
+          {/* Secondary - Lead form */}
+          <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
             {t("leadForm.title")}
-          </h2>
+          </h3>
           <p className="text-muted-foreground text-lg">
             {t("leadForm.subtitle")}
           </p>
