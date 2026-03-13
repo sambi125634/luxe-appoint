@@ -604,7 +604,7 @@ export default function OnboardingPage() {
 
                 <Button onClick={handleSaveSalon} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
                   {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
-                  {socialUrl.trim() ? "Dalej — AI przeskanuje profil" : "Dalej"}
+                  {(instagramUrl.trim() || googleMapsUrl.trim() || websiteUrl.trim()) ? "Dalej — AI przeskanuje profil" : "Dalej"}
                 </Button>
               </CardContent>
             </Card>
