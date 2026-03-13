@@ -1,101 +1,53 @@
 
 
-## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
+# Plan: Import CSV klientów + szablon przykładowy
 
-### Co już mamy
+## Kontekst
+Istniejący `CSVImport.tsx` obsługuje tylko import **usług** (services). Brakuje importu klientów. Trzeba stworzyć dedykowany komponent `ClientCSVImport` i zintegrować go w `ClientsManagement`.
 
-Projekt ma już solidne fundamenty:
-- **`/auth`** - strona logowania/rejestracji (email + hasło)
-- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
-- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
-- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
-- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
-- **`profiles`** - tabela z danymi użytkowników
+## Nowy komponent: `src/components/admin/clients/ClientCSVImport.tsx`
 
-### Problem do rozwiązania
+Dialog z 3 krokami (upload → preview → import):
 
-Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
+**Upload:**
+- Drag & drop zone dla pliku CSV
+- Przycisk "Pobierz szablon" — generuje przykładowy CSV z nagłówkami i 5 przykładowymi klientami
+- Instrukcja mapowania kolumn
 
----
+**Szablon CSV** (nagłówki + przykłady):
+```
+imie,nazwisko,telefon,email,notatki,tagi,zgoda_rodo,zgoda_marketing
+Anna,Kowalska,+48123456789,anna@email.pl,Preferuje piątki,VIP;Stały,tak,tak
+Katarzyna,Nowak,+48987654321,k.nowak@gmail.com,,Nowy,tak,nie
+```
 
-### Plan implementacji
+**Mapowanie kolumn** (fuzzy match po nagłówku):
+- `imie`/`first_name`/`imię` → first_name
+- `nazwisko`/`last_name` → last_name  
+- `telefon`/`phone`/`tel` → phone
+- `email`/`e-mail` → email
+- `notatki`/`notes`/`uwagi` → notes
+- `tagi`/`tags`/`etykiety` → tags (separator `;`)
+- `zgoda_rodo`/`rodo`/`rodo_consent` → rodo_consent
+- `zgoda_marketing`/`marketing` → marketing_consent
 
-#### FAZA 1: Role-based routing po loginie
+**Preview:** Tabela z walidacją (imię, nazwisko, telefon wymagane). Edycja/usuwanie wierszy.
 
-**Modyfikacja `/auth` i post-login flow:**
-- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
-- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
-- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
+**Import:** Batch insert przez `useCreateClient` — wstawia wszystkie prawidłowe rekordy.
 
-**Modyfikacja `AdminDashboard.tsx`:**
-- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
-- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+## Zmiany w `ClientsManagement.tsx`
 
-#### FAZA 2: Onboarding wizard (`/onboarding`)
+- Dodać przycisk "Import CSV" (ikona Upload) obok "Dodaj klienta"
+- State `isCSVImportOpen` steruje dialogiem
+- Również dodać ten przycisk w widoku pustej listy klientów (obok "Dodaj klienta")
 
-Nowa strona z 5-krokowym wizardem:
-1. **Dane salonu** - nazwa, adres, miasto, telefon
-2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
-3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
-4. **Pracownicy** - opcjonalne, można pominąć
-5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+## Pliki
 
-Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+| Plik | Zmiana |
+|------|--------|
+| `src/components/admin/clients/ClientCSVImport.tsx` | Nowy komponent |
+| `src/components/admin/clients/index.ts` | Export nowego komponentu |
+| `src/components/admin/ClientsManagement.tsx` | Integracja przycisku + dialog |
 
-#### FAZA 3: Indywidualne kokpity
-
-Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
-- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
-- **RLS** gwarantuje izolację na poziomie DB
-- Każdy salon owner widzi TYLKO swoje dane
-
-Potrzebne ulepszenia:
-- Wyświetlanie nazwy/logo salonu w sidebarze
-- Personalizacja kolorów (z `salons.theme_primary_color`)
-- Widget "Twój link do rezerwacji" na dashboardzie
-- Onboarding progress indicator dla nowo utworzonych salonów
-
-#### FAZA 4: Aplikacja mobilna (PWA)
-
-**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
-
-Dlaczego PWA:
-- Nie wymaga App Store / Google Play
-- Ten sam codebase - zero dodatkowej pracy
-- Instalowalna z przeglądarki na home screen
-- Działa offline (cached assets)
-- Push notifications przez Web Push API
-- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
-
-Implementacja:
-- Instalacja `vite-plugin-pwa`
-- Konfiguracja manifest.json (nazwa, ikony, kolory)
-- Service worker dla cache'owania
-- Strona `/install` z instrukcją instalacji
-- Meta tagi mobile-optimized w `index.html`
-
-Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
-
----
-
-### Wymagane zmiany w bazie danych
-
-1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
-2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
-
-### Nowe komponenty
-
-- `useUserRole()` hook
-- `/onboarding` page z multi-step wizard
-- PWA config (manifest, service worker, install page)
-- Zmodyfikowany `AuthPage` z role-based redirect
-- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
-
-### Kolejność implementacji
-
-1. Hook `useUserRole` + role-based redirect w `/auth`
-2. Ograniczenie menu w `/admin` per rola
-3. Onboarding wizard `/onboarding`
-4. Salon branding w sidebar
-5. PWA setup
+Brak zmian w bazie danych — używamy istniejący hook `useCreateClient`.
 
