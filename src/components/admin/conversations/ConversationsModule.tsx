@@ -154,9 +154,10 @@ const DEMO_MESSAGES: Record<string, Message[]> = {
 
 interface ConversationsModuleProps {
   isDemo?: boolean;
+  onNavigate?: (tab: string) => void;
 }
 
-export function ConversationsModule({ isDemo = false }: ConversationsModuleProps) {
+export function ConversationsModule({ isDemo = false, onNavigate }: ConversationsModuleProps) {
   const { t } = useTranslation();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
