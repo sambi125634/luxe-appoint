@@ -580,15 +580,22 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
             </p>
-            <DialogTrigger asChild>
-              <Button type="button" onClick={openNewClient} className="gap-2">
-                <Plus className="w-4 h-4" />
-                {t('clients.addClient')}
+            <div className="flex gap-2">
+              <DialogTrigger asChild>
+                <Button type="button" onClick={openNewClient} className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  {t('clients.addClient')}
+                </Button>
+              </DialogTrigger>
+              <Button variant="outline" onClick={() => setIsCSVImportOpen(true)} className="gap-2">
+                <Upload className="w-4 h-4" />
+                Import CSV
               </Button>
-            </DialogTrigger>
+            </div>
           </div>
         </div>
         {renderClientDialog()}
+        <ClientCSVImport open={isCSVImportOpen} onOpenChange={setIsCSVImportOpen} isDemo={isDemo} />
       </Dialog>
     );
   }
