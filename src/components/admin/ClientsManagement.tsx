@@ -580,7 +580,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
             </p>
-            <div className="flex gap-2">
+            <div className="flex justify-center gap-3">
               <DialogTrigger asChild>
                 <Button type="button" onClick={openNewClient} className="gap-2">
                   <Plus className="w-4 h-4" />
