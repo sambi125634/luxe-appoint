@@ -108,7 +108,7 @@ function parseCSVText(text: string): ParsedClient[] {
 function parseXLSXBuffer(buffer: ArrayBuffer): ParsedClient[] {
   const workbook = XLSX.read(buffer, { type: "array" });
   const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-  const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(firstSheet, { header: 1 }) as unknown[][];
+  const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 }) as unknown[][];
   
   if (jsonData.length < 2) return [];
   const headers = (jsonData[0] as unknown[]).map(h => String(h ?? ""));
