@@ -121,7 +121,7 @@ export default function AuthPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    const validation = signupSchema.safeParse({ email: signupEmail, password: signupPassword, firstName, lastName });
+    const validation = signupSchema.safeParse({ email: signupEmail, password: signupPassword, firstName, lastName, phone: signupPhone });
     if (!validation.success) {
       toast.error(validation.error.errors[0].message);
       return;
@@ -133,7 +133,7 @@ export default function AuthPage() {
       password: signupPassword,
       options: {
         emailRedirectTo: redirectUrl,
-        data: { first_name: firstName.trim(), last_name: lastName.trim() },
+        data: { first_name: firstName.trim(), last_name: lastName.trim(), phone: signupPhone.trim() },
       },
     });
     if (error) {
