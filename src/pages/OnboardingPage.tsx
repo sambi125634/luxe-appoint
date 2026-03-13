@@ -1066,7 +1066,7 @@ export default function OnboardingPage() {
                   {[
                     { label: "Usługi skonfigurowane", value: scanResult ? `${scanResult.services.length} (AI)` : "✓ z szablonu", done: true },
                     { label: "Autopilot", value: "AKTYWNY", done: true },
-                    { label: "Widget rezerwacji", value: "Gotowy", done: true },
+                    { label: "Link do rezerwacji", value: "Udostępniony", done: true },
                     { label: "Klientki zaimportowane", value: importedCount > 0 ? `${importedCount}` : "—", done: importedCount > 0 },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg">
