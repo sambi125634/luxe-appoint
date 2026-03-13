@@ -575,16 +575,31 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                <div className="space-y-2 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
+                <div className="space-y-3 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#E91E8C]" />
-                    <Label className="text-sm font-semibold">Profil Instagram lub Google Maps</Label>
+                    <Label className="text-sm font-semibold">AI Scan — uzupełni dane za Ciebie</Label>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Oszczędź 10 minut — AI uzupełni dane za Ciebie!
+                    Podaj minimum 1 link. Im więcej, tym dokładniejszy profil.
                   </p>
-                  <Input value={socialUrl} onChange={e => setSocialUrl(e.target.value)}
-                    placeholder="https://instagram.com/twojsalon lub link Google Maps" />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Instagram className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <Input value={instagramUrl} onChange={e => setInstagramUrl(e.target.value)}
+                        placeholder="https://instagram.com/twojsalon" className="text-sm" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <Input value={googleMapsUrl} onChange={e => setGoogleMapsUrl(e.target.value)}
+                        placeholder="Link do wizytówki Google Maps" className="text-sm" />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                      <Input value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
+                        placeholder="Strona www, Booksy lub inny cennik" className="text-sm" />
+                    </div>
+                  </div>
                 </div>
 
                 <Button onClick={handleSaveSalon} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
