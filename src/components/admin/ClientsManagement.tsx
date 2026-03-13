@@ -572,15 +572,11 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   if (!isDemo && clients.length === 0) {
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleClientDialogOpenChange}>
-        <div className="space-y-6">
-          <SectionGuide sectionKey="clients" />
-          <div className="text-center py-16">
-            <Users className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-            <h3 className="text-xl font-serif font-semibold mb-2">Brak klientów</h3>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Dodaj pierwszego klienta ręcznie lub poczekaj — profil zostanie utworzony automatycznie przy pierwszej rezerwacji online.
-            </p>
-            <div className="flex justify-center gap-3">
+      <div className="space-y-6">
+          {/* Always-visible action bar */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-2xl font-serif font-bold">{t('clients.title')}</h2>
+            <div className="flex gap-2">
               <DialogTrigger asChild>
                 <Button type="button" onClick={openNewClient} className="gap-2">
                   <Plus className="w-4 h-4" />
@@ -589,8 +585,27 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               </DialogTrigger>
               <Button variant="outline" onClick={() => setIsCSVImportOpen(true)} className="gap-2">
                 <Upload className="w-4 h-4" />
-                Import CSV
+                Importuj plik
               </Button>
+            </div>
+          </div>
+
+          <SectionGuide sectionKey="clients" />
+
+          {/* Empty state with dropzone */}
+          <div className="text-center py-8">
+            <Users className="w-12 h-12 mx-auto text-muted-foreground/30 mb-3" />
+            <h3 className="text-lg font-serif font-semibold mb-1">Brak klientów</h3>
+            <p className="text-muted-foreground text-sm mb-6 max-w-sm mx-auto">
+              Dodaj pierwszego klienta ręcznie lub zaimportuj listę z pliku CSV / Excel.
+            </p>
+            <div
+              onClick={() => setIsCSVImportOpen(true)}
+              className="border-2 border-dashed border-muted-foreground/25 rounded-xl p-8 max-w-md mx-auto cursor-pointer hover:border-primary/50 hover:bg-muted/20 transition-colors"
+            >
+              <Upload className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" />
+              <p className="text-sm font-medium">Kliknij, aby zaimportować plik</p>
+              <p className="text-xs text-muted-foreground mt-1">CSV, XLSX lub XLS</p>
             </div>
           </div>
         </div>
@@ -630,7 +645,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             </DialogTrigger>
             <Button variant="outline" onClick={() => setIsCSVImportOpen(true)} className="gap-2">
               <Upload className="w-4 h-4" />
-              Import CSV
+              Importuj plik
             </Button>
           </div>
         </div>
