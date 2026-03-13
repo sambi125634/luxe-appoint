@@ -195,8 +195,9 @@ export default function OnboardingPage() {
   // Step 1 — Salon info
   const [salonName, setSalonName] = useState("");
   const [salonCity, setSalonCity] = useState("");
-  const [salonType, setSalonType] = useState("multi");
+  const [salonType, setSalonType] = useState("");
   const [teamSize, setTeamSize] = useState("1");
+  const [clientSources, setClientSources] = useState<string[]>([]);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [googleMapsUrl, setGoogleMapsUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
@@ -263,6 +264,7 @@ export default function OnboardingPage() {
 
   const handleSaveSalon = async () => {
     if (!salonName.trim()) { toast.error("Podaj nazwę salonu"); return; }
+    if (!salonType) { toast.error("Wybierz typ salonu"); return; }
     if (!userId) return;
     setSaving(true);
 
@@ -271,6 +273,7 @@ export default function OnboardingPage() {
         name: salonName.trim(), city: salonCity.trim() || null,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
         social_url: instagramUrl.trim() || websiteUrl.trim() || null, onboarding_step: 1,
+        client_sources: clientSources,
       }).eq("id", createdSalonId);
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
     } else {
@@ -280,6 +283,7 @@ export default function OnboardingPage() {
         owner_id: userId, onboarding_step: 1, onboarding_completed: false,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
         social_url: instagramUrl.trim() || websiteUrl.trim() || null,
+        client_sources: clientSources,
       }).select("id, slug").single();
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
       setCreatedSalonId(salon.id);
@@ -324,7 +328,7 @@ export default function OnboardingPage() {
   const saveDefaultServices = async (salonIdOverride?: string) => {
     const salonId = salonIdOverride ?? createdSalonId;
     if (!salonId) return;
-    const template = SERVICE_TEMPLATES[salonType] ?? SERVICE_TEMPLATES.multi;
+    const template = SERVICE_TEMPLATES[salonType || "multi"] ?? SERVICE_TEMPLATES.multi;
     const allServiceIds: string[] = [];
     for (let i = 0; i < template.length; i++) {
       const cat = template[i];
@@ -633,13 +637,33 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
+                {/* Skąd przyszły Twoje klientki? */}
+                <div className="space-y-2">
+                  <Label>Skąd teraz bierzesz nowe klientki?</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { key: "booksy", label: "Booksy / Fresha / Versum", emoji: "🔵" },
+                      { key: "instagram", label: "Instagram / Social media", emoji: "📱" },
+                      { key: "referrals", label: "Polecenia", emoji: "👯" },
+                      { key: "google", label: "Google / Strona www", emoji: "🌐" },
+                      { key: "phone", label: "Telefon / Stali klienci", emoji: "📞" },
+                    ].map(s => (
+                      <Button key={s.key} variant={clientSources.includes(s.key) ? "default" : "outline"} size="sm"
+                        onClick={() => setClientSources(prev => prev.includes(s.key) ? prev.filter(x => x !== s.key) : [...prev, s.key])}
+                        className={cn("text-xs h-auto py-2 justify-start", clientSources.includes(s.key) && "shadow-lg")}>
+                        <span className="mr-1">{s.emoji}</span>{s.label}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="space-y-3 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#E91E8C]" />
                     <Label className="text-sm font-semibold">AI Scan — uzupełni dane za Ciebie</Label>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Podaj minimum 1 link. Im więcej, tym dokładniejszy profil.
+                    AI przeczyta Twój profil i wstępnie wypełni usługi, ceny i godziny pracy — Ty tylko sprawdzisz czy się zgadzają.
                   </p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
@@ -655,14 +679,14 @@ export default function OnboardingPage() {
                     <div className="flex items-center gap-2">
                       <Link2 className="w-4 h-4 text-muted-foreground shrink-0" />
                       <Input value={websiteUrl} onChange={e => setWebsiteUrl(e.target.value)}
-                        placeholder="Strona www, Booksy lub inny cennik" className="text-sm" />
+                        placeholder="Link do Booksy / Fresha / Versum (AI skopiuje Twoje usługi)" className="text-sm" />
                     </div>
                   </div>
                 </div>
 
-                <Button onClick={handleSaveSalon} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                <Button onClick={handleSaveSalon} disabled={saving || !salonType} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
                   {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ArrowRight className="mr-2 h-4 w-4" />}
-                  {(instagramUrl.trim() || googleMapsUrl.trim() || websiteUrl.trim()) ? "Dalej — AI przeskanuje profil" : "Dalej"}
+                  {(instagramUrl.trim() || googleMapsUrl.trim() || websiteUrl.trim()) ? "Skanuj mój profil AI →" : `Dalej — krok 2 z ${STEPS.length} →`}
                 </Button>
               </CardContent>
             </Card>

@@ -1747,6 +1747,7 @@ export type Database = {
         Row: {
           address: string | null
           city: string | null
+          client_sources: Json | null
           created_at: string
           description: string | null
           email: string | null
@@ -1770,6 +1771,7 @@ export type Database = {
         Insert: {
           address?: string | null
           city?: string | null
+          client_sources?: Json | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -1793,6 +1795,7 @@ export type Database = {
         Update: {
           address?: string | null
           city?: string | null
+          client_sources?: Json | null
           created_at?: string
           description?: string | null
           email?: string | null
