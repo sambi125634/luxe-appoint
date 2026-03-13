@@ -98,10 +98,10 @@ serve(async (req) => {
     // Stage 2: AI extraction with real data
     const systemPrompt = hasScrapedData
       ? `Jesteś asystentem AI specjalizującym się w ekstrakcji danych salonów beauty w Polsce.
-Otrzymasz PRAWDZIWĄ treść stron internetowych salonu. Twoim zadaniem jest WYODRĘBNIĆ wszystkie dane, NIE generować wymyślonych.
+Otrzymasz PRAWDZIWĄ treść stron internetowych salonu. Twoim zadaniem jest WYODRĘBNIĆ dane, NIE generować wymyślonych.
 
 ZASADY:
-- Wyodrębnij KAŻDĄ usługę wymienioną na stronie — nie pomijaj żadnej
+- Wyodrębnij MAKSYMALNIE 80 najważniejszych usług (jeśli jest ich więcej, wybierz najczęściej oferowane)
 - Zachowaj DOKŁADNE nazwy usług jak na stronie
 - Zachowaj DOKŁADNE ceny jak na stronie (w PLN)
 - Jeśli czas trwania nie jest podany, oszacuj go na podstawie typu usługi
@@ -116,11 +116,11 @@ Wygeneruj co najmniej 15-25 usług typowych dla tego typu salonu z realistycznym
 Odpowiedz używając tool call "extract_salon_data".`;
 
     const userPrompt = hasScrapedData
-      ? `Wyodrębnij WSZYSTKIE usługi i dane z poniższej treści strony salonu beauty.
-Pamiętaj: chcę KAŻDĄ usługę, nawet jeśli jest ich 100+. Nie pomijaj żadnej.
+      ? `Wyodrębnij usługi i dane z poniższej treści strony salonu beauty.
+Maksymalnie 80 najważniejszych usług. Grupuj je w logiczne kategorie.
 
 TREŚĆ STRON:
-${scrapedContent.slice(0, 60000)}`
+${scrapedContent.slice(0, 30000)}`
       : `Wygeneruj dane dla salonu beauty typu "${salonTypeHint}" na podstawie tych URL: ${urlList.join(", ")}
 Wygeneruj co najmniej 20 usług z cenami typowymi dla polskiego rynku.`;
 
@@ -133,7 +133,7 @@ Wygeneruj co najmniej 20 usług z cenami typowymi dla polskiego rynku.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },

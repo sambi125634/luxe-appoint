@@ -32,7 +32,12 @@ const SALON_TYPES = [
   { key: "nails", label: "Paznokcie", emoji: "💅" },
   { key: "hair", label: "Fryzjerstwo", emoji: "💇‍♀️" },
   { key: "cosmetology", label: "Kosmetologia", emoji: "🧴" },
+  { key: "brows_lashes", label: "Brwi i rzęsy", emoji: "🪷" },
   { key: "makeup", label: "Makijaż", emoji: "💄" },
+  { key: "aesthetic_med", label: "Medycyna estetyczna", emoji: "💉" },
+  { key: "spa_massage", label: "Masaż / SPA", emoji: "🧖‍♀️" },
+  { key: "barber", label: "Barber", emoji: "🧔" },
+  { key: "physiotherapy", label: "Fizjoterapia", emoji: "🦴" },
   { key: "multi", label: "Multi / Inne", emoji: "✨" },
 ];
 
@@ -94,6 +99,71 @@ const SERVICE_TEMPLATES: Record<string, { category: string; services: { name: st
       { name: "Makijaż dzienny", duration: 45, price: 150 },
       { name: "Makijaż wieczorowy", duration: 60, price: 200 },
       { name: "Makijaż ślubny", duration: 90, price: 400 },
+    ]},
+  ],
+  brows_lashes: [
+    { category: "Brwi", services: [
+      { name: "Regulacja brwi", duration: 20, price: 40 },
+      { name: "Henna brwi", duration: 30, price: 60 },
+      { name: "Laminacja brwi", duration: 45, price: 150 },
+      { name: "Microblading", duration: 120, price: 800 },
+    ]},
+    { category: "Rzęsy", services: [
+      { name: "Przedłużanie rzęs 1:1", duration: 120, price: 200 },
+      { name: "Przedłużanie rzęs objętościowe", duration: 150, price: 280 },
+      { name: "Uzupełnienie rzęs", duration: 60, price: 120 },
+      { name: "Laminacja rzęs", duration: 60, price: 150 },
+    ]},
+  ],
+  aesthetic_med: [
+    { category: "Iniekcje", services: [
+      { name: "Botox — czoło", duration: 30, price: 600 },
+      { name: "Kwas hialuronowy — usta", duration: 45, price: 800 },
+      { name: "Mezoterapia igłowa twarz", duration: 45, price: 500 },
+      { name: "Lipoliza iniekcyjna", duration: 30, price: 400 },
+    ]},
+    { category: "Zabiegi aparaturowe", services: [
+      { name: "Laser frakcyjny CO2", duration: 60, price: 600 },
+      { name: "HIFU — lifting", duration: 90, price: 1200 },
+      { name: "Endermologia", duration: 45, price: 200 },
+    ]},
+  ],
+  spa_massage: [
+    { category: "Masaż", services: [
+      { name: "Masaż klasyczny — 60 min", duration: 60, price: 180 },
+      { name: "Masaż relaksacyjny", duration: 60, price: 200 },
+      { name: "Masaż gorącymi kamieniami", duration: 75, price: 250 },
+      { name: "Masaż sportowy", duration: 45, price: 160 },
+    ]},
+    { category: "SPA & Rytuały", services: [
+      { name: "Rytuał SPA dla dwojga", duration: 120, price: 500 },
+      { name: "Peeling całego ciała", duration: 45, price: 150 },
+      { name: "Sauna + masaż", duration: 90, price: 300 },
+    ]},
+  ],
+  barber: [
+    { category: "Strzyżenie", services: [
+      { name: "Strzyżenie męskie klasyczne", duration: 30, price: 60 },
+      { name: "Strzyżenie + broda", duration: 45, price: 90 },
+      { name: "Fade / Skin fade", duration: 40, price: 70 },
+    ]},
+    { category: "Broda", services: [
+      { name: "Strzyżenie brody", duration: 20, price: 40 },
+      { name: "Golenie brzytwą", duration: 30, price: 50 },
+      { name: "Modelowanie brody", duration: 25, price: 45 },
+    ]},
+  ],
+  physiotherapy: [
+    { category: "Fizjoterapia", services: [
+      { name: "Konsultacja fizjoterapeutyczna", duration: 60, price: 200 },
+      { name: "Terapia manualna", duration: 50, price: 180 },
+      { name: "Masaż leczniczy", duration: 45, price: 160 },
+      { name: "Kinesiotaping", duration: 20, price: 60 },
+    ]},
+    { category: "Rehabilitacja", services: [
+      { name: "Ćwiczenia indywidualne", duration: 45, price: 150 },
+      { name: "Elektroterapia", duration: 20, price: 60 },
+      { name: "Laseroterapia", duration: 15, price: 50 },
     ]},
   ],
   multi: [
@@ -404,22 +474,37 @@ export default function OnboardingPage() {
     setSaving(true);
 
     // Group services by category
+    // Group services by category
     const grouped: Record<string, ScannedService[]> = {};
     scanResult.services.forEach(s => {
       if (!grouped[s.category]) grouped[s.category] = [];
       grouped[s.category].push(s);
     });
 
+    // Batch insert: create all categories first, then all services at once
+    const categoryEntries = Object.keys(grouped);
+    const categoryInserts = categoryEntries.map((name, idx) => ({
+      salon_id: createdSalonId, name, sort_order: idx,
+    }));
+    const { data: createdCategories } = await supabase.from("service_categories")
+      .insert(categoryInserts).select("id, name");
+
+    if (!createdCategories) { toast.error("Błąd tworzenia kategorii"); setSaving(false); return; }
+
+    const categoryMap = new Map(createdCategories.map(c => [c.name, c.id]));
+    const allServicesInsert = scanResult.services
+      .filter(s => categoryMap.has(s.category))
+      .map(s => ({
+        salon_id: createdSalonId!, category_id: categoryMap.get(s.category)!,
+        name: s.name, duration: s.duration, price: s.price,
+      }));
+
     const allServiceIds: string[] = [];
-    let i = 0;
-    for (const [catName, services] of Object.entries(grouped)) {
-      const { data: cat } = await supabase.from("service_categories")
-        .insert({ salon_id: createdSalonId, name: catName, sort_order: i++ }).select("id").single();
-      if (!cat) continue;
-      const { data: insertedServices } = await supabase.from("services").insert(
-        services.map(s => ({ salon_id: createdSalonId!, category_id: cat.id, name: s.name, duration: s.duration, price: s.price }))
-      ).select("id");
-      if (insertedServices) allServiceIds.push(...insertedServices.map(s => s.id));
+    // Insert in chunks of 50 to avoid payload limits
+    for (let i = 0; i < allServicesInsert.length; i += 50) {
+      const chunk = allServicesInsert.slice(i, i + 50);
+      const { data: inserted } = await supabase.from("services").insert(chunk).select("id");
+      if (inserted) allServiceIds.push(...inserted.map(s => s.id));
     }
 
     // Auto-assign all services to owner staff
