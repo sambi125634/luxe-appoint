@@ -59,9 +59,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             {/* Headline */}
             <div className="space-y-4 animate-fade-in" style={{ animationDelay: '0.2s' }}>
               <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-                Twój salon zasługuje na kalendarz,{" "}
+                Twój system rezerwacji pracuje za Ciebie 24/7.{" "}
                 <span className="text-gradient-luxury">
-                  który myśli jak właściciel
+                  I nie bierze prowizji od Twoich klientek.
                 </span>
               </h1>
             </div>
@@ -71,8 +71,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto lg:mx-0 animate-fade-in"
               style={{ animationDelay: '0.3s' }}
             >
-              Pierwszy system rezerwacji z wbudowaną sztuczną inteligencją. 
-              Przewiduje przychody, eliminuje no-showy i wypełnia luki w grafiku — automatycznie.
+              Pierwszy system z AI, który przewiduje przychody, eliminuje no-showy 
+              i wypełnia luki w grafiku — automatycznie. Za 0% prowizji.
             </p>
 
             {/* CTAs */}
