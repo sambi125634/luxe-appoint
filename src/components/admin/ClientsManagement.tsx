@@ -232,10 +232,10 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     return clients.filter(client => {
       const query = searchQuery.toLowerCase();
       const matchesSearch = 
-        client.firstName.toLowerCase().includes(query) ||
-        client.lastName.toLowerCase().includes(query) ||
-        client.phone.includes(query) ||
-        client.email.toLowerCase().includes(query);
+        (client.firstName || '').toLowerCase().includes(query) ||
+        (client.lastName || '').toLowerCase().includes(query) ||
+        (client.phone || '').includes(query) ||
+        (client.email || '').toLowerCase().includes(query);
       if (!matchesSearch) return false;
       if (filters.tags.length > 0) {
         const hasMatchingTag = filters.tags.some(tag => client.tags.includes(tag));
