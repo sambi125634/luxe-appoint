@@ -10,6 +10,7 @@ import { useSalonId } from "@/hooks/useSalonId";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DayColumnView } from "./calendar/DayColumnView";
+import { MonthGridView } from "./calendar/MonthGridView";
 import type { AppointmentBlockData } from "./calendar/AppointmentBlock";
 
 interface Appointment {
