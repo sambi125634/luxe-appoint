@@ -119,14 +119,15 @@ export function AppointmentModal({
         email: c.email || "",
       }));
 
+  const dbServicesMapped: Service[] = (dbServices || []).map((s) => ({
+    id: s.id,
+    name: s.name,
+    duration: s.duration,
+    price: Number(s.price),
+  }));
   const services: Service[] = isDemo
     ? mockServices
-    : (dbServices || []).map((s) => ({
-        id: s.id,
-        name: s.name,
-        duration: s.duration,
-        price: Number(s.price),
-      }));
+    : dbServicesMapped.length > 0 ? dbServicesMapped : mockServices;
 
   const staffMembers: Staff[] = isDemo
     ? mockStaff
