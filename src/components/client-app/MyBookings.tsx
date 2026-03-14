@@ -307,7 +307,6 @@ export function MyBookings() {
                   return <BookingCard booking={b} isUpcoming={isUpcoming} />;
                 }}
               />
-              />
             </TabsContent>
           </Tabs>
         )}
