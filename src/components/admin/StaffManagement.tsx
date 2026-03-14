@@ -37,6 +37,12 @@ interface StaffMember {
   bio?: string | null;
   specializations?: string[];
   started_at?: string | null;
+  contract_type?: string | null;
+  commission_rate?: number | null;
+  certifications?: string[];
+  visible_in_widget?: boolean;
+  break_start?: string | null;
+  break_duration?: number | null;
 }
 
 interface WorkingHours {
