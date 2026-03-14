@@ -78,8 +78,8 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
 
   const filteredClients = clients.filter(
     (client) =>
-      client.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
-      client.phone.includes(clientSearch)
+      (client.name || "").toLowerCase().includes(clientSearch.toLowerCase()) ||
+      (client.phone || "").includes(clientSearch)
   );
 
   const cartTotal = cart.reduce(
