@@ -58,6 +58,7 @@ interface AppointmentModalProps {
   selectedDate?: Date;
   selectedTime?: string;
   isDemo?: boolean;
+  preselectedClient?: { id: string; name: string; phone: string; email: string };
 }
 
 const mockClients: Client[] = [
@@ -97,7 +98,8 @@ export function AppointmentModal({
   appointment,
   selectedDate,
   selectedTime,
-  isDemo = false
+  isDemo = false,
+  preselectedClient
 }: AppointmentModalProps) {
   const { t } = useTranslation();
 
@@ -165,6 +167,19 @@ export function AppointmentModal({
         notes: appointment.notes,
       });
       setClientSearch(appointment.clientName);
+    } else if (preselectedClient) {
+      setForm({
+        clientId: preselectedClient.id,
+        clientName: preselectedClient.name,
+        clientPhone: preselectedClient.phone,
+        clientEmail: preselectedClient.email,
+        serviceId: "",
+        staffId: "",
+        date: selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        time: selectedTime || "09:00",
+        notes: "",
+      });
+      setClientSearch(preselectedClient.name);
     } else {
       setForm({
         clientId: "",

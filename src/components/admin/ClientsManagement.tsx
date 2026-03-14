@@ -19,6 +19,7 @@ import { ClientRiskBadge } from "./ClientRiskBadge";
 import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup, ClientCSVImport } from "./clients";
 import { TagManagementDialog } from "./clients/TagManagementDialog";
 import { SectionGuide } from "./SectionGuide";
+import { AppointmentModal } from "./AppointmentModal";
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
 import { useClientTags, tagsToAvailableFormat } from "@/hooks/useClientTags";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -196,6 +197,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const { data: dbTags } = useClientTags();
   const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
   const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
 
   const availableTags = useMemo(() => {
     if (!dbTags || dbTags.length === 0) {
@@ -555,6 +557,16 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               <Edit2 className="w-4 h-4 mr-2" />
               {t('common.edit')}
             </Button>
+            <Button 
+              onClick={() => {
+                setIsDialogOpen(false);
+                setShowAppointmentModal(true);
+              }}
+              className="gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              Umów wizytę
+            </Button>
           </>
         )}
         {(isEditing || !selectedClient) && (
@@ -765,6 +777,23 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
         />
       )}
       <ClientCSVImport open={isCSVImportOpen} onOpenChange={setIsCSVImportOpen} isDemo={isDemo} />
+      {selectedClient && (
+        <AppointmentModal
+          isOpen={showAppointmentModal}
+          onClose={() => setShowAppointmentModal(false)}
+          onSave={(appointment) => {
+            setShowAppointmentModal(false);
+            toast({ title: "Wizyta umówiona", description: `${appointment.serviceName} — ${appointment.date} o ${appointment.time}` });
+          }}
+          isDemo={isDemo}
+          preselectedClient={{
+            id: selectedClient.id,
+            name: `${selectedClient.firstName} ${selectedClient.lastName}`,
+            phone: selectedClient.phone,
+            email: selectedClient.email,
+          }}
+        />
+      )}
     </Dialog>
   );
 }
