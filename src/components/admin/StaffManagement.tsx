@@ -122,7 +122,7 @@ const DEMO_STAFF: StaffMember[] = [
   },
   {
     id: "4", name: "Anna Kowalczyk", role: "Kosmetolog", email: "anna@salon.pl", phone: "+48 444 555 666",
-    color: "bg-chart-1", serviceIds: ["2", "4", "5"],
+    color: "#f59e0b", serviceIds: ["2", "4", "5"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 1 && h.dayOfWeek <= 5 })),
     avatar_url: demoAnna,
     bio: "Kosmetolog i podolog. Wykonuje zabiegi laserowe i manicure hybrydowy.",
