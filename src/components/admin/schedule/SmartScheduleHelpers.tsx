@@ -86,11 +86,11 @@ const generateMockOccupancy = (staff: StaffItem[]): OccupancyData[] => {
   return data;
 };
 
-const generateSmartSlots = (): SmartSlot[] => {
+const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
   const slots: SmartSlot[] = [];
   const today = new Date();
   
-  mockStaffMembers.forEach(staff => {
+  staff.forEach(member => {
     for (let i = 0; i < 5; i++) {
       const dayOffset = Math.floor(Math.random() * 5);
       const hour = 9 + Math.floor(Math.random() * 9);
