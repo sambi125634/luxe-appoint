@@ -58,6 +58,7 @@ interface AppointmentModalProps {
   selectedDate?: Date;
   selectedTime?: string;
   isDemo?: boolean;
+  salonId?: string;
   preselectedClient?: { id: string; name: string; phone: string; email: string };
 }
 
@@ -99,6 +100,7 @@ export function AppointmentModal({
   selectedDate,
   selectedTime,
   isDemo = false,
+  salonId,
   preselectedClient
 }: AppointmentModalProps) {
   const { t } = useTranslation();
@@ -442,7 +444,7 @@ export function AppointmentModal({
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-3">
-              <ProductSaleSection cart={productCart} onCartChange={setProductCart} />
+              <ProductSaleSection cart={productCart} onCartChange={setProductCart} salonId={salonId || (isDemo ? "demo-salon-id" : undefined)} />
             </CollapsibleContent>
           </Collapsible>
 

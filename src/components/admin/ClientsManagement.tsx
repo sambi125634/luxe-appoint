@@ -786,6 +786,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             toast({ title: "Wizyta umówiona", description: `${appointment.serviceName} — ${appointment.date} o ${appointment.time}` });
           }}
           isDemo={isDemo}
+          salonId={salonId || (isDemo ? "demo-salon-id" : undefined)}
           preselectedClient={{
             id: selectedClient.id,
             name: `${selectedClient.firstName} ${selectedClient.lastName}`,
