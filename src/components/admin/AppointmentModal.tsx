@@ -58,6 +58,7 @@ interface AppointmentModalProps {
   selectedDate?: Date;
   selectedTime?: string;
   isDemo?: boolean;
+  preselectedClient?: { id: string; name: string; phone: string; email: string };
 }
 
 const mockClients: Client[] = [
