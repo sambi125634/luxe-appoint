@@ -17,6 +17,7 @@ interface SupplierFormModalProps {
 
 export function SupplierFormModal({ open, onOpenChange, supplier, onSave }: SupplierFormModalProps) {
   const { t } = useTranslation();
+  const { salonId } = useSalonId();
   const isEditing = !!supplier;
 
   const [formData, setFormData] = useState<Partial<Supplier>>({
