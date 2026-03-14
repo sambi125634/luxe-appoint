@@ -302,10 +302,11 @@ export function MyBookings() {
             <TabsContent value="calendar">
               <BookingsCalendarView
                 bookings={bookings ?? []}
-                renderBookingCard={(b) => {
+                renderBookingCard={(b: any) => {
                   const isUpcoming = !isPast(parseISO(b.start_time)) && b.status !== "cancelled";
                   return <BookingCard booking={b} isUpcoming={isUpcoming} />;
                 }}
+              />
               />
             </TabsContent>
           </Tabs>
