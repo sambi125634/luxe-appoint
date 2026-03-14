@@ -44,6 +44,18 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
   const daysSinceLastVisit = getDaysSinceLastVisit();
   const needsAttention = daysSinceLastVisit && daysSinceLastVisit > 30;
 
+  const avgVisitValue = client.totalVisits > 0 ? Math.round(client.totalSpent / client.totalVisits) : 0;
+
+  const getRetentionStatus = () => {
+    if (!daysSinceLastVisit) return { color: 'bg-red-500', label: 'Utracona', textColor: 'text-red-600' };
+    if (daysSinceLastVisit <= 30) return { color: 'bg-emerald-500', label: 'Aktywna', textColor: 'text-emerald-600' };
+    if (daysSinceLastVisit <= 60) return { color: 'bg-yellow-500', label: 'Uwaga', textColor: 'text-yellow-600' };
+    if (daysSinceLastVisit <= 90) return { color: 'bg-orange-500', label: 'Ryzyko', textColor: 'text-orange-600' };
+    return { color: 'bg-red-500', label: 'Utracona', textColor: 'text-red-600' };
+  };
+
+  const retention = getRetentionStatus();
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString(
       i18n.language === 'pl' ? 'pl-PL' : 'en-US', 
