@@ -170,7 +170,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
 
       {activeView === "templates" && (
         <div className="space-y-6">
-          <ScheduleTemplates onApplyTemplate={handleApplyTemplate} />
+          <ScheduleTemplates onApplyTemplate={handleApplyTemplate} isDemo={isDemo} />
         </div>
       )}
 
