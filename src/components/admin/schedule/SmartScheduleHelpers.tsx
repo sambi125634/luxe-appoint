@@ -73,8 +73,8 @@ const generateMockOccupancy = (staff: StaffItem[]): OccupancyData[] => {
       const totalMinutes = 480; // 8 hours
       const bookedMinutes = Math.floor(Math.random() * 400) + 80;
       data.push({
-        staffId: staff.id,
-        staffName: staff.name,
+        staffId: member.id,
+        staffName: member.name,
         date: format(addDays(today, i), "yyyy-MM-dd"),
         occupancyPercent: Math.round((bookedMinutes / totalMinutes) * 100),
         totalMinutes,
