@@ -264,6 +264,10 @@ export function MyBookings() {
               <TabsTrigger value="past" className="flex-1 rounded-lg data-[state=active]:shadow-sm font-semibold">
                 Historia ({past.length})
               </TabsTrigger>
+              <TabsTrigger value="calendar" className="flex-1 rounded-lg data-[state=active]:shadow-sm font-semibold">
+                <CalendarDays className="h-4 w-4 mr-1" />
+                Miesiąc
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-3">
