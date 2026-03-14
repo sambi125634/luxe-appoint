@@ -35,6 +35,15 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       items: [
         { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
         { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
+        { icon: Users, labelKey: "admin.staff", tab: "staff" },
+        { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
+      ],
+    },
+    {
+      titleKey: "sidebar.offer",
+      items: [
+        { icon: Scissors, labelKey: "admin.services", tab: "services" },
+        { icon: Package, labelKey: "admin.products", tab: "products" },
       ],
     },
     {
@@ -53,20 +62,6 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: Heart, labelKey: "admin.referral", tab: "referral" },
         { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
         { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
-      ],
-    },
-    {
-      titleKey: "sidebar.offer",
-      items: [
-        { icon: Scissors, labelKey: "admin.services", tab: "services" },
-        { icon: Package, labelKey: "admin.products", tab: "products" },
-      ],
-    },
-    {
-      titleKey: "sidebar.team",
-      items: [
-        { icon: Users, labelKey: "admin.staff", tab: "staff" },
-        { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
       ],
     },
     {
