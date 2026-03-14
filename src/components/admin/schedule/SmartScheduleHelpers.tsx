@@ -51,8 +51,8 @@ const generateMockGaps = (staff: StaffItem[]): ScheduleGap[] => {
       const duration = [30, 45, 60, 75, 90][Math.floor(Math.random() * 5)];
       
       gaps.push({
-        staffId: staff.id,
-        staffName: staff.name,
+        staffId: member.id,
+        staffName: member.name,
         date: format(addDays(today, dayOffset), "yyyy-MM-dd"),
         startTime: `${startHour.toString().padStart(2, '0')}:00`,
         endTime: `${Math.floor((startHour * 60 + duration) / 60).toString().padStart(2, '0')}:${((startHour * 60 + duration) % 60).toString().padStart(2, '0')}`,
