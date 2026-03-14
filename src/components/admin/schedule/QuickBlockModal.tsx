@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ScheduleBlock, mockStaffMembers } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface QuickBlockModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface QuickBlockModalProps {
   onSave: (block: Omit<ScheduleBlock, 'id'>) => void;
   selectedDate?: Date;
   selectedStaffId?: string;
+  isDemo?: boolean;
 }
 
 const blockTypes = [
@@ -33,8 +35,13 @@ export function QuickBlockModal({
   onClose, 
   onSave, 
   selectedDate,
-  selectedStaffId 
+  selectedStaffId,
+  isDemo = false
 }: QuickBlockModalProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffList = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [form, setForm] = useState({
     staffId: selectedStaffId || "",
     date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
@@ -122,7 +129,7 @@ export function QuickBlockModal({
                 <SelectValue placeholder="Wybierz pracownika" />
               </SelectTrigger>
               <SelectContent>
-                {mockStaffMembers.map(staff => (
+                {staffList.map(staff => (
                   <SelectItem key={staff.id} value={staff.id}>
                     <div className="flex items-center gap-2">
                       <div 

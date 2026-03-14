@@ -10,12 +10,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { mockStaffMembers } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+
+interface StaffItem {
+  id: string;
+  name: string;
+  color: string;
+  role: string | null;
+}
 
 interface WeekDuplicationProps {
+  isDemo?: boolean;
   onDuplicate?: (staffIds: string[], sourceWeek: Date, targetWeeksCount: number, includeExceptions: boolean) => void;
 }
 
-export function WeekDuplication({ onDuplicate }: WeekDuplicationProps) {
+export function WeekDuplication({ onDuplicate, isDemo = false }: WeekDuplicationProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffMembers: StaffItem[] = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
@@ -46,10 +59,10 @@ export function WeekDuplication({ onDuplicate }: WeekDuplicationProps) {
   };
 
   const selectAllStaff = () => {
-    if (selectedStaff.length === mockStaffMembers.length) {
+    if (selectedStaff.length === staffMembers.length) {
       setSelectedStaff([]);
     } else {
-      setSelectedStaff(mockStaffMembers.map(s => s.id));
+      setSelectedStaff(staffMembers.map(s => s.id));
     }
   };
 
@@ -144,11 +157,11 @@ export function WeekDuplication({ onDuplicate }: WeekDuplicationProps) {
                   <div className="flex items-center justify-between">
                     <Label>Wybierz pracowników</Label>
                     <Button variant="ghost" size="sm" onClick={selectAllStaff}>
-                      {selectedStaff.length === mockStaffMembers.length ? "Odznacz wszystkich" : "Zaznacz wszystkich"}
+                     {selectedStaff.length === staffMembers.length ? "Odznacz wszystkich" : "Zaznacz wszystkich"}
                     </Button>
                   </div>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {mockStaffMembers.map(staff => (
+                    {staffMembers.map(staff => (
                       <label
                         key={staff.id}
                         className={cn(

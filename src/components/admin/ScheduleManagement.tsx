@@ -157,26 +157,26 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
       {activeView === "calendar" && (
         <div className="space-y-6">
           <WeeklyCalendar isDemo={isDemo} />
-          <WeekDuplication onDuplicate={handleWeekDuplicate} />
+          <WeekDuplication onDuplicate={handleWeekDuplicate} isDemo={isDemo} />
         </div>
       )}
 
       {activeView === "grid" && (
         <div className="space-y-6">
           <ScheduleGridView isDemo={isDemo} />
-          <WeekDuplication onDuplicate={handleWeekDuplicate} />
+          <WeekDuplication onDuplicate={handleWeekDuplicate} isDemo={isDemo} />
         </div>
       )}
 
       {activeView === "templates" && (
         <div className="space-y-6">
-          <ScheduleTemplates onApplyTemplate={handleApplyTemplate} />
+          <ScheduleTemplates onApplyTemplate={handleApplyTemplate} isDemo={isDemo} />
         </div>
       )}
 
       {activeView === "smart" && (
         <div className="space-y-6">
-          <SmartScheduleHelpers />
+          <SmartScheduleHelpers isDemo={isDemo} />
         </div>
       )}
 
@@ -185,6 +185,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
         isOpen={isQuickBlockOpen}
         onClose={() => setIsQuickBlockOpen(false)}
         onSave={handleSaveBlock}
+        isDemo={isDemo}
       />
 
       {/* New Appointment Modal (header button) */}

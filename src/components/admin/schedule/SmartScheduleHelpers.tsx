@@ -28,13 +28,21 @@ import {
   OccupancyData, 
   mockStaffMembers 
 } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+
+interface StaffItem {
+  id: string;
+  name: string;
+  color: string;
+  role: string | null;
+}
 
 // Mock data generators
-const generateMockGaps = (): ScheduleGap[] => {
+const generateMockGaps = (staff: StaffItem[]): ScheduleGap[] => {
   const gaps: ScheduleGap[] = [];
   const today = new Date();
   
-  mockStaffMembers.forEach(staff => {
+  staff.forEach(member => {
     // Generate 2-4 gaps per staff member for the week
     const gapCount = Math.floor(Math.random() * 3) + 2;
     for (let i = 0; i < gapCount; i++) {
@@ -43,8 +51,8 @@ const generateMockGaps = (): ScheduleGap[] => {
       const duration = [30, 45, 60, 75, 90][Math.floor(Math.random() * 5)];
       
       gaps.push({
-        staffId: staff.id,
-        staffName: staff.name,
+        staffId: member.id,
+        staffName: member.name,
         date: format(addDays(today, dayOffset), "yyyy-MM-dd"),
         startTime: `${startHour.toString().padStart(2, '0')}:00`,
         endTime: `${Math.floor((startHour * 60 + duration) / 60).toString().padStart(2, '0')}:${((startHour * 60 + duration) % 60).toString().padStart(2, '0')}`,
@@ -56,17 +64,17 @@ const generateMockGaps = (): ScheduleGap[] => {
   return gaps.sort((a, b) => b.durationMinutes - a.durationMinutes);
 };
 
-const generateMockOccupancy = (): OccupancyData[] => {
+const generateMockOccupancy = (staff: StaffItem[]): OccupancyData[] => {
   const data: OccupancyData[] = [];
   const today = new Date();
   
-  mockStaffMembers.forEach(staff => {
+  staff.forEach(member => {
     for (let i = 0; i < 7; i++) {
       const totalMinutes = 480; // 8 hours
       const bookedMinutes = Math.floor(Math.random() * 400) + 80;
       data.push({
-        staffId: staff.id,
-        staffName: staff.name,
+        staffId: member.id,
+        staffName: member.name,
         date: format(addDays(today, i), "yyyy-MM-dd"),
         occupancyPercent: Math.round((bookedMinutes / totalMinutes) * 100),
         totalMinutes,
@@ -78,11 +86,11 @@ const generateMockOccupancy = (): OccupancyData[] => {
   return data;
 };
 
-const generateSmartSlots = (): SmartSlot[] => {
+const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
   const slots: SmartSlot[] = [];
   const today = new Date();
   
-  mockStaffMembers.forEach(staff => {
+  staff.forEach(member => {
     for (let i = 0; i < 5; i++) {
       const dayOffset = Math.floor(Math.random() * 5);
       const hour = 9 + Math.floor(Math.random() * 9);
@@ -91,8 +99,8 @@ const generateSmartSlots = (): SmartSlot[] => {
       slots.push({
         date: format(addDays(today, dayOffset), "yyyy-MM-dd"),
         time: `${hour.toString().padStart(2, '0')}:${Math.random() > 0.5 ? '00' : '30'}`,
-        staffId: staff.id,
-        staffName: staff.name,
+        staffId: member.id,
+        staffName: member.name,
         isRecommended,
         fillsGap: isRecommended && Math.random() > 0.3,
         occupancyBefore: Math.floor(Math.random() * 40) + 30,
@@ -105,11 +113,16 @@ const generateSmartSlots = (): SmartSlot[] => {
 };
 
 interface SmartScheduleHelpersProps {
+  isDemo?: boolean;
   onSlotSelect?: (slot: SmartSlot) => void;
   onGapSelect?: (gap: ScheduleGap) => void;
 }
 
-export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartScheduleHelpersProps) {
+export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false }: SmartScheduleHelpersProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffMembers: StaffItem[] = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [activeTab, setActiveTab] = useState("gaps");
   const [minGapDuration, setMinGapDuration] = useState(30);
   const [selectedStaffFilter, setSelectedStaffFilter] = useState<string>("all");
@@ -117,10 +130,10 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartSchedul
   const [nextAvailableStaff, setNextAvailableStaff] = useState("");
   const [nextAvailablePreference, setNextAvailablePreference] = useState("");
 
-  // Mock data
-  const gaps = useMemo(() => generateMockGaps(), []);
-  const occupancy = useMemo(() => generateMockOccupancy(), []);
-  const smartSlots = useMemo(() => generateSmartSlots(), []);
+  // Mock data (uses staffMembers for generation)
+  const gaps = useMemo(() => generateMockGaps(staffMembers), [staffMembers]);
+  const occupancy = useMemo(() => generateMockOccupancy(staffMembers), [staffMembers]);
+  const smartSlots = useMemo(() => generateSmartSlots(staffMembers), [staffMembers]);
 
   const filteredGaps = gaps.filter(gap => {
     if (gap.durationMinutes < minGapDuration) return false;
@@ -131,7 +144,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartSchedul
   const lowOccupancyDays = occupancy.filter(o => o.occupancyPercent < 30);
   
   const getStaffColor = (staffId: string) => {
-    return mockStaffMembers.find(s => s.id === staffId)?.color || "hsl(var(--primary))";
+    return staffMembers.find(s => s.id === staffId)?.color || "hsl(var(--primary))";
   };
 
   return (
@@ -206,7 +219,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartSchedul
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Wszyscy</SelectItem>
-                    {mockStaffMembers.map(s => (
+                    {staffMembers.map(s => (
                       <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                     ))}
                   </SelectContent>
@@ -265,7 +278,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartSchedul
           {/* Occupancy Tab */}
           <TabsContent value="occupancy" className="mt-4 space-y-4">
             <div className="grid gap-3">
-              {mockStaffMembers.map(staff => {
+              {staffMembers.map(staff => {
                 const staffOccupancy = occupancy.filter(o => o.staffId === staff.id);
                 const avgOccupancy = Math.round(
                   staffOccupancy.reduce((sum, o) => sum + o.occupancyPercent, 0) / staffOccupancy.length
@@ -402,7 +415,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartSchedul
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Dowolny</SelectItem>
-                    {mockStaffMembers.map(s => (
+                    {staffMembers.map(s => (
                       <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                     ))}
                   </SelectContent>
