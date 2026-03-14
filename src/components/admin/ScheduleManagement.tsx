@@ -164,7 +164,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
       {activeView === "grid" && (
         <div className="space-y-6">
           <ScheduleGridView isDemo={isDemo} />
-          <WeekDuplication onDuplicate={handleWeekDuplicate} />
+          <WeekDuplication onDuplicate={handleWeekDuplicate} isDemo={isDemo} />
         </div>
       )}
 
