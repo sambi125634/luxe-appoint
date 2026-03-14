@@ -151,7 +151,7 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
                   </Badge>
                 ) : null;
               })}
-              {client.tags.length > 2 && (
+              {(client.tags || []).length > 2 && (
                 <Badge variant="secondary" className="text-xs">
                   +{client.tags.length - 2}
                 </Badge>
