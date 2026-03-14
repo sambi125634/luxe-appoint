@@ -2,7 +2,8 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isPast, parseISO, differenceInHours, differenceInDays } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle } from "lucide-react";
+import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays } from "lucide-react";
+import { BookingsCalendarView } from "./BookingsCalendarView";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -263,6 +264,10 @@ export function MyBookings() {
               <TabsTrigger value="past" className="flex-1 rounded-lg data-[state=active]:shadow-sm font-semibold">
                 Historia ({past.length})
               </TabsTrigger>
+              <TabsTrigger value="calendar" className="flex-1 rounded-lg data-[state=active]:shadow-sm font-semibold">
+                <CalendarDays className="h-4 w-4 mr-1" />
+                Miesiąc
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-3">
@@ -292,6 +297,16 @@ export function MyBookings() {
               ) : (
                 past.map((b) => <BookingCard key={b.id} booking={b} />)
               )}
+            </TabsContent>
+
+            <TabsContent value="calendar">
+              <BookingsCalendarView
+                bookings={bookings ?? []}
+                renderBookingCard={(b: any) => {
+                  const isUpcoming = !isPast(parseISO(b.start_time)) && b.status !== "cancelled";
+                  return <BookingCard booking={b} isUpcoming={isUpcoming} />;
+                }}
+              />
             </TabsContent>
           </Tabs>
         )}
