@@ -278,7 +278,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
           {/* Occupancy Tab */}
           <TabsContent value="occupancy" className="mt-4 space-y-4">
             <div className="grid gap-3">
-              {mockStaffMembers.map(staff => {
+              {staffMembers.map(staff => {
                 const staffOccupancy = occupancy.filter(o => o.staffId === staff.id);
                 const avgOccupancy = Math.round(
                   staffOccupancy.reduce((sum, o) => sum + o.occupancyPercent, 0) / staffOccupancy.length
