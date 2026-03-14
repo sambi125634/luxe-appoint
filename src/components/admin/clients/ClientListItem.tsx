@@ -65,11 +65,11 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
             {/* Avatar */}
             <div className={cn(
               "w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
-              client.tags.includes("vip") 
+              (client.tags || []).includes("vip") 
                 ? "bg-gradient-to-r from-amber-400 to-amber-600 text-white"
                 : "bg-muted text-muted-foreground"
             )}>
-              {client.firstName[0]}{client.lastName[0]}
+              {(client.firstName || '')[0]}{(client.lastName || '')[0]}
             </div>
 
             {/* Main info */}
