@@ -579,6 +579,21 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         </>
       )}
 
+      {/* ========= MONTH VIEW ========= */}
+      {calendarView === "month" && (
+        <MonthGridView
+          date={currentDate}
+          staff={staff}
+          appointments={monthAppointments}
+          onDayClick={(day) => {
+            setCurrentDate(day);
+            setCalendarView("day");
+          }}
+          onAppointmentClick={handleAppointmentClick}
+          locale={locale}
+        />
+      )}
+
       <AppointmentModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
