@@ -19,6 +19,7 @@ interface ProductFormModalProps {
 
 export function ProductFormModal({ open, onOpenChange, product, onSave }: ProductFormModalProps) {
   const { t } = useTranslation();
+  const { salonId } = useSalonId();
   const isEditing = !!product;
 
   const [formData, setFormData] = useState<Partial<Product>>({
