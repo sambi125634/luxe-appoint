@@ -775,6 +775,21 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                   )}
                 </div>
               ))}
+
+              <div className="border-t border-border pt-3 mt-3">
+                <Label className="flex items-center gap-1 mb-2"><Coffee className="w-3.5 h-3.5" /> Przerwa obiadowa</Label>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Godzina</Label>
+                    <Input type="time" value={form.break_start} onChange={(e) => setForm(prev => ({ ...prev, break_start: e.target.value }))} className="w-28" />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Czas trwania (min)</Label>
+                    <Input type="number" min={0} max={120} step={5} value={form.break_duration} onChange={(e) => setForm(prev => ({ ...prev, break_duration: e.target.value }))} className="w-24" placeholder="30" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Przerwa blokuje slot w kalendarzu automatycznie</p>
+              </div>
             </div>
           )}
 
