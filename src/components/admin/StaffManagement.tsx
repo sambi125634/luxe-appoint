@@ -95,7 +95,7 @@ const CONTRACT_TYPES = [
 const DEMO_STAFF: StaffMember[] = [
   {
     id: "1", name: "Maria Nowakowska", role: "Kosmetolog", email: "maria@salon.pl", phone: "+48 123 456 789",
-    color: "bg-primary", serviceIds: ["1", "2", "4"],
+    color: "#6366f1", serviceIds: ["1", "2", "4"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 1 && h.dayOfWeek <= 5 })),
     avatar_url: demoMaria,
     bio: "Doświadczona kosmetolog z 8-letnim stażem. Specjalizuje się w zabiegach anti-aging i pielęgnacji skóry problemowej.",
