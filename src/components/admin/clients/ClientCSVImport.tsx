@@ -34,11 +34,16 @@ const HEADER_MAP: Record<string, string> = {
 };
 
 const TEMPLATE_CSV = `imie,nazwisko,telefon,email,notatki,tagi,zgoda_rodo,zgoda_marketing
-Anna,Kowalska,+48123456789,anna@email.pl,Preferuje piątki,VIP;Stały,tak,tak
-Katarzyna,Nowak,+48987654321,k.nowak@gmail.com,,Nowy,tak,nie
-Magdalena,Wiśniewska,+48555123456,magda@wp.pl,Wrażliwa skóra,Stały;Wrażliwa skóra,tak,tak
-Ewa,Dąbrowska,+48111222333,ewa.d@email.pl,,,tak,nie
-Zofia,Lewandowska,+48444555666,zofia@gmail.com,Klientka VIP,VIP;Ambasador,tak,tak`;
+Anna,Kowalska,+48 501 234 567,anna.kowalska@gmail.com,Alergia na nikiel — unikać przy manicure,VIP;stała klientka,tak,tak
+Maria,Nowak,+48 602 345 678,maria.nowak@wp.pl,Preferuje wizyty w środy rano,nowa,tak,nie
+Katarzyna,Wiśniewska,+48 503 456 789,,Uczulona na lateks — tylko rękawiczki nitrylowe,VIP;alergia,tak,tak
+Joanna,Lewandowska,+48 604 567 890,j.lewandowska@onet.pl,Klientka od 3 lat. Lubi dużo rozmawiać :),stała klientka,tak,tak
+Magdalena,Wójcik,+48 505 678 901,magda.wojcik@gmail.com,,nowa;polecona,tak,nie
+Agnieszka,Kamińska,+48 606 789 012,,Ciąża — nie stosować UV ani kwasów,w ciąży;uwaga,tak,tak
+Paulina,Zielińska,+48 507 890 123,paulina.z@gmail.com,VIP — zawsze kawa przed wizytą,VIP;stała klientka,tak,tak
+Beata,Szymańska,+48 608 901 234,beata.s@wp.pl,,nowa,tak,nie
+Natalia,Dąbrowska,+48 509 012 345,natalia.d@onet.pl,Wrażliwa skóra — delikatne preparaty,wrażliwa skóra,tak,tak
+Izabela,Mazur,+48 600 123 456,,No-show 2x — wymagać depozytu,no-show;uwaga,tak,nie`;
 
 const ACCEPTED_EXTENSIONS = [".csv", ".xlsx", ".xls"];
 const ACCEPTED_MIME = ".csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv";
