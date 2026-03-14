@@ -557,6 +557,16 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               <Edit2 className="w-4 h-4 mr-2" />
               {t('common.edit')}
             </Button>
+            <Button 
+              onClick={() => {
+                setIsDialogOpen(false);
+                setShowAppointmentModal(true);
+              }}
+              className="gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              Umów wizytę
+            </Button>
           </>
         )}
         {(isEditing || !selectedClient) && (
