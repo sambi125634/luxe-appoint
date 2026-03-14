@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles, Eye, EyeOff, Coffee, Award, FileText, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { SectionGuide } from "./SectionGuide";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
@@ -35,6 +37,12 @@ interface StaffMember {
   bio?: string | null;
   specializations?: string[];
   started_at?: string | null;
+  contract_type?: string | null;
+  commission_rate?: number | null;
+  certifications?: string[];
+  visible_in_widget?: boolean;
+  break_start?: string | null;
+  break_duration?: number | null;
 }
 
 interface WorkingHours {
@@ -62,12 +70,32 @@ const DEMO_SERVICES = [
   { id: "5", name: "Manicure hybrydowy" },
 ];
 
-const colors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1", "bg-chart-2", "bg-chart-3"];
+const STAFF_COLORS = [
+  { value: "#6366f1", label: "Indigo" },
+  { value: "#ec4899", label: "Róż" },
+  { value: "#f59e0b", label: "Amber" },
+  { value: "#10b981", label: "Szmaragd" },
+  { value: "#8b5cf6", label: "Fiolet" },
+  { value: "#ef4444", label: "Czerwień" },
+  { value: "#06b6d4", label: "Cyan" },
+  { value: "#f97316", label: "Pomarańcz" },
+  { value: "#84cc16", label: "Limonka" },
+  { value: "#64748b", label: "Szary" },
+  { value: "#d946ef", label: "Fuksja" },
+  { value: "#14b8a6", label: "Morski" },
+];
+
+const CONTRACT_TYPES = [
+  { value: "employment", label: "Umowa o pracę" },
+  { value: "b2b", label: "B2B" },
+  { value: "mandate", label: "Umowa zlecenie" },
+  { value: "internship", label: "Staż" },
+];
 
 const DEMO_STAFF: StaffMember[] = [
   {
     id: "1", name: "Maria Nowakowska", role: "Kosmetolog", email: "maria@salon.pl", phone: "+48 123 456 789",
-    color: "bg-primary", serviceIds: ["1", "2", "4"],
+    color: "#6366f1", serviceIds: ["1", "2", "4"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 1 && h.dayOfWeek <= 5 })),
     avatar_url: demoMaria,
     bio: "Doświadczona kosmetolog z 8-letnim stażem. Specjalizuje się w zabiegach anti-aging i pielęgnacji skóry problemowej.",
@@ -76,7 +104,7 @@ const DEMO_STAFF: StaffMember[] = [
   },
   {
     id: "2", name: "Karolina Wiśniewska", role: "Stylistka brwi", email: "karolina@salon.pl", phone: "+48 987 654 321",
-    color: "bg-secondary", serviceIds: ["1", "5"],
+    color: "#ec4899", serviceIds: ["1", "5"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 1 && h.dayOfWeek <= 5 })),
     avatar_url: demoKasia,
     bio: "Certyfikowana stylistka brwi i rzęs. Ukończyła kurs PhiBrows i laminacji.",
@@ -85,7 +113,7 @@ const DEMO_STAFF: StaffMember[] = [
   },
   {
     id: "3", name: "Joanna Lewandowska", role: "Masażystka", email: "joanna@salon.pl", phone: "+48 111 222 333",
-    color: "bg-accent", serviceIds: ["3"],
+    color: "#10b981", serviceIds: ["3"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 2 && h.dayOfWeek <= 6 })),
     avatar_url: null,
     bio: "Fizjoterapeutka z dyplomem AWF. Specjalizuje się w masażach leczniczych i relaksacyjnych.",
@@ -94,7 +122,7 @@ const DEMO_STAFF: StaffMember[] = [
   },
   {
     id: "4", name: "Anna Kowalczyk", role: "Kosmetolog", email: "anna@salon.pl", phone: "+48 444 555 666",
-    color: "bg-chart-1", serviceIds: ["2", "4", "5"],
+    color: "#f59e0b", serviceIds: ["2", "4", "5"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 1 && h.dayOfWeek <= 5 })),
     avatar_url: demoAnna,
     bio: "Kosmetolog i podolog. Wykonuje zabiegi laserowe i manicure hybrydowy.",
@@ -190,8 +218,17 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       role: s.role || "Specjalista",
       email: s.email || "",
       phone: s.phone || "",
-      color: s.color || "bg-primary",
+      color: s.color || STAFF_COLORS[0].value,
       avatar_url: s.avatar_url,
+      bio: s.bio,
+      specializations: Array.isArray(s.specializations) ? (s.specializations as string[]) : [],
+      started_at: s.started_at,
+      contract_type: s.contract_type,
+      commission_rate: s.commission_rate,
+      certifications: s.certifications || [],
+      visible_in_widget: s.visible_in_widget ?? true,
+      break_start: s.break_start,
+      break_duration: s.break_duration,
       serviceIds: staffServicesMap?.[s.id] || [],
       workingHours: workingHoursMap?.[s.id]?.length
         ? defaultWorkingHours.map(dh => {
@@ -221,9 +258,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   ];
 
   const [form, setForm] = useState({
-    name: "", role: "", email: "", phone: "", color: colors[0], serviceIds: [] as string[],
+    name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [] as string[],
     workingHours: defaultWorkingHours, bio: "", specializations: [] as string[], started_at: "",
+    contract_type: "", commission_rate: "" as string, certifications: [] as string[], visible_in_widget: true,
+    break_start: "", break_duration: "" as string,
   });
+  const [newCertification, setNewCertification] = useState("");
 
   const openDialog = (member?: StaffMember) => {
     if (member) {
@@ -232,11 +272,14 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         name: member.name, role: member.role, email: member.email, phone: member.phone,
         color: member.color, serviceIds: member.serviceIds, workingHours: member.workingHours,
         bio: member.bio || "", specializations: member.specializations || [], started_at: member.started_at || "",
+        contract_type: member.contract_type || "", commission_rate: member.commission_rate?.toString() || "",
+        certifications: member.certifications || [], visible_in_widget: member.visible_in_widget ?? true,
+        break_start: member.break_start || "", break_duration: member.break_duration?.toString() || "",
       });
       setAvatarPreview(member.avatar_url || null);
     } else {
       setEditingStaff(null);
-      setForm({ name: "", role: "", email: "", phone: "", color: colors[0], serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "" });
+      setForm({ name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "", contract_type: "", commission_rate: "", certifications: [], visible_in_widget: true, break_start: "", break_duration: "" });
       setAvatarPreview(null);
     }
     setAvatarFile(null);
@@ -299,6 +342,9 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         const updateData: Record<string, unknown> = {
           name: form.name, role: form.role, email: form.email || null, phone: form.phone || null, color: form.color,
           bio: form.bio || null, specializations: form.specializations, started_at: form.started_at || null,
+          contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
+          certifications: form.certifications, visible_in_widget: form.visible_in_widget,
+          break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
         };
         if (avatarUrl) updateData.avatar_url = avatarUrl;
         const { error } = await supabase.from("staff_members").update(updateData as never).eq("id", editingStaff.id);
@@ -308,6 +354,9 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           name: form.name, role: form.role, email: form.email || null, phone: form.phone || null,
           color: form.color, salon_id: salonId!,
           bio: form.bio || null, specializations: form.specializations, started_at: form.started_at || null,
+          contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
+          certifications: form.certifications, visible_in_widget: form.visible_in_widget,
+          break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
         };
         const { data, error } = await supabase
           .from("staff_members")
@@ -433,7 +482,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                 <div className="flex items-start gap-4">
                   <Avatar className="w-14 h-14 ring-2 ring-border">
                     {member.avatar_url && <AvatarImage src={member.avatar_url} alt={member.name} className="object-cover" />}
-                    <AvatarFallback className={cn(member.color, "text-primary-foreground font-serif text-lg")}>
+                    <AvatarFallback className="font-serif text-lg" style={{ backgroundColor: member.color, color: 'white' }}>
                       {getInitials(member.name)}
                     </AvatarFallback>
                   </Avatar>
@@ -539,7 +588,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
             <div className="relative group cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
               <Avatar className="w-16 h-16 ring-2 ring-border">
                 {avatarPreview && <AvatarImage src={avatarPreview} alt="Avatar" className="object-cover" />}
-                <AvatarFallback className={cn(form.color, "text-primary-foreground font-serif text-xl")}>
+                <AvatarFallback className="font-serif text-xl" style={{ backgroundColor: form.color, color: 'white' }}>
                   {form.name ? getInitials(form.name) : <Camera className="w-6 h-6" />}
                 </AvatarFallback>
               </Avatar>
@@ -593,10 +642,27 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
               </div>
               <div>
                 <Label>{t('staff.calendarColor')}</Label>
-                <div className="flex gap-2 mt-2">
-                  {colors.map(color => (
-                    <button key={color} type="button" className={cn("w-8 h-8 rounded-full transition-all", color, form.color === color ? "ring-2 ring-offset-2 ring-foreground" : "")} onClick={() => setForm(prev => ({ ...prev, color }))} />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {STAFF_COLORS.map(c => (
+                    <button key={c.value} type="button" title={c.label} className={cn("w-8 h-8 rounded-full transition-all", form.color === c.value ? "ring-2 ring-offset-2 ring-foreground" : "")} style={{ backgroundColor: c.value }} onClick={() => setForm(prev => ({ ...prev, color: c.value }))} />
                   ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Typ umowy</Label>
+                  <Select value={form.contract_type} onValueChange={(v) => setForm(prev => ({ ...prev, contract_type: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Wybierz..." /></SelectTrigger>
+                    <SelectContent>
+                      {CONTRACT_TYPES.map(ct => (
+                        <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-1"><Percent className="w-3.5 h-3.5" /> Prowizja (%)</Label>
+                  <Input type="number" min={0} max={100} step={0.5} value={form.commission_rate} onChange={(e) => setForm(prev => ({ ...prev, commission_rate: e.target.value }))} placeholder="np. 40" />
                 </div>
               </div>
               <div>
@@ -656,6 +722,39 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                 />
                 <p className="text-xs text-muted-foreground mt-1">Staż wyświetlany na karcie pracownika</p>
               </div>
+
+              <div>
+                <Label className="flex items-center gap-1"><Award className="w-3.5 h-3.5" /> Certyfikaty / Uprawnienia</Label>
+                <div className="flex flex-wrap gap-1.5 mt-2 mb-2">
+                  {form.certifications.map(cert => (
+                    <Badge key={cert} variant="outline" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => setForm(prev => ({ ...prev, certifications: prev.certifications.filter(c => c !== cert) }))}>
+                      <Award className="w-3 h-3" /> {cert} ×
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={newCertification}
+                    onChange={(e) => setNewCertification(e.target.value)}
+                    placeholder="np. PhiBrows, Laser klasa IV..."
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); const val = newCertification.trim(); if (val && !form.certifications.includes(val)) { setForm(prev => ({ ...prev, certifications: [...prev.certifications, val] })); } setNewCertification(""); } }}
+                  />
+                  <Button type="button" variant="outline" size="sm" onClick={() => { const val = newCertification.trim(); if (val && !form.certifications.includes(val)) { setForm(prev => ({ ...prev, certifications: [...prev.certifications, val] })); } setNewCertification(""); }} disabled={!newCertification.trim()}>
+                    Dodaj
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                <div className="flex items-center gap-2">
+                  {form.visible_in_widget ? <Eye className="w-4 h-4 text-primary" /> : <EyeOff className="w-4 h-4 text-muted-foreground" />}
+                  <div>
+                    <p className="text-sm font-medium">Widoczność w rezerwacjach</p>
+                    <p className="text-xs text-muted-foreground">Czy klientki widzą tę osobę w widgecie rezerwacji</p>
+                  </div>
+                </div>
+                <Switch checked={form.visible_in_widget} onCheckedChange={(v) => setForm(prev => ({ ...prev, visible_in_widget: v }))} />
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
@@ -676,6 +775,21 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                   )}
                 </div>
               ))}
+
+              <div className="border-t border-border pt-3 mt-3">
+                <Label className="flex items-center gap-1 mb-2"><Coffee className="w-3.5 h-3.5" /> Przerwa obiadowa</Label>
+                <div className="flex items-center gap-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Godzina</Label>
+                    <Input type="time" value={form.break_start} onChange={(e) => setForm(prev => ({ ...prev, break_start: e.target.value }))} className="w-28" />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground">Czas trwania (min)</Label>
+                    <Input type="number" min={0} max={120} step={5} value={form.break_duration} onChange={(e) => setForm(prev => ({ ...prev, break_duration: e.target.value }))} className="w-24" placeholder="30" />
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Przerwa blokuje slot w kalendarzu automatycznie</p>
+              </div>
             </div>
           )}
 

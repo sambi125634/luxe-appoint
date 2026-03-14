@@ -11,6 +11,15 @@ export interface StaffMemberData {
   color: string | null;
   avatar_url: string | null;
   is_active: boolean;
+  contract_type: string | null;
+  commission_rate: number | null;
+  certifications: string[] | null;
+  visible_in_widget: boolean;
+  break_start: string | null;
+  break_duration: number | null;
+  bio: string | null;
+  specializations: unknown[] | null;
+  started_at: string | null;
 }
 
 export function useStaffMembers() {
@@ -21,7 +30,7 @@ export function useStaffMembers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("staff_members")
-        .select("id, name, role, email, phone, color, avatar_url, is_active")
+        .select("id, name, role, email, phone, color, avatar_url, is_active, contract_type, commission_rate, certifications, visible_in_widget, break_start, break_duration, bio, specializations, started_at")
         .eq("salon_id", salonId!)
         .eq("is_active", true)
         .order("name");
