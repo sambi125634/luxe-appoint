@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Supplier } from "../types";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface SupplierFormModalProps {
   open: boolean;
