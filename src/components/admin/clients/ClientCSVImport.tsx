@@ -156,7 +156,7 @@ export function ClientCSVImport({ open, onOpenChange, isDemo }: ClientCSVImportP
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "szablon_klienci.csv";
+    a.download = "przyklad_import_klientow.csv";
     a.click();
     URL.revokeObjectURL(url);
   };
