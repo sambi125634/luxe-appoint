@@ -636,10 +636,27 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
               </div>
               <div>
                 <Label>{t('staff.calendarColor')}</Label>
-                <div className="flex gap-2 mt-2">
-                  {colors.map(color => (
-                    <button key={color} type="button" className={cn("w-8 h-8 rounded-full transition-all", color, form.color === color ? "ring-2 ring-offset-2 ring-foreground" : "")} onClick={() => setForm(prev => ({ ...prev, color }))} />
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {STAFF_COLORS.map(c => (
+                    <button key={c.value} type="button" title={c.label} className={cn("w-8 h-8 rounded-full transition-all", form.color === c.value ? "ring-2 ring-offset-2 ring-foreground" : "")} style={{ backgroundColor: c.value }} onClick={() => setForm(prev => ({ ...prev, color: c.value }))} />
                   ))}
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Typ umowy</Label>
+                  <Select value={form.contract_type} onValueChange={(v) => setForm(prev => ({ ...prev, contract_type: v }))}>
+                    <SelectTrigger><SelectValue placeholder="Wybierz..." /></SelectTrigger>
+                    <SelectContent>
+                      {CONTRACT_TYPES.map(ct => (
+                        <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="flex items-center gap-1"><Percent className="w-3.5 h-3.5" /> Prowizja (%)</Label>
+                  <Input type="number" min={0} max={100} step={0.5} value={form.commission_rate} onChange={(e) => setForm(prev => ({ ...prev, commission_rate: e.target.value }))} placeholder="np. 40" />
                 </div>
               </div>
               <div>
