@@ -999,8 +999,9 @@
   "sidebar": {
     "dailyWork": "Daily work",
     "clients": "Clients",
-    "marketingGrowth": "Marketing & Growth",
-    "management": "Management",
+    "marketing": "Marketing",
+    "offer": "Offer",
+    "team": "Team",
     "finance": "Finance",
     "system": "System",
     "employee": "Employee",

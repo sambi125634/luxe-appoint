@@ -43,25 +43,30 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
         { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
         { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
+        { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
       ],
     },
     {
-      titleKey: "sidebar.marketingGrowth",
+      titleKey: "sidebar.marketing",
       items: [
         { icon: Radar, labelKey: "admin.retention", tab: "retention" },
         { icon: Heart, labelKey: "admin.referral", tab: "referral" },
-        { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
         { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
         { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
       ],
     },
     {
-      titleKey: "sidebar.management",
+      titleKey: "sidebar.offer",
       items: [
         { icon: Scissors, labelKey: "admin.services", tab: "services" },
+        { icon: Package, labelKey: "admin.products", tab: "products" },
+      ],
+    },
+    {
+      titleKey: "sidebar.team",
+      items: [
         { icon: Users, labelKey: "admin.staff", tab: "staff" },
         { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
-        { icon: Package, labelKey: "admin.products", tab: "products" },
       ],
     },
     {

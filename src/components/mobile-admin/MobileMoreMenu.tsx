@@ -27,25 +27,30 @@ const menuSections: { titleKey: string; items: MenuItem[] }[] = [
     items: [
       { icon: MessageSquare, labelKey: "mobileMenu.conversations", descriptionKey: "mobileMenu.conversationsDesc", tab: "conversations", color: "bg-teal-500/10 text-teal-600" },
       { icon: ClipboardList, labelKey: "mobileMenu.consultation", descriptionKey: "mobileMenu.consultationDesc", tab: "consultation", color: "bg-rose-500/10 text-rose-600" },
+      { icon: Workflow, labelKey: "mobileMenu.pipeline", descriptionKey: "mobileMenu.pipelineDesc", tab: "pipeline", color: "bg-purple-500/10 text-purple-600", ownerOnly: true },
     ],
   },
   {
-    titleKey: "sidebar.marketingGrowth",
+    titleKey: "sidebar.marketing",
     items: [
       { icon: Radar, labelKey: "mobileMenu.retention", descriptionKey: "mobileMenu.retentionDesc", tab: "retention", color: "bg-red-500/10 text-red-600" },
       { icon: Heart, labelKey: "mobileMenu.referral", descriptionKey: "mobileMenu.referralDesc", tab: "referral", color: "bg-pink-500/10 text-pink-600" },
-      { icon: Workflow, labelKey: "mobileMenu.pipeline", descriptionKey: "mobileMenu.pipelineDesc", tab: "pipeline", color: "bg-purple-500/10 text-purple-600", ownerOnly: true },
       { icon: Zap, labelKey: "mobileMenu.pixel", descriptionKey: "mobileMenu.pixelDesc", tab: "pixel", color: "bg-blue-500/10 text-blue-600" },
       { icon: Code, labelKey: "mobileMenu.widgets", descriptionKey: "mobileMenu.widgetsDesc", tab: "widgets", color: "bg-indigo-500/10 text-indigo-600", ownerOnly: true },
     ],
   },
   {
-    titleKey: "sidebar.management",
+    titleKey: "sidebar.offer",
     items: [
       { icon: Scissors, labelKey: "mobileMenu.services", descriptionKey: "mobileMenu.servicesDesc", tab: "services", color: "bg-pink-500/10 text-pink-600" },
+      { icon: Package, labelKey: "mobileMenu.products", descriptionKey: "mobileMenu.productsDesc", tab: "products", color: "bg-emerald-500/10 text-emerald-600" },
+    ],
+  },
+  {
+    titleKey: "sidebar.team",
+    items: [
       { icon: Users, labelKey: "mobileMenu.staff", descriptionKey: "mobileMenu.staffDesc", tab: "staff", color: "bg-blue-500/10 text-blue-600" },
       { icon: CalendarOff, labelKey: "mobileMenu.timeOff", descriptionKey: "mobileMenu.timeOffDesc", tab: "time-off", color: "bg-orange-500/10 text-orange-600" },
-      { icon: Package, labelKey: "mobileMenu.products", descriptionKey: "mobileMenu.productsDesc", tab: "products", color: "bg-emerald-500/10 text-emerald-600" },
     ],
   },
   {
