@@ -104,7 +104,7 @@ const DEMO_STAFF: StaffMember[] = [
   },
   {
     id: "2", name: "Karolina Wiśniewska", role: "Stylistka brwi", email: "karolina@salon.pl", phone: "+48 987 654 321",
-    color: "bg-secondary", serviceIds: ["1", "5"],
+    color: "#ec4899", serviceIds: ["1", "5"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 1 && h.dayOfWeek <= 5 })),
     avatar_url: demoKasia,
     bio: "Certyfikowana stylistka brwi i rzęs. Ukończyła kurs PhiBrows i laminacji.",
