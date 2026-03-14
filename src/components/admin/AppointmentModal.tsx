@@ -58,6 +58,7 @@ interface AppointmentModalProps {
   selectedDate?: Date;
   selectedTime?: string;
   isDemo?: boolean;
+  salonId?: string;
   preselectedClient?: { id: string; name: string; phone: string; email: string };
 }
 
