@@ -59,10 +59,10 @@ export function WeekDuplication({ onDuplicate, isDemo = false }: WeekDuplication
   };
 
   const selectAllStaff = () => {
-    if (selectedStaff.length === mockStaffMembers.length) {
+    if (selectedStaff.length === staffMembers.length) {
       setSelectedStaff([]);
     } else {
-      setSelectedStaff(mockStaffMembers.map(s => s.id));
+      setSelectedStaff(staffMembers.map(s => s.id));
     }
   };
 
