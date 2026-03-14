@@ -113,7 +113,7 @@ const DEMO_STAFF: StaffMember[] = [
   },
   {
     id: "3", name: "Joanna Lewandowska", role: "Masażystka", email: "joanna@salon.pl", phone: "+48 111 222 333",
-    color: "bg-accent", serviceIds: ["3"],
+    color: "#10b981", serviceIds: ["3"],
     workingHours: defaultWorkingHours.map(h => ({ ...h, isWorking: h.dayOfWeek >= 2 && h.dayOfWeek <= 6 })),
     avatar_url: null,
     bio: "Fizjoterapeutka z dyplomem AWF. Specjalizuje się w masażach leczniczych i relaksacyjnych.",
