@@ -2020,7 +2020,12 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          break_duration: number | null
+          break_start: string | null
+          certifications: string[] | null
           color: string | null
+          commission_rate: number | null
+          contract_type: string | null
           created_at: string
           email: string | null
           id: string
@@ -2033,11 +2038,17 @@ export type Database = {
           started_at: string | null
           updated_at: string
           user_id: string | null
+          visible_in_widget: boolean | null
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          break_duration?: number | null
+          break_start?: string | null
+          certifications?: string[] | null
           color?: string | null
+          commission_rate?: number | null
+          contract_type?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -2050,11 +2061,17 @@ export type Database = {
           started_at?: string | null
           updated_at?: string
           user_id?: string | null
+          visible_in_widget?: boolean | null
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          break_duration?: number | null
+          break_start?: string | null
+          certifications?: string[] | null
           color?: string | null
+          commission_rate?: number | null
+          contract_type?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -2067,6 +2084,7 @@ export type Database = {
           started_at?: string | null
           updated_at?: string
           user_id?: string | null
+          visible_in_widget?: boolean | null
         }
         Relationships: [
           {
