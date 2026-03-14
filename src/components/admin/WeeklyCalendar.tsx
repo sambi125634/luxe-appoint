@@ -414,15 +414,17 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-serif font-semibold">{t("calendar.title")}</h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(-1) : navigateWeek(-1))}>
+            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(-1) : calendarView === "week" ? navigateWeek(-1) : navigateMonth(-1))}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <span className="text-sm font-medium min-w-[200px] text-center">
               {calendarView === "day"
                 ? currentDate.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
-                : `${weekDays[0].toLocaleDateString(locale, { day: "numeric", month: "long" })} - ${weekDays[6].toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}`}
+                : calendarView === "week"
+                  ? `${weekDays[0].toLocaleDateString(locale, { day: "numeric", month: "long" })} - ${weekDays[6].toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}`
+                  : currentDate.toLocaleDateString(locale, { month: "long", year: "numeric" })}
             </span>
-            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(1) : navigateWeek(1))}>
+            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(1) : calendarView === "week" ? navigateWeek(1) : navigateMonth(1))}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
