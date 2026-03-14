@@ -100,6 +100,7 @@ export function AppointmentModal({
   selectedDate,
   selectedTime,
   isDemo = false,
+  salonId,
   preselectedClient
 }: AppointmentModalProps) {
   const { t } = useTranslation();
