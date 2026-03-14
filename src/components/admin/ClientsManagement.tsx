@@ -19,6 +19,7 @@ import { ClientRiskBadge } from "./ClientRiskBadge";
 import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup, ClientCSVImport } from "./clients";
 import { TagManagementDialog } from "./clients/TagManagementDialog";
 import { SectionGuide } from "./SectionGuide";
+import { AppointmentModal } from "./AppointmentModal";
 import { useClients, useCreateClient, useUpdateClient, useDeleteClient } from "@/hooks/useClients";
 import { useClientTags, tagsToAvailableFormat } from "@/hooks/useClientTags";
 import { Skeleton } from "@/components/ui/skeleton";
