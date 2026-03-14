@@ -130,10 +130,10 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
   const [nextAvailableStaff, setNextAvailableStaff] = useState("");
   const [nextAvailablePreference, setNextAvailablePreference] = useState("");
 
-  // Mock data
-  const gaps = useMemo(() => generateMockGaps(), []);
-  const occupancy = useMemo(() => generateMockOccupancy(), []);
-  const smartSlots = useMemo(() => generateSmartSlots(), []);
+  // Mock data (uses staffMembers for generation)
+  const gaps = useMemo(() => generateMockGaps(staffMembers), [staffMembers]);
+  const occupancy = useMemo(() => generateMockOccupancy(staffMembers), [staffMembers]);
+  const smartSlots = useMemo(() => generateSmartSlots(staffMembers), [staffMembers]);
 
   const filteredGaps = gaps.filter(gap => {
     if (gap.durationMinutes < minGapDuration) return false;
