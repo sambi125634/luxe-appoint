@@ -451,6 +451,15 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
               <LayoutGrid className="w-3.5 h-3.5" />
               Tydzień
             </Button>
+            <Button
+              variant={calendarView === "month" ? "default" : "ghost"}
+              size="sm"
+              className="gap-1.5 h-8 text-xs"
+              onClick={() => setCalendarView("month")}
+            >
+              <CalendarDays className="w-3.5 h-3.5" />
+              Miesiąc
+            </Button>
           </div>
 
           <Button variant="luxury" size="sm" className="gap-2" onClick={handleOpenNewAppointment}>
