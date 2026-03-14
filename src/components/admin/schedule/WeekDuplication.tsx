@@ -24,7 +24,11 @@ interface WeekDuplicationProps {
   onDuplicate?: (staffIds: string[], sourceWeek: Date, targetWeeksCount: number, includeExceptions: boolean) => void;
 }
 
-export function WeekDuplication({ onDuplicate }: WeekDuplicationProps) {
+export function WeekDuplication({ onDuplicate, isDemo = false }: WeekDuplicationProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffMembers: StaffItem[] = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedStaff, setSelectedStaff] = useState<string[]>([]);
