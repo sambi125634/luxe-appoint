@@ -1,25 +1,26 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Scissors, Plus, Minus, X, Search, ShoppingBag } from "lucide-react";
+import { Scissors, Plus, Minus, X, Search, ShoppingBag, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import { useServices, useServiceCategories } from "@/hooks/useServices";
 
 export interface ServiceCartItem {
-  service: DemoService;
+  service: ServiceItem;
   quantity: number;
 }
 
-interface DemoService {
+interface ServiceItem {
   id: string;
   name: string;
   price: number;
   category: string;
 }
 
-const DEMO_SERVICES: DemoService[] = [
+const DEMO_SERVICES: ServiceItem[] = [
   { id: "s1", name: "Manicure hybrydowy", price: 120, category: "Manicure" },
   { id: "s2", name: "Pedicure klasyczny", price: 100, category: "Pedicure" },
   { id: "s3", name: "Mezoterapia igłowa", price: 250, category: "Kosmetologia" },
@@ -35,21 +36,43 @@ const DEMO_SERVICES: DemoService[] = [
 interface ServiceSaleSectionProps {
   cart: ServiceCartItem[];
   onCartChange: (cart: ServiceCartItem[]) => void;
+  salonId?: string;
   className?: string;
 }
 
-export function ServiceSaleSection({ cart, onCartChange, className }: ServiceSaleSectionProps) {
+export function ServiceSaleSection({ cart, onCartChange, salonId, className }: ServiceSaleSectionProps) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [showPicker, setShowPicker] = useState(false);
 
-  const filteredServices = DEMO_SERVICES.filter(
+  const isDemo = !salonId || salonId === "demo-salon-id";
+
+  const { data: dbServices, isLoading: servicesLoading } = useServices();
+  const { data: dbCategories } = useServiceCategories();
+
+  const categoryMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    dbCategories?.forEach((c) => { map[c.id] = c.name; });
+    return map;
+  }, [dbCategories]);
+
+  const services: ServiceItem[] = useMemo(() => {
+    if (isDemo || !dbServices?.length) return DEMO_SERVICES;
+    return dbServices.map((s) => ({
+      id: s.id,
+      name: s.name,
+      price: Number(s.price),
+      category: s.category_id ? (categoryMap[s.category_id] || "Inne") : "Inne",
+    }));
+  }, [isDemo, dbServices, categoryMap]);
+
+  const filteredServices = services.filter(
     (s) =>
       s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       s.category.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const addToCart = (service: DemoService) => {
+  const addToCart = (service: ServiceItem) => {
     const existing = cart.find((item) => item.service.id === service.id);
     if (existing) {
       onCartChange(
@@ -113,7 +136,11 @@ export function ServiceSaleSection({ cart, onCartChange, className }: ServiceSal
         {showPicker && (
           <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg overflow-hidden">
             <ScrollArea className="max-h-48">
-              {filteredServices.length === 0 ? (
+              {!isDemo && servicesLoading ? (
+                <div className="px-4 py-6 flex items-center justify-center">
+                  <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                </div>
+              ) : filteredServices.length === 0 ? (
                 <div className="px-4 py-3 text-sm text-muted-foreground text-center">
                   Nie znaleziono usług
                 </div>

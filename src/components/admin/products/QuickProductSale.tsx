@@ -217,7 +217,7 @@ export function QuickProductSale({ open, onOpenChange, isDemo = false, onComplet
           <Separator />
 
           {/* Service Selection */}
-          <ServiceSaleSection cart={serviceCart} onCartChange={setServiceCart} />
+          <ServiceSaleSection cart={serviceCart} onCartChange={setServiceCart} salonId={salonId ?? undefined} />
 
           {hasItems && (
             <>
