@@ -113,11 +113,16 @@ const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
 };
 
 interface SmartScheduleHelpersProps {
+  isDemo?: boolean;
   onSlotSelect?: (slot: SmartSlot) => void;
   onGapSelect?: (gap: ScheduleGap) => void;
 }
 
-export function SmartScheduleHelpers({ onSlotSelect, onGapSelect }: SmartScheduleHelpersProps) {
+export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false }: SmartScheduleHelpersProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffMembers: StaffItem[] = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [activeTab, setActiveTab] = useState("gaps");
   const [minGapDuration, setMinGapDuration] = useState(30);
   const [selectedStaffFilter, setSelectedStaffFilter] = useState<string>("all");
