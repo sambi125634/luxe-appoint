@@ -722,6 +722,39 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                 />
                 <p className="text-xs text-muted-foreground mt-1">Staż wyświetlany na karcie pracownika</p>
               </div>
+
+              <div>
+                <Label className="flex items-center gap-1"><Award className="w-3.5 h-3.5" /> Certyfikaty / Uprawnienia</Label>
+                <div className="flex flex-wrap gap-1.5 mt-2 mb-2">
+                  {form.certifications.map(cert => (
+                    <Badge key={cert} variant="outline" className="gap-1 cursor-pointer hover:bg-destructive/10" onClick={() => setForm(prev => ({ ...prev, certifications: prev.certifications.filter(c => c !== cert) }))}>
+                      <Award className="w-3 h-3" /> {cert} ×
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={newCertification}
+                    onChange={(e) => setNewCertification(e.target.value)}
+                    placeholder="np. PhiBrows, Laser klasa IV..."
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); const val = newCertification.trim(); if (val && !form.certifications.includes(val)) { setForm(prev => ({ ...prev, certifications: [...prev.certifications, val] })); } setNewCertification(""); } }}
+                  />
+                  <Button type="button" variant="outline" size="sm" onClick={() => { const val = newCertification.trim(); if (val && !form.certifications.includes(val)) { setForm(prev => ({ ...prev, certifications: [...prev.certifications, val] })); } setNewCertification(""); }} disabled={!newCertification.trim()}>
+                    Dodaj
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                <div className="flex items-center gap-2">
+                  {form.visible_in_widget ? <Eye className="w-4 h-4 text-primary" /> : <EyeOff className="w-4 h-4 text-muted-foreground" />}
+                  <div>
+                    <p className="text-sm font-medium">Widoczność w rezerwacjach</p>
+                    <p className="text-xs text-muted-foreground">Czy klientki widzą tę osobę w widgecie rezerwacji</p>
+                  </div>
+                </div>
+                <Switch checked={form.visible_in_widget} onCheckedChange={(v) => setForm(prev => ({ ...prev, visible_in_widget: v }))} />
+              </div>
             </div>
           ) : (
             <div className="space-y-3">
