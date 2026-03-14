@@ -65,21 +65,21 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
             {/* Avatar */}
             <div className={cn(
               "w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
-              client.tags.includes("vip") 
+              (client.tags || []).includes("vip") 
                 ? "bg-gradient-to-r from-amber-400 to-amber-600 text-white"
                 : "bg-muted text-muted-foreground"
             )}>
-              {client.firstName[0]}{client.lastName[0]}
+              {(client.firstName || '')[0]}{(client.lastName || '')[0]}
             </div>
 
             {/* Main info */}
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold">{client.firstName} {client.lastName}</h3>
-                {client.tags.includes("vip") && (
+                {(client.tags || []).includes("vip") && (
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                 )}
-                {client.tags.includes("problematic") && (
+                {(client.tags || []).includes("problematic") && (
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                 )}
                 <ClientRiskBadge clientId={client.id} compact />
@@ -143,7 +143,7 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
 
             {/* Tags */}
             <div className="flex flex-wrap gap-1 max-w-[150px] hidden md:flex">
-              {client.tags.slice(0, 2).map(tagId => {
+              {(client.tags || []).slice(0, 2).map(tagId => {
                 const tag = getTagInfo(tagId);
                 return tag ? (
                   <Badge key={tagId} variant="secondary" className={cn("text-xs", tag.color)}>
@@ -151,7 +151,7 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
                   </Badge>
                 ) : null;
               })}
-              {client.tags.length > 2 && (
+              {(client.tags || []).length > 2 && (
                 <Badge variant="secondary" className="text-xs">
                   +{client.tags.length - 2}
                 </Badge>
