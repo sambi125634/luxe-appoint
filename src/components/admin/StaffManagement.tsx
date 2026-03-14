@@ -70,7 +70,27 @@ const DEMO_SERVICES = [
   { id: "5", name: "Manicure hybrydowy" },
 ];
 
-const colors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1", "bg-chart-2", "bg-chart-3"];
+const STAFF_COLORS = [
+  { value: "#6366f1", label: "Indigo" },
+  { value: "#ec4899", label: "Róż" },
+  { value: "#f59e0b", label: "Amber" },
+  { value: "#10b981", label: "Szmaragd" },
+  { value: "#8b5cf6", label: "Fiolet" },
+  { value: "#ef4444", label: "Czerwień" },
+  { value: "#06b6d4", label: "Cyan" },
+  { value: "#f97316", label: "Pomarańcz" },
+  { value: "#84cc16", label: "Limonka" },
+  { value: "#64748b", label: "Szary" },
+  { value: "#d946ef", label: "Fuksja" },
+  { value: "#14b8a6", label: "Morski" },
+];
+
+const CONTRACT_TYPES = [
+  { value: "employment", label: "Umowa o pracę" },
+  { value: "b2b", label: "B2B" },
+  { value: "mandate", label: "Umowa zlecenie" },
+  { value: "internship", label: "Staż" },
+];
 
 const DEMO_STAFF: StaffMember[] = [
   {
