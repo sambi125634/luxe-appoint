@@ -10,6 +10,7 @@ import { useSalonId } from "@/hooks/useSalonId";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { DayColumnView } from "./calendar/DayColumnView";
+import { MonthGridView } from "./calendar/MonthGridView";
 import type { AppointmentBlockData } from "./calendar/AppointmentBlock";
 
 interface Appointment {
@@ -67,7 +68,7 @@ const mockStaff = [
 
 const hours = Array.from({ length: 12 }, (_, i) => `${(8 + i).toString().padStart(2, "0")}:00`);
 
-type CalendarView = "day" | "week";
+type CalendarView = "day" | "week" | "month";
 
 interface WeeklyCalendarProps {
   isDemo?: boolean;
@@ -181,6 +182,11 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   const navigateWeek = (dir: number) => {
     const d = new Date(currentDate);
     d.setDate(d.getDate() + dir * 7);
+    setCurrentDate(d);
+  };
+  const navigateMonth = (dir: number) => {
+    const d = new Date(currentDate);
+    d.setMonth(d.getMonth() + dir);
     setCurrentDate(d);
   };
 
@@ -384,6 +390,16 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     })
     .map((a) => ({ ...a }));
 
+  // --- month view helpers ---
+  const monthAppointments: (AppointmentBlockData & { _date: string })[] = appointments.map((a) => {
+    const ws = getWeekStart(currentDate);
+    const dayOffset = "dayOffset" in a && a.dayOffset !== undefined ? (a.dayOffset as number) : 0;
+    const aptDate = new Date(ws);
+    aptDate.setDate(aptDate.getDate() + dayOffset);
+    const dateStr = `${aptDate.getFullYear()}-${String(aptDate.getMonth() + 1).padStart(2, "0")}-${String(aptDate.getDate()).padStart(2, "0")}`;
+    return { ...a, _date: dateStr };
+  });
+
   // Empty state
   if (!isDemo && staff.length === 0) {
     return (
@@ -408,15 +424,17 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-serif font-semibold">{t("calendar.title")}</h2>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(-1) : navigateWeek(-1))}>
+            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(-1) : calendarView === "week" ? navigateWeek(-1) : navigateMonth(-1))}>
               <ChevronLeft className="w-4 h-4" />
             </Button>
             <span className="text-sm font-medium min-w-[200px] text-center">
               {calendarView === "day"
                 ? currentDate.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long" })
-                : `${weekDays[0].toLocaleDateString(locale, { day: "numeric", month: "long" })} - ${weekDays[6].toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}`}
+                : calendarView === "week"
+                  ? `${weekDays[0].toLocaleDateString(locale, { day: "numeric", month: "long" })} - ${weekDays[6].toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" })}`
+                  : currentDate.toLocaleDateString(locale, { month: "long", year: "numeric" })}
             </span>
-            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(1) : navigateWeek(1))}>
+            <Button variant="ghost" size="icon" onClick={() => (calendarView === "day" ? navigateDay(1) : calendarView === "week" ? navigateWeek(1) : navigateMonth(1))}>
               <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
@@ -442,6 +460,15 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
             >
               <LayoutGrid className="w-3.5 h-3.5" />
               Tydzień
+            </Button>
+            <Button
+              variant={calendarView === "month" ? "default" : "ghost"}
+              size="sm"
+              className="gap-1.5 h-8 text-xs"
+              onClick={() => setCalendarView("month")}
+            >
+              <CalendarDays className="w-3.5 h-3.5" />
+              Miesiąc
             </Button>
           </div>
 
@@ -550,6 +577,21 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
             </div>
           </div>
         </>
+      )}
+
+      {/* ========= MONTH VIEW ========= */}
+      {calendarView === "month" && (
+        <MonthGridView
+          date={currentDate}
+          staff={staff}
+          appointments={monthAppointments}
+          onDayClick={(day) => {
+            setCurrentDate(day);
+            setCalendarView("day");
+          }}
+          onAppointmentClick={handleAppointmentClick}
+          locale={locale}
+        />
       )}
 
       <AppointmentModal
