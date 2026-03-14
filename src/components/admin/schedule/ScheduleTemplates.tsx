@@ -22,7 +22,11 @@ interface ScheduleTemplatesProps {
   onApplyTemplate?: (staffId: string, templateId: string, startDate: string, endDate: string) => void;
 }
 
-export function ScheduleTemplates({ onApplyTemplate }: ScheduleTemplatesProps) {
+export function ScheduleTemplates({ onApplyTemplate, isDemo = false }: ScheduleTemplatesProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffList = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [templates, setTemplates] = useState<ScheduleTemplate[]>(defaultTemplates);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isApplyDialogOpen, setIsApplyDialogOpen] = useState(false);
