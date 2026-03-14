@@ -99,8 +99,8 @@ const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
       slots.push({
         date: format(addDays(today, dayOffset), "yyyy-MM-dd"),
         time: `${hour.toString().padStart(2, '0')}:${Math.random() > 0.5 ? '00' : '30'}`,
-        staffId: staff.id,
-        staffName: staff.name,
+        staffId: member.id,
+        staffName: member.name,
         isRecommended,
         fillsGap: isRecommended && Math.random() > 0.3,
         occupancyBefore: Math.floor(Math.random() * 40) + 30,
