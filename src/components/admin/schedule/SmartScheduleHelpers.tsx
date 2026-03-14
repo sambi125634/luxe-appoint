@@ -64,11 +64,11 @@ const generateMockGaps = (staff: StaffItem[]): ScheduleGap[] => {
   return gaps.sort((a, b) => b.durationMinutes - a.durationMinutes);
 };
 
-const generateMockOccupancy = (): OccupancyData[] => {
+const generateMockOccupancy = (staff: StaffItem[]): OccupancyData[] => {
   const data: OccupancyData[] = [];
   const today = new Date();
   
-  mockStaffMembers.forEach(staff => {
+  staff.forEach(member => {
     for (let i = 0; i < 7; i++) {
       const totalMinutes = 480; // 8 hours
       const bookedMinutes = Math.floor(Math.random() * 400) + 80;
