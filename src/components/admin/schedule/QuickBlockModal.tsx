@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { ScheduleBlock, mockStaffMembers } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface QuickBlockModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface QuickBlockModalProps {
   onSave: (block: Omit<ScheduleBlock, 'id'>) => void;
   selectedDate?: Date;
   selectedStaffId?: string;
+  isDemo?: boolean;
 }
 
 const blockTypes = [
