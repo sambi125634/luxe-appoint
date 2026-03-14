@@ -184,6 +184,11 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     d.setDate(d.getDate() + dir * 7);
     setCurrentDate(d);
   };
+  const navigateMonth = (dir: number) => {
+    const d = new Date(currentDate);
+    d.setMonth(d.getMonth() + dir);
+    setCurrentDate(d);
+  };
 
   // --- drag & drop ---
   const handleDragStart = (e: React.DragEvent, id: string) => {
