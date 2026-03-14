@@ -605,6 +605,8 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               onSelect={handleServiceSelect}
               selectedService={selectedService}
               onProceed={handleNext}
+              salonId={salonId !== "demo" ? salonId : undefined}
+              isDemo={isDemo}
             />
             
             {showRecommendations && recommendations && recommendations.length > 0 && (
