@@ -263,11 +263,14 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         name: member.name, role: member.role, email: member.email, phone: member.phone,
         color: member.color, serviceIds: member.serviceIds, workingHours: member.workingHours,
         bio: member.bio || "", specializations: member.specializations || [], started_at: member.started_at || "",
+        contract_type: member.contract_type || "", commission_rate: member.commission_rate?.toString() || "",
+        certifications: member.certifications || [], visible_in_widget: member.visible_in_widget ?? true,
+        break_start: member.break_start || "", break_duration: member.break_duration?.toString() || "",
       });
       setAvatarPreview(member.avatar_url || null);
     } else {
       setEditingStaff(null);
-      setForm({ name: "", role: "", email: "", phone: "", color: colors[0], serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "" });
+      setForm({ name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "", contract_type: "", commission_rate: "", certifications: [], visible_in_widget: true, break_start: "", break_duration: "" });
       setAvatarPreview(null);
     }
     setAvatarFile(null);
