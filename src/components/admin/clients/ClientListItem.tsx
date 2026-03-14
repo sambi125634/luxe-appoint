@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { 
-  Phone, Mail, Star, AlertTriangle, ChevronRight, 
-  Clock, Calendar 
+  Phone, Mail, Star, AlertTriangle, ChevronRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
