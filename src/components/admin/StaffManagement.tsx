@@ -582,7 +582,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
             <div className="relative group cursor-pointer" onClick={() => avatarInputRef.current?.click()}>
               <Avatar className="w-16 h-16 ring-2 ring-border">
                 {avatarPreview && <AvatarImage src={avatarPreview} alt="Avatar" className="object-cover" />}
-                <AvatarFallback className={cn(form.color, "text-primary-foreground font-serif text-xl")}>
+                <AvatarFallback className="font-serif text-xl" style={{ backgroundColor: form.color, color: 'white' }}>
                   {form.name ? getInitials(form.name) : <Camera className="w-6 h-6" />}
                 </AvatarFallback>
               </Avatar>
