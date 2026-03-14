@@ -185,6 +185,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
         isOpen={isQuickBlockOpen}
         onClose={() => setIsQuickBlockOpen(false)}
         onSave={handleSaveBlock}
+        isDemo={isDemo}
       />
 
       {/* New Appointment Modal (header button) */}
