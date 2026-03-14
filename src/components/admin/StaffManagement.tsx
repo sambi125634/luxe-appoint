@@ -248,8 +248,8 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast({ title: "Za duży plik", description: "Maksymalny rozmiar zdjęcia to 2 MB", variant: "destructive" });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Za duży plik", description: "Maksymalny rozmiar zdjęcia to 10 MB", variant: "destructive" });
       return;
     }
     setAvatarFile(file);
@@ -550,7 +550,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
             </div>
             <div className="text-sm">
               <p className="font-medium">{form.name || "Nowy pracownik"}</p>
-              <p className="text-muted-foreground text-xs">Kliknij zdjęcie, aby zmienić (max 2 MB)</p>
+              <p className="text-muted-foreground text-xs">Kliknij zdjęcie, aby zmienić (max 10 MB)</p>
             </div>
           </div>
 
