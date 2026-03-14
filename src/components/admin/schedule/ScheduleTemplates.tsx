@@ -15,8 +15,10 @@ import {
   defaultTemplates, 
   dayNamesFull 
 } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface ScheduleTemplatesProps {
+  isDemo?: boolean;
   onApplyTemplate?: (staffId: string, templateId: string, startDate: string, endDate: string) => void;
 }
 
