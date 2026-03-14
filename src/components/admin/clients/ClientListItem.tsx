@@ -76,10 +76,10 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h3 className="font-semibold">{client.firstName} {client.lastName}</h3>
-                {client.tags.includes("vip") && (
+                {(client.tags || []).includes("vip") && (
                   <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
                 )}
-                {client.tags.includes("problematic") && (
+                {(client.tags || []).includes("problematic") && (
                   <AlertTriangle className="w-4 h-4 text-red-500" />
                 )}
                 <ClientRiskBadge clientId={client.id} compact />
