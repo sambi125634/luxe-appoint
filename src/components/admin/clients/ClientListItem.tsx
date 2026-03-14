@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { 
-  Phone, Mail, Star, AlertTriangle, ChevronRight, 
-  Clock, Calendar 
+  Phone, Mail, Star, AlertTriangle, ChevronRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -43,6 +42,18 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
 
   const daysSinceLastVisit = getDaysSinceLastVisit();
   const needsAttention = daysSinceLastVisit && daysSinceLastVisit > 30;
+
+  const avgVisitValue = client.totalVisits > 0 ? Math.round(client.totalSpent / client.totalVisits) : 0;
+
+  const getRetentionStatus = () => {
+    if (!daysSinceLastVisit) return { color: 'bg-red-500', label: 'Utracona', textColor: 'text-red-600' };
+    if (daysSinceLastVisit <= 30) return { color: 'bg-emerald-500', label: 'Aktywna', textColor: 'text-emerald-600' };
+    if (daysSinceLastVisit <= 60) return { color: 'bg-yellow-500', label: 'Uwaga', textColor: 'text-yellow-600' };
+    if (daysSinceLastVisit <= 90) return { color: 'bg-orange-500', label: 'Ryzyko', textColor: 'text-orange-600' };
+    return { color: 'bg-red-500', label: 'Utracona', textColor: 'text-red-600' };
+  };
+
+  const retention = getRetentionStatus();
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString(
@@ -99,47 +110,27 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
 
           {/* Right side info */}
           <div className="flex items-center gap-4">
-            {/* Last visit indicator */}
-            {client.lastVisit && (
-              <div className="text-right hidden lg:block">
+            {/* Retention status + LTV */}
+            <div className="text-right hidden sm:block min-w-[120px]">
+              <div className="flex items-center justify-end gap-1.5 mb-0.5">
+                <span className={cn("w-2 h-2 rounded-full shrink-0", retention.color)} />
+                <span className={cn("text-xs font-medium", retention.textColor)}>{retention.label}</span>
+              </div>
+              <div className="text-sm font-semibold text-foreground">
+                {client.totalSpent.toLocaleString('pl-PL')} zł
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {client.totalVisits} {t('clients.visits')} • śr. {avgVisitValue} zł
+              </div>
+              {client.lastVisit && (
                 <div className={cn(
-                  "flex items-center gap-1 text-sm",
+                  "text-xs mt-0.5",
                   needsAttention ? "text-orange-600" : "text-muted-foreground"
                 )}>
-                  <Clock className="w-3 h-3" />
-                  {daysSinceLastVisit} {t('clients.daysAgo')}
+                  {daysSinceLastVisit} {t('clients.daysAgo')} ({formatDate(client.lastVisit)})
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {formatDate(client.lastVisit)}
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            <div className="text-right hidden sm:block">
-              <div className="text-sm font-medium">{client.totalVisits} {t('clients.visits')}</div>
-              <div className="text-xs text-muted-foreground">{client.totalSpent} zł</div>
+              )}
             </div>
-
-            {/* Purchase categories */}
-            {client.purchaseCategories && client.purchaseCategories.length > 0 && (
-              <div className="flex flex-wrap gap-1 max-w-[120px] hidden xl:flex">
-                {client.purchaseCategories.slice(0, 2).map(category => (
-                  <Badge 
-                    key={category} 
-                    variant="outline" 
-                    className="text-xs bg-primary/5 border-primary/20"
-                  >
-                    {category}
-                  </Badge>
-                ))}
-                {client.purchaseCategories.length > 2 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{client.purchaseCategories.length - 2}
-                  </Badge>
-                )}
-              </div>
-            )}
 
             {/* Tags */}
             <div className="flex flex-wrap gap-1 max-w-[150px] hidden md:flex">
