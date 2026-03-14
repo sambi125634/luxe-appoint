@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { productCategories, type Product } from "../types";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface ProductFormModalProps {
   open: boolean;
