@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles, Eye, EyeOff, Coffee, Award, FileText, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
