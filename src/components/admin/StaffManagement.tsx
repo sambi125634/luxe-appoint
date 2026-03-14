@@ -218,8 +218,17 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       role: s.role || "Specjalista",
       email: s.email || "",
       phone: s.phone || "",
-      color: s.color || "bg-primary",
+      color: s.color || STAFF_COLORS[0].value,
       avatar_url: s.avatar_url,
+      bio: s.bio,
+      specializations: Array.isArray(s.specializations) ? (s.specializations as string[]) : [],
+      started_at: s.started_at,
+      contract_type: s.contract_type,
+      commission_rate: s.commission_rate,
+      certifications: s.certifications || [],
+      visible_in_widget: s.visible_in_widget ?? true,
+      break_start: s.break_start,
+      break_duration: s.break_duration,
       serviceIds: staffServicesMap?.[s.id] || [],
       workingHours: workingHoursMap?.[s.id]?.length
         ? defaultWorkingHours.map(dh => {
