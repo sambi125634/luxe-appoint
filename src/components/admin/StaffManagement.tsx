@@ -354,6 +354,9 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           name: form.name, role: form.role, email: form.email || null, phone: form.phone || null,
           color: form.color, salon_id: salonId!,
           bio: form.bio || null, specializations: form.specializations, started_at: form.started_at || null,
+          contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
+          certifications: form.certifications, visible_in_widget: form.visible_in_widget,
+          break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
         };
         const { data, error } = await supabase
           .from("staff_members")
