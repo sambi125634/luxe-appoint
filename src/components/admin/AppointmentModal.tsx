@@ -335,16 +335,22 @@ export function AppointmentModal({
                 <SelectValue placeholder={t('appointment.selectService')} />
               </SelectTrigger>
               <SelectContent>
-                {services.map(service => (
-                  <SelectItem key={service.id} value={service.id}>
-                    <div className="flex items-center justify-between w-full gap-4">
-                      <span>{service.name}</span>
-                      <span className="text-muted-foreground text-sm">
-                        {service.duration} min • {service.price} zł
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
+                {services.length === 0 ? (
+                  <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+                    Brak usług — dodaj je w zakładce Usługi
+                  </div>
+                ) : (
+                  services.map(service => (
+                    <SelectItem key={service.id} value={service.id}>
+                      <div className="flex items-center justify-between w-full gap-4">
+                        <span>{service.name}</span>
+                        <span className="text-muted-foreground text-sm">
+                          {service.duration} min • {service.price} zł
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
