@@ -169,7 +169,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
       email: c.email || "",
       tags: c.tags || [],
       notes: c.notes || "",
-      createdAt: c.created_at.split('T')[0],
+      createdAt: c.created_at ? c.created_at.split('T')[0] : "",
       lastVisit: c.last_visit_at?.split('T')[0],
       totalVisits: clientStats?.[c.id]?.totalVisits || 0,
       totalSpent: clientStats?.[c.id]?.totalSpent || 0,
