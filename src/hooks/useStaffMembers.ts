@@ -11,6 +11,15 @@ export interface StaffMemberData {
   color: string | null;
   avatar_url: string | null;
   is_active: boolean;
+  contract_type: string | null;
+  commission_rate: number | null;
+  certifications: string[] | null;
+  visible_in_widget: boolean;
+  break_start: string | null;
+  break_duration: number | null;
+  bio: string | null;
+  specializations: unknown[] | null;
+  started_at: string | null;
 }
 
 export function useStaffMembers() {
