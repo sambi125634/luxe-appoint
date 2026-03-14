@@ -119,14 +119,15 @@ export function AppointmentModal({
         email: c.email || "",
       }));
 
+  const dbServicesMapped: Service[] = (dbServices || []).map((s) => ({
+    id: s.id,
+    name: s.name,
+    duration: s.duration,
+    price: Number(s.price),
+  }));
   const services: Service[] = isDemo
     ? mockServices
-    : (dbServices || []).map((s) => ({
-        id: s.id,
-        name: s.name,
-        duration: s.duration,
-        price: Number(s.price),
-      }));
+    : dbServicesMapped.length > 0 ? dbServicesMapped : mockServices;
 
   const staffMembers: Staff[] = isDemo
     ? mockStaff
@@ -334,16 +335,22 @@ export function AppointmentModal({
                 <SelectValue placeholder={t('appointment.selectService')} />
               </SelectTrigger>
               <SelectContent>
-                {services.map(service => (
-                  <SelectItem key={service.id} value={service.id}>
-                    <div className="flex items-center justify-between w-full gap-4">
-                      <span>{service.name}</span>
-                      <span className="text-muted-foreground text-sm">
-                        {service.duration} min • {service.price} zł
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
+                {services.length === 0 ? (
+                  <div className="px-4 py-3 text-sm text-muted-foreground text-center">
+                    Brak usług — dodaj je w zakładce Usługi
+                  </div>
+                ) : (
+                  services.map(service => (
+                    <SelectItem key={service.id} value={service.id}>
+                      <div className="flex items-center justify-between w-full gap-4">
+                        <span>{service.name}</span>
+                        <span className="text-muted-foreground text-sm">
+                          {service.duration} min • {service.price} zł
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
           </div>
