@@ -144,7 +144,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
   const lowOccupancyDays = occupancy.filter(o => o.occupancyPercent < 30);
   
   const getStaffColor = (staffId: string) => {
-    return mockStaffMembers.find(s => s.id === staffId)?.color || "hsl(var(--primary))";
+    return staffMembers.find(s => s.id === staffId)?.color || "hsl(var(--primary))";
   };
 
   return (
