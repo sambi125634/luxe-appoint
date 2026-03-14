@@ -157,11 +157,11 @@ export function WeekDuplication({ onDuplicate, isDemo = false }: WeekDuplication
                   <div className="flex items-center justify-between">
                     <Label>Wybierz pracowników</Label>
                     <Button variant="ghost" size="sm" onClick={selectAllStaff}>
-                      {selectedStaff.length === mockStaffMembers.length ? "Odznacz wszystkich" : "Zaznacz wszystkich"}
+                     {selectedStaff.length === staffMembers.length ? "Odznacz wszystkich" : "Zaznacz wszystkich"}
                     </Button>
                   </div>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {mockStaffMembers.map(staff => (
+                    {staffMembers.map(staff => (
                       <label
                         key={staff.id}
                         className={cn(

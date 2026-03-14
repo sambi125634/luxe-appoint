@@ -415,7 +415,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="any">Dowolny</SelectItem>
-                    {mockStaffMembers.map(s => (
+                    {staffMembers.map(s => (
                       <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
                     ))}
                   </SelectContent>

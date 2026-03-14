@@ -323,7 +323,7 @@ export function ScheduleTemplates({ onApplyTemplate, isDemo = false }: ScheduleT
                   <SelectValue placeholder="Wybierz pracownika" />
                 </SelectTrigger>
                 <SelectContent>
-                  {mockStaffMembers.map(staff => (
+                  {staffList.map(staff => (
                     <SelectItem key={staff.id} value={staff.id}>
                       <div className="flex items-center gap-2">
                         <div 
