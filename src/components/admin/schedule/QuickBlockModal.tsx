@@ -35,8 +35,13 @@ export function QuickBlockModal({
   onClose, 
   onSave, 
   selectedDate,
-  selectedStaffId 
+  selectedStaffId,
+  isDemo = false
 }: QuickBlockModalProps) {
+  const { data: dbStaff } = useStaffMembers();
+  const staffList = isDemo 
+    ? mockStaffMembers 
+    : (dbStaff || []).map(s => ({ id: s.id, name: s.name, color: s.color || '#7c3aed', role: s.role }));
   const [form, setForm] = useState({
     staffId: selectedStaffId || "",
     date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
