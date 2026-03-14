@@ -55,7 +55,7 @@ export function SupplierFormModal({ open, onOpenChange, supplier, onSave }: Supp
     onSave({
       ...formData,
       id: supplier?.id || "",
-      salon_id: supplier?.salon_id || "demo",
+      salon_id: supplier?.salon_id || salonId || "",
       created_at: supplier?.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as Supplier);

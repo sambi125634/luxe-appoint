@@ -67,7 +67,7 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
     onSave({
       ...formData,
       id: product?.id || "",
-      salon_id: product?.salon_id || "demo",
+      salon_id: product?.salon_id || salonId || "",
       created_at: product?.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as Product);
