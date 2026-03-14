@@ -197,6 +197,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const { data: dbTags } = useClientTags();
   const [isTagManagementOpen, setIsTagManagementOpen] = useState(false);
   const [isCSVImportOpen, setIsCSVImportOpen] = useState(false);
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false);
 
   const availableTags = useMemo(() => {
     if (!dbTags || dbTags.length === 0) {
