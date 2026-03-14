@@ -249,9 +249,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   ];
 
   const [form, setForm] = useState({
-    name: "", role: "", email: "", phone: "", color: colors[0], serviceIds: [] as string[],
+    name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [] as string[],
     workingHours: defaultWorkingHours, bio: "", specializations: [] as string[], started_at: "",
+    contract_type: "", commission_rate: "" as string, certifications: [] as string[], visible_in_widget: true,
+    break_start: "", break_duration: "" as string,
   });
+  const [newCertification, setNewCertification] = useState("");
 
   const openDialog = (member?: StaffMember) => {
     if (member) {
