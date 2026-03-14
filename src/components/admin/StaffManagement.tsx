@@ -248,8 +248,8 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast({ title: "Za duży plik", description: "Maksymalny rozmiar zdjęcia to 2 MB", variant: "destructive" });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: "Za duży plik", description: "Maksymalny rozmiar zdjęcia to 10 MB", variant: "destructive" });
       return;
     }
     setAvatarFile(file);
