@@ -10,8 +10,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { mockStaffMembers } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+
+interface StaffItem {
+  id: string;
+  name: string;
+  color: string;
+  role: string | null;
+}
 
 interface WeekDuplicationProps {
+  isDemo?: boolean;
   onDuplicate?: (staffIds: string[], sourceWeek: Date, targetWeeksCount: number, includeExceptions: boolean) => void;
 }
 
