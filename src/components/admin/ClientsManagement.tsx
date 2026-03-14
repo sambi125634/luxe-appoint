@@ -777,6 +777,23 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
         />
       )}
       <ClientCSVImport open={isCSVImportOpen} onOpenChange={setIsCSVImportOpen} isDemo={isDemo} />
+      {selectedClient && (
+        <AppointmentModal
+          isOpen={showAppointmentModal}
+          onClose={() => setShowAppointmentModal(false)}
+          onSave={(appointment) => {
+            setShowAppointmentModal(false);
+            toast({ title: "Wizyta umówiona", description: `${appointment.serviceName} — ${appointment.date} o ${appointment.time}` });
+          }}
+          isDemo={isDemo}
+          preselectedClient={{
+            id: selectedClient.id,
+            name: `${selectedClient.firstName} ${selectedClient.lastName}`,
+            phone: selectedClient.phone,
+            email: selectedClient.email,
+          }}
+        />
+      )}
     </Dialog>
   );
 }
