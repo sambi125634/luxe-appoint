@@ -28,13 +28,21 @@ import {
   OccupancyData, 
   mockStaffMembers 
 } from "./types";
+import { useStaffMembers } from "@/hooks/useStaffMembers";
+
+interface StaffItem {
+  id: string;
+  name: string;
+  color: string;
+  role: string | null;
+}
 
 // Mock data generators
-const generateMockGaps = (): ScheduleGap[] => {
+const generateMockGaps = (staff: StaffItem[]): ScheduleGap[] => {
   const gaps: ScheduleGap[] = [];
   const today = new Date();
   
-  mockStaffMembers.forEach(staff => {
+  staff.forEach(member => {
     // Generate 2-4 gaps per staff member for the week
     const gapCount = Math.floor(Math.random() * 3) + 2;
     for (let i = 0; i < gapCount; i++) {
