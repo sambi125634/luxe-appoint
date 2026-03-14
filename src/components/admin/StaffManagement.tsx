@@ -550,7 +550,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
             </div>
             <div className="text-sm">
               <p className="font-medium">{form.name || "Nowy pracownik"}</p>
-              <p className="text-muted-foreground text-xs">Kliknij zdjęcie, aby zmienić (max 2 MB)</p>
+              <p className="text-muted-foreground text-xs">Kliknij zdjęcie, aby zmienić (max 10 MB)</p>
             </div>
           </div>
 
