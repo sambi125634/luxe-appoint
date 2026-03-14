@@ -614,6 +614,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="0">0%</SelectItem>
+                    <SelectItem value="5">5%</SelectItem>
                     <SelectItem value="8">8%</SelectItem>
                     <SelectItem value="23">23%</SelectItem>
                   </SelectContent>
