@@ -298,6 +298,16 @@ export function MyBookings() {
                 past.map((b) => <BookingCard key={b.id} booking={b} />)
               )}
             </TabsContent>
+
+            <TabsContent value="calendar">
+              <BookingsCalendarView
+                bookings={bookings ?? []}
+                renderBookingCard={(b) => {
+                  const isUpcoming = !isPast(parseISO(b.start_time)) && b.status !== "cancelled";
+                  return <BookingCard booking={b} isUpcoming={isUpcoming} />;
+                }}
+              />
+            </TabsContent>
           </Tabs>
         )}
       </div>
