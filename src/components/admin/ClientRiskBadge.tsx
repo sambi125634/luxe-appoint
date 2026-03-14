@@ -13,7 +13,7 @@ interface ClientRiskBadgeProps {
 }
 
 export function ClientRiskBadge({ clientId, salonId, showTooltip = true, size = "sm", compact = false }: ClientRiskBadgeProps) {
-  const { data: riskData, isLoading } = useClientRiskScore(clientId, salonId || "demo-salon");
+  const { data: riskData, isLoading } = useClientRiskScore(clientId, salonId || undefined);
 
   if (isLoading) {
     return <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />;

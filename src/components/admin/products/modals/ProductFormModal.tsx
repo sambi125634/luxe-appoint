@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { productCategories, type Product } from "../types";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface ProductFormModalProps {
   open: boolean;
@@ -18,6 +19,7 @@ interface ProductFormModalProps {
 
 export function ProductFormModal({ open, onOpenChange, product, onSave }: ProductFormModalProps) {
   const { t } = useTranslation();
+  const { salonId } = useSalonId();
   const isEditing = !!product;
 
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -65,7 +67,7 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
     onSave({
       ...formData,
       id: product?.id || "",
-      salon_id: product?.salon_id || "demo",
+      salon_id: product?.salon_id || salonId || "",
       created_at: product?.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as Product);

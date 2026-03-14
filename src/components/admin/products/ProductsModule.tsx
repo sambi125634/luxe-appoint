@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3 } from "lucide-react";
+import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2 } from "lucide-react";
 import { ProductsCatalog } from "./ProductsCatalog";
 import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
@@ -22,8 +22,24 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
   const { salonId, isLoading } = useSalonId();
   const [activeTab, setActiveTab] = useState<ProductTab>("catalog");
 
-  const effectiveSalonId = isDemo ? DEMO_SALON_ID : (salonId || DEMO_SALON_ID);
+  const effectiveSalonId = isDemo ? DEMO_SALON_ID : (salonId ?? undefined);
   const { products } = useProducts(effectiveSalonId);
+
+  if (!isDemo && isLoading) {
+    return (
+      <div className="flex items-center justify-center p-12">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (!isDemo && !salonId) {
+    return (
+      <div className="text-center p-12 text-muted-foreground">
+        Błąd: nie można załadować danych salonu. Odśwież stronę.
+      </div>
+    );
+  }
 
   const tabs = [
     { id: "catalog" as ProductTab, label: t("products.catalog"), icon: Package },

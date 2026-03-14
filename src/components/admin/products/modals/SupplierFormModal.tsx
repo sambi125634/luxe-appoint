@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { Supplier } from "../types";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface SupplierFormModalProps {
   open: boolean;
@@ -16,6 +17,7 @@ interface SupplierFormModalProps {
 
 export function SupplierFormModal({ open, onOpenChange, supplier, onSave }: SupplierFormModalProps) {
   const { t } = useTranslation();
+  const { salonId } = useSalonId();
   const isEditing = !!supplier;
 
   const [formData, setFormData] = useState<Partial<Supplier>>({
@@ -53,7 +55,7 @@ export function SupplierFormModal({ open, onOpenChange, supplier, onSave }: Supp
     onSave({
       ...formData,
       id: supplier?.id || "",
-      salon_id: supplier?.salon_id || "demo",
+      salon_id: supplier?.salon_id || salonId || "",
       created_at: supplier?.created_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     } as Supplier);
