@@ -351,17 +351,93 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
     );
   }
 
+  // Category templates for quick start
+  const categoryTemplates = [
+    { name: "Salon kosmetyczny", categories: [
+      { name: "Twarz", icon: "🧖‍♀️" }, { name: "Ciało", icon: "💆‍♀️" }, { name: "Depilacja", icon: "✂️" }, { name: "Brwi i rzęsy", icon: "👁️" },
+    ]},
+    { name: "Salon fryzjerski", categories: [
+      { name: "Strzyżenie", icon: "✂️" }, { name: "Koloryzacja", icon: "🎨" }, { name: "Stylizacja", icon: "💇‍♀️" }, { name: "Pielęgnacja", icon: "✨" },
+    ]},
+    { name: "Salon paznokci", categories: [
+      { name: "Manicure", icon: "💅" }, { name: "Pedicure", icon: "🦶" }, { name: "Zdobienia", icon: "🎨" }, { name: "Pielęgnacja dłoni", icon: "🤲" },
+    ]},
+    { name: "Salon masażu / SPA", categories: [
+      { name: "Masaże", icon: "💆" }, { name: "Rytuały SPA", icon: "🧘" }, { name: "Zabiegi na ciało", icon: "✨" }, { name: "Sauna i wellness", icon: "♨️" },
+    ]},
+  ];
+
+  const applyTemplate = async (template: typeof categoryTemplates[0]) => {
+    if (isDemo) return;
+    try {
+      for (const cat of template.categories) {
+        await createCategoryMutation.mutateAsync({ name: cat.name, icon: cat.icon });
+      }
+      toast({ title: "Szablon zastosowany", description: `Dodano ${template.categories.length} kategorii z szablonu "${template.name}". Teraz dodaj usługi w każdej kategorii.` });
+    } catch {
+      toast({ title: "Błąd", description: "Nie udało się zastosować szablonu", variant: "destructive" });
+    }
+  };
+
   // Empty state
   if (!isDemo && services.length === 0 && categories.length === 0) {
     return (
       <div className="space-y-6">
         <SectionGuide sectionKey="services" />
-        <div className="text-center py-16">
+        <div className="text-center py-12">
           <Package className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
-          <h3 className="text-xl font-serif font-semibold mb-2">Brak usług</h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Dodaj kategorie i usługi, które oferujesz. Bez usług klientki nie będą mogły rezerwować wizyt przez widget.
+          <h3 className="text-xl font-serif font-semibold mb-2">Rozpocznij konfigurację usług</h3>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+            Bez usług klientki nie będą mogły rezerwować wizyt. Skonfiguruj ofertę w 3 krokach:
           </p>
+
+          {/* Step-by-step guide */}
+          <div className="max-w-lg mx-auto mb-8 space-y-3 text-left">
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-muted/50 border border-border">
+              <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">1</div>
+              <div>
+                <p className="font-semibold text-sm">Dodaj kategorie usług</p>
+                <p className="text-xs text-muted-foreground">Np. „Twarz", „Ciało", „Paznokcie" — grupują usługi w widżecie rezerwacji</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-muted/50 border border-border">
+              <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold shrink-0">2</div>
+              <div>
+                <p className="font-semibold text-sm">Dodaj usługi w każdej kategorii</p>
+                <p className="text-xs text-muted-foreground">Nazwa, czas trwania, cena, opis i zdjęcie — to widzi klientka</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-muted/50 border border-border">
+              <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-sm font-bold shrink-0">3</div>
+              <div>
+                <p className="font-semibold text-sm">Przypisz personel do usług</p>
+                <p className="text-xs text-muted-foreground">Określ kto wykonuje daną usługę — potrzebne do kalendarza</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick start templates */}
+          <div className="max-w-lg mx-auto mb-6">
+            <p className="text-sm font-medium text-muted-foreground mb-3">Szybki start — wybierz szablon kategorii:</p>
+            <div className="grid grid-cols-2 gap-2">
+              {categoryTemplates.map((tpl) => (
+                <Button
+                  key={tpl.name}
+                  variant="outline"
+                  size="sm"
+                  className="justify-start gap-2 h-auto py-3 px-4"
+                  onClick={() => applyTemplate(tpl)}
+                >
+                  <FolderOpen className="w-4 h-4 shrink-0 text-primary" />
+                  <div className="text-left">
+                    <p className="text-xs font-semibold">{tpl.name}</p>
+                    <p className="text-[10px] text-muted-foreground">{tpl.categories.map(c => c.name).join(', ')}</p>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+
           <div className="flex gap-3 justify-center">
             <Button variant="outline" onClick={() => openCategoryDialog()} className="gap-2">
               <Plus className="w-4 h-4" />
@@ -614,6 +690,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="0">0%</SelectItem>
+                    <SelectItem value="5">5%</SelectItem>
                     <SelectItem value="8">8%</SelectItem>
                     <SelectItem value="23">23%</SelectItem>
                   </SelectContent>

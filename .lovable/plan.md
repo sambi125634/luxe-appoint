@@ -1,47 +1,101 @@
 
 
-# Plan: Naprawa panelu klienta + dodanie stawek VAT
+## Analiza techniczna: Login salon owners + indywidualne kokpity + aplikacja mobilna
 
-## Problem
-1. **BookingWidget** i jego sub-komponenty (`ServiceSelection`, `StaffSelection`) używają **hardcodowanych danych demo** (usługi, kategorie, personel). Gdy panel klienta (`SalonProfile`) otwiera BookingWidget, wyświetla się "Peeling kawitacyjny", "Anna Kowalska" itp. zamiast prawdziwych danych salonu.
-2. **Stawki VAT** — brakuje stawki 5% (obowiązująca w Polsce). Obecnie dostępne: 0%, 8%, 23%.
+### Co już mamy
 
-## Zakres zmian
+Projekt ma już solidne fundamenty:
+- **`/auth`** - strona logowania/rejestracji (email + hasło)
+- **`/admin`** - pełny panel admina z 14 modułami (dashboard, kalendarz, klienci, usługi, etc.)
+- **`useSalonId` hook** - automatycznie wykrywa salon właściciela lub pracownika
+- **RLS policies** - izolacja danych per `salon_id` na wszystkich tabelach
+- **`user_roles`** - system ról (`super_admin`, `salon_owner`, `staff`)
+- **`profiles`** - tabela z danymi użytkowników
 
-### 1. ServiceSelection.tsx — pobieranie danych z bazy
-- Dodać props: `salonId`, `isDemo`
-- Zamiast hardcodowanych `services[]` i `categories[]`, pobierać z Supabase (`services` + `service_categories` filtrowane po `salon_id`)
-- W trybie demo zachować obecne dane mockowe
-- Kategorie dynamicznie budować z danych DB
+### Problem do rozwiązania
 
-### 2. StaffSelection.tsx — pobieranie danych z bazy
-- Dodać props: `salonId`, `isDemo`
-- Zamiast hardcodowanych `staffMembers[]`, pobierać z `staff_members` (filtrowane po `salon_id`, `is_active=true`)
-- W trybie demo zachować obecne dane mockowe
+Obecny `/admin` nie rozróżnia ról - każdy zalogowany widzi ten sam panel. Brak onboardingu dla nowych salonów. Brak aplikacji mobilnej.
 
-### 3. BookingWidget.tsx — propagacja salonId i isDemo
-- Przekazywać `salonId` i `isDemo` do `ServiceSelection` i `StaffSelection`
-- Poprawić logikę `isDemo` — gdy `salonId` jest realnym UUID, nie traktować jako demo
-- Usunąć hardcodowane `serviceRecommendations` (lub oznaczyć jako demo-only)
+---
 
-### 4. SalonProfile.tsx — przekazanie salonId do BookingWidget
-- Przekazać `salonId` do `<BookingWidget salonId={salonId} />`
+### Plan implementacji
 
-### 5. Stawki VAT — rozszerzenie
-- W `ServicesManagement.tsx` dodać brakującą stawkę **5%** do selecta VAT
-- Kolejność: 0%, 5%, 8%, 23%
+#### FAZA 1: Role-based routing po loginie
 
-### 6. Pusty stan z instrukcją (szablony)
-- Gdy nowe konto nie ma żadnych usług, wyświetlić pusty stan z instrukcją krok-po-kroku:
-  1. "Najpierw dodaj kategorie usług (np. Twarz, Ciało, Paznokcie)"
-  2. "Następnie dodaj usługi w każdej kategorii"
-  3. "Przypisz personel do usług"
-- Dodać przycisk "Użyj szablonu" z pustymi kategoriami (nazwy bez usług) jako punkt startowy
+**Modyfikacja `/auth` i post-login flow:**
+- Po zalogowaniu sprawdzamy rolę użytkownika (`super_admin` → `/super-admin`, `salon_owner` → `/admin`, `staff` → `/admin` z ograniczonym menu)
+- Jeśli `salon_owner` ale brak salonu w DB → redirect do `/onboarding`
+- Nowy hook `useUserRole()` do pobierania roli z `user_roles`
 
-## Pliki do edycji
-- `src/components/booking/ServiceSelection.tsx` — główna zmiana: dane z DB
-- `src/components/booking/StaffSelection.tsx` — główna zmiana: dane z DB
-- `src/components/booking/BookingWidget.tsx` — propagacja props
-- `src/components/client-app/SalonProfile.tsx` — przekazanie salonId
-- `src/components/admin/ServicesManagement.tsx` — VAT 5% + lepszy empty state
+**Modyfikacja `AdminDashboard.tsx`:**
+- Sprawdzenie roli przy mount - jeśli `staff`, ukryj wrażliwe taby (księgowość, ustawienia, pipeline)
+- Wyświetlanie nazwy salonu w sidebar (z `useSalonId`)
+
+#### FAZA 2: Onboarding wizard (`/onboarding`)
+
+Nowa strona z 5-krokowym wizardem:
+1. **Dane salonu** - nazwa, adres, miasto, telefon
+2. **Godziny pracy** - wybór typowego tygodnia (pon-pt 9-18, sob 9-14)
+3. **Usługi** - szablony branżowe (beauty/fryzjer/med. estetyczna) + ręczne dodawanie
+4. **Pracownicy** - opcjonalne, można pominąć
+5. **Podsumowanie** - link do widgetu `/s/[slug]`, kod embed
+
+Tworzy rekord w `salons` + `service_categories` + `services` + `working_hours`.
+
+#### FAZA 3: Indywidualne kokpity
+
+Kokpit już istnieje (`/admin`) i jest gotowy na multi-tenant:
+- **`useSalonId()`** filtruje dane po salon_id zalogowanego użytkownika
+- **RLS** gwarantuje izolację na poziomie DB
+- Każdy salon owner widzi TYLKO swoje dane
+
+Potrzebne ulepszenia:
+- Wyświetlanie nazwy/logo salonu w sidebarze
+- Personalizacja kolorów (z `salons.theme_primary_color`)
+- Widget "Twój link do rezerwacji" na dashboardzie
+- Onboarding progress indicator dla nowo utworzonych salonów
+
+#### FAZA 4: Aplikacja mobilna (PWA)
+
+**Rekomendacja: PWA (Progressive Web App)** zamiast natywnej aplikacji.
+
+Dlaczego PWA:
+- Nie wymaga App Store / Google Play
+- Ten sam codebase - zero dodatkowej pracy
+- Instalowalna z przeglądarki na home screen
+- Działa offline (cached assets)
+- Push notifications przez Web Push API
+- Panel admin jest już responsywny (mobile sidebar, hamburger menu)
+
+Implementacja:
+- Instalacja `vite-plugin-pwa`
+- Konfiguracja manifest.json (nazwa, ikony, kolory)
+- Service worker dla cache'owania
+- Strona `/install` z instrukcją instalacji
+- Meta tagi mobile-optimized w `index.html`
+
+Jeśli w przyszłości potrzebna natywna aplikacja (dostęp do kamery, sensorów), możemy dodać Capacitor jako wrapper.
+
+---
+
+### Wymagane zmiany w bazie danych
+
+1. **Tabela `salons`**: dodać `onboarding_completed` (boolean, default false), `onboarding_step` (integer, default 0)
+2. **Nowe dane seed**: szablony usług per branża (beauty, fryzjer, medycyna estetyczna)
+
+### Nowe komponenty
+
+- `useUserRole()` hook
+- `/onboarding` page z multi-step wizard
+- PWA config (manifest, service worker, install page)
+- Zmodyfikowany `AuthPage` z role-based redirect
+- Zmodyfikowany `AdminSidebar` z salon branding i role-based menu
+
+### Kolejność implementacji
+
+1. Hook `useUserRole` + role-based redirect w `/auth`
+2. Ograniczenie menu w `/admin` per rola
+3. Onboarding wizard `/onboarding`
+4. Salon branding w sidebar
+5. PWA setup
 

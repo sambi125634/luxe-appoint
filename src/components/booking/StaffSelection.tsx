@@ -3,6 +3,9 @@ import { User, Star, Clock, CalendarDays, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StaffMember {
   id: string;
@@ -17,9 +20,11 @@ interface StaffSelectionProps {
   onSelect: (staff: StaffMember | null) => void;
   selectedStaff: StaffMember | null;
   onProceed?: () => void;
+  salonId?: string;
+  isDemo?: boolean;
 }
 
-const staffMembers: StaffMember[] = [
+const demoStaffMembers: StaffMember[] = [
   { id: "1", name: "Anna Kowalska", role: "Kosmetolog", rating: 4.9, nextAvailable: "Dziś, 14:00" },
   { id: "2", name: "Maria Nowak", role: "Specjalista depilacji", rating: 4.8, nextAvailable: "Jutro, 10:00" },
   { id: "3", name: "Karolina Wiśniewska", role: "Stylistka brwi i rzęs", rating: 5.0, nextAvailable: "Dziś, 16:30" },
@@ -28,19 +33,40 @@ const staffMembers: StaffMember[] = [
 
 type SelectionMode = 'specialist' | 'time';
 
-export function StaffSelection({ onSelect, selectedStaff, onProceed }: StaffSelectionProps) {
+export function StaffSelection({ onSelect, selectedStaff, onProceed, salonId, isDemo = false }: StaffSelectionProps) {
   const [mode, setMode] = useState<SelectionMode>('specialist');
   const isAnySelected = selectedStaff === null;
+
+  // Fetch real staff from DB
+  const { data: dbStaff, isLoading } = useQuery({
+    queryKey: ["booking-staff", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("staff_members")
+        .select("id, name, role, avatar_url")
+        .eq("salon_id", salonId!)
+        .eq("is_active", true);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  const staffMembers: StaffMember[] = isDemo
+    ? demoStaffMembers
+    : (dbStaff ?? []).map(s => ({
+        id: s.id,
+        name: s.name,
+        role: s.role || "Specjalista",
+        avatar: s.avatar_url || undefined,
+        rating: 5.0,
+      }));
   
   const handleSelect = (staff: StaffMember | null) => {
     onSelect(staff);
-    // Auto-advance after selection
-    setTimeout(() => {
-      onProceed?.();
-    }, 150);
+    setTimeout(() => { onProceed?.(); }, 150);
   };
 
-  // Sort by next available for "time first" mode
   const sortedStaff = mode === 'time' 
     ? [...staffMembers].sort((a, b) => {
         if (a.nextAvailable?.includes('Dziś') && !b.nextAvailable?.includes('Dziś')) return -1;
@@ -48,6 +74,15 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed }: StaffSele
         return 0;
       })
     : staffMembers;
+
+  if (!isDemo && isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48 mx-auto" />
+        {[1,2,3].map(i => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -78,13 +113,13 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed }: StaffSele
         </Button>
       </div>
 
-      {mode === 'time' && (
+      {mode === 'time' && staffMembers.length > 0 && (
         <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl animate-fade-in">
           <div className="flex items-center gap-2 text-sm">
             <CalendarDays className="w-4 h-4 text-primary" />
             <span className="font-medium">Najbliższy dostępny termin:</span>
             <Badge variant="secondary" className="bg-primary/10 text-primary">
-              Dziś, 14:00 - Anna Kowalska
+              {staffMembers[0]?.nextAvailable ? `${staffMembers[0].nextAvailable} - ${staffMembers[0].name}` : staffMembers[0]?.name}
             </Badge>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
@@ -180,6 +215,14 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed }: StaffSele
             </div>
           </button>
         ))}
+
+        {staffMembers.length === 0 && !isDemo && (
+          <div className="text-center py-8 text-muted-foreground">
+            <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+            <p className="font-medium">Brak dostępnych specjalistów</p>
+            <p className="text-sm">Salon nie ma jeszcze dodanego zespołu</p>
+          </div>
+        )}
       </div>
     </div>
   );
