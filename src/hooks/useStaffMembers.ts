@@ -30,7 +30,7 @@ export function useStaffMembers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("staff_members")
-        .select("id, name, role, email, phone, color, avatar_url, is_active")
+        .select("id, name, role, email, phone, color, avatar_url, is_active, contract_type, commission_rate, certifications, visible_in_widget, break_start, break_duration, bio, specializations, started_at")
         .eq("salon_id", salonId!)
         .eq("is_active", true)
         .order("name");
