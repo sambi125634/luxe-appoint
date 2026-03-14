@@ -143,7 +143,7 @@ export function ClientListItem({ client, availableTags, onClick }: ClientListIte
 
             {/* Tags */}
             <div className="flex flex-wrap gap-1 max-w-[150px] hidden md:flex">
-              {client.tags.slice(0, 2).map(tagId => {
+              {(client.tags || []).slice(0, 2).map(tagId => {
                 const tag = getTagInfo(tagId);
                 return tag ? (
                   <Badge key={tagId} variant="secondary" className={cn("text-xs", tag.color)}>
