@@ -68,7 +68,7 @@ const mockStaff = [
 
 const hours = Array.from({ length: 12 }, (_, i) => `${(8 + i).toString().padStart(2, "0")}:00`);
 
-type CalendarView = "day" | "week";
+type CalendarView = "day" | "week" | "month";
 
 interface WeeklyCalendarProps {
   isDemo?: boolean;
