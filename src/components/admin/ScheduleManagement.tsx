@@ -176,7 +176,7 @@ export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) 
 
       {activeView === "smart" && (
         <div className="space-y-6">
-          <SmartScheduleHelpers />
+          <SmartScheduleHelpers isDemo={isDemo} />
         </div>
       )}
 
