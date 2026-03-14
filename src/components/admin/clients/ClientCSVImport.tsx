@@ -303,7 +303,7 @@ export function ClientCSVImport({ open, onOpenChange, isDemo }: ClientCSVImportP
 
             <Button variant="outline" onClick={downloadTemplate} className="gap-2 w-full">
               <Download className="w-4 h-4" />
-              Pobierz szablon CSV z przykładami
+              Pobierz przykładowy plik CSV
             </Button>
           </div>
         )}
