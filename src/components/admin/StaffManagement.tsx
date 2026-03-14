@@ -476,7 +476,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                 <div className="flex items-start gap-4">
                   <Avatar className="w-14 h-14 ring-2 ring-border">
                     {member.avatar_url && <AvatarImage src={member.avatar_url} alt={member.name} className="object-cover" />}
-                    <AvatarFallback className={cn(member.color, "text-primary-foreground font-serif text-lg")}>
+                    <AvatarFallback className="font-serif text-lg" style={{ backgroundColor: member.color, color: 'white' }}>
                       {getInitials(member.name)}
                     </AvatarFallback>
                   </Avatar>
