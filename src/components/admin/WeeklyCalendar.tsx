@@ -390,6 +390,16 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
     })
     .map((a) => ({ ...a }));
 
+  // --- month view helpers ---
+  const monthAppointments: (AppointmentBlockData & { _date: string })[] = appointments.map((a) => {
+    const ws = getWeekStart(currentDate);
+    const dayOffset = "dayOffset" in a && a.dayOffset !== undefined ? (a.dayOffset as number) : 0;
+    const aptDate = new Date(ws);
+    aptDate.setDate(aptDate.getDate() + dayOffset);
+    const dateStr = `${aptDate.getFullYear()}-${String(aptDate.getMonth() + 1).padStart(2, "0")}-${String(aptDate.getDate()).padStart(2, "0")}`;
+    return { ...a, _date: dateStr };
+  });
+
   // Empty state
   if (!isDemo && staff.length === 0) {
     return (
