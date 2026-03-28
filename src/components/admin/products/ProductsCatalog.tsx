@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, AlertTriangle, Package, Loader2, QrCode } from "lucide-react";
+import { Plus, Search, Filter, MoreHorizontal, Edit, Trash2, AlertTriangle, Package, Loader2, QrCode, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,15 +10,16 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ProductFormModal } from "./modals/ProductFormModal";
 import QRCodeDisplay from "./QRCodeDisplay";
-import { productCategories, type Product } from "./types";
+import { CategoryManagementDialog } from "./CategoryManagementDialog";
+import { type Product } from "./types";
 import { useProducts, type Product as DBProduct } from "@/hooks/useProducts";
+import { useProductCategories } from "@/hooks/useProductCategories";
 import { cn } from "@/lib/utils";
 
 interface ProductsCatalogProps {
   salonId?: string;
 }
 
-// Helper to convert DB product to component Product type
 const toProduct = (p: DBProduct): Product => ({
   id: p.id,
   salon_id: p.salon_id,
@@ -45,13 +46,24 @@ const toProduct = (p: DBProduct): Product => ({
 export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
   const { t } = useTranslation();
   const { products: dbProducts, isLoading, createProduct, updateProduct, deleteProduct } = useProducts(salonId);
+  const { categories } = useProductCategories(salonId);
   const products = dbProducts.map(toProduct);
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [qrProduct, setQrProduct] = useState<Product | null>(null);
+  const [showCategoryDialog, setShowCategoryDialog] = useState(false);
+
+  // Build category names from DB categories
+  const categoryNames = categories.map((c) => c.name);
+
+  // Count products per category for the management dialog
+  const productCountByCategory: Record<string, number> = {};
+  products.forEach((p) => {
+    productCountByCategory[p.category] = (productCountByCategory[p.category] || 0) + 1;
+  });
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -215,20 +227,30 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
                 className="pl-10"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full sm:w-[200px]">
-                <Filter className="w-4 h-4 mr-2" />
-                <SelectValue placeholder={t("products.allCategories")} />
-              </SelectTrigger>
-              <SelectContent className="bg-background border">
-                <SelectItem value="all">{t("products.allCategories")}</SelectItem>
-                {productCategories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder={t("products.allCategories")} />
+                </SelectTrigger>
+                <SelectContent className="bg-background border">
+                  <SelectItem value="all">{t("products.allCategories")}</SelectItem>
+                  {categoryNames.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {categories.find((c) => c.name === cat)?.icon} {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowCategoryDialog(true)}
+                title="Zarządzaj kategoriami"
+              >
+                <Settings className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Products Table */}
@@ -255,6 +277,7 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
                 ) : (
                   filteredProducts.map((product) => {
                     const status = getStockStatus(product);
+                    const catInfo = categories.find((c) => c.name === product.category);
                     return (
                       <TableRow key={product.id} className="hover:bg-muted/30">
                         <TableCell>
@@ -267,7 +290,10 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
                         </TableCell>
                         <TableCell className="hidden md:table-cell">{product.brand || "-"}</TableCell>
                         <TableCell className="hidden sm:table-cell">
-                          <Badge variant="outline">{product.category}</Badge>
+                          <Badge variant="outline">
+                            {catInfo?.icon && <span className="mr-1">{catInfo.icon}</span>}
+                            {product.category}
+                          </Badge>
                         </TableCell>
                         <TableCell className="text-right font-medium">
                           {product.sale_price_gross.toLocaleString()} zł
@@ -329,12 +355,20 @@ export function ProductsCatalog({ salonId }: ProductsCatalogProps) {
         }}
         product={editingProduct}
         onSave={handleSaveProduct}
+        salonId={salonId}
       />
 
       <QRCodeDisplay
         product={qrProduct}
         open={!!qrProduct}
         onOpenChange={(open) => !open && setQrProduct(null)}
+      />
+
+      <CategoryManagementDialog
+        open={showCategoryDialog}
+        onOpenChange={setShowCategoryDialog}
+        salonId={salonId}
+        productCountByCategory={productCountByCategory}
       />
     </div>
   );
