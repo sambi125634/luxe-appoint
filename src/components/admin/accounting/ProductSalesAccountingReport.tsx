@@ -1,547 +1,360 @@
 import { useState } from "react";
-import { format } from "date-fns";
-import { pl } from "date-fns/locale";
 import { 
-  Package, 
-  Download, 
-  TrendingUp, 
-  DollarSign, 
-  ShoppingBag,
-  ArrowUpRight,
-  ArrowDownRight,
-  Filter
+  Package, Download, TrendingUp, DollarSign, ShoppingBag,
+  ArrowUpRight, ArrowDownRight, Filter, Minus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
 import { 
-  exportToCSV, 
-  ProductExportData, 
-  exportProductSales 
-} from "@/lib/csvExport";
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, Legend,
+} from "recharts";
+import { cn } from "@/lib/utils";
 
 interface ProductSalesAccountingReportProps {
   dateRange: { from: Date; to: Date };
 }
 
-// Mock data for product sales — dates relative to today
-const today = new Date();
-const ddAgo = (daysAgo: number) => {
-  const d = new Date(today);
-  d.setDate(d.getDate() - daysAgo);
-  return d.toISOString().split("T")[0];
+// ─── Rich demo data ───
+const MOCK_PRODUCT_SALES_REPORT = {
+  period: "Ostatnie 30 dni",
+  totalRevenue: 4280,
+  totalItemsSold: 89,
+  totalOrders: 34,
+  avgOrderValue: 125.88,
+  topProducts: [
+    { id: "m1", name: "Serum witaminowe C 30ml", brand: "L'Oréal Professionnel", category: "Pielęgnacja twarzy", unitsSold: 12, revenue: 1788, avgPrice: 149, margin: 49.7, trend: 23 },
+    { id: "m2", name: "Lakier hybrydowy Classic Red", brand: "Semilac", category: "Paznokcie", unitsSold: 18, revenue: 630, avgPrice: 35, margin: 48.6, trend: 5 },
+    { id: "m3", name: "Krem nawilżający do twarzy 50ml", brand: "L'Oréal Professionnel", category: "Pielęgnacja twarzy", unitsSold: 9, revenue: 801, avgPrice: 89, margin: 49.4, trend: -8 },
+    { id: "m4", name: "Maska nawilżająca do włosów", brand: "Kérastase", category: "Włosy", unitsSold: 7, revenue: 1113, avgPrice: 159, margin: 49.7, trend: 15 },
+    { id: "m5", name: "Top coat no-wipe 7ml", brand: "Semilac", category: "Paznokcie", unitsSold: 14, revenue: 546, avgPrice: 39, margin: 48.7, trend: 31 },
+    { id: "m6", name: "Olejek arganowy do włosów", brand: "Kérastase", category: "Włosy", unitsSold: 5, revenue: 475, avgPrice: 95, margin: 49.5, trend: -3 },
+    { id: "m7", name: "Baza pod lakier hybrydowy", brand: "Semilac", category: "Paznokcie", unitsSold: 11, revenue: 539, avgPrice: 49, margin: 49.0, trend: 8 },
+    { id: "m8", name: "Krem pod oczy z retinolem", brand: "L'Oréal Professionnel", category: "Pielęgnacja twarzy", unitsSold: 4, revenue: 476, avgPrice: 119, margin: 49.6, trend: 44 },
+  ],
+  salesByCategory: [
+    { category: "Pielęgnacja twarzy", revenue: 3065, units: 25, color: "hsl(var(--primary))" },
+    { category: "Paznokcie", revenue: 1715, units: 43, color: "#E91E8C" },
+    { category: "Włosy", revenue: 1588, units: 12, color: "#0D9488" },
+    { category: "Pielęgnacja ciała", revenue: 680, units: 8, color: "#F59E0B" },
+    { category: "Akcesoria", revenue: 232, units: 1, color: "#6B7280" },
+  ],
+  salesByDay: [
+    { date: "10 mar", revenue: 89, units: 3 },
+    { date: "11 mar", revenue: 245, units: 7 },
+    { date: "12 mar", revenue: 178, units: 5 },
+    { date: "13 mar", revenue: 310, units: 9 },
+    { date: "14 mar", revenue: 420, units: 11 },
+    { date: "15 mar", revenue: 165, units: 4 },
+    { date: "16 mar", revenue: 89, units: 2 },
+    { date: "17 mar", revenue: 534, units: 14 },
+    { date: "18 mar", revenue: 290, units: 8 },
+    { date: "19 mar", revenue: 445, units: 12 },
+    { date: "20 mar", revenue: 380, units: 10 },
+    { date: "21 mar", revenue: 155, units: 4 },
+    { date: "22 mar", revenue: 75, units: 2 },
+    { date: "23 mar", revenue: 480, units: 13 },
+    { date: "24 mar", revenue: 325, units: 9 },
+    { date: "25 mar", revenue: 265, units: 7 },
+    { date: "26 mar", revenue: 495, units: 13 },
+    { date: "27 mar", revenue: 340, units: 9 },
+    { date: "28 mar", revenue: 120, units: 3 },
+    { date: "29 mar", revenue: 685, units: 18 },
+  ],
+  staffSales: [
+    { name: "Anna (właścicielka)", unitsSold: 38, revenue: 1820, commission: 182 },
+    { name: "Oliwia Wrona", unitsSold: 31, revenue: 1490, commission: 149 },
+    { name: "Karolina W.", unitsSold: 20, revenue: 970, commission: 97 },
+  ],
 };
 
-const mockProductSales = [
-  {
-    id: "ps1",
-    date: ddAgo(0),
-    productId: "p1",
-    productName: "Serum witaminowe C",
-    category: "Kosmetyki",
-    brand: "La Roche-Posay",
-    sku: "LRP-SER-001",
-    quantity: 5,
-    unitPriceNet: 97.56,
-    unitPriceGross: 120,
-    vatRate: 23,
-    totalNet: 487.80,
-    totalGross: 600,
-    vatAmount: 112.20,
-    costPrice: 65,
-    profit: 162.80,
-    profitMargin: 33.4,
-    staffId: "s1",
-    staffName: "Maria Kowalczyk",
-    paymentMethod: "karta",
-    clientName: "Anna Kowalska",
-  },
-  {
-    id: "ps2",
-    date: ddAgo(0),
-    productId: "p2",
-    productName: "Krem nawilżający premium",
-    category: "Kosmetyki",
-    brand: "Avène",
-    sku: "AVN-KRM-002",
-    quantity: 3,
-    unitPriceNet: 153.66,
-    unitPriceGross: 189,
-    vatRate: 23,
-    totalNet: 460.98,
-    totalGross: 567,
-    vatAmount: 106.02,
-    costPrice: 95,
-    profit: 175.98,
-    profitMargin: 38.2,
-    staffId: "s2",
-    staffName: "Aleksandra Wiśniewska",
-    paymentMethod: "gotówka",
-    clientName: "Katarzyna Nowak",
-  },
-  {
-    id: "ps3",
-    date: ddAgo(1),
-    productId: "p3",
-    productName: "Olejek do masażu",
-    category: "Akcesoria",
-    brand: "Bio-Oil",
-    sku: "BIO-OLE-003",
-    quantity: 8,
-    unitPriceNet: 48.78,
-    unitPriceGross: 60,
-    vatRate: 23,
-    totalNet: 390.24,
-    totalGross: 480,
-    vatAmount: 89.76,
-    costPrice: 28,
-    profit: 166.24,
-    profitMargin: 42.6,
-    staffId: "s1",
-    staffName: "Maria Kowalczyk",
-    paymentMethod: "karta",
-    clientName: "Magdalena Wiśniewska",
-  },
-  {
-    id: "ps4",
-    date: ddAgo(1),
-    productId: "p4",
-    productName: "Maska do włosów",
-    category: "Pielęgnacja włosów",
-    brand: "Kérastase",
-    sku: "KER-MSK-004",
-    quantity: 2,
-    unitPriceNet: 162.60,
-    unitPriceGross: 200,
-    vatRate: 23,
-    totalNet: 325.20,
-    totalGross: 400,
-    vatAmount: 74.80,
-    costPrice: 110,
-    profit: 105.20,
-    profitMargin: 32.3,
-    staffId: "s3",
-    staffName: "Natalia Kamińska",
-    paymentMethod: "online",
-    clientName: "Joanna Lewandowska",
-  },
-  {
-    id: "ps5",
-    date: ddAgo(2),
-    productId: "p1",
-    productName: "Serum witaminowe C",
-    category: "Kosmetyki",
-    brand: "La Roche-Posay",
-    sku: "LRP-SER-001",
-    quantity: 3,
-    unitPriceNet: 97.56,
-    unitPriceGross: 120,
-    vatRate: 23,
-    totalNet: 292.68,
-    totalGross: 360,
-    vatAmount: 67.32,
-    costPrice: 65,
-    profit: 97.68,
-    profitMargin: 33.4,
-    staffId: "s2",
-    staffName: "Aleksandra Wiśniewska",
-    paymentMethod: "karta",
-    clientName: "Ewa Dąbrowska",
-  },
-];
-
-// Aggregate data by product
-const aggregateByProduct = (sales: typeof mockProductSales) => {
-  const map = new Map<string, {
-    productName: string;
-    category: string;
-    brand: string;
-    sku: string;
-    totalQuantity: number;
-    totalGross: number;
-    totalNet: number;
-    totalVat: number;
-    totalProfit: number;
-    avgMargin: number;
-  }>();
-  
-  sales.forEach(sale => {
-    const existing = map.get(sale.productId);
-    if (existing) {
-      existing.totalQuantity += sale.quantity;
-      existing.totalGross += sale.totalGross;
-      existing.totalNet += sale.totalNet;
-      existing.totalVat += sale.vatAmount;
-      existing.totalProfit += sale.profit;
-    } else {
-      map.set(sale.productId, {
-        productName: sale.productName,
-        category: sale.category,
-        brand: sale.brand,
-        sku: sale.sku,
-        totalQuantity: sale.quantity,
-        totalGross: sale.totalGross,
-        totalNet: sale.totalNet,
-        totalVat: sale.vatAmount,
-        totalProfit: sale.profit,
-        avgMargin: sale.profitMargin,
-      });
-    }
-  });
-  
-  return Array.from(map.entries()).map(([id, data]) => ({
-    productId: id,
-    ...data,
-    avgMargin: (data.totalProfit / data.totalNet) * 100,
-  })).sort((a, b) => b.totalGross - a.totalGross);
-};
-
-// Aggregate data by staff
-const aggregateByStaff = (sales: typeof mockProductSales) => {
-  const map = new Map<string, {
-    staffName: string;
-    salesCount: number;
-    totalQuantity: number;
-    totalGross: number;
-    totalProfit: number;
-  }>();
-  
-  sales.forEach(sale => {
-    const existing = map.get(sale.staffId);
-    if (existing) {
-      existing.salesCount += 1;
-      existing.totalQuantity += sale.quantity;
-      existing.totalGross += sale.totalGross;
-      existing.totalProfit += sale.profit;
-    } else {
-      map.set(sale.staffId, {
-        staffName: sale.staffName,
-        salesCount: 1,
-        totalQuantity: sale.quantity,
-        totalGross: sale.totalGross,
-        totalProfit: sale.profit,
-      });
-    }
-  });
-  
-  return Array.from(map.entries()).map(([id, data]) => ({
-    staffId: id,
-    ...data,
-  })).sort((a, b) => b.totalGross - a.totalGross);
-};
+const PIE_COLORS = ["#7c3aed", "#E91E8C", "#0D9488", "#F59E0B", "#6B7280"];
 
 export function ProductSalesAccountingReport({ dateRange }: ProductSalesAccountingReportProps) {
   const { t } = useTranslation();
-  const [viewMode, setViewMode] = useState<"transactions" | "products" | "staff">("transactions");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("pl-PL", {
-      style: "currency",
-      currency: "PLN",
-    }).format(amount);
-  };
 
-  // Filter sales by category
-  const filteredSales = categoryFilter === "all" 
-    ? mockProductSales 
-    : mockProductSales.filter(s => s.category === categoryFilter);
+  // Always show demo for now (same pattern as existing component)
+  const isShowingDemo = true;
+  const data = MOCK_PRODUCT_SALES_REPORT;
 
-  // Calculate totals
-  const totals = filteredSales.reduce(
-    (acc, sale) => ({
-      quantity: acc.quantity + sale.quantity,
-      gross: acc.gross + sale.totalGross,
-      net: acc.net + sale.totalNet,
-      vat: acc.vat + sale.vatAmount,
-      profit: acc.profit + sale.profit,
-    }),
-    { quantity: 0, gross: 0, net: 0, vat: 0, profit: 0 }
-  );
+  const formatCurrency = (amount: number) =>
+    new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN" }).format(amount);
 
-  const avgMargin = totals.net > 0 ? (totals.profit / totals.net) * 100 : 0;
+  const filteredProducts = categoryFilter === "all"
+    ? data.topProducts
+    : data.topProducts.filter((p) => p.category === categoryFilter);
 
-  // Get unique categories for filter
-  const categories = [...new Set(mockProductSales.map(s => s.category))];
-
-  // Aggregated data
-  const productAggregates = aggregateByProduct(filteredSales);
-  const staffAggregates = aggregateByStaff(filteredSales);
-
-  const handleExportCSV = () => {
-    const exportData: ProductExportData[] = filteredSales.map(sale => ({
-      date: sale.date,
-      productName: sale.productName,
-      category: sale.category,
-      brand: sale.brand,
-      sku: sale.sku,
-      quantity: sale.quantity,
-      unitPriceGross: sale.unitPriceGross,
-      totalGross: sale.totalGross,
-      vatRate: sale.vatRate,
-      vatAmount: sale.vatAmount,
-      profit: sale.profit,
-      staffName: sale.staffName,
-      clientName: sale.clientName,
-      paymentMethod: sale.paymentMethod,
-    }));
-    exportProductSales(exportData);
-  };
+  const categories = [...new Set(data.topProducts.map((p) => p.category))];
 
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      {/* Demo banner */}
+      {isShowingDemo && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-50 border border-amber-200">
+          <span className="text-lg">👁️</span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-amber-800">
+              Podgląd demo — przykładowe dane sprzedaży
+            </p>
+            <p className="text-xs text-amber-600 mt-0.5">
+              Tak będzie wyglądał Twój raport gdy zaczniesz sprzedawać produkty klientkom. Dane zostaną zastąpione rzeczywistymi automatycznie.
+            </p>
+          </div>
+          <span className="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-1 rounded-full border border-amber-300">
+            DEMO
+          </span>
+        </div>
+      )}
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
           <CardContent className="p-5">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
               <DollarSign className="w-4 h-4" />
-              {t('accounting.productSales.totalRevenue')}
+              💰 Przychód ze sprzedaży
             </div>
-            <p className="text-2xl font-bold">{formatCurrency(totals.gross)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(data.totalRevenue)}</p>
+            <p className="text-xs text-muted-foreground mt-1">ostatnie 30 dni</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
               <ShoppingBag className="w-4 h-4" />
-              {t('accounting.productSales.soldItems')}
+              📦 Sprzedanych sztuk
             </div>
-            <p className="text-2xl font-bold">{totals.quantity}</p>
+            <p className="text-2xl font-bold">{data.totalItemsSold}</p>
+            <p className="text-xs text-muted-foreground mt-1">w {data.totalOrders} transakcjach</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
               <TrendingUp className="w-4 h-4" />
-              {t('accounting.productSales.profit')}
+              🛒 Średnia wartość zakupu
             </div>
-            <p className="text-2xl font-bold text-green-600">{formatCurrency(totals.profit)}</p>
+            <p className="text-2xl font-bold">{formatCurrency(data.avgOrderValue)}</p>
+            <p className="text-xs text-muted-foreground mt-1">per transakcja</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-5">
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
               <ArrowUpRight className="w-4 h-4" />
-              {t('accounting.productSales.avgMargin')}
+              📈 Najlepszy produkt
             </div>
-            <p className="text-2xl font-bold">{avgMargin.toFixed(1)}%</p>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-              <Package className="w-4 h-4" />
-              {t('accounting.productSales.vatAmount')}
-            </div>
-            <p className="text-2xl font-bold">{formatCurrency(totals.vat)}</p>
+            <p className="text-sm font-bold leading-tight">{data.topProducts[0].name}</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              {data.topProducts[0].unitsSold} szt · {formatCurrency(data.topProducts[0].revenue)}
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters and Actions */}
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Bar chart — daily sales */}
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Sprzedaż dzienna</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <ResponsiveContainer width="100%" height={220}>
+              <BarChart data={data.salesByDay}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                <XAxis dataKey="date" tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                <YAxis tick={{ fontSize: 11 }} className="text-muted-foreground" />
+                <Tooltip formatter={(value: number) => [`${value} zł`, "Przychód"]} />
+                <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+            {isShowingDemo && (
+              <span className="absolute bottom-2 right-3 text-xs text-muted-foreground/40 font-medium select-none">
+                dane przykładowe
+              </span>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Pie chart — by category */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Wg kategorii</CardTitle>
+          </CardHeader>
+          <CardContent className="relative">
+            <ResponsiveContainer width="100%" height={220}>
+              <PieChart>
+                <Pie
+                  data={data.salesByCategory}
+                  dataKey="revenue"
+                  nameKey="category"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={75}
+                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
+                >
+                  {data.salesByCategory.map((_, idx) => (
+                    <Cell key={idx} fill={PIE_COLORS[idx % PIE_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => [`${value} zł`, "Przychód"]} />
+                <Legend wrapperStyle={{ fontSize: 11 }} />
+              </PieChart>
+            </ResponsiveContainer>
+            {isShowingDemo && (
+              <span className="absolute bottom-2 right-3 text-xs text-muted-foreground/40 font-medium select-none">
+                dane przykładowe
+              </span>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-        <div className="flex gap-3">
-          <Select value={viewMode} onValueChange={(v) => setViewMode(v as typeof viewMode)}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="transactions">{t('accounting.productSales.viewTransactions')}</SelectItem>
-              <SelectItem value="products">{t('accounting.productSales.viewByProduct')}</SelectItem>
-              <SelectItem value="staff">{t('accounting.productSales.viewByStaff')}</SelectItem>
-            </SelectContent>
-          </Select>
-          
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[180px]">
-              <Filter className="w-4 h-4 mr-2" />
-              <SelectValue placeholder={t('accounting.productSales.allCategories')} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t('accounting.productSales.allCategories')}</SelectItem>
-              {categories.map(cat => (
-                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <Button variant="outline" className="gap-2" onClick={handleExportCSV}>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-[200px]">
+            <Filter className="w-4 h-4 mr-2" />
+            <SelectValue placeholder="Wszystkie kategorie" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Wszystkie kategorie</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Button variant="outline" className="gap-2" size="sm">
           <Download className="w-4 h-4" />
-          {t('accounting.exportCsv')}
+          Eksport CSV
         </Button>
       </div>
 
-      {/* Data Tables */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
-        {viewMode === "transactions" && (
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>{t('accounting.date')}</TableHead>
-                <TableHead>{t('accounting.productSales.product')}</TableHead>
-                <TableHead>{t('accounting.productSales.category')}</TableHead>
-                <TableHead className="text-center">{t('accounting.productSales.qty')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.unitPrice')}</TableHead>
-                <TableHead className="text-right">{t('accounting.grossAmount')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.vat')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.profit')}</TableHead>
-                <TableHead>{t('accounting.employee')}</TableHead>
-                <TableHead>{t('accounting.paymentMethod')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredSales.map((sale) => (
-                <TableRow key={sale.id}>
-                  <TableCell>{format(new Date(sale.date), "dd.MM.yyyy")}</TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{sale.productName}</p>
-                      <p className="text-xs text-muted-foreground">{sale.brand} • {sale.sku}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{sale.category}</Badge>
-                  </TableCell>
-                  <TableCell className="text-center">{sale.quantity}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(sale.unitPriceGross)}</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(sale.totalGross)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{formatCurrency(sale.vatAmount)}</TableCell>
-                  <TableCell className="text-right">
-                    <span className="text-green-600">{formatCurrency(sale.profit)}</span>
-                    <span className="text-xs text-muted-foreground ml-1">({sale.profitMargin.toFixed(0)}%)</span>
-                  </TableCell>
-                  <TableCell>{sale.staffName}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{sale.paymentMethod}</Badge>
-                  </TableCell>
+      {/* Top Products Table */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Package className="w-4 h-4" />
+            Top produkty
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="rounded-lg border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-10">#</TableHead>
+                  <TableHead>Produkt</TableHead>
+                  <TableHead>Kategoria</TableHead>
+                  <TableHead className="text-center">Sprzedano</TableHead>
+                  <TableHead className="text-right">Przychód</TableHead>
+                  <TableHead className="text-right">Marża</TableHead>
+                  <TableHead className="text-right">Trend</TableHead>
                 </TableRow>
-              ))}
-              {/* Totals Row */}
-              <TableRow className="bg-muted/50 font-semibold">
-                <TableCell colSpan={3}>{t('accounting.total')}</TableCell>
-                <TableCell className="text-center">{totals.quantity}</TableCell>
-                <TableCell></TableCell>
-                <TableCell className="text-right">{formatCurrency(totals.gross)}</TableCell>
-                <TableCell className="text-right">{formatCurrency(totals.vat)}</TableCell>
-                <TableCell className="text-right text-green-600">{formatCurrency(totals.profit)}</TableCell>
-                <TableCell colSpan={2}></TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        )}
+              </TableHeader>
+              <TableBody>
+                {filteredProducts.map((product, idx) => (
+                  <TableRow key={product.id} className="hover:bg-muted/30">
+                    <TableCell className="font-medium text-muted-foreground">{idx + 1}</TableCell>
+                    <TableCell>
+                      <div>
+                        <p className="font-medium text-sm">{product.name}</p>
+                        <p className="text-xs text-muted-foreground">{product.brand}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary" className="text-xs">{product.category}</Badge>
+                    </TableCell>
+                    <TableCell className="text-center font-medium">{product.unitsSold} szt</TableCell>
+                    <TableCell className="text-right font-medium">{formatCurrency(product.revenue)}</TableCell>
+                    <TableCell className="text-right">
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-xs",
+                          product.margin > 45 ? "border-green-300 bg-green-50 text-green-700" :
+                          product.margin >= 30 ? "border-yellow-300 bg-yellow-50 text-yellow-700" :
+                          "border-red-300 bg-red-50 text-red-700"
+                        )}
+                      >
+                        {product.margin.toFixed(1)}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {product.trend > 0 ? (
+                        <span className="inline-flex items-center gap-0.5 text-green-600 text-sm font-medium">
+                          <ArrowUpRight className="w-3.5 h-3.5" />+{product.trend}%
+                        </span>
+                      ) : product.trend < 0 ? (
+                        <span className="inline-flex items-center gap-0.5 text-destructive text-sm font-medium">
+                          <ArrowDownRight className="w-3.5 h-3.5" />{product.trend}%
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground"><Minus className="w-3.5 h-3.5 inline" /></span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
 
-        {viewMode === "products" && (
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>{t('accounting.productSales.product')}</TableHead>
-                <TableHead>{t('accounting.productSales.category')}</TableHead>
-                <TableHead className="text-center">{t('accounting.productSales.soldQty')}</TableHead>
-                <TableHead className="text-right">{t('accounting.grossAmount')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.vat')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.profit')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.margin')}</TableHead>
-                <TableHead>{t('accounting.productSales.share')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {productAggregates.map((product) => (
-                <TableRow key={product.productId}>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{product.productName}</p>
-                      <p className="text-xs text-muted-foreground">{product.brand} • {product.sku}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{product.category}</Badge>
-                  </TableCell>
-                  <TableCell className="text-center">{product.totalQuantity}</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(product.totalGross)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{formatCurrency(product.totalVat)}</TableCell>
-                  <TableCell className="text-right text-green-600">{formatCurrency(product.totalProfit)}</TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={product.avgMargin > 35 ? "default" : "secondary"}>
-                      {product.avgMargin.toFixed(1)}%
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Progress 
-                        value={(product.totalGross / totals.gross) * 100} 
-                        className="w-16 h-2" 
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        {((product.totalGross / totals.gross) * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </TableCell>
+      {/* Staff Sales */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Sprzedaż wg pracownika</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="rounded-lg border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead>Pracownik</TableHead>
+                  <TableHead className="text-center">Sprzedano szt.</TableHead>
+                  <TableHead className="text-right">Przychód</TableHead>
+                  <TableHead className="text-right">Prowizja</TableHead>
+                  <TableHead>Udział</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-
-        {viewMode === "staff" && (
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead>{t('accounting.employee')}</TableHead>
-                <TableHead className="text-center">{t('accounting.productSales.transactions')}</TableHead>
-                <TableHead className="text-center">{t('accounting.productSales.soldItems')}</TableHead>
-                <TableHead className="text-right">{t('accounting.grossAmount')}</TableHead>
-                <TableHead className="text-right">{t('accounting.productSales.profit')}</TableHead>
-                <TableHead>{t('accounting.productSales.share')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {staffAggregates.map((staff) => (
-                <TableRow key={staff.staffId}>
-                  <TableCell className="font-medium">{staff.staffName}</TableCell>
-                  <TableCell className="text-center">{staff.salesCount}</TableCell>
-                  <TableCell className="text-center">{staff.totalQuantity}</TableCell>
-                  <TableCell className="text-right font-medium">{formatCurrency(staff.totalGross)}</TableCell>
-                  <TableCell className="text-right text-green-600">{formatCurrency(staff.totalProfit)}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Progress 
-                        value={(staff.totalGross / totals.gross) * 100} 
-                        className="w-20 h-2" 
-                      />
-                      <span className="text-xs text-muted-foreground">
-                        {((staff.totalGross / totals.gross) * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+              </TableHeader>
+              <TableBody>
+                {data.staffSales.map((staff, idx) => (
+                  <TableRow key={idx}>
+                    <TableCell className="font-medium">{staff.name}</TableCell>
+                    <TableCell className="text-center">{staff.unitsSold}</TableCell>
+                    <TableCell className="text-right font-medium">{formatCurrency(staff.revenue)}</TableCell>
+                    <TableCell className="text-right text-green-600">{formatCurrency(staff.commission)}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Progress value={(staff.revenue / data.totalRevenue) * 100} className="w-16 h-2" />
+                        <span className="text-xs text-muted-foreground">
+                          {((staff.revenue / data.totalRevenue) * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
