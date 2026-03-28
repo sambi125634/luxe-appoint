@@ -80,6 +80,7 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   const { t, i18n } = useTranslation();
   const { data: dbStaff } = useStaffMembers();
   const { salonId } = useSalonId();
+  const { permissions, staffId: currentStaffId, isOwner } = useStaffPermissions();
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [currentDate, setCurrentDate] = useState(new Date());
