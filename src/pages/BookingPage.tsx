@@ -78,15 +78,35 @@ export default function BookingPage() {
         slug: salon.slug,
       });
 
-      // Use mock widget config with real salon data
-      const widget = mockWidgets.find(w => w.slug === slug) || {
-        ...mockWidgets[0],
+      // Build widget config from real salon data
+      const widget: WidgetConfig = {
+        id: "main",
+        name: salon.name,
         slug: salon.slug,
         salonId: salon.id,
+        isActive: true,
+        type: "main",
+        services: [],
+        showAllServices: true,
         theme: {
-          ...mockWidgets[0].theme,
+          primaryColor: "#7c3aed",
+          secondaryColor: "#a78bfa",
+          accentColor: "#c4b5fd",
+          backgroundColor: "#ffffff",
+          borderRadius: "lg",
+          fontFamily: "Inter",
+          showLogo: true,
+          showHeader: true,
           headerText: salon.name,
+          showFooter: true,
+          footerText: "Powered by Beauty Calendar",
         },
+        formFields: [],
+        steps: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        viewCount: 0,
+        bookingCount: 0,
       };
       setWidgetConfig(widget);
       setLoading(false);

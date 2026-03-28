@@ -92,11 +92,11 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
-  // Check if this is demo mode (demo-salon slug or no real salon)
-  const isDemo = widgetConfig?.slug === 'demo-salon' || widgetConfig?.slug === 'main' || !widgetConfig;
+  // Check if this is demo mode
+  const isDemo = widgetConfig?.slug === 'demo-salon' || !widgetConfig || !widgetConfig?.salonId;
   
-  // Use salon ID from props, or fallback for demo
-  const salonId = propSalonId || "demo";
+  // Use salon ID from props or widget config
+  const salonId = propSalonId || widgetConfig?.salonId || (isDemo ? "demo" : null);
   
   useEffect(() => {
     // In demo mode, use mock settings with prepayment enabled for demonstration
