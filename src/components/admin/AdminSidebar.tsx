@@ -93,12 +93,18 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
     },
   ];
 
+  const { permissions, isOwner } = useStaffPermissions();
+
   const visibleSections = allSections
     .map(section => ({
       ...section,
-      items: userRole === "staff"
-        ? section.items.filter(item => !OWNER_ONLY_TABS.includes(item.tab))
-        : section.items,
+      items: isOwner
+        ? section.items
+        : section.items.filter(item => {
+            const requiredPerm = TAB_PERMISSION_MAP[item.tab];
+            if (!requiredPerm) return true; // no restriction
+            return permissions[requiredPerm];
+          }),
     }))
     .filter(section => section.items.length > 0);
 
