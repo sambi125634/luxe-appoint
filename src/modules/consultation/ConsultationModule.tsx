@@ -156,7 +156,7 @@ export function ConsultationModule({ isDemo }: Props) {
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-medium text-sm">{tpl.name}</p>
                             {(tpl as any).is_active !== false ? (
-                              <Badge variant="outline" className="text-xs border-emerald-300 text-emerald-600 bg-emerald-50">Aktywna</Badge>
+                              <Badge variant="default" className="text-xs">Aktywna</Badge>
                             ) : (
                               <Badge variant="outline" className="text-xs">Nieaktywna</Badge>
                             )}
