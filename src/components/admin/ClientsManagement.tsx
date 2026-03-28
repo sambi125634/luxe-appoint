@@ -63,7 +63,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "1", firstName: "Anna", lastName: "Kowalska", phone: "+48 123 456 789", email: "anna.kowalska@email.pl",
     tags: ["vip", "regular"], notes: "Preferuje zabiegi w piątki po 16:00. Alergia na parabeny.",
     createdAt: "2024-01-15", lastVisit: "2024-12-01", totalVisits: 24, totalSpent: 4800,
-    purchaseCategories: ["Zabiegi na twarz", "Mezoterapia"],
+    purchaseCategories: ["Zabiegi na twarz", "Mezoterapia"], purchaseGroup: "vip_shopper",
     visits: [
       { id: "v1", date: "2024-12-01", time: "14:00", service: "Mezoterapia twarzy", category: "Mezoterapia", staff: "Maria", status: "completed", price: 350 },
       { id: "v2", date: "2024-11-15", time: "16:00", service: "Manicure hybrydowy", category: "Manicure & Pedicure", staff: "Anna", status: "completed", price: 120 },
@@ -72,7 +72,7 @@ const DEMO_CLIENTS: Client[] = [
   {
     id: "2", firstName: "Katarzyna", lastName: "Nowak", phone: "+48 987 654 321", email: "k.nowak@gmail.com",
     tags: ["new"], notes: "", createdAt: "2024-11-20", lastVisit: "2024-11-20", totalVisits: 1, totalSpent: 200,
-    purchaseCategories: ["Konsultacje"],
+    purchaseCategories: ["Konsultacje"], purchaseGroup: "new_client",
     visits: [
       { id: "v4", date: "2024-11-20", time: "11:00", service: "Konsultacja", category: "Konsultacje", staff: "Joanna", status: "completed", price: 200 },
     ]
@@ -81,7 +81,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "3", firstName: "Magdalena", lastName: "Wiśniewska", phone: "+48 555 123 456", email: "magda.w@wp.pl",
     tags: ["regular", "evening"], notes: "Wrażliwa skóra. Zawsze rezerwuje na 18:00.",
     createdAt: "2023-06-10", lastVisit: "2024-11-28", totalVisits: 18, totalSpent: 3600,
-    purchaseCategories: ["Depilacja"],
+    purchaseCategories: ["Depilacja"], purchaseGroup: "loyal",
     visits: [
       { id: "v5", date: "2024-11-28", time: "18:00", service: "Depilacja laserowa", category: "Depilacja", staff: "Maria", status: "completed", price: 300 },
     ]
@@ -90,7 +90,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "4", firstName: "Ewa", lastName: "Dąbrowska", phone: "+48 111 222 333", email: "ewa.d@email.pl",
     tags: ["problematic"], notes: "Dwukrotnie nie pojawiła się na wizycie bez uprzedzenia.",
     createdAt: "2024-03-01", lastVisit: "2024-10-15", totalVisits: 5, totalSpent: 650,
-    purchaseCategories: ["Manicure & Pedicure"],
+    purchaseCategories: ["Manicure & Pedicure"], purchaseGroup: "dormant",
     visits: [
       { id: "v7", date: "2024-10-15", time: "12:00", service: "Manicure klasyczny", category: "Manicure & Pedicure", staff: "Anna", status: "completed", price: 80 },
     ]
@@ -99,7 +99,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "5", firstName: "Zofia", lastName: "Lewandowska", phone: "+48 444 555 666", email: "zofia.lew@gmail.com",
     tags: ["vip", "friday-lover"], notes: "Klientka VIP - zawsze oferować kawę/herbatę.",
     createdAt: "2022-09-01", lastVisit: "2024-12-02", totalVisits: 48, totalSpent: 12500,
-    purchaseCategories: ["Lifting", "Mezoterapia", "Zabiegi na twarz"],
+    purchaseCategories: ["Lifting", "Mezoterapia", "Zabiegi na twarz"], purchaseGroup: "vip_shopper",
     visits: [
       { id: "v9", date: "2024-12-02", time: "10:00", service: "Lifting HIFU", category: "Lifting", staff: "Joanna", status: "completed", price: 800 },
     ]
