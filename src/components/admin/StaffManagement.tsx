@@ -256,6 +256,8 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       salary_bonus_threshold: s.salary_bonus_threshold,
       salary_bonus_rate: s.salary_bonus_rate,
       flat_rate_per_service: s.flat_rate_per_service,
+      invitation_status: s.invitation_status,
+      staff_role: s.staff_role,
       serviceIds: staffServicesMap?.[s.id] || [],
       workingHours: workingHoursMap?.[s.id]?.length
         ? defaultWorkingHours.map(dh => {
