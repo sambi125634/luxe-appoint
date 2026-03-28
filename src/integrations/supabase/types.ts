@@ -1911,8 +1911,13 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          is_optional: boolean | null
+          mix_ratio: number | null
+          notes: string | null
           product_id: string
+          quantity_unit: string | null
           quantity_used: number
+          quantity_value: number | null
           salon_id: string
           service_id: string
           unit: string | null
@@ -1920,8 +1925,13 @@ export type Database = {
         Insert: {
           created_at?: string | null
           id?: string
+          is_optional?: boolean | null
+          mix_ratio?: number | null
+          notes?: string | null
           product_id: string
+          quantity_unit?: string | null
           quantity_used?: number
+          quantity_value?: number | null
           salon_id: string
           service_id: string
           unit?: string | null
@@ -1929,8 +1939,13 @@ export type Database = {
         Update: {
           created_at?: string | null
           id?: string
+          is_optional?: boolean | null
+          mix_ratio?: number | null
+          notes?: string | null
           product_id?: string
+          quantity_unit?: string | null
           quantity_used?: number
+          quantity_value?: number | null
           salon_id?: string
           service_id?: string
           unit?: string | null
