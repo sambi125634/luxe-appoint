@@ -1,10 +1,18 @@
-import { useTranslation } from "react-i18next";
-import { Users, TrendingUp, ArrowRight } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { Users, HelpCircle, Mail, Gift, ChevronRight, Info } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import {
+  type PurchaseGroup,
+  PURCHASE_GROUPS,
+  PURCHASE_GROUP_LIST,
+} from "@/lib/purchase-groups";
 
+// Re-export the old type for backwards compatibility
 export interface CategoryGroup {
   category: string;
   clientCount: number;
@@ -19,107 +27,238 @@ export interface CategoryGroup {
   }[];
 }
 
-interface PurchaseGroupsProps {
-  groups: CategoryGroup[];
-  onSelectCategory: (category: string) => void;
+interface ClientWithGroup {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  totalSpent: number;
+  totalVisits: number;
+  lastVisit?: string;
+  purchaseGroup: PurchaseGroup;
 }
 
-const categoryColors: Record<string, string> = {
-  "Zabiegi na twarz": "from-pink-500 to-rose-500",
-  "Pielęgnacja ciała": "from-purple-500 to-violet-500",
-  "Manicure & Pedicure": "from-red-500 to-pink-500",
-  "Depilacja": "from-amber-500 to-orange-500",
-  "Makijaż": "from-fuchsia-500 to-pink-500",
-  "Mezoterapia": "from-cyan-500 to-blue-500",
-  "Lifting": "from-indigo-500 to-purple-500",
-  "Fryzjerstwo": "from-teal-500 to-emerald-500",
-  "default": "from-slate-500 to-slate-600"
-};
+interface PurchaseGroupsProps {
+  // New API
+  clients?: ClientWithGroup[];
+  groupStats?: Record<PurchaseGroup, number>;
+  onSelectClient?: (clientId: string) => void;
+  // Legacy API (kept for backwards compat)
+  groups?: CategoryGroup[];
+  onSelectCategory?: (category: string) => void;
+}
 
-export function PurchaseGroups({ groups, onSelectCategory }: PurchaseGroupsProps) {
-  const { t, i18n } = useTranslation();
+export function PurchaseGroups({
+  clients = [],
+  groupStats,
+  onSelectClient,
+  groups,
+  onSelectCategory,
+}: PurchaseGroupsProps) {
+  const [activeGroup, setActiveGroup] = useState<PurchaseGroup | null>(null);
+  const [showExplanation, setShowExplanation] = useState(false);
 
+  // If using legacy API, render old component
+  if (groups && onSelectCategory && !groupStats) {
+    return <LegacyPurchaseGroups groups={groups} onSelectCategory={onSelectCategory} />;
+  }
+
+  const stats = groupStats || ({} as Record<PurchaseGroup, number>);
+  const activeConfig = activeGroup ? PURCHASE_GROUPS[activeGroup] : null;
+  const filteredClients = activeGroup
+    ? clients.filter(c => c.purchaseGroup === activeGroup)
+    : [];
+
+  const getDaysSince = (date?: string) => {
+    if (!date) return null;
+    return Math.floor((Date.now() - new Date(date).getTime()) / 86400000);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Grupy zakupowe</h3>
+          <p className="text-sm text-muted-foreground">
+            Automatyczna klasyfikacja klientek na podstawie historii zakupów
+          </p>
+        </div>
+        <Button variant="ghost" size="sm" onClick={() => setShowExplanation(true)} className="gap-1.5 text-muted-foreground">
+          <HelpCircle className="w-4 h-4" />
+          Jak działają grupy?
+        </Button>
+      </div>
+
+      {/* Group tiles */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {PURCHASE_GROUP_LIST.map(group => {
+          const count = stats[group.id] || 0;
+          const isActive = activeGroup === group.id;
+
+          return (
+            <div
+              key={group.id}
+              onClick={() => setActiveGroup(isActive ? null : group.id)}
+              className={cn(
+                "rounded-xl p-4 cursor-pointer border-2 transition-all hover:shadow-md",
+                isActive
+                  ? "border-primary shadow-md scale-[1.02]"
+                  : "border-transparent"
+              )}
+              style={{ backgroundColor: group.bgColor }}
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xl">{group.emoji}</span>
+                <span className="text-2xl font-bold font-serif" style={{ color: group.color }}>
+                  {count}
+                </span>
+              </div>
+              <p className="font-medium text-sm text-foreground">{group.label}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{group.description}</p>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Active group detail panel */}
+      {activeGroup && activeConfig && (
+        <Card className="border-primary/20">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold flex items-center gap-2">
+                <span>{activeConfig.emoji}</span>
+                {activeConfig.label}
+                <Badge variant="secondary">{filteredClients.length} klientek</Badge>
+              </h4>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" className="gap-1.5" disabled>
+                  <Mail className="w-3.5 h-3.5" />
+                  Wyślij wiadomość
+                </Button>
+                <Button variant="outline" size="sm" className="gap-1.5" disabled>
+                  <Gift className="w-3.5 h-3.5" />
+                  Utwórz ofertę
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-muted/50 text-sm">
+              <span>💡</span>
+              <span className="text-muted-foreground">{activeConfig.tip}</span>
+            </div>
+
+            {filteredClients.length === 0 ? (
+              <p className="text-center py-6 text-muted-foreground text-sm">
+                Brak klientek w tej grupie
+              </p>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {filteredClients.map(client => {
+                  const days = getDaysSince(client.lastVisit);
+                  return (
+                    <div
+                      key={client.id}
+                      onClick={() => onSelectClient?.(client.id)}
+                      className="flex items-center justify-between p-3 rounded-lg bg-background border hover:bg-muted/30 cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground">
+                          {client.firstName[0]}{client.lastName[0]}
+                        </div>
+                        <div>
+                          <p className="font-medium text-sm">{client.firstName} {client.lastName}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {days !== null ? `Ostatni zakup: ${days} dni temu` : "Brak danych"} · Łącznie: {client.totalSpent.toLocaleString("pl-PL")} zł · {client.totalVisits} wizyt
+                          </p>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Explanation dialog */}
+      <ExplanationDialog open={showExplanation} onOpenChange={setShowExplanation} />
+    </div>
+  );
+}
+
+function ExplanationDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
+  const explanations = [
+    { emoji: "💎", name: "VIP Shopper", criterion: "Kupiła za ponad 2000 zł łącznie i wróciła min. 3 razy" },
+    { emoji: "🔁", name: "Stała klientka", criterion: "Min. 5 zakupów w ostatnich 6 miesiącach" },
+    { emoji: "🌱", name: "Nowa klientka", criterion: "Pierwsze 1-2 zakupy w ciągu ostatnich 60 dni — dopiero zaczyna" },
+    { emoji: "😴", name: "Uśpiona", criterion: "Nic nie kupiła od ponad 90 dni — czas ją odświeżyć" },
+    { emoji: "🎯", name: "Sezonowa", criterion: "Kupuje tylko w określonych porach roku — np. przed latem lub świętami" },
+    { emoji: "🧪", name: "Odkrywczyni", criterion: "Testuje różne kategorie produktów — szuka swojego ulubionego" },
+  ];
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>📊 Jak działają grupy zakupowe?</DialogTitle>
+          <DialogDescription>
+            Grupy są przypisywane automatycznie na podstawie historii zakupów każdej klientki.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3">
+          {explanations.map(e => (
+            <div key={e.name} className="flex items-start gap-3 p-2.5 rounded-lg bg-muted/30">
+              <span className="text-lg shrink-0">{e.emoji}</span>
+              <div>
+                <p className="font-medium text-sm">{e.name}</p>
+                <p className="text-xs text-muted-foreground">{e.criterion}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-muted/50 text-xs text-muted-foreground">
+          <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+          <span>
+            Grupy są obliczane automatycznie i nie możesz ich ręcznie zmieniać.
+            Jeśli chcesz wpłynąć na przypisanie klientki — uzupełnij jej historię zakupów.
+          </span>
+        </div>
+
+        <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full">
+          Zamknij
+        </Button>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Legacy component kept for backwards compatibility
+function LegacyPurchaseGroups({ groups, onSelectCategory }: { groups: CategoryGroup[]; onSelectCategory: (cat: string) => void }) {
   if (groups.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-        <p className="font-medium">{t('clients.purchaseGroups.noGroups')}</p>
-        <p className="text-sm">{t('clients.purchaseGroups.noGroupsHint')}</p>
+        <p className="font-medium">Brak grup zakupowych</p>
+        <p className="text-sm">Grupy pojawią się automatycznie gdy klientki zaczną kupować.</p>
       </div>
     );
   }
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat(i18n.language === 'pl' ? 'pl-PL' : 'en-US', {
-      style: 'currency',
-      currency: 'PLN',
-      minimumFractionDigits: 0
-    }).format(value);
-  };
-
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {groups.map((group) => {
-        const colorClass = categoryColors[group.category] || categoryColors.default;
-        
-        return (
-          <Card 
-            key={group.category} 
-            className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group"
-            onClick={() => onSelectCategory(group.category)}
-          >
-            <CardHeader className={cn("pb-2 bg-gradient-to-r text-white", colorClass)}>
-              <CardTitle className="text-lg font-medium flex items-center justify-between">
-                {group.category}
-                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-4">
-              <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-serif">{group.clientCount}</div>
-                  <div className="text-xs text-muted-foreground">{t('clients.purchaseGroups.clients')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-serif">{formatCurrency(group.totalRevenue)}</div>
-                  <div className="text-xs text-muted-foreground">{t('clients.purchaseGroups.revenue')}</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold font-serif">{group.avgVisits.toFixed(1)}</div>
-                  <div className="text-xs text-muted-foreground">{t('clients.purchaseGroups.avgVisits')}</div>
-                </div>
-              </div>
-
-              {/* Top 3 clients preview */}
-              <div className="space-y-1.5">
-                <div className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  <TrendingUp className="w-3 h-3" />
-                  {t('clients.purchaseGroups.topClients')}
-                </div>
-                {group.clients.slice(0, 3).map((client) => (
-                  <div 
-                    key={client.id} 
-                    className="flex items-center justify-between text-sm py-1 px-2 rounded bg-muted/50"
-                  >
-                    <span className="font-medium truncate">
-                      {client.firstName} {client.lastName}
-                    </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {formatCurrency(client.totalSpent)}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-
-              {group.clientCount > 3 && (
-                <Button variant="ghost" size="sm" className="w-full mt-2 text-xs">
-                  {t('clients.purchaseGroups.viewAll', { count: group.clientCount })}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+      {groups.map(group => (
+        <Card key={group.category} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => onSelectCategory(group.category)}>
+          <CardContent className="p-4">
+            <h3 className="font-semibold">{group.category}</h3>
+            <p className="text-sm text-muted-foreground">{group.clientCount} klientek · {group.totalRevenue.toLocaleString("pl-PL")} zł</p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }

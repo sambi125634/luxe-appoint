@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Filter, X, Calendar, Tag, FolderOpen } from "lucide-react";
+import { Filter, X, Calendar, Tag, FolderOpen, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -8,12 +8,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { PURCHASE_GROUP_LIST, type PurchaseGroup } from "@/lib/purchase-groups";
 
 export interface ClientFiltersState {
   tags: string[];
   categories: string[];
   inactivityDays: number | null;
   needsFollowup: boolean;
+  purchaseGroups: PurchaseGroup[];
 }
 
 interface ClientFiltersProps {
@@ -35,6 +37,7 @@ export function ClientFilters({
   const activeFiltersCount = 
     filters.tags.length + 
     filters.categories.length + 
+    (filters.purchaseGroups?.length || 0) +
     (filters.inactivityDays ? 1 : 0) + 
     (filters.needsFollowup ? 1 : 0);
 
@@ -52,12 +55,21 @@ export function ClientFilters({
     onFiltersChange({ ...filters, categories: newCategories });
   };
 
+  const togglePurchaseGroup = (groupId: PurchaseGroup) => {
+    const current = filters.purchaseGroups || [];
+    const newGroups = current.includes(groupId)
+      ? current.filter(g => g !== groupId)
+      : [...current, groupId];
+    onFiltersChange({ ...filters, purchaseGroups: newGroups });
+  };
+
   const clearFilters = () => {
     onFiltersChange({
       tags: [],
       categories: [],
       inactivityDays: null,
-      needsFollowup: false
+      needsFollowup: false,
+      purchaseGroups: [],
     });
   };
 
@@ -135,6 +147,31 @@ export function ClientFilters({
                 </div>
               </div>
             )}
+
+            {/* Purchase groups filter */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm">
+                <Users className="w-3 h-3" />
+                Grupa zakupowa
+              </Label>
+              <div className="flex flex-wrap gap-1.5">
+                {PURCHASE_GROUP_LIST.map(group => (
+                  <Badge
+                    key={group.id}
+                    variant="secondary"
+                    className={cn(
+                      "cursor-pointer text-xs gap-1",
+                      (filters.purchaseGroups || []).includes(group.id)
+                        ? "bg-primary/20 text-primary"
+                        : "bg-muted text-muted-foreground opacity-60"
+                    )}
+                    onClick={() => togglePurchaseGroup(group.id)}
+                  >
+                    {group.emoji} {group.label}
+                  </Badge>
+                ))}
+              </div>
+            </div>
 
             {/* Inactivity filter */}
             <div className="space-y-2">
@@ -222,6 +259,15 @@ export function ClientFilters({
               />
             </Badge>
           )}
+          {(filters.purchaseGroups || []).map(groupId => {
+            const group = PURCHASE_GROUP_LIST.find(g => g.id === groupId);
+            return group ? (
+              <Badge key={groupId} variant="secondary" className="text-xs gap-1 bg-primary/20 text-primary">
+                {group.emoji} {group.label}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => togglePurchaseGroup(groupId)} />
+              </Badge>
+            ) : null;
+          })}
         </div>
       )}
     </div>

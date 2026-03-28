@@ -5,6 +5,7 @@ import {
   Star, AlertTriangle, Edit2, Trash2, User,
   History, StickyNote, Tag, Users, FolderOpen, Upload
 } from "lucide-react";
+import { classifyPurchaseGroup, getGroupStats, PURCHASE_GROUPS, type PurchaseGroup } from "@/lib/purchase-groups";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +54,7 @@ interface Client {
   totalSpent: number;
   visits: Visit[];
   purchaseCategories: string[];
+  purchaseGroup: PurchaseGroup;
 }
 
 // Demo mock data
@@ -61,7 +63,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "1", firstName: "Anna", lastName: "Kowalska", phone: "+48 123 456 789", email: "anna.kowalska@email.pl",
     tags: ["vip", "regular"], notes: "Preferuje zabiegi w piątki po 16:00. Alergia na parabeny.",
     createdAt: "2024-01-15", lastVisit: "2024-12-01", totalVisits: 24, totalSpent: 4800,
-    purchaseCategories: ["Zabiegi na twarz", "Mezoterapia"],
+    purchaseCategories: ["Zabiegi na twarz", "Mezoterapia"], purchaseGroup: "vip_shopper",
     visits: [
       { id: "v1", date: "2024-12-01", time: "14:00", service: "Mezoterapia twarzy", category: "Mezoterapia", staff: "Maria", status: "completed", price: 350 },
       { id: "v2", date: "2024-11-15", time: "16:00", service: "Manicure hybrydowy", category: "Manicure & Pedicure", staff: "Anna", status: "completed", price: 120 },
@@ -70,7 +72,7 @@ const DEMO_CLIENTS: Client[] = [
   {
     id: "2", firstName: "Katarzyna", lastName: "Nowak", phone: "+48 987 654 321", email: "k.nowak@gmail.com",
     tags: ["new"], notes: "", createdAt: "2024-11-20", lastVisit: "2024-11-20", totalVisits: 1, totalSpent: 200,
-    purchaseCategories: ["Konsultacje"],
+    purchaseCategories: ["Konsultacje"], purchaseGroup: "new_client",
     visits: [
       { id: "v4", date: "2024-11-20", time: "11:00", service: "Konsultacja", category: "Konsultacje", staff: "Joanna", status: "completed", price: 200 },
     ]
@@ -79,7 +81,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "3", firstName: "Magdalena", lastName: "Wiśniewska", phone: "+48 555 123 456", email: "magda.w@wp.pl",
     tags: ["regular", "evening"], notes: "Wrażliwa skóra. Zawsze rezerwuje na 18:00.",
     createdAt: "2023-06-10", lastVisit: "2024-11-28", totalVisits: 18, totalSpent: 3600,
-    purchaseCategories: ["Depilacja"],
+    purchaseCategories: ["Depilacja"], purchaseGroup: "loyal",
     visits: [
       { id: "v5", date: "2024-11-28", time: "18:00", service: "Depilacja laserowa", category: "Depilacja", staff: "Maria", status: "completed", price: 300 },
     ]
@@ -88,7 +90,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "4", firstName: "Ewa", lastName: "Dąbrowska", phone: "+48 111 222 333", email: "ewa.d@email.pl",
     tags: ["problematic"], notes: "Dwukrotnie nie pojawiła się na wizycie bez uprzedzenia.",
     createdAt: "2024-03-01", lastVisit: "2024-10-15", totalVisits: 5, totalSpent: 650,
-    purchaseCategories: ["Manicure & Pedicure"],
+    purchaseCategories: ["Manicure & Pedicure"], purchaseGroup: "dormant",
     visits: [
       { id: "v7", date: "2024-10-15", time: "12:00", service: "Manicure klasyczny", category: "Manicure & Pedicure", staff: "Anna", status: "completed", price: 80 },
     ]
@@ -97,7 +99,7 @@ const DEMO_CLIENTS: Client[] = [
     id: "5", firstName: "Zofia", lastName: "Lewandowska", phone: "+48 444 555 666", email: "zofia.lew@gmail.com",
     tags: ["vip", "friday-lover"], notes: "Klientka VIP - zawsze oferować kawę/herbatę.",
     createdAt: "2022-09-01", lastVisit: "2024-12-02", totalVisits: 48, totalSpent: 12500,
-    purchaseCategories: ["Lifting", "Mezoterapia", "Zabiegi na twarz"],
+    purchaseCategories: ["Lifting", "Mezoterapia", "Zabiegi na twarz"], purchaseGroup: "vip_shopper",
     visits: [
       { id: "v9", date: "2024-12-02", time: "10:00", service: "Lifting HIFU", category: "Lifting", staff: "Joanna", status: "completed", price: 800 },
     ]
@@ -162,21 +164,36 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const clients: Client[] = useMemo(() => {
     if (isDemo) return DEMO_CLIENTS;
     if (!dbClients) return [];
-    return dbClients.map(c => ({
-      id: c.id,
-      firstName: c.first_name,
-      lastName: c.last_name,
-      phone: c.phone,
-      email: c.email || "",
-      tags: c.tags || [],
-      notes: c.notes || "",
-      createdAt: c.created_at ? c.created_at.split('T')[0] : "",
-      lastVisit: c.last_visit_at?.split('T')[0],
-      totalVisits: clientStats?.[c.id]?.totalVisits || 0,
-      totalSpent: clientStats?.[c.id]?.totalSpent || 0,
-      visits: clientStats?.[c.id]?.visits || [],
-      purchaseCategories: c.purchase_categories || [],
-    }));
+    return dbClients.map(c => {
+      const visits = clientStats?.[c.id]?.visits || [];
+      const totalVisits = clientStats?.[c.id]?.totalVisits || 0;
+      const totalSpent = clientStats?.[c.id]?.totalSpent || 0;
+      const purchaseCategories = c.purchase_categories || [];
+      const purchaseDates = visits.map(v => v.date);
+      const purchaseGroup = classifyPurchaseGroup({
+        totalSpent,
+        purchaseCount: totalVisits,
+        lastPurchaseDate: c.last_visit_at?.split('T')[0] || null,
+        purchaseDates,
+        purchaseCategories,
+      });
+      return {
+        id: c.id,
+        firstName: c.first_name,
+        lastName: c.last_name,
+        phone: c.phone,
+        email: c.email || "",
+        tags: c.tags || [],
+        notes: c.notes || "",
+        createdAt: c.created_at ? c.created_at.split('T')[0] : "",
+        lastVisit: c.last_visit_at?.split('T')[0],
+        totalVisits,
+        totalSpent,
+        visits,
+        purchaseCategories,
+        purchaseGroup,
+      };
+    });
   }, [isDemo, dbClients, clientStats]);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -190,7 +207,8 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     tags: [],
     categories: [],
     inactivityDays: null,
-    needsFollowup: false
+    needsFollowup: false,
+    purchaseGroups: [],
   });
 
   // DB-driven tags
@@ -255,6 +273,9 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
         const daysSince = getDaysSinceLastVisit(client.lastVisit);
         if (!daysSince || daysSince < 30) return false;
       }
+      if (filters.purchaseGroups && filters.purchaseGroups.length > 0) {
+        if (!filters.purchaseGroups.includes(client.purchaseGroup)) return false;
+      }
       return true;
     });
   }, [clients, searchQuery, filters]);
@@ -312,7 +333,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     const newClient: Client = {
       id: Date.now().toString(), firstName: "", lastName: "", phone: "", email: "",
       tags: ["new"], notes: "", createdAt: new Date().toISOString().split('T')[0],
-      totalVisits: 0, totalSpent: 0, visits: [], purchaseCategories: []
+      totalVisits: 0, totalSpent: 0, visits: [], purchaseCategories: [], purchaseGroup: "none" as PurchaseGroup
     };
     setSelectedClient(null);
     setEditedClient(newClient);
@@ -520,6 +541,15 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
                   <Badge key={tagId} className={tag.color}>{tag.label}</Badge>
                 ) : null;
               })}
+              {/* Purchase group badge */}
+              {(() => {
+                const groupConfig = PURCHASE_GROUPS[selectedClient.purchaseGroup];
+                return groupConfig && selectedClient.purchaseGroup !== "none" ? (
+                  <Badge variant="outline" className="gap-1" title={groupConfig.tip}>
+                    {groupConfig.emoji} {groupConfig.label}
+                  </Badge>
+                ) : null;
+              })()}
             </div>
             <ClientRiskBadge clientId={selectedClient.id} />
           </TabsContent>
@@ -762,8 +792,21 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
           </>
         ) : (
           <PurchaseGroups 
-            groups={purchaseGroups}
-            onSelectCategory={handleSelectCategory}
+            clients={clients.map(c => ({
+              id: c.id,
+              firstName: c.firstName,
+              lastName: c.lastName,
+              phone: c.phone,
+              totalSpent: c.totalSpent,
+              totalVisits: c.totalVisits,
+              lastVisit: c.lastVisit,
+              purchaseGroup: c.purchaseGroup,
+            }))}
+            groupStats={getGroupStats(clients.map(c => c.purchaseGroup))}
+            onSelectClient={(clientId) => {
+              const client = clients.find(c => c.id === clientId);
+              if (client) openClientDetails(client);
+            }}
           />
         )}
       </div>
