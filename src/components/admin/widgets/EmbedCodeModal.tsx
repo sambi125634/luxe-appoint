@@ -62,7 +62,7 @@ export function EmbedCodeModal({ widget, isOpen, onClose }: EmbedCodeModalProps)
 
   const getScriptCode = () => {
     return `<div id="beauty-calendar-widget" data-widget="${widget.slug}"></div>
-<script src="${baseUrl}/widget.js" async></script>`;
+<script src="${productionBaseUrl}/widget.js" async></script>`;
   };
 
   const getPopupCode = () => {

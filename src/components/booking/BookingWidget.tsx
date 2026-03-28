@@ -458,6 +458,19 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
 
   const transitionDirection = currentStep > previousStep ? 'forward' : 'backward';
 
+  if (!isDemo && !salonId) {
+    return (
+      <div className="w-full max-w-xl mx-auto p-6">
+        <div className="rounded-xl border bg-card p-6 text-center space-y-2">
+          <h2 className="text-lg font-semibold">Nie można załadować widgetu.</h2>
+          <p className="text-sm text-muted-foreground">
+            Sprawdź czy salon jest poprawnie skonfigurowany.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (isConfirmed) {
     return (
       <BookingConfirmation

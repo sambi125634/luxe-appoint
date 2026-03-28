@@ -343,7 +343,7 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                   <Label htmlFor="slug">Slug URL</Label>
                   <div className="flex">
                     <span className="px-3 py-2 bg-muted rounded-l-md border border-r-0 text-sm text-muted-foreground">
-                      /book/
+                      /s/
                     </span>
                     <Input
                       id="slug"
