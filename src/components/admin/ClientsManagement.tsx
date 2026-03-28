@@ -164,21 +164,36 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const clients: Client[] = useMemo(() => {
     if (isDemo) return DEMO_CLIENTS;
     if (!dbClients) return [];
-    return dbClients.map(c => ({
-      id: c.id,
-      firstName: c.first_name,
-      lastName: c.last_name,
-      phone: c.phone,
-      email: c.email || "",
-      tags: c.tags || [],
-      notes: c.notes || "",
-      createdAt: c.created_at ? c.created_at.split('T')[0] : "",
-      lastVisit: c.last_visit_at?.split('T')[0],
-      totalVisits: clientStats?.[c.id]?.totalVisits || 0,
-      totalSpent: clientStats?.[c.id]?.totalSpent || 0,
-      visits: clientStats?.[c.id]?.visits || [],
-      purchaseCategories: c.purchase_categories || [],
-    }));
+    return dbClients.map(c => {
+      const visits = clientStats?.[c.id]?.visits || [];
+      const totalVisits = clientStats?.[c.id]?.totalVisits || 0;
+      const totalSpent = clientStats?.[c.id]?.totalSpent || 0;
+      const purchaseCategories = c.purchase_categories || [];
+      const purchaseDates = visits.map(v => v.date);
+      const purchaseGroup = classifyPurchaseGroup({
+        totalSpent,
+        purchaseCount: totalVisits,
+        lastPurchaseDate: c.last_visit_at?.split('T')[0] || null,
+        purchaseDates,
+        purchaseCategories,
+      });
+      return {
+        id: c.id,
+        firstName: c.first_name,
+        lastName: c.last_name,
+        phone: c.phone,
+        email: c.email || "",
+        tags: c.tags || [],
+        notes: c.notes || "",
+        createdAt: c.created_at ? c.created_at.split('T')[0] : "",
+        lastVisit: c.last_visit_at?.split('T')[0],
+        totalVisits,
+        totalSpent,
+        visits,
+        purchaseCategories,
+        purchaseGroup,
+      };
+    });
   }, [isDemo, dbClients, clientStats]);
 
   const [searchQuery, setSearchQuery] = useState("");
