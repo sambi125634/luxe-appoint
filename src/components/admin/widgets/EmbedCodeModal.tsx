@@ -36,8 +36,8 @@ export function EmbedCodeModal({ widget, isOpen, onClose }: EmbedCodeModalProps)
     return `${window.location.origin}/s/${slug}`;
   };
 
-  const baseUrl = window.location.origin;
-  const widgetUrl = getWidgetUrl(widget.slug);
+  const productionBaseUrl = "https://calendar.beauty-funnels.com";
+  const widgetUrl = `${productionBaseUrl}/s/${widget.slug}`;
   
   const getIframeCode = () => {
     if (responsive) {
@@ -62,7 +62,7 @@ export function EmbedCodeModal({ widget, isOpen, onClose }: EmbedCodeModalProps)
 
   const getScriptCode = () => {
     return `<div id="beauty-calendar-widget" data-widget="${widget.slug}"></div>
-<script src="${baseUrl}/widget.js" async></script>`;
+<script src="${productionBaseUrl}/widget.js" async></script>`;
   };
 
   const getPopupCode = () => {
