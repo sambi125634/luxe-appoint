@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,19 +7,33 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { productCategories, type Product } from "../types";
+import { Badge } from "@/components/ui/badge";
+import { type Product } from "../types";
 import { useSalonId } from "@/hooks/useSalonId";
+import { useProductCategories } from "@/hooks/useProductCategories";
+import { cn } from "@/lib/utils";
+
+const VAT_OPTIONS = [
+  { value: "23", label: "23% — standardowa" },
+  { value: "8", label: "8% — środki higieniczne" },
+  { value: "5", label: "5% — preparaty medyczne" },
+  { value: "0", label: "0% — eksport / zwolnione" },
+  { value: "-1", label: "zw — zwolnione z VAT" },
+];
 
 interface ProductFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   product: Product | null;
   onSave: (product: Product) => void;
+  salonId?: string;
 }
 
-export function ProductFormModal({ open, onOpenChange, product, onSave }: ProductFormModalProps) {
+export function ProductFormModal({ open, onOpenChange, product, onSave, salonId: propSalonId }: ProductFormModalProps) {
   const { t } = useTranslation();
-  const { salonId } = useSalonId();
+  const { salonId: hookSalonId } = useSalonId();
+  const salonId = propSalonId || hookSalonId;
+  const { categories } = useProductCategories(salonId ?? undefined);
   const isEditing = !!product;
 
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -62,6 +76,20 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
     }
   }, [product, open]);
 
+  // VAT calculations
+  const effectiveVatRate = (formData.vat_rate ?? 23) < 0 ? 0 : (formData.vat_rate ?? 23);
+  const purchaseNet = formData.purchase_price_net || 0;
+  const purchaseGross = useMemo(() => purchaseNet * (1 + effectiveVatRate / 100), [purchaseNet, effectiveVatRate]);
+  const saleGross = formData.sale_price_gross || 0;
+  const marginPercent = useMemo(() => saleGross > 0 ? ((saleGross - purchaseGross) / saleGross) * 100 : 0, [saleGross, purchaseGross]);
+  const profitPerUnit = useMemo(() => saleGross - purchaseGross, [saleGross, purchaseGross]);
+
+  const getMarginColor = () => {
+    if (marginPercent > 30) return "text-green-600";
+    if (marginPercent >= 15) return "text-yellow-600";
+    return "text-destructive";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
@@ -73,6 +101,8 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
     } as Product);
   };
 
+  const categoryNames = categories.map((c) => c.name);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -82,7 +112,8 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Basic info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="name">{t("products.name")} *</Label>
@@ -113,11 +144,15 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
                   <SelectValue placeholder={t("products.selectCategory")} />
                 </SelectTrigger>
                 <SelectContent className="bg-background border">
-                  {productCategories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
+                  {categoryNames.map((cat) => {
+                    const catInfo = categories.find((c) => c.name === cat);
+                    return (
+                      <SelectItem key={cat} value={cat}>
+                        {catInfo?.icon && <span className="mr-1">{catInfo.icon}</span>}
+                        {cat}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -149,50 +184,89 @@ export function ProductFormModal({ open, onOpenChange, product, onSave }: Produc
                 onChange={(e) => setFormData({ ...formData, ean: e.target.value })}
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="sale_price_gross">{t("products.salePrice")} (brutto) *</Label>
-              <Input
-                id="sale_price_gross"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.sale_price_gross}
-                onChange={(e) => setFormData({ ...formData, sale_price_gross: parseFloat(e.target.value) || 0 })}
-                required
-              />
+          {/* Price & VAT Section */}
+          <div className="space-y-4 p-4 rounded-xl border bg-muted/30">
+            <h3 className="font-semibold flex items-center gap-2">💰 Ceny i VAT</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Purchase price net */}
+              <div className="space-y-2">
+                <Label htmlFor="purchase_price_net">Cena zakupu netto (zł)</Label>
+                <Input
+                  id="purchase_price_net"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.purchase_price_net || ""}
+                  onChange={(e) => setFormData({ ...formData, purchase_price_net: parseFloat(e.target.value) || undefined })}
+                />
+              </div>
+
+              {/* VAT rate */}
+              <div className="space-y-2">
+                <Label>Stawka VAT</Label>
+                <Select
+                  value={formData.vat_rate?.toString() ?? "23"}
+                  onValueChange={(value) => setFormData({ ...formData, vat_rate: parseFloat(value) })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-background border">
+                    {VAT_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Purchase price gross (calculated) */}
+              <div className="space-y-2">
+                <Label>Cena zakupu brutto (zł)</Label>
+                <Input
+                  type="number"
+                  value={purchaseGross.toFixed(2)}
+                  readOnly
+                  className="bg-muted/50"
+                />
+              </div>
+
+              {/* Sale price gross */}
+              {!formData.is_for_internal_use && (
+                <div className="space-y-2">
+                  <Label htmlFor="sale_price_gross">{t("products.salePrice")} brutto (zł) *</Label>
+                  <Input
+                    id="sale_price_gross"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.sale_price_gross}
+                    onChange={(e) => setFormData({ ...formData, sale_price_gross: parseFloat(e.target.value) || 0 })}
+                    required={!formData.is_for_internal_use}
+                  />
+                </div>
+              )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="purchase_price_net">{t("products.purchasePrice")} (netto)</Label>
-              <Input
-                id="purchase_price_net"
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.purchase_price_net || ""}
-                onChange={(e) => setFormData({ ...formData, purchase_price_net: parseFloat(e.target.value) || undefined })}
-              />
-            </div>
+            {/* Margin display */}
+            {!formData.is_for_internal_use && purchaseNet > 0 && saleGross > 0 && (
+              <div className={cn("flex items-center gap-3 p-3 rounded-lg border", getMarginColor())}>
+                <Badge variant="outline" className={cn("text-sm font-bold", getMarginColor())}>
+                  Marża: {marginPercent.toFixed(1)}%
+                </Badge>
+                <span className="text-sm font-medium">
+                  Zysk: {profitPerUnit.toFixed(2)} zł/szt
+                </span>
+              </div>
+            )}
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="vat_rate">{t("products.vatRate")} (%)</Label>
-              <Select
-                value={formData.vat_rate?.toString()}
-                onValueChange={(value) => setFormData({ ...formData, vat_rate: parseFloat(value) })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-background border">
-                  <SelectItem value="23">23%</SelectItem>
-                  <SelectItem value="8">8%</SelectItem>
-                  <SelectItem value="5">5%</SelectItem>
-                  <SelectItem value="0">0%</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
+          {/* Stock */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="min_stock">{t("products.minStock")}</Label>
               <Input
