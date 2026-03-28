@@ -36,8 +36,8 @@ export function EmbedCodeModal({ widget, isOpen, onClose }: EmbedCodeModalProps)
     return `${window.location.origin}/s/${slug}`;
   };
 
-  const baseUrl = window.location.origin;
-  const widgetUrl = getWidgetUrl(widget.slug);
+  const productionBaseUrl = "https://calendar.beauty-funnels.com";
+  const widgetUrl = `${productionBaseUrl}/s/${widget.slug}`;
   
   const getIframeCode = () => {
     if (responsive) {

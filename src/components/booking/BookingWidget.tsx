@@ -121,6 +121,8 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     }
     
     const fetchSalonSettings = async () => {
+      if (!salonId) return;
+
       const { data } = await supabase
         .from("salons")
         .select("settings")
