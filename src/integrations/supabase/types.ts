@@ -692,9 +692,82 @@ export type Database = {
           },
         ]
       }
+      consultation_sends: {
+        Row: {
+          appointment_id: string | null
+          card_id: string | null
+          client_id: string | null
+          completed_at: string | null
+          expires_at: string | null
+          id: string
+          salon_id: string
+          send_method: string | null
+          sent_at: string | null
+          status: string | null
+          unique_token: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          card_id?: string | null
+          client_id?: string | null
+          completed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          salon_id: string
+          send_method?: string | null
+          sent_at?: string | null
+          status?: string | null
+          unique_token?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          card_id?: string | null
+          client_id?: string | null
+          completed_at?: string | null
+          expires_at?: string | null
+          id?: string
+          salon_id?: string
+          send_method?: string | null
+          sent_at?: string | null
+          status?: string | null
+          unique_token?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consultation_sends_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_sends_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_sends_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consultation_sends_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       consultation_templates: {
         Row: {
+          category: string | null
           created_at: string | null
+          estimated_minutes: number | null
           fields: Json
           id: string
           is_active: boolean | null
@@ -704,7 +777,9 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          category?: string | null
           created_at?: string | null
+          estimated_minutes?: number | null
           fields?: Json
           id?: string
           is_active?: boolean | null
@@ -714,7 +789,9 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          category?: string | null
           created_at?: string | null
+          estimated_minutes?: number | null
           fields?: Json
           id?: string
           is_active?: boolean | null
@@ -2020,6 +2097,51 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_consultation_cards: {
+        Row: {
+          card_id: string
+          created_at: string | null
+          id: string
+          is_required: boolean | null
+          send_hours_before: number | null
+          send_timing: string | null
+          service_id: string
+        }
+        Insert: {
+          card_id: string
+          created_at?: string | null
+          id?: string
+          is_required?: boolean | null
+          send_hours_before?: number | null
+          send_timing?: string | null
+          service_id: string
+        }
+        Update: {
+          card_id?: string
+          created_at?: string | null
+          id?: string
+          is_required?: boolean | null
+          send_hours_before?: number | null
+          send_timing?: string | null
+          service_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_consultation_cards_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_consultation_cards_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
