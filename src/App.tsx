@@ -16,6 +16,7 @@ import InstallPage from "./pages/InstallPage";
 import ClientApp from "./pages/ClientApp";
 import MobileAdminApp from "./pages/MobileAdminApp";
 import JoinSalonPage from "./pages/JoinSalonPage";
+import StaffOnboardingPage from "./pages/StaffOnboardingPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
