@@ -10,6 +10,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
 type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "settings" | "support" | "retention" | "pixel" | "analytics" | "consultation" | "referral";
 
@@ -21,8 +22,20 @@ interface AdminSidebarProps {
   salonName?: string | null;
 }
 
-// Tabs restricted from staff
-const OWNER_ONLY_TABS: TabType[] = ["accounting", "pipeline", "settings", "widgets"];
+// Permission-based tab visibility mapping
+const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
+  accounting: "can_view_finances",
+  analytics: "can_view_finances",
+  pipeline: "can_view_finances",
+  settings: "can_manage_staff",
+  staff: "can_manage_staff",
+  widgets: "can_manage_marketing",
+  retention: "can_manage_marketing",
+  referral: "can_manage_marketing",
+  pixel: "can_manage_marketing",
+  products: "can_manage_products",
+  services: "can_edit_services",
+};
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
   const { t } = useTranslation();
