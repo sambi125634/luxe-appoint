@@ -506,7 +506,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
   }
 
   const getInvitationBadge = (member: StaffMember) => {
-    const status = (member as Record<string, unknown>).invitation_status as string;
+    const status = member.invitation_status;
     switch (status) {
       case "active": return <Badge variant="default" className="text-[10px] bg-green-500/10 text-green-600 border-green-200">✅ Aktywny</Badge>;
       case "invited": return <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-200">⏳ Oczekuje</Badge>;
@@ -515,7 +515,7 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
     }
   };
 
-  const hasOwner = staff.some(m => (m as Record<string, unknown>).staff_role === "owner");
+  const hasOwner = staff.some(m => m.staff_role === "owner");
 
   return (
     <div className="space-y-6">
