@@ -4,6 +4,7 @@ export interface BookingWidget {
   id: string;
   name: string;
   slug: string;
+  salonId?: string;
   description?: string;
   type: "main" | "campaign" | "promo";
   isActive: boolean;

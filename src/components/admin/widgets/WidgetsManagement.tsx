@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Plus, 
   Copy, 
@@ -14,7 +14,8 @@ import {
   MoreVertical,
   Check,
   Megaphone,
-  Instagram
+  Instagram,
+  CheckCircle2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,18 +29,47 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
-import { BookingWidget, mockWidgets, mockPromotions, WidgetPromotion } from "./types";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSalonId } from "@/hooks/useSalonId";
+import { BookingWidget, mockWidgets, mockPromotions, WidgetPromotion, defaultWidgetTheme, defaultFormFields, defaultWidgetSteps } from "./types";
 import { EmbedCodeModal } from "./EmbedCodeModal";
 import { WidgetEditor } from "./WidgetEditor";
 import { PromotionsManager } from "./PromotionsManager";
 import { InstagramLinkGenerator } from "./InstagramLinkGenerator";
 import { SectionGuide } from "../SectionGuide";
 
+function getWidgetUrl(slug: string): string {
+  const hostname = window.location.hostname;
+  
+  if (hostname === "admin.beauty-funnels.com") {
+    return `https://calendar.beauty-funnels.com/s/${slug}`;
+  }
+  
+  return `${window.location.origin}/s/${slug}`;
+}
+
 interface WidgetsManagementProps {
   isDemo?: boolean;
 }
 
 export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
+  const { salonId } = useSalonId();
+  
+  const { data: salonData } = useQuery({
+    queryKey: ["salon-widget-data", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("salons")
+        .select("id, name, slug, settings, theme_primary_color")
+        .eq("id", salonId!)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!salonId && !isDemo,
+  });
+
   const [widgets, setWidgets] = useState<BookingWidget[]>(isDemo ? mockWidgets : []);
   const [promotions, setPromotions] = useState<WidgetPromotion[]>(isDemo ? mockPromotions : []);
   const [activeTab, setActiveTab] = useState("widgets");
@@ -48,8 +78,36 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [embedWidget, setEmbedWidget] = useState<BookingWidget | null>(null);
 
+  // Build main widget from salon data when not demo
+  useEffect(() => {
+    if (!isDemo && salonData && widgets.length === 0) {
+      const mainWidget: BookingWidget = {
+        id: "main",
+        name: "Główny widget rezerwacji",
+        slug: salonData.slug,
+        description: "Domyślny widget rezerwacji ze wszystkimi usługami",
+        type: "main",
+        isActive: true,
+        services: [],
+        showAllServices: true,
+        theme: {
+          ...defaultWidgetTheme,
+          primaryColor: salonData.theme_primary_color || "#7c3aed",
+          headerText: salonData.name,
+        },
+        formFields: defaultFormFields,
+        steps: defaultWidgetSteps,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        viewCount: 0,
+        bookingCount: 0,
+      };
+      setWidgets([mainWidget]);
+    }
+  }, [salonData, isDemo]);
+
   const handleCopyLink = (widget: BookingWidget) => {
-    const link = `${window.location.origin}/book/${widget.slug}`;
+    const link = getWidgetUrl(widget.slug);
     navigator.clipboard.writeText(link);
     toast.success("Link skopiowany!", {
       description: link,
@@ -92,7 +150,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
   };
 
   const handlePreview = (widget: BookingWidget) => {
-    window.open(`/book/${widget.slug}`, '_blank');
+    window.open(getWidgetUrl(widget.slug), '_blank');
   };
 
   const getWidgetTypeLabel = (type: BookingWidget["type"]) => {
@@ -110,6 +168,9 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
       case "promo": return "outline";
     }
   };
+
+  const salonSlug = salonData?.slug || "demo-salon";
+  const salonName = salonData?.name || "Demo Salon Beauty";
 
   return (
     <div className="space-y-6">
@@ -229,6 +290,24 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
                 </CardHeader>
                 
                 <CardContent className="space-y-4">
+                  {/* Link do rezerwacji */}
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Link do rezerwacji online</p>
+                    <div className="flex gap-2">
+                      <div className="flex-1 px-3 py-1.5 bg-muted rounded-md text-xs font-mono truncate">
+                        {getWidgetUrl(widget.slug)}
+                      </div>
+                      <Button variant="outline" size="sm" className="gap-1.5 shrink-0" onClick={() => handleCopyLink(widget)}>
+                        <Copy className="w-3 h-3" />
+                        Kopiuj
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-green-600">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Widget aktywny — klientki mogą rezerwować</span>
+                    </div>
+                  </div>
+
                   {/* Stats */}
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-1 text-muted-foreground">
@@ -264,15 +343,6 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
                       variant="outline" 
                       size="sm" 
                       className="flex-1 gap-2"
-                      onClick={() => handleCopyLink(widget)}
-                    >
-                      <Copy className="w-3 h-3" />
-                      Link
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="flex-1 gap-2"
                       onClick={() => handleOpenEmbed(widget)}
                     >
                       <Code className="w-3 h-3" />
@@ -285,7 +355,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
                       onClick={() => handlePreview(widget)}
                     >
                       <ExternalLink className="w-3 h-3" />
-                      Podgląd
+                      Testuj
                     </Button>
                   </div>
                 </CardContent>
@@ -318,7 +388,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
         </TabsContent>
 
         <TabsContent value="instagram" className="mt-6">
-          <InstagramLinkGenerator salonSlug="demo-salon" salonName="Demo Salon Beauty" />
+          <InstagramLinkGenerator salonSlug={salonSlug} salonName={salonName} />
         </TabsContent>
       </Tabs>
 
