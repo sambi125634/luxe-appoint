@@ -24,6 +24,8 @@ import demoMaria from "@/assets/demo-staff-maria.jpg";
 import demoKasia from "@/assets/demo-staff-kasia.jpg";
 import demoAnna from "@/assets/demo-staff-anna.jpg";
 
+type CompensationType = 'commission' | 'salary' | 'hourly' | 'salary_plus_commission' | 'flat_per_service';
+
 interface StaffMember {
   id: string;
   name: string;
@@ -43,7 +45,21 @@ interface StaffMember {
   visible_in_widget?: boolean;
   break_start?: string | null;
   break_duration?: number | null;
+  compensation_type?: CompensationType;
+  base_salary?: number | null;
+  hourly_rate?: number | null;
+  salary_bonus_threshold?: number | null;
+  salary_bonus_rate?: number | null;
+  flat_rate_per_service?: number | null;
 }
+
+const COMPENSATION_TYPES: { value: CompensationType; label: string; description: string }[] = [
+  { value: "commission", label: "Prowizja od wizyty", description: "X% od wartości każdej wykonanej usługi" },
+  { value: "salary", label: "Stała pensja miesięczna", description: "Stała kwota wypłacana co miesiąc" },
+  { value: "hourly", label: "Stawka godzinowa", description: "Stawka × przepracowane godziny z kalendarza" },
+  { value: "salary_plus_commission", label: "Pensja + premia od wyników", description: "Stała podstawa + % od nadwyżki ponad próg" },
+  { value: "flat_per_service", label: "Stała stawka za zabieg", description: "Stała kwota za każdy wykonany zabieg" },
+];
 
 interface WorkingHours {
   dayOfWeek: number;
