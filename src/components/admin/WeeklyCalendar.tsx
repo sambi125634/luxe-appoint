@@ -105,16 +105,24 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
   const weekEndISO = getWeekEnd(currentDate).toISOString();
 
   // Fetch appointments from DB in production
+  const shouldFilterByStaff = !isOwner && !permissions.can_view_all_calendar && !!currentStaffId;
+
   const { data: dbAppointments } = useQuery({
-    queryKey: ["calendar-appointments", salonId, weekStartISO],
+    queryKey: ["calendar-appointments", salonId, weekStartISO, shouldFilterByStaff ? currentStaffId : "all"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("appointments")
         .select("id, staff_id, start_time, end_time, status, price, notes, clients(first_name, last_name, phone), services(name, duration), staff_members(name)")
         .eq("salon_id", salonId!)
         .gte("start_time", weekStartISO)
         .lte("start_time", weekEndISO)
         .neq("status", "cancelled");
+
+      if (shouldFilterByStaff) {
+        query = query.eq("staff_id", currentStaffId!);
+      }
+
+      const { data, error } = await query;
       if (error) throw error;
       return data;
     },
