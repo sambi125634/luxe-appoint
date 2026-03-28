@@ -28,6 +28,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
   const { salonId, isLoading } = useSalonId();
   const [activeTab, setActiveTab] = useState<ProductTab>("catalog");
   const [ordersView, setOrdersView] = useState<"list" | "new">("list");
+  const [isInvoiceUploadOpen, setIsInvoiceUploadOpen] = useState(false);
 
   const effectiveSalonId = isDemo ? DEMO_SALON_ID : (salonId ?? undefined);
   const { products } = useProducts(effectiveSalonId);
