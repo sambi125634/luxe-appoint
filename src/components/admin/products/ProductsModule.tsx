@@ -77,7 +77,18 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
 
   return (
     <div className="space-y-6">
-      <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
+      <div className="flex items-center justify-between">
+        <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
+        <Button variant="outline" onClick={() => setIsInvoiceUploadOpen(true)} className="gap-2">
+          <FileText className="w-4 h-4" />
+          <span className="hidden sm:inline">Wgraj fakturę</span>
+        </Button>
+      </div>
+      <InvoiceAIScanner
+        open={isInvoiceUploadOpen}
+        onOpenChange={setIsInvoiceUploadOpen}
+        salonId={effectiveSalonId}
+      />
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as ProductTab); if (v === "orders") setOrdersView("list"); }}>
         <TabsList className="bg-muted/50 p-1 h-auto flex-wrap">
           {tabs.map((tab) => (
