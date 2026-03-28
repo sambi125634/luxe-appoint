@@ -68,8 +68,8 @@ export function StaffPermissionsTab({ isDemo = false }: StaffPermissionsTabProps
       name: s.name,
       avatar_url: s.avatar_url,
       color: s.color || "#7c3aed",
-      staff_role: (s as Record<string, unknown>).staff_role as string || "specialist",
-      permissions: ((s as Record<string, unknown>).permissions as StaffPermissions) || DEFAULT_PERMISSIONS,
+      staff_role: s.staff_role || "specialist",
+      permissions: (s.permissions as unknown as StaffPermissions) || DEFAULT_PERMISSIONS,
     }));
   }, [staffMembers]);
 
