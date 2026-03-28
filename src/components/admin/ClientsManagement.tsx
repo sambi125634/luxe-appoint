@@ -329,7 +329,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     const newClient: Client = {
       id: Date.now().toString(), firstName: "", lastName: "", phone: "", email: "",
       tags: ["new"], notes: "", createdAt: new Date().toISOString().split('T')[0],
-      totalVisits: 0, totalSpent: 0, visits: [], purchaseCategories: []
+      totalVisits: 0, totalSpent: 0, visits: [], purchaseCategories: [], purchaseGroup: "none" as PurchaseGroup
     };
     setSelectedClient(null);
     setEditedClient(newClient);
