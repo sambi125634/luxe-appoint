@@ -5,6 +5,7 @@ import {
   Star, AlertTriangle, Edit2, Trash2, User,
   History, StickyNote, Tag, Users, FolderOpen, Upload
 } from "lucide-react";
+import { classifyPurchaseGroup, getGroupStats, PURCHASE_GROUPS, type PurchaseGroup } from "@/lib/purchase-groups";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
