@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles, Eye, EyeOff, Coffee, Award, FileText, Percent } from "lucide-react";
+import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles, Eye, EyeOff, Coffee, Award, FileText, Percent, Users, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { SectionGuide } from "./SectionGuide";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
@@ -19,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StaffInviteTab } from "./staff/StaffInviteTab";
+import { StaffPermissionsTab } from "./staff/StaffPermissionsTab";
 
 import demoMaria from "@/assets/demo-staff-maria.jpg";
 import demoKasia from "@/assets/demo-staff-kasia.jpg";
