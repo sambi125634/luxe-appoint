@@ -284,6 +284,10 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
     workingHours: defaultWorkingHours, bio: "", specializations: [] as string[], started_at: "",
     contract_type: "", commission_rate: "" as string, certifications: [] as string[], visible_in_widget: true,
     break_start: "", break_duration: "" as string,
+    compensation_type: "commission" as CompensationType,
+    base_salary: "" as string, hourly_rate: "" as string,
+    salary_bonus_threshold: "" as string, salary_bonus_rate: "" as string,
+    flat_rate_per_service: "" as string,
   });
   const [newCertification, setNewCertification] = useState("");
 
