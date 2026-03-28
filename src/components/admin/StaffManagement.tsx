@@ -301,11 +301,15 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         contract_type: member.contract_type || "", commission_rate: member.commission_rate?.toString() || "",
         certifications: member.certifications || [], visible_in_widget: member.visible_in_widget ?? true,
         break_start: member.break_start || "", break_duration: member.break_duration?.toString() || "",
+        compensation_type: member.compensation_type || "commission",
+        base_salary: member.base_salary?.toString() || "", hourly_rate: member.hourly_rate?.toString() || "",
+        salary_bonus_threshold: member.salary_bonus_threshold?.toString() || "", salary_bonus_rate: member.salary_bonus_rate?.toString() || "",
+        flat_rate_per_service: member.flat_rate_per_service?.toString() || "",
       });
       setAvatarPreview(member.avatar_url || null);
     } else {
       setEditingStaff(null);
-      setForm({ name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "", contract_type: "", commission_rate: "", certifications: [], visible_in_widget: true, break_start: "", break_duration: "" });
+      setForm({ name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "", contract_type: "", commission_rate: "", certifications: [], visible_in_widget: true, break_start: "", break_duration: "", compensation_type: "commission", base_salary: "", hourly_rate: "", salary_bonus_threshold: "", salary_bonus_rate: "", flat_rate_per_service: "" });
       setAvatarPreview(null);
     }
     setAvatarFile(null);
