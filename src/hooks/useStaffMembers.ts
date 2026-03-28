@@ -26,6 +26,11 @@ export interface StaffMemberData {
   salary_bonus_threshold: number | null;
   salary_bonus_rate: number | null;
   flat_rate_per_service: number | null;
+  invitation_email: string | null;
+  invitation_status: string | null;
+  invitation_sent_at: string | null;
+  staff_role: string | null;
+  permissions: Record<string, boolean> | null;
 }
 
 export function useStaffMembers() {
