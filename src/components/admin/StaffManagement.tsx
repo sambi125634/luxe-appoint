@@ -245,6 +245,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       visible_in_widget: s.visible_in_widget ?? true,
       break_start: s.break_start,
       break_duration: s.break_duration,
+      compensation_type: (s.compensation_type as CompensationType) || "commission",
+      base_salary: s.base_salary,
+      hourly_rate: s.hourly_rate,
+      salary_bonus_threshold: s.salary_bonus_threshold,
+      salary_bonus_rate: s.salary_bonus_rate,
+      flat_rate_per_service: s.flat_rate_per_service,
       serviceIds: staffServicesMap?.[s.id] || [],
       workingHours: workingHoursMap?.[s.id]?.length
         ? defaultWorkingHours.map(dh => {
