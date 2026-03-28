@@ -537,6 +537,15 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
                   <Badge key={tagId} className={tag.color}>{tag.label}</Badge>
                 ) : null;
               })}
+              {/* Purchase group badge */}
+              {(() => {
+                const groupConfig = PURCHASE_GROUPS[selectedClient.purchaseGroup];
+                return groupConfig && selectedClient.purchaseGroup !== "none" ? (
+                  <Badge variant="outline" className="gap-1" title={groupConfig.tip}>
+                    {groupConfig.emoji} {groupConfig.label}
+                  </Badge>
+                ) : null;
+              })()}
             </div>
             <ClientRiskBadge clientId={selectedClient.id} />
           </TabsContent>
