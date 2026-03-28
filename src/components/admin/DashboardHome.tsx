@@ -17,6 +17,7 @@ import { MOCK_RADAR_CLIENTS } from "@/modules/retention/mock-data";
 import { StockAlertsCard } from "./products/StockAlertsCard";
 import { RevenuePredictionCard } from "./dashboard/RevenuePredictionCard";
 import { WeeklyBriefWidget } from "./dashboard/WeeklyBriefWidget";
+import { TodayStaffCard } from "./dashboard/TodayStaffCard";
 import { SectionGuide } from "./SectionGuide";
 import { SetupChecklist } from "./SetupChecklist";
 import { useSalonId } from "@/hooks/useSalonId";
@@ -332,6 +333,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
 
       {/* Weekly Brief Widget */}
       <WeeklyBriefWidget isDemo={isDemo} />
+
+      {/* Today's Staff Widget */}
+      <TodayStaffCard salonId={salonId} isDemo={isDemo} />
 
       {/* AI Revenue Prediction */}
       <RevenuePredictionCard salonId={salonId ?? undefined} isDemo={isDemo} />
