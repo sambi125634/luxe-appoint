@@ -164,6 +164,15 @@ export function StaffInviteTab({ salonId, isDemo = false, hasOwner = false }: St
             }))
           );
         }
+
+        // Send invitation email via edge function
+        try {
+          await supabase.functions.invoke("send-staff-invitation", {
+            body: { staffMemberId: data.id, salonId },
+          });
+        } catch (emailErr) {
+          console.warn("Email send failed (non-blocking):", emailErr);
+        }
       }
 
       queryClient.invalidateQueries({ queryKey: ["staff-members"] });
