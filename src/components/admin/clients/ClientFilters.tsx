@@ -37,6 +37,7 @@ export function ClientFilters({
   const activeFiltersCount = 
     filters.tags.length + 
     filters.categories.length + 
+    (filters.purchaseGroups?.length || 0) +
     (filters.inactivityDays ? 1 : 0) + 
     (filters.needsFollowup ? 1 : 0);
 
