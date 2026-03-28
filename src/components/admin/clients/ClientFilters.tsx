@@ -138,6 +138,14 @@ export function ClientFilters({
                         filters.categories.includes(category) 
                           ? "bg-primary/20 text-primary" 
                           : "bg-muted text-muted-foreground opacity-60"
+                      )}
+                      onClick={() => toggleCategory(category)}
+                    >
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Purchase groups filter */}
@@ -164,14 +172,6 @@ export function ClientFilters({
                 ))}
               </div>
             </div>
-                      onClick={() => toggleCategory(category)}
-                    >
-                      {category}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {/* Inactivity filter */}
             <div className="space-y-2">
