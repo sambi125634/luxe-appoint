@@ -20,6 +20,12 @@ export interface StaffMemberData {
   bio: string | null;
   specializations: unknown[] | null;
   started_at: string | null;
+  compensation_type: string | null;
+  base_salary: number | null;
+  hourly_rate: number | null;
+  salary_bonus_threshold: number | null;
+  salary_bonus_rate: number | null;
+  flat_rate_per_service: number | null;
 }
 
 export function useStaffMembers() {
@@ -30,7 +36,7 @@ export function useStaffMembers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("staff_members")
-        .select("id, name, role, email, phone, color, avatar_url, is_active, contract_type, commission_rate, certifications, visible_in_widget, break_start, break_duration, bio, specializations, started_at")
+        .select("id, name, role, email, phone, color, avatar_url, is_active, contract_type, commission_rate, certifications, visible_in_widget, break_start, break_duration, bio, specializations, started_at, compensation_type, base_salary, hourly_rate, salary_bonus_threshold, salary_bonus_rate, flat_rate_per_service")
         .eq("salon_id", salonId!)
         .eq("is_active", true)
         .order("name");

@@ -2019,20 +2019,26 @@ export type Database = {
       staff_members: {
         Row: {
           avatar_url: string | null
+          base_salary: number | null
           bio: string | null
           break_duration: number | null
           break_start: string | null
           certifications: string[] | null
           color: string | null
           commission_rate: number | null
+          compensation_type: string | null
           contract_type: string | null
           created_at: string
           email: string | null
+          flat_rate_per_service: number | null
+          hourly_rate: number | null
           id: string
           is_active: boolean
           name: string
           phone: string | null
           role: string | null
+          salary_bonus_rate: number | null
+          salary_bonus_threshold: number | null
           salon_id: string
           specializations: Json | null
           started_at: string | null
@@ -2042,20 +2048,26 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          base_salary?: number | null
           bio?: string | null
           break_duration?: number | null
           break_start?: string | null
           certifications?: string[] | null
           color?: string | null
           commission_rate?: number | null
+          compensation_type?: string | null
           contract_type?: string | null
           created_at?: string
           email?: string | null
+          flat_rate_per_service?: number | null
+          hourly_rate?: number | null
           id?: string
           is_active?: boolean
           name: string
           phone?: string | null
           role?: string | null
+          salary_bonus_rate?: number | null
+          salary_bonus_threshold?: number | null
           salon_id: string
           specializations?: Json | null
           started_at?: string | null
@@ -2065,20 +2077,26 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          base_salary?: number | null
           bio?: string | null
           break_duration?: number | null
           break_start?: string | null
           certifications?: string[] | null
           color?: string | null
           commission_rate?: number | null
+          compensation_type?: string | null
           contract_type?: string | null
           created_at?: string
           email?: string | null
+          flat_rate_per_service?: number | null
+          hourly_rate?: number | null
           id?: string
           is_active?: boolean
           name?: string
           phone?: string | null
           role?: string | null
+          salary_bonus_rate?: number | null
+          salary_bonus_threshold?: number | null
           salon_id?: string
           specializations?: Json | null
           started_at?: string | null

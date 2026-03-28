@@ -24,6 +24,8 @@ import demoMaria from "@/assets/demo-staff-maria.jpg";
 import demoKasia from "@/assets/demo-staff-kasia.jpg";
 import demoAnna from "@/assets/demo-staff-anna.jpg";
 
+type CompensationType = 'commission' | 'salary' | 'hourly' | 'salary_plus_commission' | 'flat_per_service';
+
 interface StaffMember {
   id: string;
   name: string;
@@ -43,7 +45,21 @@ interface StaffMember {
   visible_in_widget?: boolean;
   break_start?: string | null;
   break_duration?: number | null;
+  compensation_type?: CompensationType;
+  base_salary?: number | null;
+  hourly_rate?: number | null;
+  salary_bonus_threshold?: number | null;
+  salary_bonus_rate?: number | null;
+  flat_rate_per_service?: number | null;
 }
+
+const COMPENSATION_TYPES: { value: CompensationType; label: string; description: string }[] = [
+  { value: "commission", label: "Prowizja od wizyty", description: "X% od wartości każdej wykonanej usługi" },
+  { value: "salary", label: "Stała pensja miesięczna", description: "Stała kwota wypłacana co miesiąc" },
+  { value: "hourly", label: "Stawka godzinowa", description: "Stawka × przepracowane godziny z kalendarza" },
+  { value: "salary_plus_commission", label: "Pensja + premia od wyników", description: "Stała podstawa + % od nadwyżki ponad próg" },
+  { value: "flat_per_service", label: "Stała stawka za zabieg", description: "Stała kwota za każdy wykonany zabieg" },
+];
 
 interface WorkingHours {
   dayOfWeek: number;
@@ -229,6 +245,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       visible_in_widget: s.visible_in_widget ?? true,
       break_start: s.break_start,
       break_duration: s.break_duration,
+      compensation_type: (s.compensation_type as CompensationType) || "commission",
+      base_salary: s.base_salary,
+      hourly_rate: s.hourly_rate,
+      salary_bonus_threshold: s.salary_bonus_threshold,
+      salary_bonus_rate: s.salary_bonus_rate,
+      flat_rate_per_service: s.flat_rate_per_service,
       serviceIds: staffServicesMap?.[s.id] || [],
       workingHours: workingHoursMap?.[s.id]?.length
         ? defaultWorkingHours.map(dh => {
@@ -262,6 +284,10 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
     workingHours: defaultWorkingHours, bio: "", specializations: [] as string[], started_at: "",
     contract_type: "", commission_rate: "" as string, certifications: [] as string[], visible_in_widget: true,
     break_start: "", break_duration: "" as string,
+    compensation_type: "commission" as CompensationType,
+    base_salary: "" as string, hourly_rate: "" as string,
+    salary_bonus_threshold: "" as string, salary_bonus_rate: "" as string,
+    flat_rate_per_service: "" as string,
   });
   const [newCertification, setNewCertification] = useState("");
 
@@ -275,11 +301,15 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
         contract_type: member.contract_type || "", commission_rate: member.commission_rate?.toString() || "",
         certifications: member.certifications || [], visible_in_widget: member.visible_in_widget ?? true,
         break_start: member.break_start || "", break_duration: member.break_duration?.toString() || "",
+        compensation_type: member.compensation_type || "commission",
+        base_salary: member.base_salary?.toString() || "", hourly_rate: member.hourly_rate?.toString() || "",
+        salary_bonus_threshold: member.salary_bonus_threshold?.toString() || "", salary_bonus_rate: member.salary_bonus_rate?.toString() || "",
+        flat_rate_per_service: member.flat_rate_per_service?.toString() || "",
       });
       setAvatarPreview(member.avatar_url || null);
     } else {
       setEditingStaff(null);
-      setForm({ name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "", contract_type: "", commission_rate: "", certifications: [], visible_in_widget: true, break_start: "", break_duration: "" });
+      setForm({ name: "", role: "", email: "", phone: "", color: STAFF_COLORS[0].value, serviceIds: [], workingHours: defaultWorkingHours, bio: "", specializations: [], started_at: "", contract_type: "", commission_rate: "", certifications: [], visible_in_widget: true, break_start: "", break_duration: "", compensation_type: "commission", base_salary: "", hourly_rate: "", salary_bonus_threshold: "", salary_bonus_rate: "", flat_rate_per_service: "" });
       setAvatarPreview(null);
     }
     setAvatarFile(null);
@@ -345,6 +375,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
           certifications: form.certifications, visible_in_widget: form.visible_in_widget,
           break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
+          compensation_type: form.compensation_type,
+          base_salary: form.base_salary ? parseFloat(form.base_salary) : null,
+          hourly_rate: form.hourly_rate ? parseFloat(form.hourly_rate) : null,
+          salary_bonus_threshold: form.salary_bonus_threshold ? parseFloat(form.salary_bonus_threshold) : null,
+          salary_bonus_rate: form.salary_bonus_rate ? parseFloat(form.salary_bonus_rate) : null,
+          flat_rate_per_service: form.flat_rate_per_service ? parseFloat(form.flat_rate_per_service) : null,
         };
         if (avatarUrl) updateData.avatar_url = avatarUrl;
         const { error } = await supabase.from("staff_members").update(updateData as never).eq("id", editingStaff.id);
@@ -357,6 +393,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
           certifications: form.certifications, visible_in_widget: form.visible_in_widget,
           break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
+          compensation_type: form.compensation_type,
+          base_salary: form.base_salary ? parseFloat(form.base_salary) : null,
+          hourly_rate: form.hourly_rate ? parseFloat(form.hourly_rate) : null,
+          salary_bonus_threshold: form.salary_bonus_threshold ? parseFloat(form.salary_bonus_threshold) : null,
+          salary_bonus_rate: form.salary_bonus_rate ? parseFloat(form.salary_bonus_rate) : null,
+          flat_rate_per_service: form.flat_rate_per_service ? parseFloat(form.flat_rate_per_service) : null,
         };
         const { data, error } = await supabase
           .from("staff_members")
@@ -648,21 +690,79 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Typ umowy</Label>
-                  <Select value={form.contract_type} onValueChange={(v) => setForm(prev => ({ ...prev, contract_type: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Wybierz..." /></SelectTrigger>
-                    <SelectContent>
-                      {CONTRACT_TYPES.map(ct => (
-                        <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="flex items-center gap-1"><Percent className="w-3.5 h-3.5" /> Prowizja (%)</Label>
-                  <Input type="number" min={0} max={100} step={0.5} value={form.commission_rate} onChange={(e) => setForm(prev => ({ ...prev, commission_rate: e.target.value }))} placeholder="np. 40" />
+              <div>
+                <Label>Typ umowy</Label>
+                <Select value={form.contract_type} onValueChange={(v) => setForm(prev => ({ ...prev, contract_type: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Wybierz..." /></SelectTrigger>
+                  <SelectContent>
+                    {CONTRACT_TYPES.map(ct => (
+                      <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 💰 Model rozliczeń */}
+              <div className="border-t border-border pt-4 mt-2">
+                <Label className="flex items-center gap-1 text-base font-semibold mb-3">💰 Model rozliczeń</Label>
+                <Select value={form.compensation_type} onValueChange={(v) => setForm(prev => ({ ...prev, compensation_type: v as CompensationType }))}>
+                  <SelectTrigger><SelectValue placeholder="Wybierz model..." /></SelectTrigger>
+                  <SelectContent>
+                    {COMPENSATION_TYPES.map(ct => (
+                      <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1 italic">
+                  {COMPENSATION_TYPES.find(ct => ct.value === form.compensation_type)?.description}
+                </p>
+
+                <div className="mt-3 space-y-3">
+                  {form.compensation_type === "commission" && (
+                    <div>
+                      <Label className="flex items-center gap-1"><Percent className="w-3.5 h-3.5" /> Prowizja (%)</Label>
+                      <Input type="number" min={0} max={100} step={0.5} value={form.commission_rate} onChange={(e) => setForm(prev => ({ ...prev, commission_rate: e.target.value }))} placeholder="np. 30" />
+                    </div>
+                  )}
+
+                  {form.compensation_type === "salary" && (
+                    <div>
+                      <Label>Pensja miesięczna (zł brutto)</Label>
+                      <Input type="number" min={0} step={100} value={form.base_salary} onChange={(e) => setForm(prev => ({ ...prev, base_salary: e.target.value }))} placeholder="np. 4500" />
+                    </div>
+                  )}
+
+                  {form.compensation_type === "hourly" && (
+                    <div>
+                      <Label>Stawka godzinowa (zł)</Label>
+                      <Input type="number" min={0} step={1} value={form.hourly_rate} onChange={(e) => setForm(prev => ({ ...prev, hourly_rate: e.target.value }))} placeholder="np. 40" />
+                    </div>
+                  )}
+
+                  {form.compensation_type === "salary_plus_commission" && (
+                    <>
+                      <div>
+                        <Label>Podstawa miesięczna (zł)</Label>
+                        <Input type="number" min={0} step={100} value={form.base_salary} onChange={(e) => setForm(prev => ({ ...prev, base_salary: e.target.value }))} placeholder="np. 3500" />
+                      </div>
+                      <div>
+                        <Label>Próg przychodów (zł)</Label>
+                        <Input type="number" min={0} step={100} value={form.salary_bonus_threshold} onChange={(e) => setForm(prev => ({ ...prev, salary_bonus_threshold: e.target.value }))} placeholder="np. 8000" />
+                        <p className="text-xs text-muted-foreground mt-0.5">Powyżej jakiego przychodu nalicza się premia</p>
+                      </div>
+                      <div>
+                        <Label>Premia powyżej progu (%)</Label>
+                        <Input type="number" min={0} max={100} step={1} value={form.salary_bonus_rate} onChange={(e) => setForm(prev => ({ ...prev, salary_bonus_rate: e.target.value }))} placeholder="np. 10" />
+                      </div>
+                    </>
+                  )}
+
+                  {form.compensation_type === "flat_per_service" && (
+                    <div>
+                      <Label>Stawka za zabieg (zł)</Label>
+                      <Input type="number" min={0} step={10} value={form.flat_rate_per_service} onChange={(e) => setForm(prev => ({ ...prev, flat_rate_per_service: e.target.value }))} placeholder="np. 100" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div>

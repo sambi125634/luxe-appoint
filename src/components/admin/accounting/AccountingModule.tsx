@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { startOfMonth, endOfMonth, format } from "date-fns";
-import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText, PieChart, UserX } from "lucide-react";
+import { Calculator, Receipt, Users, Ticket, Download, BarChart3, Package, FileText, PieChart, UserX, Banknote } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccountingFiltersBar } from "./AccountingFilters";
 import { AccountingCharts } from "./AccountingCharts";
@@ -13,6 +13,7 @@ import { ProductSalesAccountingReport } from "./ProductSalesAccountingReport";
 import { ManualEntryModal, ManualTransaction } from "./ManualEntryModal";
 import { OccupancyReport } from "./OccupancyReport";
 import { NoShowsReport } from "./NoShowsReport";
+import { StaffCompensationReport } from "./StaffCompensationReport";
 import { AccountingFilters, Transaction } from "./types";
 import { mockTransactions } from "./mockData";
 import { useToast } from "@/hooks/use-toast";
@@ -234,6 +235,10 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
             <Download className="w-4 h-4 hidden sm:inline" />
             <span>{t('accounting.export')}</span>
           </TabsTrigger>
+          <TabsTrigger value="compensation" className="gap-2">
+            <Banknote className="w-4 h-4 hidden sm:inline" />
+            <span>Rozliczenia</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="charts" className="mt-6">
@@ -270,6 +275,10 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
 
         <TabsContent value="export" className="mt-6">
           <ExportSection dateRange={filters.dateRange} />
+        </TabsContent>
+
+        <TabsContent value="compensation" className="mt-6">
+          <StaffCompensationReport dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
       </Tabs>
     </div>
