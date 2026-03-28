@@ -54,6 +54,7 @@ interface Client {
   totalSpent: number;
   visits: Visit[];
   purchaseCategories: string[];
+  purchaseGroup: PurchaseGroup;
 }
 
 // Demo mock data
