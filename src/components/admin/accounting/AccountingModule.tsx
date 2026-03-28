@@ -235,6 +235,10 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
             <Download className="w-4 h-4 hidden sm:inline" />
             <span>{t('accounting.export')}</span>
           </TabsTrigger>
+          <TabsTrigger value="compensation" className="gap-2">
+            <Banknote className="w-4 h-4 hidden sm:inline" />
+            <span>Rozliczenia</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="charts" className="mt-6">
