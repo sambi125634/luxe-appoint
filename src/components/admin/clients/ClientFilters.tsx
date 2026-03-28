@@ -55,12 +55,21 @@ export function ClientFilters({
     onFiltersChange({ ...filters, categories: newCategories });
   };
 
+  const togglePurchaseGroup = (groupId: PurchaseGroup) => {
+    const current = filters.purchaseGroups || [];
+    const newGroups = current.includes(groupId)
+      ? current.filter(g => g !== groupId)
+      : [...current, groupId];
+    onFiltersChange({ ...filters, purchaseGroups: newGroups });
+  };
+
   const clearFilters = () => {
     onFiltersChange({
       tags: [],
       categories: [],
       inactivityDays: null,
-      needsFollowup: false
+      needsFollowup: false,
+      purchaseGroups: [],
     });
   };
 
