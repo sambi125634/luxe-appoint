@@ -54,6 +54,8 @@ interface StaffMember {
   salary_bonus_threshold?: number | null;
   salary_bonus_rate?: number | null;
   flat_rate_per_service?: number | null;
+  invitation_status?: string | null;
+  staff_role?: string | null;
 }
 
 const COMPENSATION_TYPES: { value: CompensationType; label: string; description: string }[] = [
