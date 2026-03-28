@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart } from "lucide-react";
+import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart, FileText } from "lucide-react";
 import { ProductsCatalog } from "./ProductsCatalog";
 import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
@@ -9,6 +9,7 @@ import { ProductSalesReport } from "./ProductSalesReport";
 import { SuppliersManagement } from "./SuppliersManagement";
 import { BulkOrderForm } from "./BulkOrderForm";
 import { PurchaseOrdersList } from "./PurchaseOrdersList";
+import { InvoiceAIScanner } from "./InvoiceAIScanner";
 import ServiceRecipes from "@/modules/inventory/ServiceRecipes";
 import InventoryStats from "@/modules/inventory/InventoryStats";
 import { useSalonId } from "@/hooks/useSalonId";
@@ -27,6 +28,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
   const { salonId, isLoading } = useSalonId();
   const [activeTab, setActiveTab] = useState<ProductTab>("catalog");
   const [ordersView, setOrdersView] = useState<"list" | "new">("list");
+  const [isInvoiceUploadOpen, setIsInvoiceUploadOpen] = useState(false);
 
   const effectiveSalonId = isDemo ? DEMO_SALON_ID : (salonId ?? undefined);
   const { products } = useProducts(effectiveSalonId);
@@ -75,7 +77,18 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
 
   return (
     <div className="space-y-6">
-      <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
+      <div className="flex items-center justify-between">
+        <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
+        <Button variant="outline" onClick={() => setIsInvoiceUploadOpen(true)} className="gap-2">
+          <FileText className="w-4 h-4" />
+          <span className="hidden sm:inline">Wgraj fakturę</span>
+        </Button>
+      </div>
+      <InvoiceAIScanner
+        open={isInvoiceUploadOpen}
+        onOpenChange={setIsInvoiceUploadOpen}
+        salonId={effectiveSalonId}
+      />
       <Tabs value={activeTab} onValueChange={(v) => { setActiveTab(v as ProductTab); if (v === "orders") setOrdersView("list"); }}>
         <TabsList className="bg-muted/50 p-1 h-auto flex-wrap">
           {tabs.map((tab) => (
