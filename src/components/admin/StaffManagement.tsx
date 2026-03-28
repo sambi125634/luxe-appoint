@@ -375,6 +375,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
           certifications: form.certifications, visible_in_widget: form.visible_in_widget,
           break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
+          compensation_type: form.compensation_type,
+          base_salary: form.base_salary ? parseFloat(form.base_salary) : null,
+          hourly_rate: form.hourly_rate ? parseFloat(form.hourly_rate) : null,
+          salary_bonus_threshold: form.salary_bonus_threshold ? parseFloat(form.salary_bonus_threshold) : null,
+          salary_bonus_rate: form.salary_bonus_rate ? parseFloat(form.salary_bonus_rate) : null,
+          flat_rate_per_service: form.flat_rate_per_service ? parseFloat(form.flat_rate_per_service) : null,
         };
         if (avatarUrl) updateData.avatar_url = avatarUrl;
         const { error } = await supabase.from("staff_members").update(updateData as never).eq("id", editingStaff.id);
@@ -387,6 +393,12 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
           contract_type: form.contract_type || null, commission_rate: form.commission_rate ? parseFloat(form.commission_rate) : null,
           certifications: form.certifications, visible_in_widget: form.visible_in_widget,
           break_start: form.break_start || null, break_duration: form.break_duration ? parseInt(form.break_duration) : null,
+          compensation_type: form.compensation_type,
+          base_salary: form.base_salary ? parseFloat(form.base_salary) : null,
+          hourly_rate: form.hourly_rate ? parseFloat(form.hourly_rate) : null,
+          salary_bonus_threshold: form.salary_bonus_threshold ? parseFloat(form.salary_bonus_threshold) : null,
+          salary_bonus_rate: form.salary_bonus_rate ? parseFloat(form.salary_bonus_rate) : null,
+          flat_rate_per_service: form.flat_rate_per_service ? parseFloat(form.flat_rate_per_service) : null,
         };
         const { data, error } = await supabase
           .from("staff_members")
