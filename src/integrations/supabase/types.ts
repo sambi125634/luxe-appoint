@@ -2033,14 +2033,19 @@ export type Database = {
           flat_rate_per_service: number | null
           hourly_rate: number | null
           id: string
+          invitation_email: string | null
+          invitation_sent_at: string | null
+          invitation_status: string | null
           is_active: boolean
           name: string
+          permissions: Json | null
           phone: string | null
           role: string | null
           salary_bonus_rate: number | null
           salary_bonus_threshold: number | null
           salon_id: string
           specializations: Json | null
+          staff_role: string | null
           started_at: string | null
           updated_at: string
           user_id: string | null
@@ -2062,14 +2067,19 @@ export type Database = {
           flat_rate_per_service?: number | null
           hourly_rate?: number | null
           id?: string
+          invitation_email?: string | null
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
           is_active?: boolean
           name: string
+          permissions?: Json | null
           phone?: string | null
           role?: string | null
           salary_bonus_rate?: number | null
           salary_bonus_threshold?: number | null
           salon_id: string
           specializations?: Json | null
+          staff_role?: string | null
           started_at?: string | null
           updated_at?: string
           user_id?: string | null
@@ -2091,14 +2101,19 @@ export type Database = {
           flat_rate_per_service?: number | null
           hourly_rate?: number | null
           id?: string
+          invitation_email?: string | null
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
           is_active?: boolean
           name?: string
+          permissions?: Json | null
           phone?: string | null
           role?: string | null
           salary_bonus_rate?: number | null
           salary_bonus_threshold?: number | null
           salon_id?: string
           specializations?: Json | null
+          staff_role?: string | null
           started_at?: string | null
           updated_at?: string
           user_id?: string | null
