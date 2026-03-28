@@ -779,8 +779,21 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
           </>
         ) : (
           <PurchaseGroups 
-            groups={purchaseGroups}
-            onSelectCategory={handleSelectCategory}
+            clients={clients.map(c => ({
+              id: c.id,
+              firstName: c.firstName,
+              lastName: c.lastName,
+              phone: c.phone,
+              totalSpent: c.totalSpent,
+              totalVisits: c.totalVisits,
+              lastVisit: c.lastVisit,
+              purchaseGroup: c.purchaseGroup,
+            }))}
+            groupStats={getGroupStats(clients.map(c => c.purchaseGroup))}
+            onSelectClient={(clientId) => {
+              const client = clients.find(c => c.id === clientId);
+              if (client) openClientDetails(client);
+            }}
           />
         )}
       </div>
