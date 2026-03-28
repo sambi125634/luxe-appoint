@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Filter, X, Calendar, Tag, FolderOpen } from "lucide-react";
+import { Filter, X, Calendar, Tag, FolderOpen, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -8,12 +8,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { PURCHASE_GROUP_LIST, type PurchaseGroup } from "@/lib/purchase-groups";
 
 export interface ClientFiltersState {
   tags: string[];
   categories: string[];
   inactivityDays: number | null;
   needsFollowup: boolean;
+  purchaseGroups: PurchaseGroup[];
 }
 
 interface ClientFiltersProps {
