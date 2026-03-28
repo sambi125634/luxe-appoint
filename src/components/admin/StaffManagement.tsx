@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles, Eye, EyeOff, Coffee, Award, FileText, Percent } from "lucide-react";
+import { Plus, Pencil, Trash2, Mail, Phone, Calendar, User, UserPlus, Star, TrendingUp, Camera, Clock, Sparkles, Eye, EyeOff, Coffee, Award, FileText, Percent, Users, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { SectionGuide } from "./SectionGuide";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
@@ -19,6 +20,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StaffInviteTab } from "./staff/StaffInviteTab";
+import { StaffPermissionsTab } from "./staff/StaffPermissionsTab";
 
 import demoMaria from "@/assets/demo-staff-maria.jpg";
 import demoKasia from "@/assets/demo-staff-kasia.jpg";
@@ -51,6 +54,8 @@ interface StaffMember {
   salary_bonus_threshold?: number | null;
   salary_bonus_rate?: number | null;
   flat_rate_per_service?: number | null;
+  invitation_status?: string | null;
+  staff_role?: string | null;
 }
 
 const COMPENSATION_TYPES: { value: CompensationType; label: string; description: string }[] = [
@@ -251,6 +256,8 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
       salary_bonus_threshold: s.salary_bonus_threshold,
       salary_bonus_rate: s.salary_bonus_rate,
       flat_rate_per_service: s.flat_rate_per_service,
+      invitation_status: s.invitation_status,
+      staff_role: s.staff_role,
       serviceIds: staffServicesMap?.[s.id] || [],
       workingHours: workingHoursMap?.[s.id]?.length
         ? defaultWorkingHours.map(dh => {
@@ -500,121 +507,159 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
     );
   }
 
+  const getInvitationBadge = (member: StaffMember) => {
+    const status = member.invitation_status;
+    switch (status) {
+      case "active": return <Badge variant="default" className="text-[10px] bg-green-500/10 text-green-600 border-green-200">✅ Aktywny</Badge>;
+      case "invited": return <Badge variant="secondary" className="text-[10px] bg-amber-500/10 text-amber-600 border-amber-200">⏳ Oczekuje</Badge>;
+      case "accepted": return <Badge variant="secondary" className="text-[10px] bg-blue-500/10 text-blue-600 border-blue-200">🔵 Zaakceptowany</Badge>;
+      default: return <Badge variant="outline" className="text-[10px]">📧 Nie zaproszony</Badge>;
+    }
+  };
+
+  const hasOwner = staff.some(m => m.staff_role === "owner");
+
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="staff" />
-      <div className="glass-card p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-serif font-semibold">{t('staff.title')} ({staff.length})</h3>
-          <Button variant="luxury" size="sm" className="gap-2" onClick={() => openDialog()}>
-            <Plus className="w-4 h-4" />
-            {t('staff.addStaff')}
-          </Button>
-        </div>
+      
+      <Tabs defaultValue="list" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="list" className="gap-2">
+            <Users className="w-4 h-4" />
+            👥 Pracownicy
+          </TabsTrigger>
+          <TabsTrigger value="invite" className="gap-2">
+            <UserPlus className="w-4 h-4" />
+            ➕ Zaproś pracownika
+          </TabsTrigger>
+          <TabsTrigger value="permissions" className="gap-2">
+            <Shield className="w-4 h-4" />
+            📋 Role i uprawnienia
+          </TabsTrigger>
+        </TabsList>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {staff.map((member, index) => {
-            const services = getServiceNames(member.serviceIds);
-            const schedule = getScheduleSummary(member.workingHours);
-            const demoStats = isDemo ? DEMO_STATS[member.id] : null;
-            const tenure = getTenure(member.started_at);
+        <TabsContent value="list">
+          <div className="glass-card p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-serif font-semibold">{t('staff.title')} ({staff.length})</h3>
+              <Button variant="luxury" size="sm" className="gap-2" onClick={() => openDialog()}>
+                <Plus className="w-4 h-4" />
+                {t('staff.addStaff')}
+              </Button>
+            </div>
 
-            return (
-              <div key={member.id} className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
-                <div className="flex items-start gap-4">
-                  <Avatar className="w-14 h-14 ring-2 ring-border">
-                    {member.avatar_url && <AvatarImage src={member.avatar_url} alt={member.name} className="object-cover" />}
-                    <AvatarFallback className="font-serif text-lg" style={{ backgroundColor: member.color, color: 'white' }}>
-                      {getInitials(member.name)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="font-medium">{member.name}</p>
-                        <p className="text-sm text-muted-foreground">{member.role}</p>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => openDialog(member)}>
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => deleteStaff(member.id)}>
-                          <Trash2 className="w-4 h-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              {staff.map((member, index) => {
+                const services = getServiceNames(member.serviceIds);
+                const schedule = getScheduleSummary(member.workingHours);
+                const demoStats = isDemo ? DEMO_STATS[member.id] : null;
+                const tenure = getTenure(member.started_at);
 
-                    {/* Schedule summary */}
-                    <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
-                      <Clock className="w-3.5 h-3.5" />
-                      {schedule}
-                      {tenure && <span className="ml-2 text-muted-foreground/70">· staż {tenure}</span>}
-                    </div>
+                return (
+                  <div key={member.id} className="p-4 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors animate-fade-in" style={{ animationDelay: `${index * 50}ms` }}>
+                    <div className="flex items-start gap-4">
+                      <Avatar className="w-14 h-14 ring-2 ring-border">
+                        {member.avatar_url && <AvatarImage src={member.avatar_url} alt={member.name} className="object-cover" />}
+                        <AvatarFallback className="font-serif text-lg" style={{ backgroundColor: member.color, color: 'white' }}>
+                          {getInitials(member.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{member.name}</p>
+                              {!isDemo && getInvitationBadge(member)}
+                            </div>
+                            <p className="text-sm text-muted-foreground">{member.role}</p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openDialog(member)}>
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => deleteStaff(member.id)}>
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </div>
 
-                    {/* Services chips */}
-                    {services.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {services.slice(0, 3).map(name => (
-                          <Badge key={name} variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
-                            {name}
-                          </Badge>
-                        ))}
-                        {services.length > 3 && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal">
-                            +{services.length - 3}
-                          </Badge>
+                        <div className="flex items-center gap-1.5 mt-2 text-xs text-muted-foreground">
+                          <Clock className="w-3.5 h-3.5" />
+                          {schedule}
+                          {tenure && <span className="ml-2 text-muted-foreground/70">· staż {tenure}</span>}
+                        </div>
+
+                        {services.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-2">
+                            {services.slice(0, 3).map(name => (
+                              <Badge key={name} variant="secondary" className="text-[10px] px-1.5 py-0 font-normal">
+                                {name}
+                              </Badge>
+                            ))}
+                            {services.length > 3 && (
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 font-normal">
+                                +{services.length - 3}
+                              </Badge>
+                            )}
+                          </div>
                         )}
-                      </div>
-                    )}
 
-                    {/* Specializations */}
-                    {member.specializations && member.specializations.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-1.5">
-                        {member.specializations.map(spec => (
-                          <span key={spec} className="inline-flex items-center gap-0.5 text-[10px] text-primary/80">
-                            <Sparkles className="w-2.5 h-2.5" />
-                            {spec}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                        {member.specializations && member.specializations.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {member.specializations.map(spec => (
+                              <span key={spec} className="inline-flex items-center gap-0.5 text-[10px] text-primary/80">
+                                <Sparkles className="w-2.5 h-2.5" />
+                                {spec}
+                              </span>
+                            ))}
+                          </div>
+                        )}
 
-                    {/* Demo stats */}
-                    {demoStats && (
-                      <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <TrendingUp className="w-3.5 h-3.5" />
-                          {demoStats.visits} wizyt/mies.
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                          {demoStats.rating}
-                        </span>
-                      </div>
-                    )}
+                        {demoStats && (
+                          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <TrendingUp className="w-3.5 h-3.5" />
+                              {demoStats.visits} wizyt/mies.
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                              {demoStats.rating}
+                            </span>
+                          </div>
+                        )}
 
-                    {/* Contact info */}
-                    <div className="mt-2 space-y-0.5">
-                      {member.email && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Mail className="w-3 h-3" />
-                          {member.email}
+                        <div className="mt-2 space-y-0.5">
+                          {member.email && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Mail className="w-3 h-3" />
+                              {member.email}
+                            </div>
+                          )}
+                          {member.phone && (
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Phone className="w-3 h-3" />
+                              {member.phone}
+                            </div>
+                          )}
                         </div>
-                      )}
-                      {member.phone && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Phone className="w-3 h-3" />
-                          {member.phone}
-                        </div>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+                );
+              })}
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="invite">
+          <StaffInviteTab salonId={salonId} isDemo={isDemo} hasOwner={hasOwner} />
+        </TabsContent>
+
+        <TabsContent value="permissions">
+          <StaffPermissionsTab isDemo={isDemo} />
+        </TabsContent>
+      </Tabs>
 
       {/* Staff Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

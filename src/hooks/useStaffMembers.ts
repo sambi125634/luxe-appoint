@@ -26,6 +26,11 @@ export interface StaffMemberData {
   salary_bonus_threshold: number | null;
   salary_bonus_rate: number | null;
   flat_rate_per_service: number | null;
+  invitation_email: string | null;
+  invitation_status: string | null;
+  invitation_sent_at: string | null;
+  staff_role: string | null;
+  permissions: Record<string, boolean> | null;
 }
 
 export function useStaffMembers() {
@@ -36,7 +41,7 @@ export function useStaffMembers() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("staff_members")
-        .select("id, name, role, email, phone, color, avatar_url, is_active, contract_type, commission_rate, certifications, visible_in_widget, break_start, break_duration, bio, specializations, started_at, compensation_type, base_salary, hourly_rate, salary_bonus_threshold, salary_bonus_rate, flat_rate_per_service")
+        .select("id, name, role, email, phone, color, avatar_url, is_active, contract_type, commission_rate, certifications, visible_in_widget, break_start, break_duration, bio, specializations, started_at, compensation_type, base_salary, hourly_rate, salary_bonus_threshold, salary_bonus_rate, flat_rate_per_service, invitation_email, invitation_status, invitation_sent_at, staff_role, permissions")
         .eq("salon_id", salonId!)
         .eq("is_active", true)
         .order("name");
