@@ -78,13 +78,13 @@ export function StaffCompensationReport({ dateRange, isDemo = false }: StaffComp
     if (!staffMembers || !completedAppointments) return [];
 
     return staffMembers.map((staff): StaffRow => {
-      const compType = ((staff as Record<string, unknown>).compensation_type as CompensationType) || "commission";
+      const compType = (staff.compensation_type as CompensationType) || "commission";
       const commRate = staff.commission_rate ?? 30;
-      const baseSalary = Number((staff as Record<string, unknown>).base_salary) || 0;
-      const hourlyRate = Number((staff as Record<string, unknown>).hourly_rate) || 0;
-      const bonusThreshold = Number((staff as Record<string, unknown>).salary_bonus_threshold) || 0;
-      const bonusRate = Number((staff as Record<string, unknown>).salary_bonus_rate) || 0;
-      const flatRate = Number((staff as Record<string, unknown>).flat_rate_per_service) || 0;
+      const baseSalary = Number(staff.base_salary) || 0;
+      const hourlyRate = Number(staff.hourly_rate) || 0;
+      const bonusThreshold = Number(staff.salary_bonus_threshold) || 0;
+      const bonusRate = Number(staff.salary_bonus_rate) || 0;
+      const flatRate = Number(staff.flat_rate_per_service) || 0;
 
       const staffAppts = completedAppointments.filter(a => a.staff_id === staff.id);
       const totalRevenue = staffAppts.reduce((sum, a) => sum + Number(a.price ?? 0), 0);
