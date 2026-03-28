@@ -276,6 +276,10 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
         <TabsContent value="export" className="mt-6">
           <ExportSection dateRange={filters.dateRange} />
         </TabsContent>
+
+        <TabsContent value="compensation" className="mt-6">
+          <StaffCompensationReport dateRange={filters.dateRange} isDemo={isDemo} />
+        </TabsContent>
       </Tabs>
     </div>
   );
