@@ -20,6 +20,12 @@ export interface StaffMemberData {
   bio: string | null;
   specializations: unknown[] | null;
   started_at: string | null;
+  compensation_type: string | null;
+  base_salary: number | null;
+  hourly_rate: number | null;
+  salary_bonus_threshold: number | null;
+  salary_bonus_rate: number | null;
+  flat_rate_per_service: number | null;
 }
 
 export function useStaffMembers() {
