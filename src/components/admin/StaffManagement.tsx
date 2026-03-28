@@ -690,21 +690,79 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Typ umowy</Label>
-                  <Select value={form.contract_type} onValueChange={(v) => setForm(prev => ({ ...prev, contract_type: v }))}>
-                    <SelectTrigger><SelectValue placeholder="Wybierz..." /></SelectTrigger>
-                    <SelectContent>
-                      {CONTRACT_TYPES.map(ct => (
-                        <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="flex items-center gap-1"><Percent className="w-3.5 h-3.5" /> Prowizja (%)</Label>
-                  <Input type="number" min={0} max={100} step={0.5} value={form.commission_rate} onChange={(e) => setForm(prev => ({ ...prev, commission_rate: e.target.value }))} placeholder="np. 40" />
+              <div>
+                <Label>Typ umowy</Label>
+                <Select value={form.contract_type} onValueChange={(v) => setForm(prev => ({ ...prev, contract_type: v }))}>
+                  <SelectTrigger><SelectValue placeholder="Wybierz..." /></SelectTrigger>
+                  <SelectContent>
+                    {CONTRACT_TYPES.map(ct => (
+                      <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* 💰 Model rozliczeń */}
+              <div className="border-t border-border pt-4 mt-2">
+                <Label className="flex items-center gap-1 text-base font-semibold mb-3">💰 Model rozliczeń</Label>
+                <Select value={form.compensation_type} onValueChange={(v) => setForm(prev => ({ ...prev, compensation_type: v as CompensationType }))}>
+                  <SelectTrigger><SelectValue placeholder="Wybierz model..." /></SelectTrigger>
+                  <SelectContent>
+                    {COMPENSATION_TYPES.map(ct => (
+                      <SelectItem key={ct.value} value={ct.value}>{ct.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1 italic">
+                  {COMPENSATION_TYPES.find(ct => ct.value === form.compensation_type)?.description}
+                </p>
+
+                <div className="mt-3 space-y-3">
+                  {form.compensation_type === "commission" && (
+                    <div>
+                      <Label className="flex items-center gap-1"><Percent className="w-3.5 h-3.5" /> Prowizja (%)</Label>
+                      <Input type="number" min={0} max={100} step={0.5} value={form.commission_rate} onChange={(e) => setForm(prev => ({ ...prev, commission_rate: e.target.value }))} placeholder="np. 30" />
+                    </div>
+                  )}
+
+                  {form.compensation_type === "salary" && (
+                    <div>
+                      <Label>Pensja miesięczna (zł brutto)</Label>
+                      <Input type="number" min={0} step={100} value={form.base_salary} onChange={(e) => setForm(prev => ({ ...prev, base_salary: e.target.value }))} placeholder="np. 4500" />
+                    </div>
+                  )}
+
+                  {form.compensation_type === "hourly" && (
+                    <div>
+                      <Label>Stawka godzinowa (zł)</Label>
+                      <Input type="number" min={0} step={1} value={form.hourly_rate} onChange={(e) => setForm(prev => ({ ...prev, hourly_rate: e.target.value }))} placeholder="np. 40" />
+                    </div>
+                  )}
+
+                  {form.compensation_type === "salary_plus_commission" && (
+                    <>
+                      <div>
+                        <Label>Podstawa miesięczna (zł)</Label>
+                        <Input type="number" min={0} step={100} value={form.base_salary} onChange={(e) => setForm(prev => ({ ...prev, base_salary: e.target.value }))} placeholder="np. 3500" />
+                      </div>
+                      <div>
+                        <Label>Próg przychodów (zł)</Label>
+                        <Input type="number" min={0} step={100} value={form.salary_bonus_threshold} onChange={(e) => setForm(prev => ({ ...prev, salary_bonus_threshold: e.target.value }))} placeholder="np. 8000" />
+                        <p className="text-xs text-muted-foreground mt-0.5">Powyżej jakiego przychodu nalicza się premia</p>
+                      </div>
+                      <div>
+                        <Label>Premia powyżej progu (%)</Label>
+                        <Input type="number" min={0} max={100} step={1} value={form.salary_bonus_rate} onChange={(e) => setForm(prev => ({ ...prev, salary_bonus_rate: e.target.value }))} placeholder="np. 10" />
+                      </div>
+                    </>
+                  )}
+
+                  {form.compensation_type === "flat_per_service" && (
+                    <div>
+                      <Label>Stawka za zabieg (zł)</Label>
+                      <Input type="number" min={0} step={10} value={form.flat_rate_per_service} onChange={(e) => setForm(prev => ({ ...prev, flat_rate_per_service: e.target.value }))} placeholder="np. 100" />
+                    </div>
+                  )}
                 </div>
               </div>
               <div>
