@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useStaffPermissions } from "@/hooks/useStaffPermissions";
 import { ChevronLeft, ChevronRight, Plus, Clock, CalendarDays, LayoutGrid, Columns3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
