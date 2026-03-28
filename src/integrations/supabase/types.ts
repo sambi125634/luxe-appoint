@@ -1148,6 +1148,47 @@ export type Database = {
           },
         ]
       }
+      product_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_default: boolean | null
+          name: string
+          salon_id: string
+          sort_order: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_default?: boolean | null
+          name: string
+          salon_id: string
+          sort_order?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_default?: boolean | null
+          name?: string
+          salon_id?: string
+          sort_order?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_categories_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           brand: string | null
@@ -1162,6 +1203,7 @@ export type Database = {
           is_for_internal_use: boolean
           min_stock: number
           name: string
+          product_category_id: string | null
           purchase_price_net: number | null
           sale_price_gross: number
           salon_id: string
@@ -1184,6 +1226,7 @@ export type Database = {
           is_for_internal_use?: boolean
           min_stock?: number
           name: string
+          product_category_id?: string | null
           purchase_price_net?: number | null
           sale_price_gross?: number
           salon_id: string
@@ -1206,6 +1249,7 @@ export type Database = {
           is_for_internal_use?: boolean
           min_stock?: number
           name?: string
+          product_category_id?: string | null
           purchase_price_net?: number | null
           sale_price_gross?: number
           salon_id?: string
@@ -1216,6 +1260,13 @@ export type Database = {
           vat_rate?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "products_product_category_id_fkey"
+            columns: ["product_category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "products_salon_id_fkey"
             columns: ["salon_id"]
@@ -2667,6 +2718,10 @@ export type Database = {
       }
       seed_default_client_tags: {
         Args: { _salon_id: string }
+        Returns: undefined
+      }
+      seed_default_product_categories: {
+        Args: { p_salon_id: string }
         Returns: undefined
       }
       user_belongs_to_salon: {
