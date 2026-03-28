@@ -273,6 +273,9 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
         const daysSince = getDaysSinceLastVisit(client.lastVisit);
         if (!daysSince || daysSince < 30) return false;
       }
+      if (filters.purchaseGroups && filters.purchaseGroups.length > 0) {
+        if (!filters.purchaseGroups.includes(client.purchaseGroup)) return false;
+      }
       return true;
     });
   }, [clients, searchQuery, filters]);

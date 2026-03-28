@@ -138,7 +138,32 @@ export function ClientFilters({
                         filters.categories.includes(category) 
                           ? "bg-primary/20 text-primary" 
                           : "bg-muted text-muted-foreground opacity-60"
-                      )}
+            )}
+
+            {/* Purchase groups filter */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-sm">
+                <Users className="w-3 h-3" />
+                Grupa zakupowa
+              </Label>
+              <div className="flex flex-wrap gap-1.5">
+                {PURCHASE_GROUP_LIST.map(group => (
+                  <Badge
+                    key={group.id}
+                    variant="secondary"
+                    className={cn(
+                      "cursor-pointer text-xs gap-1",
+                      (filters.purchaseGroups || []).includes(group.id)
+                        ? "bg-primary/20 text-primary"
+                        : "bg-muted text-muted-foreground opacity-60"
+                    )}
+                    onClick={() => togglePurchaseGroup(group.id)}
+                  >
+                    {group.emoji} {group.label}
+                  </Badge>
+                ))}
+              </div>
+            </div>
                       onClick={() => toggleCategory(category)}
                     >
                       {category}
