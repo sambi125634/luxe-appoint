@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart } from "lucide-react";
+import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart, FileText } from "lucide-react";
 import { ProductsCatalog } from "./ProductsCatalog";
 import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
@@ -9,6 +9,7 @@ import { ProductSalesReport } from "./ProductSalesReport";
 import { SuppliersManagement } from "./SuppliersManagement";
 import { BulkOrderForm } from "./BulkOrderForm";
 import { PurchaseOrdersList } from "./PurchaseOrdersList";
+import { InvoiceAIScanner } from "./InvoiceAIScanner";
 import ServiceRecipes from "@/modules/inventory/ServiceRecipes";
 import InventoryStats from "@/modules/inventory/InventoryStats";
 import { useSalonId } from "@/hooks/useSalonId";
