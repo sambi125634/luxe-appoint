@@ -207,7 +207,8 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
     tags: [],
     categories: [],
     inactivityDays: null,
-    needsFollowup: false
+    needsFollowup: false,
+    purchaseGroups: [],
   });
 
   // DB-driven tags
