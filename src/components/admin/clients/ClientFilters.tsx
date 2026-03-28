@@ -259,6 +259,15 @@ export function ClientFilters({
               />
             </Badge>
           )}
+          {(filters.purchaseGroups || []).map(groupId => {
+            const group = PURCHASE_GROUP_LIST.find(g => g.id === groupId);
+            return group ? (
+              <Badge key={groupId} variant="secondary" className="text-xs gap-1 bg-primary/20 text-primary">
+                {group.emoji} {group.label}
+                <X className="w-3 h-3 cursor-pointer" onClick={() => togglePurchaseGroup(groupId)} />
+              </Badge>
+            ) : null;
+          })}
         </div>
       )}
     </div>
