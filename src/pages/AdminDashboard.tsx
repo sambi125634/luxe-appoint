@@ -12,7 +12,7 @@ import { ScheduleManagement } from "@/components/admin/ScheduleManagement";
 import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
-import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
+
 
 import { ConversationsModule } from "@/components/admin/conversations/ConversationsModule";
 import { PipelineModule } from "@/components/admin/pipeline";
