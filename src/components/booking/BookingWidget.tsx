@@ -648,19 +648,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     );
   }
 
-  const recommendations = useMemo(() => {
-    if (!selectedService) return [];
-    if (isDemo) {
-      return demoServiceRecommendations[selectedService.id] || [];
-    }
-    return (dbRecommendations || []).map(r => ({
-      id: r.id,
-      name: r.name,
-      price: r.price,
-      duration: r.duration,
-    }));
-  }, [selectedService, isDemo, dbRecommendations]);
-
   const progressStepIndex = stepMapping.indexOf(currentStepId);
 
   return (
