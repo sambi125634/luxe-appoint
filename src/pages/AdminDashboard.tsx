@@ -23,7 +23,7 @@ import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { RetentionDashboard } from "@/modules/retention";
 
-import { PixelDashboard } from "@/modules/pixel";
+
 import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
