@@ -10,7 +10,7 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { WidgetsManagement } from "@/components/admin/widgets";
-import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
+
 
 import { SettingsModule } from "@/components/admin/settings";
 import { ConversationsModule } from "@/components/admin/conversations";
