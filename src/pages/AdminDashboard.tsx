@@ -102,6 +102,7 @@ export default function AdminDashboard() {
       case "analytics": return "True Profit Analytics";
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
+      case "export": return "Eksport danych";
       default: return "Dashboard";
     }
   };
