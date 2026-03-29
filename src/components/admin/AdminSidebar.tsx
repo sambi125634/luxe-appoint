@@ -35,6 +35,7 @@ const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   pixel: "can_manage_marketing",
   products: "can_manage_products",
   services: "can_edit_services",
+  export: "can_view_finances",
 };
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
