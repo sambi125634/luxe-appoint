@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "settings" | "support" | "retention" | "pixel" | "analytics" | "consultation" | "referral" | "export";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "settings" | "support" | "retention" | "analytics" | "consultation" | "referral" | "export";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -32,7 +32,7 @@ const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   widgets: "can_manage_marketing",
   retention: "can_manage_marketing",
   referral: "can_manage_marketing",
-  pixel: "can_manage_marketing",
+  
   products: "can_manage_products",
   services: "can_edit_services",
   export: "can_view_finances",
@@ -74,7 +74,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       items: [
         { icon: Radar, labelKey: "admin.retention", tab: "retention" },
         { icon: Heart, labelKey: "admin.referral", tab: "referral" },
-        { icon: Zap, labelKey: "admin.pixel", tab: "pixel" },
+        
         { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
       ],
     },

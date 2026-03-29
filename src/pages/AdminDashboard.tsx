@@ -23,7 +23,7 @@ import { ProductsModule } from "@/components/admin/products";
 import { SupportModule } from "@/components/admin/support";
 import { RetentionDashboard } from "@/modules/retention";
 
-import { PixelDashboard } from "@/modules/pixel";
+
 import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
@@ -98,7 +98,7 @@ export default function AdminDashboard() {
       case "settings": return "Ustawienia";
       case "support": return "Pomoc & AI Asystent";
       case "retention": return "Retencja klientek";
-      case "pixel": return "Meta Pixel & CRM Sync";
+      
       case "analytics": return "True Profit Analytics";
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
       case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} initialTab={settingsInitialTab} />;
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard salonId={salonId ?? undefined} isDemo={false} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
-      case "pixel": return <PixelDashboard />;
+      
       case "analytics": return <TrueProfitDashboard onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
