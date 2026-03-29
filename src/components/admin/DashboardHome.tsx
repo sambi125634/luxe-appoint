@@ -378,19 +378,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
         </Card>
       </div>
 
-      {/* Weekly Brief Widget */}
-      <WeeklyBriefWidget isDemo={isDemo} />
-
-      {/* Today's Staff Widget */}
-      <TodayStaffCard salonId={salonId} isDemo={isDemo} />
-
-      {/* AI Revenue Prediction */}
-      <RevenuePredictionCard salonId={salonId ?? undefined} isDemo={isDemo} />
-
-      {/* Retention Flow Widget */}
-      <RetentionFlowWidget onNavigate={handleNavigate} isDemo={isDemo} />
-
-      {/* Bottom section */}
+      {/* Today's appointments + sidebar */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Today's appointments list */}
         <Card className="lg:col-span-2">
@@ -478,10 +466,8 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
           </CardContent>
         </Card>
 
-        {/* Right column */}
+        {/* Right column: top services + top staff */}
         <div className="space-y-6">
-          <StockAlertsCard alerts={stockAlerts} topSelling={topSelling} />
-
           {/* Top services */}
           <Card>
             <CardHeader>
@@ -563,6 +549,21 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
           </Card>
         </div>
       </div>
+
+      {/* AI Revenue Prediction */}
+      <RevenuePredictionCard salonId={salonId ?? undefined} isDemo={isDemo} />
+
+      {/* Retention Flow Widget */}
+      <RetentionFlowWidget onNavigate={handleNavigate} isDemo={isDemo} />
+
+      {/* Today's Staff Widget */}
+      <TodayStaffCard salonId={salonId} isDemo={isDemo} />
+
+      {/* Weekly Brief Widget */}
+      <WeeklyBriefWidget isDemo={isDemo} />
+
+      {/* Stock Alerts */}
+      <StockAlertsCard alerts={stockAlerts} topSelling={topSelling} />
     </div>
   );
 }
