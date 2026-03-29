@@ -82,6 +82,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       items: [
         { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
         { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
+        { icon: Download, labelKey: "admin.export", tab: "export" },
       ],
     },
     {
