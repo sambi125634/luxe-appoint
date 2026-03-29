@@ -33,10 +33,27 @@ interface DashboardHomeProps {
 }
 
 // Mock data for demo mode
+const demoTime = (h: number, m: number) => {
+  const d = new Date();
+  d.setHours(h, m, 0, 0);
+  return d.toISOString();
+};
+
 const DEMO_APPOINTMENTS = [
-  { id: "d1", start_time: new Date().toISOString(), end_time: new Date().toISOString(), status: "confirmed" as const, price: 150, notes: null, clients: { first_name: "Anna", last_name: "Kowalska", phone: "+48 123 456 789" }, services: { name: "Manicure hybrydowy" }, staff_members: { name: "Maria Nowakowska" } },
-  { id: "d2", start_time: new Date().toISOString(), end_time: new Date().toISOString(), status: "booked" as const, price: 350, notes: null, clients: { first_name: "Katarzyna", last_name: "Nowak", phone: "+48 987 654 321" }, services: { name: "Mezoterapia igłowa" }, staff_members: { name: "Joanna Lewandowska" } },
-  { id: "d3", start_time: new Date().toISOString(), end_time: new Date().toISOString(), status: "confirmed" as const, price: 200, notes: null, clients: { first_name: "Magdalena", last_name: "Wiśniewska", phone: "+48 555 123 456" }, services: { name: "Masaż relaksacyjny" }, staff_members: { name: "Karolina Wiśniewska" } },
+  { id: "d1",  start_time: demoTime(8, 0),   end_time: demoTime(9, 0),   status: "confirmed" as const, price: 150, notes: null, clients: { first_name: "Anna",       last_name: "Kowalska",    phone: "+48 123 456 789" }, services: { name: "Manicure hybrydowy" },     staff_members: { name: "Maria Nowakowska" } },
+  { id: "d2",  start_time: demoTime(8, 30),  end_time: demoTime(9, 30),  status: "confirmed" as const, price: 280, notes: null, clients: { first_name: "Beata",      last_name: "Mazur",       phone: "+48 501 234 567" }, services: { name: "Koloryzacja + tonowanie" }, staff_members: { name: "Joanna Lewandowska" } },
+  { id: "d3",  start_time: demoTime(9, 0),   end_time: demoTime(10, 0),  status: "confirmed" as const, price: 120, notes: null, clients: { first_name: "Celina",     last_name: "Kaczmarek",   phone: "+48 502 345 678" }, services: { name: "Pedicure klasyczny" },      staff_members: { name: "Karolina Wiśniewska" } },
+  { id: "d4",  start_time: demoTime(9, 30),  end_time: demoTime(10, 30), status: "booked" as const,     price: 350, notes: null, clients: { first_name: "Katarzyna",  last_name: "Nowak",       phone: "+48 987 654 321" }, services: { name: "Mezoterapia igłowa" },      staff_members: { name: "Joanna Lewandowska" } },
+  { id: "d5",  start_time: demoTime(10, 0),  end_time: demoTime(11, 0),  status: "confirmed" as const, price: 200, notes: null, clients: { first_name: "Magdalena",  last_name: "Wiśniewska",  phone: "+48 555 123 456" }, services: { name: "Masaż relaksacyjny" },      staff_members: { name: "Aleksandra Dąbrowska" } },
+  { id: "d6",  start_time: demoTime(10, 30), end_time: demoTime(11, 30), status: "confirmed" as const, price: 180, notes: null, clients: { first_name: "Dorota",     last_name: "Pawlak",      phone: "+48 503 456 789" }, services: { name: "Henna brwi i rzęs" },       staff_members: { name: "Maria Nowakowska" } },
+  { id: "d7",  start_time: demoTime(11, 0),  end_time: demoTime(12, 0),  status: "confirmed" as const, price: 450, notes: null, clients: { first_name: "Ewa",        last_name: "Jabłońska",   phone: "+48 504 567 890" }, services: { name: "Botox — czoło + lwia zmarszczka" }, staff_members: { name: "Joanna Lewandowska" } },
+  { id: "d8",  start_time: demoTime(12, 0),  end_time: demoTime(13, 0),  status: "confirmed" as const, price: 160, notes: null, clients: { first_name: "Grażyna",    last_name: "Tomczak",     phone: "+48 505 678 901" }, services: { name: "Manicure japoński" },       staff_members: { name: "Karolina Wiśniewska" } },
+  { id: "d9",  start_time: demoTime(13, 0),  end_time: demoTime(14, 0),  status: "booked" as const,     price: 320, notes: null, clients: { first_name: "Izabela",    last_name: "Szymańska",   phone: "+48 506 789 012" }, services: { name: "Mikrodermabrazja" },        staff_members: { name: "Aleksandra Dąbrowska" } },
+  { id: "d10", start_time: demoTime(13, 30), end_time: demoTime(14, 30), status: "confirmed" as const, price: 90,  notes: null, clients: { first_name: "Joanna",     last_name: "Zielińska",   phone: "+48 507 890 123" }, services: { name: "Regulacja brwi" },          staff_members: { name: "Maria Nowakowska" } },
+  { id: "d11", start_time: demoTime(14, 0),  end_time: demoTime(15, 0),  status: "cancelled" as const,  price: 250, notes: null, clients: { first_name: "Karolina",   last_name: "Wójcik",      phone: "+48 508 901 234" }, services: { name: "Peeling chemiczny" },       staff_members: { name: "Joanna Lewandowska" } },
+  { id: "d12", start_time: demoTime(15, 0),  end_time: demoTime(16, 0),  status: "confirmed" as const, price: 180, notes: null, clients: { first_name: "Laura",      last_name: "Kamińska",    phone: "+48 509 012 345" }, services: { name: "Przedłużanie rzęs 1:1" },  staff_members: { name: "Karolina Wiśniewska" } },
+  { id: "d13", start_time: demoTime(15, 30), end_time: demoTime(16, 30), status: "confirmed" as const, price: 140, notes: null, clients: { first_name: "Monika",     last_name: "Olszewska",   phone: "+48 510 123 456" }, services: { name: "Depilacja woskiem — nogi" }, staff_members: { name: "Aleksandra Dąbrowska" } },
+  { id: "d14", start_time: demoTime(16, 0),  end_time: demoTime(17, 0),  status: "confirmed" as const, price: 200, notes: null, clients: { first_name: "Natalia",    last_name: "Grabowska",   phone: "+48 511 234 567" }, services: { name: "Masaż twarzy kobido" },     staff_members: { name: "Maria Nowakowska" } },
 ];
 const DEMO_TOP_SERVICES = [
   { name: "Manicure hybrydowy", count: 48, revenue: 5760 },
@@ -405,7 +422,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
               </div>
             ) : (
               <div className="space-y-3">
-                {todayAppointments.slice(0, 6).map((appointment) => {
+                {todayAppointments.slice(0, 8).map((appointment) => {
                   const client = appointment.clients as { first_name: string; last_name: string; phone: string } | null;
                   const service = appointment.services as { name: string } | null;
                   const staff = appointment.staff_members as { name: string } | null;
@@ -461,6 +478,11 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
                     </div>
                   );
                 })}
+                {todayAppointments.length > 8 && (
+                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => handleNavigate("calendar")}>
+                    + {todayAppointments.length - 8} więcej wizyt — zobacz wszystkie
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
