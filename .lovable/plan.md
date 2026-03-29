@@ -1,33 +1,54 @@
 
 
-# Naprawa podglądu widgetów w trybie demo
+# Naprawa migającego sidebara w trybie demo
 
 ## Problem
-Kliknięcie "Podgląd" w module Widgety (tryb demo) otwiera URL `/s/main` (lub `/s/black-friday`). `BookingPage` szuka salonu z tym slugiem w bazie danych, nie znajduje go, i wyświetla "Salon nie znaleziony".
+`AdminSidebar` używa hooka `useStaffPermissions()` do filtrowania widocznych zakładek. Ten hook:
 
-Przycisk "Wypróbuj rezerwację" w prawym górnym rogu działa, bo kieruje na `/book/demo-salon` — slug rozpoznawany jako demo.
+1. **Podczas ładowania** (query pending) zwraca domyślnie `isOwner: true` (linia 76) → **widać wszystkie opcje**
+2. **Po załadowaniu** — w demo nie ma zalogowanego użytkownika, więc `getUser()` zwraca `null` → hook zwraca `DEFAULT_PERMISSIONS` z `isOwner: false` → **większość zakładek znika**
 
-## Przyczyna
-`handlePreview` wywołuje `getWidgetUrl(widget.slug)` co generuje `/s/{slug}`. Mock widgety mają slugi `main`, `black-friday`, `mezoterapia-promocja` — żaden z nich nie istnieje w bazie i żaden nie jest rozpoznawany jako demo przez `BookingPage`.
+To wyjaśnia "miganie": początkowo sidebar jest pełny, a po chwili ścina się do kilku opcji.
 
 ## Rozwiązanie
 
-### `WidgetsManagement.tsx` — zmiana `handlePreview` dla demo
-W trybie demo, zamiast otwierać `/s/{widget.slug}`, kieruj zawsze na `/book/demo-salon`:
+### Zmiana w `AdminSidebar` — props `isDemo`
+
+Dodać opcjonalny prop `isDemo?: boolean` do `AdminSidebarProps`. Gdy `isDemo === true`:
+- Pominąć filtrowanie po uprawnieniach — pokazać **wszystkie sekcje**
+- Nie wywoływać logiki permissions (lub zignorować wynik)
 
 ```typescript
-const handlePreview = (widget: BookingWidget) => {
-  if (isDemo) {
-    window.open(`${window.location.origin}/book/demo-salon`, '_blank');
-  } else {
-    window.open(getWidgetUrl(widget.slug), '_blank');
-  }
-};
+// AdminSidebar.tsx
+const visibleSections = isDemo
+  ? allSections
+  : allSections
+      .map(section => ({
+        ...section,
+        items: isOwner
+          ? section.items
+          : section.items.filter(item => {
+              const requiredPerm = TAB_PERMISSION_MAP[item.tab];
+              if (!requiredPerm) return true;
+              return permissions[requiredPerm];
+            }),
+      }))
+      .filter(section => section.items.length > 0);
 ```
 
-Analogicznie zaktualizować `handleCopyLink` — w demo pokazuje link demo-salon, a nie fałszywy slug.
+### Zmiana w `DemoPage.tsx`
+
+Przekazać `isDemo` do sidebara:
+```tsx
+<AdminSidebar 
+  activeTab={activeTab} 
+  onTabChange={setActiveTab}
+  onClose={() => setSidebarOpen(false)}
+  isDemo
+/>
+```
 
 ### Zakres zmian
-- Jeden plik: `src/components/admin/widgets/WidgetsManagement.tsx`
-- Dwie funkcje: `handlePreview`, `handleCopyLink`
+- `src/components/admin/AdminSidebar.tsx` — dodać prop `isDemo`, pominąć filtrowanie
+- `src/pages/DemoPage.tsx` — przekazać `isDemo` do `AdminSidebar`
 
