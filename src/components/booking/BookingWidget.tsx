@@ -69,8 +69,8 @@ interface SalonSettings {
   };
 }
 
-// Recommendations mapping
-const serviceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
+// Demo recommendations mapping (only used in demo mode)
+const demoServiceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
   "1": [
     { id: "2", name: "Mezoterapia igłowa", price: 350, duration: 60 },
     { id: "3", name: "Mikrodermabrazja", price: 180, duration: 50 },
