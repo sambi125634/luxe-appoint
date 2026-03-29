@@ -1548,13 +1548,20 @@ export type Database = {
       }
       referral_codes: {
         Row: {
+          activated_at: string | null
+          clicks: number | null
           client_id: string
           code: string
           created_at: string | null
+          expires_at: string | null
           id: string
           is_active: boolean | null
           new_client_reward_value: number | null
+          referee_reward_description: string | null
+          referee_reward_type: string | null
+          referee_reward_value: number | null
           referral_url: string | null
+          reward_description: string | null
           reward_type: string | null
           reward_value: number | null
           salon_id: string
@@ -1563,13 +1570,20 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          activated_at?: string | null
+          clicks?: number | null
           client_id: string
           code: string
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           is_active?: boolean | null
           new_client_reward_value?: number | null
+          referee_reward_description?: string | null
+          referee_reward_type?: string | null
+          referee_reward_value?: number | null
           referral_url?: string | null
+          reward_description?: string | null
           reward_type?: string | null
           reward_value?: number | null
           salon_id: string
@@ -1578,13 +1592,20 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          activated_at?: string | null
+          clicks?: number | null
           client_id?: string
           code?: string
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           is_active?: boolean | null
           new_client_reward_value?: number | null
+          referee_reward_description?: string | null
+          referee_reward_type?: string | null
+          referee_reward_value?: number | null
           referral_url?: string | null
+          reward_description?: string | null
           reward_type?: string | null
           reward_value?: number | null
           salon_id?: string
@@ -1604,6 +1625,74 @@ export type Database = {
             foreignKeyName: "referral_codes_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      referral_config: {
+        Row: {
+          auto_activate_after_visits: number | null
+          auto_send_review_request: boolean | null
+          created_at: string | null
+          facebook_review_url: string | null
+          google_review_url: string | null
+          id: string
+          program_active: boolean | null
+          referee_reward_description: string | null
+          referee_reward_type: string | null
+          referee_reward_value: number | null
+          referrer_reward_description: string | null
+          referrer_reward_type: string | null
+          referrer_reward_value: number | null
+          review_send_channel: string | null
+          review_send_delay_hours: number | null
+          salon_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          auto_activate_after_visits?: number | null
+          auto_send_review_request?: boolean | null
+          created_at?: string | null
+          facebook_review_url?: string | null
+          google_review_url?: string | null
+          id?: string
+          program_active?: boolean | null
+          referee_reward_description?: string | null
+          referee_reward_type?: string | null
+          referee_reward_value?: number | null
+          referrer_reward_description?: string | null
+          referrer_reward_type?: string | null
+          referrer_reward_value?: number | null
+          review_send_channel?: string | null
+          review_send_delay_hours?: number | null
+          salon_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          auto_activate_after_visits?: number | null
+          auto_send_review_request?: boolean | null
+          created_at?: string | null
+          facebook_review_url?: string | null
+          google_review_url?: string | null
+          id?: string
+          program_active?: boolean | null
+          referee_reward_description?: string | null
+          referee_reward_type?: string | null
+          referee_reward_value?: number | null
+          referrer_reward_description?: string | null
+          referrer_reward_type?: string | null
+          referrer_reward_value?: number | null
+          review_send_channel?: string | null
+          review_send_delay_hours?: number | null
+          salon_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_config_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -1992,9 +2081,17 @@ export type Database = {
           created_at: string | null
           id: string
           message_number: number | null
+          nps_score: number | null
+          opened_at: string | null
+          platform: string | null
+          review_stars: number | null
+          review_url: string | null
           salon_id: string
+          send_channel: string | null
           sent_at: string | null
           status: string | null
+          template_id: string | null
+          tracking_token: string | null
         }
         Insert: {
           appointment_id?: string | null
@@ -2004,9 +2101,17 @@ export type Database = {
           created_at?: string | null
           id?: string
           message_number?: number | null
+          nps_score?: number | null
+          opened_at?: string | null
+          platform?: string | null
+          review_stars?: number | null
+          review_url?: string | null
           salon_id: string
+          send_channel?: string | null
           sent_at?: string | null
           status?: string | null
+          template_id?: string | null
+          tracking_token?: string | null
         }
         Update: {
           appointment_id?: string | null
@@ -2016,9 +2121,17 @@ export type Database = {
           created_at?: string | null
           id?: string
           message_number?: number | null
+          nps_score?: number | null
+          opened_at?: string | null
+          platform?: string | null
+          review_stars?: number | null
+          review_url?: string | null
           salon_id?: string
+          send_channel?: string | null
           sent_at?: string | null
           status?: string | null
+          template_id?: string | null
+          tracking_token?: string | null
         }
         Relationships: [
           {
