@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
-  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus
+  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus, Radio, AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -48,6 +49,25 @@ const DEMO_TOP_STAFF = [
   { name: "Karolina Wiśniewska", appointments: 42, revenue: 8400 },
   { name: "Joanna Lewandowska", appointments: 38, revenue: 7600 },
 ];
+
+function CommunicationAlert({ salonId, onNavigate }: { salonId: string; onNavigate: (tab: string) => void }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    supabase.from("salons").select("communication_setup_completed").eq("id", salonId).single().then(({ data }) => {
+      if (data && !(data as Record<string, unknown>).communication_setup_completed) setShow(true);
+    });
+  }, [salonId]);
+  if (!show) return null;
+  return (
+    <Alert className="cursor-pointer border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20" onClick={() => onNavigate("settings")}>
+      <Radio className="h-4 w-4 text-amber-600" />
+      <AlertTitle className="text-amber-800 dark:text-amber-200">Skonfiguruj komunikację z klientkami</AlertTitle>
+      <AlertDescription className="text-amber-700 dark:text-amber-300">
+        Bez emaila i SMS klientki nie dostają przypomnień o wizytach → więcej no-show
+      </AlertDescription>
+    </Alert>
+  );
+}
 
 export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps) {
   const { t, i18n } = useTranslation();
@@ -223,6 +243,11 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="home" />
+
+      {/* Communication setup alert */}
+      {!isDemo && salonId && (
+        <CommunicationAlert salonId={salonId} onNavigate={handleNavigate} />
+      )}
 
       {/* Setup Checklist */}
       {!isDemo && salonId && <SetupChecklist salonId={salonId} onNavigate={handleNavigate} />}

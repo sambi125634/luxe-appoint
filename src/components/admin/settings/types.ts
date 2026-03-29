@@ -1,1 +1,1 @@
-export type SettingsTabType = "profile" | "booking" | "notifications" | "integrations" | "automation";
+export type SettingsTabType = "profile" | "booking" | "notifications" | "communication" | "integrations" | "automation";

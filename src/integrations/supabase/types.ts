@@ -1993,6 +1993,12 @@ export type Database = {
           address: string | null
           city: string | null
           client_sources: Json | null
+          communication_email: string | null
+          communication_email_verified: boolean | null
+          communication_phone: string | null
+          communication_phone_verified: boolean | null
+          communication_provider: Json | null
+          communication_setup_completed: boolean | null
           created_at: string
           description: string | null
           email: string | null
@@ -2017,6 +2023,12 @@ export type Database = {
           address?: string | null
           city?: string | null
           client_sources?: Json | null
+          communication_email?: string | null
+          communication_email_verified?: boolean | null
+          communication_phone?: string | null
+          communication_phone_verified?: boolean | null
+          communication_provider?: Json | null
+          communication_setup_completed?: boolean | null
           created_at?: string
           description?: string | null
           email?: string | null
@@ -2041,6 +2053,12 @@ export type Database = {
           address?: string | null
           city?: string | null
           client_sources?: Json | null
+          communication_email?: string | null
+          communication_email_verified?: boolean | null
+          communication_phone?: string | null
+          communication_phone_verified?: boolean | null
+          communication_provider?: Json | null
+          communication_setup_completed?: boolean | null
           created_at?: string
           description?: string | null
           email?: string | null

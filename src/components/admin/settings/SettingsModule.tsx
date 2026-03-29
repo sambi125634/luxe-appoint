@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { AutomationSettings } from "./AutomationSettings";
+import { CommunicationSettings } from "./CommunicationSettings";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 import { SectionGuide } from "../SectionGuide";
@@ -41,6 +42,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     { id: "profile" as const, label: t("settingsModule.salonProfile"), icon: Building2 },
     { id: "booking" as const, label: t("settingsModule.booking"), icon: Calendar },
     { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell },
+    { id: "communication" as const, label: "Komunikacja", icon: Radio },
     { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
     { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
   ];
@@ -49,7 +51,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5 h-auto gap-2 bg-transparent p-0">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -87,6 +89,14 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               isSaving={isSaving}
               onSave={(updates) => updateSettings("notifications", updates)}
               onSaveIntegration={(updates) => updateSettings("integrations", updates)}
+            />
+          </TabsContent>
+          <TabsContent value="communication" className="m-0">
+            <CommunicationSettings
+              isLoading={isLoading}
+              isSaving={isSaving}
+              isDemo={isDemo}
+              onNavigateToModule={onNavigateToModule}
             />
           </TabsContent>
           <TabsContent value="integrations" className="m-0">
