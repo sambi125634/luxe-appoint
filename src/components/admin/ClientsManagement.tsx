@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { 
   Search, Plus, Phone, Mail, Calendar, Clock, 
   Star, AlertTriangle, Edit2, Trash2, User,
-  History, StickyNote, Tag, Users, FolderOpen, Upload
+  History, StickyNote, Tag, Users, FolderOpen, Upload, Heart
 } from "lucide-react";
 import { classifyPurchaseGroup, getGroupStats, PURCHASE_GROUPS, type PurchaseGroup } from "@/lib/purchase-groups";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { ClientRiskBadge } from "./ClientRiskBadge";
-import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup, ClientCSVImport } from "./clients";
+import { ClientFilters, ClientFiltersState, PurchaseGroups, ClientListItem, CategoryGroup, ClientCSVImport, ServicePreferences } from "./clients";
 import { TagManagementDialog } from "./clients/TagManagementDialog";
 import { SectionGuide } from "./SectionGuide";
 import { AppointmentModal } from "./AppointmentModal";
@@ -202,7 +202,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedClient, setEditedClient] = useState<Client | null>(null);
   const [activeTab, setActiveTab] = useState("info");
-  const [mainViewTab, setMainViewTab] = useState<"list" | "groups">("list");
+  const [mainViewTab, setMainViewTab] = useState<"list" | "groups" | "preferences">("list");
   const [filters, setFilters] = useState<ClientFiltersState>({
     tags: [],
     categories: [],
@@ -750,6 +750,16 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             <FolderOpen className="w-4 h-4" />
             {t('clients.purchaseGroups.title')}
           </button>
+          <button
+            onClick={() => setMainViewTab("preferences")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              mainViewTab === "preferences" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Heart className="w-4 h-4" />
+            Preferencje zakupowe
+          </button>
         </div>
 
         {mainViewTab === "list" ? (
@@ -790,7 +800,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               )}
             </div>
           </>
-        ) : (
+        ) : mainViewTab === "groups" ? (
           <PurchaseGroups 
             clients={clients.map(c => ({
               id: c.id,
@@ -803,6 +813,14 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               purchaseGroup: c.purchaseGroup,
             }))}
             groupStats={getGroupStats(clients.map(c => c.purchaseGroup))}
+            onSelectClient={(clientId) => {
+              const client = clients.find(c => c.id === clientId);
+              if (client) openClientDetails(client);
+            }}
+          />
+        ) : (
+          <ServicePreferences
+            clients={clients}
             onSelectClient={(clientId) => {
               const client = clients.find(c => c.id === clientId);
               if (client) openClientDetails(client);
