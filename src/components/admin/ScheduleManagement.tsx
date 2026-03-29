@@ -118,11 +118,15 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
       <SectionGuide sectionKey="calendar" />
       {/* Top Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Tabs value={activeView} onValueChange={(v) => setActiveView(v as "calendar" | "grid" | "templates" | "smart")} className="w-full sm:w-auto">
-          <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+        <Tabs value={activeView} onValueChange={(v) => setActiveView(v as "calendar" | "grid" | "templates" | "smart" | "time-off")} className="w-full sm:w-auto">
+          <TabsList className="grid grid-cols-5 w-full sm:w-auto">
             <TabsTrigger value="calendar" className="gap-2">
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">{t('schedule.calendar')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="time-off" className="gap-2">
+              <CalendarOff className="w-4 h-4" />
+              <span className="hidden sm:inline">Urlopy</span>
             </TabsTrigger>
             <TabsTrigger value="grid" className="gap-2">
               <LayoutGrid className="w-4 h-4" />
