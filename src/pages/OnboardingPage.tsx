@@ -280,6 +280,12 @@ export default function OnboardingPage() {
   const [scanSkipped, setScanSkipped] = useState(false);
   const [scanPercentage, setScanPercentage] = useState(0);
 
+  // Step 2 — Communication config
+  const [emailOption, setEmailOption] = useState<"own" | "system">("system");
+  const [smsOption, setSmsOption] = useState<"own" | "virtual" | "disabled">("virtual");
+  const [commEmail, setCommEmail] = useState("");
+  const [commPhone, setCommPhone] = useState("");
+
   // Step 3 — Autopilot toggles
   const [autopilotToggles, setAutopilotToggles] = useState<Record<string, boolean>>({
     reminders: true, retention: true, reviews: true, noshow: true, brief: true,
