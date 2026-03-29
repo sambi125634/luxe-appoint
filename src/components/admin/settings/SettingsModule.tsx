@@ -42,6 +42,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     { id: "profile" as const, label: t("settingsModule.salonProfile"), icon: Building2 },
     { id: "booking" as const, label: t("settingsModule.booking"), icon: Calendar },
     { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell },
+    { id: "communication" as const, label: "Komunikacja", icon: Radio },
     { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
     { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
   ];
