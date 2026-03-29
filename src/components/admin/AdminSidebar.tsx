@@ -51,7 +51,6 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
         { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
         { icon: Users, labelKey: "admin.staff", tab: "staff" },
-        { icon: CalendarOff, labelKey: "time-off", tab: "time-off" },
       ],
     },
     {

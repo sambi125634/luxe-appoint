@@ -187,6 +187,12 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
         </div>
       )}
 
+      {activeView === "time-off" && (
+        <div className="space-y-6">
+          <TimeOffManagement isDemo={isDemo} />
+        </div>
+      )}
+
       {/* Quick Block Modal */}
       <QuickBlockModal
         isOpen={isQuickBlockOpen}
