@@ -800,7 +800,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               )}
             </div>
           </>
-        ) : (
+        ) : mainViewTab === "groups" ? (
           <PurchaseGroups 
             clients={clients.map(c => ({
               id: c.id,
@@ -813,6 +813,14 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
               purchaseGroup: c.purchaseGroup,
             }))}
             groupStats={getGroupStats(clients.map(c => c.purchaseGroup))}
+            onSelectClient={(clientId) => {
+              const client = clients.find(c => c.id === clientId);
+              if (client) openClientDetails(client);
+            }}
+          />
+        ) : (
+          <ServicePreferences
+            clients={clients}
             onSelectClient={(clientId) => {
               const client = clients.find(c => c.id === clientId);
               if (client) openClientDetails(client);
