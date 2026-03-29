@@ -26,6 +26,21 @@ async function sendEmail(to: string, from: string, subject: string, html: string
   return await response.json();
 }
 
+function buildTrackingUrl(
+  baseUrl: string,
+  event: "open" | "click",
+  params: { messageId: string; salonId: string; clientId: string; sequenceName?: string; redirect?: string }
+) {
+  const url = new URL(`${baseUrl}/functions/v1/track-retention`);
+  url.searchParams.set("e", event);
+  url.searchParams.set("m", params.messageId);
+  url.searchParams.set("s", params.salonId);
+  url.searchParams.set("c", params.clientId);
+  if (params.sequenceName) url.searchParams.set("seq", params.sequenceName);
+  if (params.redirect) url.searchParams.set("r", params.redirect);
+  return url.toString();
+}
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -41,7 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Get all salons with follow-up enabled
     const { data: salons, error: salonsError } = await supabase
       .from("salons")
-      .select("id, name, address, phone, settings")
+      .select("id, name, slug, address, phone, settings")
       .eq("is_active", true);
 
     if (salonsError) {
@@ -55,7 +70,6 @@ const handler = async (req: Request): Promise<Response> => {
     for (const salon of salons || []) {
       const settings = salon.settings?.notifications || {};
       
-      // Skip if follow-up emails disabled
       if (!settings.emailFollowupEnabled) {
         console.log(`Follow-up emails disabled for salon ${salon.id}`);
         continue;
@@ -66,14 +80,11 @@ const handler = async (req: Request): Promise<Response> => {
       const followupWindowStart = new Date(now.getTime() - (followupHours * 60 + 60) * 60 * 1000);
       const followupWindowEnd = new Date(now.getTime() - (followupHours * 60 - 60) * 60 * 1000);
 
-      console.log(`Checking completed appointments for salon ${salon.id} between ${followupWindowStart.toISOString()} and ${followupWindowEnd.toISOString()}`);
-
-      // Fetch completed appointments that need follow-up
       const { data: appointments, error: appointmentsError } = await supabase
         .from("appointments")
         .select(`
           *,
-          clients!inner(first_name, last_name, email, phone),
+          clients!inner(id, first_name, last_name, email, phone),
           services!inner(name, duration, price),
           staff_members!inner(name)
         `)
@@ -101,11 +112,31 @@ const handler = async (req: Request): Promise<Response> => {
         }
 
         try {
+          // Generate unique message ID for tracking
+          const messageId = `followup-${appointment.id}`;
+          
+          // Build tracking URLs
+          const bookingUrl = `https://beautyfunnel.pl/booking/${salon.slug || salon.id}`;
+          
+          const trackingPixelUrl = buildTrackingUrl(supabaseUrl, "open", {
+            messageId,
+            salonId: salon.id,
+            clientId: client.id,
+            sequenceName: "followup",
+          });
+          
+          const trackedBookingUrl = buildTrackingUrl(supabaseUrl, "click", {
+            messageId,
+            salonId: salon.id,
+            clientId: client.id,
+            sequenceName: "followup",
+            redirect: bookingUrl,
+          });
+
           // Get template or use default
           const template = settings.emailFollowupTemplate || 
             `Cześć {imie}!\n\nDziękujemy za wizytę w {nazwa_salonu}!\n\nMamy nadzieję, że jesteś zadowolona z usługi "{usluga}".\n\nBędzie nam miło, jeśli podzielisz się swoją opinią lub umówisz się na kolejną wizytę.\n\nDo zobaczenia!\n{nazwa_salonu}`;
 
-          // Format date
           const visitDate = new Date(appointment.start_time);
           const formattedDate = visitDate.toLocaleDateString("pl-PL", {
             weekday: "long",
@@ -114,7 +145,6 @@ const handler = async (req: Request): Promise<Response> => {
             day: "numeric",
           });
 
-          // Replace variables
           const emailBody = template
             .replace(/{imie}/g, client.first_name)
             .replace(/{nazwisko}/g, client.last_name)
@@ -134,7 +164,7 @@ const handler = async (req: Request): Promise<Response> => {
               <div style="background: #faf5ff; padding: 30px; border-radius: 0 0 12px 12px;">
                 <p style="font-size: 16px; line-height: 1.6; color: #374151;">${htmlBody}</p>
                 <div style="text-align: center; margin-top: 20px;">
-                  <a href="#" style="display: inline-block; background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                  <a href="${trackedBookingUrl}" style="display: inline-block; background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
                     Umów kolejną wizytę
                   </a>
                 </div>
@@ -143,6 +173,7 @@ const handler = async (req: Request): Promise<Response> => {
                   Wysłano przez Beauty Calendar | beautyfunnel.pl
                 </p>
               </div>
+              <img src="${trackingPixelUrl}" width="1" height="1" style="display:none;" alt="" />
             </div>
           `;
 
@@ -155,7 +186,17 @@ const handler = async (req: Request): Promise<Response> => {
 
           console.log(`Follow-up email sent for appointment ${appointment.id}:`, emailResponse.id);
 
-          // Mark as sent
+          // Record "sent" tracking event
+          await supabase.from("email_tracking_events").insert({
+            salon_id: salon.id,
+            client_id: client.id,
+            message_id: messageId,
+            sequence_name: "followup",
+            event_type: "sent",
+            metadata: { resend_id: emailResponse.id, service: service.name },
+          });
+
+          // Mark appointment as sent
           await supabase
             .from("appointments")
             .update({
@@ -175,11 +216,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log(`Follow-up emails job completed. Sent: ${totalSent}, Errors: ${totalErrors}`);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
-        sent: totalSent, 
-        errors: totalErrors 
-      }),
+      JSON.stringify({ success: true, sent: totalSent, errors: totalErrors }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {
