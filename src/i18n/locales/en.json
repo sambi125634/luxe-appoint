@@ -344,7 +344,8 @@
     "stats": "Statistics",
     "trueProfit": "True Profit",
     "consultation": "Consultations",
-    "retention": "Retention"
+    "retention": "Retention",
+    "export": "Data Export"
   },
   "settings": {
     "salonProfile": "Salon profile",
