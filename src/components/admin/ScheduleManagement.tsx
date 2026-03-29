@@ -30,9 +30,10 @@ import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface ScheduleManagementProps {
   isDemo?: boolean;
+  onNavigate?: (tab: string) => void;
 }
 
-export function ScheduleManagement({ isDemo = false }: ScheduleManagementProps) {
+export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManagementProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
