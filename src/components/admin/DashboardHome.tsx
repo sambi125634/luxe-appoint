@@ -84,6 +84,21 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
   const monthStart = startOfMonth(today).toISOString();
   const monthEnd = endOfMonth(today).toISOString();
 
+  // Salon slug for booking widget link
+  const { data: salonSlug } = useQuery({
+    queryKey: ["dashboard-salon-slug", salonId, isDemo],
+    queryFn: async () => {
+      if (isDemo) return "demo-salon";
+      const { data } = await supabase
+        .from("salons")
+        .select("slug")
+        .eq("id", salonId!)
+        .single();
+      return (data as any)?.slug as string | null;
+    },
+    enabled: isDemo || !!salonId,
+  });
+
   // Today's appointments
   const { data: todayAppointments = [], isLoading: apptLoading } = useQuery({
     queryKey: ["dashboard-today-appointments", salonId, isDemo],
