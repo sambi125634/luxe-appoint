@@ -492,6 +492,19 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
 
   const transitionDirection = currentStep > previousStep ? 'forward' : 'backward';
 
+  const recommendations = useMemo(() => {
+    if (!selectedService) return [];
+    if (isDemo) {
+      return demoServiceRecommendations[selectedService.id] || [];
+    }
+    return (dbRecommendations || []).map(r => ({
+      id: r.id,
+      name: r.name,
+      price: r.price,
+      duration: r.duration,
+    }));
+  }, [selectedService, isDemo, dbRecommendations]);
+
   if (!isDemo && !salonId) {
     return (
       <div className="w-full max-w-xl mx-auto p-6">
