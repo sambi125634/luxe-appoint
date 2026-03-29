@@ -92,6 +92,8 @@ export default function DemoPage() {
           return <ConsultationModule isDemo />;
         case "referral":
           return <ReferralEngine isDemo />;
+        case "export":
+          return <ExportModule />;
         default:
           return null;
       }
