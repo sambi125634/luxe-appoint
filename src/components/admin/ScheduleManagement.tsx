@@ -41,7 +41,7 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
   const queryClient = useQueryClient();
   const { salonId } = useSalonId();
   const { data: dbStaff } = useStaffMembers();
-  const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart">("calendar");
+  const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart" | "time-off">("calendar");
   const [isQuickBlockOpen, setIsQuickBlockOpen] = useState(false);
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
 
