@@ -20,6 +20,7 @@ interface AdminSidebarProps {
   onClose?: () => void;
   userRole?: string | null;
   salonName?: string | null;
+  isDemo?: boolean;
 }
 
 // Permission-based tab visibility mapping
@@ -38,7 +39,7 @@ const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   export: "can_view_finances",
 };
 
-export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName, isDemo }: AdminSidebarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -97,18 +98,20 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
 
   const { permissions, isOwner } = useStaffPermissions();
 
-  const visibleSections = allSections
-    .map(section => ({
-      ...section,
-      items: isOwner
-        ? section.items
-        : section.items.filter(item => {
-            const requiredPerm = TAB_PERMISSION_MAP[item.tab];
-            if (!requiredPerm) return true; // no restriction
-            return permissions[requiredPerm];
-          }),
-    }))
-    .filter(section => section.items.length > 0);
+  const visibleSections = isDemo
+    ? allSections
+    : allSections
+        .map(section => ({
+          ...section,
+          items: isOwner
+            ? section.items
+            : section.items.filter(item => {
+                const requiredPerm = TAB_PERMISSION_MAP[item.tab];
+                if (!requiredPerm) return true;
+                return permissions[requiredPerm];
+              }),
+        }))
+        .filter(section => section.items.length > 0);
 
   const displayName = salonName || "Beauty Calendar";
   const initials = displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();

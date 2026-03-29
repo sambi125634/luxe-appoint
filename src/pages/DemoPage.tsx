@@ -146,6 +146,7 @@ export default function DemoPage() {
             activeTab={activeTab} 
             onTabChange={setActiveTab}
             onClose={() => setSidebarOpen(false)}
+            isDemo
           />
         </aside>
 
