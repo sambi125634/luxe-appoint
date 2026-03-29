@@ -750,6 +750,16 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
             <FolderOpen className="w-4 h-4" />
             {t('clients.purchaseGroups.title')}
           </button>
+          <button
+            onClick={() => setMainViewTab("preferences")}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors",
+              mainViewTab === "preferences" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Heart className="w-4 h-4" />
+            Preferencje zakupowe
+          </button>
         </div>
 
         {mainViewTab === "list" ? (
