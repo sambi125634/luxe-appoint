@@ -118,17 +118,20 @@ export function RevenuePredictionCard({ salonId, isDemo = false }: RevenuePredic
 
         <div className="bg-background/40 rounded-lg p-3">
           <p className="text-xs text-muted-foreground mb-2">{t('revenuePrediction.last7Days')}</p>
-          <div className="flex items-end gap-1.5 h-16">
-            {DEMO_WEEKLY_BARS.map((bar, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div
-                  className="w-full rounded-t bg-primary/70 hover:bg-primary transition-colors min-h-[2px]"
-                  style={{ height: `${(bar.value / maxBar) * 100}%` }}
-                  title={`${bar.day}: ${bar.value.toLocaleString()} zł`}
-                />
-                <span className="text-[10px] text-muted-foreground">{bar.day}</span>
-              </div>
-            ))}
+          <div className="flex items-end gap-1.5" style={{ height: 64 }}>
+            {DEMO_WEEKLY_BARS.map((bar, i) => {
+              const barHeight = Math.max(4, (bar.value / maxBar) * 52);
+              return (
+                <div key={i} className="flex-1 flex flex-col items-center justify-end h-full">
+                  <div
+                    className="w-full rounded-t bg-primary/70 hover:bg-primary transition-colors"
+                    style={{ height: barHeight }}
+                    title={`${bar.day}: ${bar.value.toLocaleString()} zł`}
+                  />
+                  <span className="text-[10px] text-muted-foreground mt-1">{bar.day}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
