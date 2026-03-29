@@ -276,11 +276,44 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const isFormStep = currentStepId === "form";
   const isPaymentStep = currentStepId === "payment";
 
+  // Dynamic recommendations query for real salons
+  const { data: dbRecommendations } = useQuery({
+    queryKey: ["service-recommendations", salonId, selectedService?.id, selectedService?.category],
+    queryFn: async () => {
+      if (!salonId || salonId === "demo" || !selectedService) return [];
+      
+      // Try same category first
+      let query = supabase
+        .from("services")
+        .select("id, name, price, duration")
+        .eq("salon_id", salonId)
+        .neq("id", selectedService.id)
+        .limit(3);
+
+      if (selectedService.category) {
+        query = query.eq("category_id", selectedService.category);
+      }
+
+      const { data } = await query;
+      
+      // Fallback: if no results from same category, get any other services
+      if (!data || data.length === 0) {
+        const { data: fallback } = await supabase
+          .from("services")
+          .select("id, name, price, duration")
+          .eq("salon_id", salonId)
+          .neq("id", selectedService.id)
+          .limit(3);
+        return fallback || [];
+      }
+      return data;
+    },
+    enabled: !!salonId && salonId !== "demo" && !!selectedService,
+  });
+
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
-    if (serviceRecommendations[service.id]) {
-      setShowRecommendations(true);
-    }
+    setShowRecommendations(true);
   };
 
   const handleNext = () => {
