@@ -202,7 +202,7 @@ export function ClientsManagement({ isDemo = false }: ClientsManagementProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedClient, setEditedClient] = useState<Client | null>(null);
   const [activeTab, setActiveTab] = useState("info");
-  const [mainViewTab, setMainViewTab] = useState<"list" | "groups">("list");
+  const [mainViewTab, setMainViewTab] = useState<"list" | "groups" | "preferences">("list");
   const [filters, setFilters] = useState<ClientFiltersState>({
     tags: [],
     categories: [],
