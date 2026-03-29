@@ -1,35 +1,44 @@
 
 
-# Widget "Dziś w pracy" na dashboardzie
+# Naprawa upsell w widgecie rezerwacji
 
-## Co budujemy
-Nowy komponent `TodayStaffCard` wyświetlany na dashboardzie tuż pod KPI cards. Pokazuje listę pracowników z ich statusem (w pracy / zaraz zaczyna / wolne / poza godzinami), godzinami pracy i najbliższą wizytą.
+## Problem (2 przyczyny)
 
-## Logika statusów
-- **🟢 Zielony** — teraz jest w godzinach pracy
-- **🟡 Żółty** — zaczyna za < 1h
-- **🔴 Czerwony** — wolne / urlop (z tabeli `time_off`)
-- **⚪ Szary** — poza godzinami pracy (nie pracuje w ten dzień tygodnia)
+1. **Rekomendacje hardcoded na demo ID** — `serviceRecommendations` to statyczny obiekt z kluczami "1"-"9" (demo). Dla prawdziwych salonów (UUID jako ID) nigdy nie ma dopasowania, więc upsell albo się nie pokazuje, albo pokazuje dane demo.
 
-## Dane z bazy
-1. `staff_members` — lista aktywnych pracowników salonu (name, avatar_url, color, role)
-2. `working_hours` — godziny pracy na dzisiejszy dzień tygodnia (start_time, end_time, is_working)
-3. `time_off` — urlopy obejmujące dzisiejszy dzień
-4. `appointments` — wizyty na dziś per pracownik (count + najbliższa przyszła wizyta z nazwą usługi)
+2. **Klik nic nie robi** — `onClick` na badge tylko wyświetla toast "Dodaj następnym razem" zamiast faktycznie dodać usługę do rezerwacji.
 
-## Nowe pliki
-### `src/components/admin/dashboard/TodayStaffCard.tsx`
-- Przyjmuje props: `salonId`, `isDemo`
-- 4 zapytania useQuery (staff, working_hours, time_off, today appointments)
-- Łączy dane w listę: dla każdego pracownika oblicza status, godziny, liczbę wizyt i następną wizytę
-- Sortowanie: zielony → żółty → szary → czerwony
-- UI: Card z nagłówkiem "👥 Dziś w pracy — [dzień, data]", lista pracowników z awatarem/inicjałami, kropką statusu, godzinami i info o wizytach
-- Demo mode: mock data (3 pracowników)
+## Plan naprawy
 
-## Zmiany w istniejących plikach
-### `src/components/admin/DashboardHome.tsx`
-- Import `TodayStaffCard`
-- Render pod KPI cards, nad sekcją "Dzisiejsze wizyty": `<TodayStaffCard salonId={salonId} isDemo={isDemo} />`
+### 1. Dynamiczne rekomendacje z bazy danych
+W `BookingWidget.tsx`:
+- Dla prawdziwych salonów: po wybraniu usługi pobierz inne usługi z tej samej kategorii (lub losowe z katalogu salonu) jako rekomendacje
+- Dla demo: zachowaj obecny hardcoded mapping
+- Użyj prostego query: `services` z tego samego `salon_id`, inna niż wybrana, limit 3
 
-Bez zmian w bazie danych — wszystkie potrzebne tabele i relacje już istnieją.
+### 2. Klik dodaje usługę do rezerwacji
+Zmień onClick na badge rekomendacji tak, aby:
+- Wybrał klikniętą usługę jako `selectedService` (zastępuje obecną)
+- Lub — lepsze UX — dodaj stan `additionalServices: Service[]` i pozwól na multi-select (ale to duża zmiana)
+
+**Proponowane proste rozwiązanie**: kliknięcie rekomendacji wybiera ją jako główną usługę (zamienia aktualnie wybraną) i automatycznie przechodzi do następnego kroku. Toast potwierdza: "Zmieniono na: [nazwa usługi]".
+
+### 3. Zmiany w plikach
+
+**`src/components/booking/BookingWidget.tsx`**:
+- Usuń hardcoded `serviceRecommendations` obiekt
+- Dodaj `useQuery` do pobrania rekomendacji z DB (usługi z tej samej kategorii, inne niż wybrana)
+- Dla demo: filtruj `demoServices` po kategorii
+- Zmień `onClick` na badge: wywołaj `handleServiceSelect(rec)` zamiast toast
+- Po kliknięciu rekomendacji pokaż toast "Wybrano: [nazwa]" i odśwież rekomendacje
+
+**Logika rekomendacji dla prawdziwych salonów**:
+```
+SELECT * FROM services 
+WHERE salon_id = :salonId 
+  AND id != :selectedServiceId
+  AND category_id = :selectedCategoryId
+LIMIT 3
+```
+Fallback gdy brak w tej samej kategorii — pokaż dowolne inne usługi.
 
