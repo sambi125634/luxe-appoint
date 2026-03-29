@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { 
   Calendar, 
+  CalendarOff,
   LayoutGrid, 
   FileText, 
   Copy, 
@@ -20,6 +21,7 @@ import {
   QuickBlockModal,
   SmartScheduleHelpers 
 } from "./schedule";
+import { TimeOffManagement } from "./TimeOffManagement";
 import { useTranslation } from "react-i18next";
 import { SectionGuide } from "./SectionGuide";
 import { useSalonId } from "@/hooks/useSalonId";
@@ -39,7 +41,7 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
   const queryClient = useQueryClient();
   const { salonId } = useSalonId();
   const { data: dbStaff } = useStaffMembers();
-  const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart">("calendar");
+  const [activeView, setActiveView] = useState<"calendar" | "grid" | "templates" | "smart" | "time-off">("calendar");
   const [isQuickBlockOpen, setIsQuickBlockOpen] = useState(false);
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
 
@@ -116,11 +118,15 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
       <SectionGuide sectionKey="calendar" />
       {/* Top Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <Tabs value={activeView} onValueChange={(v) => setActiveView(v as "calendar" | "grid" | "templates" | "smart")} className="w-full sm:w-auto">
-          <TabsList className="grid grid-cols-4 w-full sm:w-auto">
+        <Tabs value={activeView} onValueChange={(v) => setActiveView(v as "calendar" | "grid" | "templates" | "smart" | "time-off")} className="w-full sm:w-auto">
+          <TabsList className="grid grid-cols-5 w-full sm:w-auto">
             <TabsTrigger value="calendar" className="gap-2">
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">{t('schedule.calendar')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="time-off" className="gap-2">
+              <CalendarOff className="w-4 h-4" />
+              <span className="hidden sm:inline">Urlopy</span>
             </TabsTrigger>
             <TabsTrigger value="grid" className="gap-2">
               <LayoutGrid className="w-4 h-4" />
@@ -178,6 +184,12 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
       {activeView === "smart" && (
         <div className="space-y-6">
           <SmartScheduleHelpers isDemo={isDemo} onNavigate={onNavigate} />
+        </div>
+      )}
+
+      {activeView === "time-off" && (
+        <div className="space-y-6">
+          <TimeOffManagement isDemo={isDemo} />
         </div>
       )}
 

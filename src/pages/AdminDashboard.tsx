@@ -12,7 +12,7 @@ import { ScheduleManagement } from "@/components/admin/ScheduleManagement";
 import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
-import { TimeOffManagement } from "@/components/admin/TimeOffManagement";
+
 
 import { ConversationsModule } from "@/components/admin/conversations/ConversationsModule";
 import { PipelineModule } from "@/components/admin/pipeline";
@@ -94,7 +94,7 @@ export default function AdminDashboard() {
       
       case "staff": return "Personel";
       case "services": return "Usługi";
-      case "time-off": return "Urlopy i dni wolne";
+      
       case "settings": return "Ustawienia";
       case "support": return "Pomoc & AI Asystent";
       case "retention": return "Retencja klientek";
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
       
       case "services": return <ServicesManagement />;
       case "staff": return <StaffManagement />;
-      case "time-off": return <TimeOffManagement />;
+      
       case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} initialTab={settingsInitialTab} />;
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard salonId={salonId ?? undefined} isDemo={false} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
