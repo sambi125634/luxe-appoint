@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { format, addDays, startOfWeek, differenceInMinutes, parse } from "date-fns";
+import { useState, useMemo, useCallback } from "react";
+import { format, addDays, startOfWeek } from "date-fns";
 import { pl } from "date-fns/locale";
 import { 
   Lightbulb, 
@@ -12,10 +12,13 @@ import {
   User,
   ChevronRight,
   Filter,
-  Star
+  Star,
+  MessageSquare,
+  Tag,
+  ArrowRightLeft,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
@@ -37,13 +40,22 @@ interface StaffItem {
   role: string | null;
 }
 
+// Demo service definitions for search
+const DEMO_SERVICES = [
+  { id: "peeling", name: "Peeling kawitacyjny", duration: 60 },
+  { id: "mezoterapia", name: "Mezoterapia igłowa", duration: 90 },
+  { id: "masaz", name: "Masaż relaksacyjny", duration: 60 },
+  { id: "depilacja", name: "Depilacja laserowa", duration: 45 },
+  { id: "brwi", name: "Stylizacja brwi", duration: 30 },
+  { id: "rzesy", name: "Przedłużanie rzęs", duration: 120 },
+];
+
 // Mock data generators
 const generateMockGaps = (staff: StaffItem[]): ScheduleGap[] => {
   const gaps: ScheduleGap[] = [];
   const today = new Date();
   
   staff.forEach(member => {
-    // Generate 2-4 gaps per staff member for the week
     const gapCount = Math.floor(Math.random() * 3) + 2;
     for (let i = 0; i < gapCount; i++) {
       const dayOffset = Math.floor(Math.random() * 5);
@@ -70,7 +82,7 @@ const generateMockOccupancy = (staff: StaffItem[]): OccupancyData[] => {
   
   staff.forEach(member => {
     for (let i = 0; i < 7; i++) {
-      const totalMinutes = 480; // 8 hours
+      const totalMinutes = 480;
       const bookedMinutes = Math.floor(Math.random() * 400) + 80;
       data.push({
         staffId: member.id,
@@ -114,11 +126,21 @@ const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
 
 interface SmartScheduleHelpersProps {
   isDemo?: boolean;
+  onNavigate?: (tab: string) => void;
   onSlotSelect?: (slot: SmartSlot) => void;
   onGapSelect?: (gap: ScheduleGap) => void;
 }
 
-export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false }: SmartScheduleHelpersProps) {
+interface SearchResult {
+  date: string;
+  time: string;
+  staffName: string;
+  staffId: string;
+  serviceName: string;
+  serviceDuration: number;
+}
+
+export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false, onNavigate }: SmartScheduleHelpersProps) {
   const { data: dbStaff } = useStaffMembers();
   const staffMembers: StaffItem[] = isDemo 
     ? mockStaffMembers 
@@ -129,8 +151,10 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
   const [nextAvailableService, setNextAvailableService] = useState("");
   const [nextAvailableStaff, setNextAvailableStaff] = useState("");
   const [nextAvailablePreference, setNextAvailablePreference] = useState("");
+  const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Mock data (uses staffMembers for generation)
   const gaps = useMemo(() => generateMockGaps(staffMembers), [staffMembers]);
   const occupancy = useMemo(() => generateMockOccupancy(staffMembers), [staffMembers]);
   const smartSlots = useMemo(() => generateSmartSlots(staffMembers), [staffMembers]);
@@ -143,8 +167,101 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
 
   const lowOccupancyDays = occupancy.filter(o => o.occupancyPercent < 30);
   
+  // Group low occupancy by day for detailed view
+  const lowOccupancyByDay = useMemo(() => {
+    const grouped: Record<string, { date: string; staff: { name: string; percent: number }[] }> = {};
+    lowOccupancyDays.forEach(day => {
+      if (!grouped[day.date]) {
+        grouped[day.date] = { date: day.date, staff: [] };
+      }
+      grouped[day.date].staff.push({ name: day.staffName, percent: day.occupancyPercent });
+    });
+    return Object.values(grouped).slice(0, 4);
+  }, [lowOccupancyDays]);
+
   const getStaffColor = (staffId: string) => {
     return staffMembers.find(s => s.id === staffId)?.color || "hsl(var(--primary))";
+  };
+
+  // Dynamic search logic
+  const handleSearch = useCallback(() => {
+    setIsSearching(true);
+    setHasSearched(true);
+
+    // Simulate search delay
+    setTimeout(() => {
+      const today = new Date();
+      const service = DEMO_SERVICES.find(s => s.id === nextAvailableService);
+      const serviceName = service?.name || DEMO_SERVICES[0].name;
+      const serviceDuration = service?.duration || 60;
+
+      // Pick staff
+      let selectedStaff: StaffItem;
+      if (nextAvailableStaff && nextAvailableStaff !== "any") {
+        selectedStaff = staffMembers.find(s => s.id === nextAvailableStaff) || staffMembers[0];
+      } else {
+        selectedStaff = staffMembers[Math.floor(Math.random() * staffMembers.length)];
+      }
+
+      // Pick date and time based on preference
+      let dayOffset = 1 + Math.floor(Math.random() * 3);
+      let hour: number;
+      let minute: number;
+
+      switch (nextAvailablePreference) {
+        case "morning":
+          hour = 8 + Math.floor(Math.random() * 4);
+          minute = Math.random() > 0.5 ? 0 : 30;
+          break;
+        case "afternoon":
+          hour = 12 + Math.floor(Math.random() * 5);
+          minute = Math.random() > 0.5 ? 0 : 30;
+          break;
+        case "evening":
+          hour = 17 + Math.floor(Math.random() * 3);
+          minute = Math.random() > 0.5 ? 0 : 30;
+          break;
+        case "friday":
+          // Find next Friday
+          const currentDay = today.getDay();
+          dayOffset = currentDay <= 5 ? 5 - currentDay : 12 - currentDay;
+          if (dayOffset === 0) dayOffset = 7;
+          hour = 10 + Math.floor(Math.random() * 6);
+          minute = Math.random() > 0.5 ? 0 : 30;
+          break;
+        case "weekend":
+          const curDay = today.getDay();
+          dayOffset = curDay === 6 ? 7 : (6 - curDay);
+          hour = 10 + Math.floor(Math.random() * 4);
+          minute = Math.random() > 0.5 ? 0 : 30;
+          break;
+        default:
+          hour = 9 + Math.floor(Math.random() * 9);
+          minute = Math.random() > 0.5 ? 0 : 30;
+      }
+
+      const resultDate = addDays(today, dayOffset);
+
+      setSearchResult({
+        date: format(resultDate, "yyyy-MM-dd"),
+        time: `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`,
+        staffName: selectedStaff.name,
+        staffId: selectedStaff.id,
+        serviceName,
+        serviceDuration,
+      });
+      setIsSearching(false);
+    }, 800);
+  }, [nextAvailableService, nextAvailableStaff, nextAvailablePreference, staffMembers]);
+
+  const handleSlotClick = () => {
+    if (!searchResult) return;
+    // Navigate to booking widget
+    if (isDemo) {
+      window.open("/book/demo-salon", "_blank");
+    } else {
+      window.open("/book/salon", "_blank");
+    }
   };
 
   return (
@@ -336,12 +453,79 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
               })}
             </div>
 
-            {lowOccupancyDays.length > 0 && (
-              <div className="p-3 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
-                <p className="text-sm text-red-800 dark:text-red-200">
-                  <strong>Uwaga:</strong> Wykryto {lowOccupancyDays.length} dni z obłożeniem poniżej 30%. 
-                  Rozważ kampanię promocyjną.
-                </p>
+            {/* ── ROZBUDOWANE OSTRZEŻENIE O NISKIM OBŁOŻENIU ── */}
+            {lowOccupancyByDay.length > 0 && (
+              <div className="space-y-3">
+                {/* Szczegóły — które dni, którzy pracownicy */}
+                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <div className="flex items-center gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
+                    <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                      Wykryto {lowOccupancyDays.length} slotów z obłożeniem &lt;30%
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    {lowOccupancyByDay.map((day, i) => (
+                      <div key={i} className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-red-700 dark:text-red-300">
+                          {format(new Date(day.date), "EEEE, d MMM", { locale: pl })}
+                        </span>
+                        <div className="flex gap-2 flex-wrap justify-end">
+                          {day.staff.map((s, j) => (
+                            <Badge key={j} variant="outline" className="text-xs border-red-300 dark:border-red-700 text-red-700 dark:text-red-300">
+                              {s.name.split(" ")[0]}: {s.percent}%
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3 konkretne akcje */}
+                <div className="grid gap-2">
+                  <button
+                    onClick={() => onNavigate?.("retention")}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center flex-shrink-0">
+                      <MessageSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">Wyślij SMS do klientek z ostatniego miesiąca</p>
+                      <p className="text-xs text-muted-foreground">Przypomnienie o wolnych terminach zwiększa zapisy o ~18%</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+                  </button>
+
+                  <button
+                    onClick={() => onNavigate?.("widgets")}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center flex-shrink-0">
+                      <Tag className="w-4 h-4 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">Dodaj promocję -20% na puste dni</p>
+                      <p className="text-xs text-muted-foreground">Stwórz widget z rabatem na konkretne terminy</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+                  </button>
+
+                  <button
+                    onClick={() => onNavigate?.("calendar")}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors text-left group"
+                  >
+                    <div className="w-9 h-9 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
+                      <ArrowRightLeft className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium">Przenieś wizytę z pełnego dnia</p>
+                      <p className="text-xs text-muted-foreground">Równoważ grafik — klientki z przepełnionych dni mogą preferować luźniejszy termin</p>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
+                  </button>
+                </div>
               </div>
             )}
           </TabsContent>
@@ -404,12 +588,12 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
             </div>
           </TabsContent>
 
-          {/* Next Available Tab */}
+          {/* Next Available Tab — DYNAMIC SEARCH */}
           <TabsContent value="next-available" className="mt-4 space-y-4">
             <div className="space-y-4">
               <div>
                 <Label>Pracownik</Label>
-                <Select value={nextAvailableStaff} onValueChange={setNextAvailableStaff}>
+                <Select value={nextAvailableStaff} onValueChange={(v) => { setNextAvailableStaff(v); setHasSearched(false); setSearchResult(null); }}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Dowolny pracownik" />
                   </SelectTrigger>
@@ -424,22 +608,21 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
 
               <div>
                 <Label>Usługa</Label>
-                <Select value={nextAvailableService} onValueChange={setNextAvailableService}>
+                <Select value={nextAvailableService} onValueChange={(v) => { setNextAvailableService(v); setHasSearched(false); setSearchResult(null); }}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Wybierz usługę" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="peeling">Peeling kawitacyjny (60 min)</SelectItem>
-                    <SelectItem value="mezoterapia">Mezoterapia igłowa (90 min)</SelectItem>
-                    <SelectItem value="masaz">Masaż relaksacyjny (60 min)</SelectItem>
-                    <SelectItem value="depilacja">Depilacja laserowa (45 min)</SelectItem>
+                    {DEMO_SERVICES.map(s => (
+                      <SelectItem key={s.id} value={s.id}>{s.name} ({s.duration} min)</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
                 <Label>Preferencja czasowa</Label>
-                <Select value={nextAvailablePreference} onValueChange={setNextAvailablePreference}>
+                <Select value={nextAvailablePreference} onValueChange={(v) => { setNextAvailablePreference(v); setHasSearched(false); setSearchResult(null); }}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Dowolna pora" />
                   </SelectTrigger>
@@ -454,26 +637,57 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
                 </Select>
               </div>
 
-              <Button className="w-full gap-2" variant="luxury">
-                <Search className="w-4 h-4" />
-                Znajdź najbliższy termin
+              <Button 
+                className="w-full gap-2" 
+                variant="luxury" 
+                onClick={handleSearch}
+                disabled={isSearching}
+              >
+                {isSearching ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Szukam...
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-4 h-4" />
+                    Znajdź najbliższy termin
+                  </>
+                )}
               </Button>
 
-              {/* Mock result */}
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Najbliższy wolny termin:</p>
-                    <p className="font-semibold text-green-700 dark:text-green-400">
-                      Środa, 11 grudnia o 14:30
-                    </p>
-                    <p className="text-xs text-muted-foreground">Maria Nowakowska</p>
+              {/* Dynamic result */}
+              {hasSearched && searchResult && (
+                <div 
+                  className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors group"
+                  onClick={handleSlotClick}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-800 flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-green-600 dark:text-green-400" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs text-muted-foreground">Najbliższy wolny termin:</p>
+                      <p className="font-semibold text-green-700 dark:text-green-400">
+                        {format(new Date(searchResult.date), "EEEE, d MMMM", { locale: pl })} o {searchResult.time}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {searchResult.staffName} • {searchResult.serviceName} ({searchResult.serviceDuration} min)
+                      </p>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <ExternalLink className="w-4 h-4 text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform" />
+                      <span className="text-[10px] text-green-600 dark:text-green-400 font-medium">Zarezerwuj</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+
+              {hasSearched && !searchResult && !isSearching && (
+                <div className="p-4 rounded-lg bg-muted/30 border border-border text-center">
+                  <p className="text-sm text-muted-foreground">Nie znaleziono wolnego terminu spełniającego kryteria</p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
