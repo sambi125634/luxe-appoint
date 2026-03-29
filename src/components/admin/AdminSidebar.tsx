@@ -98,18 +98,20 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
 
   const { permissions, isOwner } = useStaffPermissions();
 
-  const visibleSections = allSections
-    .map(section => ({
-      ...section,
-      items: isOwner
-        ? section.items
-        : section.items.filter(item => {
-            const requiredPerm = TAB_PERMISSION_MAP[item.tab];
-            if (!requiredPerm) return true; // no restriction
-            return permissions[requiredPerm];
-          }),
-    }))
-    .filter(section => section.items.length > 0);
+  const visibleSections = isDemo
+    ? allSections
+    : allSections
+        .map(section => ({
+          ...section,
+          items: isOwner
+            ? section.items
+            : section.items.filter(item => {
+                const requiredPerm = TAB_PERMISSION_MAP[item.tab];
+                if (!requiredPerm) return true;
+                return permissions[requiredPerm];
+              }),
+        }))
+        .filter(section => section.items.length > 0);
 
   const displayName = salonName || "Beauty Calendar";
   const initials = displayName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
