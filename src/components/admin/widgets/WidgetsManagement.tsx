@@ -157,7 +157,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
   };
 
   const handlePreview = (widget: BookingWidget) => {
-    window.open(getWidgetUrl(widget.slug), '_blank');
+    window.open(getDemoOrRealUrl(widget), '_blank');
   };
 
   const getWidgetTypeLabel = (type: BookingWidget["type"]) => {
