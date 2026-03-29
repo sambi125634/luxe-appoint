@@ -19,9 +19,9 @@ interface WeeklyBriefWidgetProps {
   onShowHistory?: () => void;
 }
 
-export function WeeklyBriefWidget({ isDemo = false, onShowHistory }: WeeklyBriefWidgetProps) {
+export function WeeklyBriefWidget({ isDemo = false, onShowHistory, defaultOpen = false }: WeeklyBriefWidgetProps & { defaultOpen?: boolean }) {
   const { t } = useTranslation();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultOpen);
   const { salonId } = useSalonId();
   const { data: brief, isLoading } = useLatestBrief(isDemo ? "demo" : salonId ?? undefined, isDemo);
   const generateBrief = useGenerateBrief();
