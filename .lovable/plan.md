@@ -1,52 +1,39 @@
 
 
-# Optymalna kolejność widgetów w Dashboard
-
-## Obecna kolejność
-1. Alerty (komunikacja, setup checklist)
-2. Header + KPI karty (4x)
-3. Weekly Brief
-4. Dzisiejszy zespół (TodayStaffCard)
-5. Prognoza przychodu (RevenuePredictionCard)
-6. Retencja klientek (RetentionFlowWidget)
-7. Dzisiejsze wizyty (lista) + sidebar (stany magazynowe, top usługi, top pracownicy)
+# Rozbudowa demo wizyt + "Zobacz wszystkie" → kalendarz
 
 ## Problem
-Dzisiejsze wizyty — **najważniejsza rzecz rano** — są dopiero na samym dole. Weekly Brief (strategiczny, nie pilny) jest wyżej niż lista wizyt. Retencja (ważna, ale nie pilna) jest też przed wizytami.
+1. **Godziny demo** — wszystkie 3 wizyty mają `new Date()` (aktualna godzina, np. 0:55). Powinny mieć realistyczne godziny pracy (8:00–16:00).
+2. **Za mało wizyt** — tylko 3, a powinno być 12–15 dla wiarygodności.
+3. **"Zobacz wszystkie"** — przycisk prowadzi do `handleNavigate("calendar")`, ale w demo to nic nie robi widocznie. Powinien nawigować do zakładki kalendarza.
 
-## Proponowana kolejność (priorytet właścicielki)
-
-```text
-1. Alerty (setup/komunikacja)     ← bez zmian, pilne
-2. Header + KPI karty (4x)        ← bez zmian, szybki przegląd
-3. DZISIEJSZE WIZYTY + sidebar    ← ↑↑↑ z dołu na górę
-   (lista wizyt | top usługi + top pracownicy)
-4. Prognoza przychodu              ← ↑ pieniądze = priorytet
-5. Retencja klientek               ← bez zmian, zdrowie bazy
-6. Dzisiejszy zespół               ← ↓ informacyjne, nie pilne
-7. Weekly Brief                    ← ↓↓ strategiczne, raz w tygodniu
-8. Stany magazynowe                ← ↓ na dół, rzadko pilne
-```
-
-**Logika**: Rano właścicielka chce wiedzieć: *ile wizyt, kto przychodzi, ile zarobię*. Dopiero potem patrzy na retencję i strategię.
-
-## Zmiany techniczne
+## Zmiany
 
 ### Plik: `src/components/admin/DashboardHome.tsx`
 
-Zmiana kolejności bloków w JSX (bez zmiany logiki):
+**1. Rozbudowa `DEMO_APPOINTMENTS`** — z 3 do ~14 wizyt:
+- Realistyczne godziny od 8:00 do 17:00 (co 30–60 min)
+- 4 pracownice, różne usługi beauty
+- Mix statusów: ~10 confirmed, 2 booked, 1 cancelled, 1 completed
+- Realistyczne ceny (80–450 zł)
+- Każda wizyta z unikalnymi danymi klientki
 
+Przykład struktury godzin:
 ```
-1. CommunicationAlert + SetupChecklist
-2. Header + QuickProductSale
-3. KPI Cards (4x grid)
-4. Bottom section (appointments list + top services/staff sidebar)
-5. RevenuePredictionCard
-6. RetentionFlowWidget
-7. TodayStaffCard
-8. WeeklyBriefWidget
-9. StockAlertsCard (przeniesiony z sidebara na osobny wiersz)
+08:00, 08:30, 09:00, 09:30, 10:00, 10:30, 
+11:00, 12:00, 13:00, 13:30, 14:00, 15:00, 15:30, 16:00
 ```
 
-StockAlertsCard zostaje wyciągnięty z prawej kolumny bottom section i umieszczony jako samodzielny widget na dole — rzadko wymaga natychmiastowej uwagi.
+**2. Zwiększenie limitu wyświetlania** — linia 408 zmienia `slice(0, 6)` na `slice(0, 8)` + dodanie informacji ile wizyt jest ukrytych pod "Zobacz wszystkie".
+
+**3. "Zobacz wszystkie"** — linia 387, `onClick` zmieniony:
+- W trybie demo: `onNavigate("calendar")` (nawiguje do zakładki Kalendarz)
+- W trybie produkcyjnym: bez zmian
+
+To już prowadzi do zakładki kalendarza — upewnię się, że `handleNavigate` jest poprawnie zdefiniowany i przekazuje "calendar".
+
+### Szczegóły techniczne
+- Helper `demoTime(hour, minute)` tworzy datę z dzisiejszą datą ale o zadanej godzinie
+- Dane demo: 14 wizyt, 4 pracownice, 10+ różnych usług
+- KPI "Szacowany przychód" automatycznie się zaktualizuje (suma cen)
 
