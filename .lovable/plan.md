@@ -1,54 +1,52 @@
 
 
-# Naprawa migającego sidebara w trybie demo
+# Optymalna kolejność widgetów w Dashboard
+
+## Obecna kolejność
+1. Alerty (komunikacja, setup checklist)
+2. Header + KPI karty (4x)
+3. Weekly Brief
+4. Dzisiejszy zespół (TodayStaffCard)
+5. Prognoza przychodu (RevenuePredictionCard)
+6. Retencja klientek (RetentionFlowWidget)
+7. Dzisiejsze wizyty (lista) + sidebar (stany magazynowe, top usługi, top pracownicy)
 
 ## Problem
-`AdminSidebar` używa hooka `useStaffPermissions()` do filtrowania widocznych zakładek. Ten hook:
+Dzisiejsze wizyty — **najważniejsza rzecz rano** — są dopiero na samym dole. Weekly Brief (strategiczny, nie pilny) jest wyżej niż lista wizyt. Retencja (ważna, ale nie pilna) jest też przed wizytami.
 
-1. **Podczas ładowania** (query pending) zwraca domyślnie `isOwner: true` (linia 76) → **widać wszystkie opcje**
-2. **Po załadowaniu** — w demo nie ma zalogowanego użytkownika, więc `getUser()` zwraca `null` → hook zwraca `DEFAULT_PERMISSIONS` z `isOwner: false` → **większość zakładek znika**
+## Proponowana kolejność (priorytet właścicielki)
 
-To wyjaśnia "miganie": początkowo sidebar jest pełny, a po chwili ścina się do kilku opcji.
-
-## Rozwiązanie
-
-### Zmiana w `AdminSidebar` — props `isDemo`
-
-Dodać opcjonalny prop `isDemo?: boolean` do `AdminSidebarProps`. Gdy `isDemo === true`:
-- Pominąć filtrowanie po uprawnieniach — pokazać **wszystkie sekcje**
-- Nie wywoływać logiki permissions (lub zignorować wynik)
-
-```typescript
-// AdminSidebar.tsx
-const visibleSections = isDemo
-  ? allSections
-  : allSections
-      .map(section => ({
-        ...section,
-        items: isOwner
-          ? section.items
-          : section.items.filter(item => {
-              const requiredPerm = TAB_PERMISSION_MAP[item.tab];
-              if (!requiredPerm) return true;
-              return permissions[requiredPerm];
-            }),
-      }))
-      .filter(section => section.items.length > 0);
+```text
+1. Alerty (setup/komunikacja)     ← bez zmian, pilne
+2. Header + KPI karty (4x)        ← bez zmian, szybki przegląd
+3. DZISIEJSZE WIZYTY + sidebar    ← ↑↑↑ z dołu na górę
+   (lista wizyt | top usługi + top pracownicy)
+4. Prognoza przychodu              ← ↑ pieniądze = priorytet
+5. Retencja klientek               ← bez zmian, zdrowie bazy
+6. Dzisiejszy zespół               ← ↓ informacyjne, nie pilne
+7. Weekly Brief                    ← ↓↓ strategiczne, raz w tygodniu
+8. Stany magazynowe                ← ↓ na dół, rzadko pilne
 ```
 
-### Zmiana w `DemoPage.tsx`
+**Logika**: Rano właścicielka chce wiedzieć: *ile wizyt, kto przychodzi, ile zarobię*. Dopiero potem patrzy na retencję i strategię.
 
-Przekazać `isDemo` do sidebara:
-```tsx
-<AdminSidebar 
-  activeTab={activeTab} 
-  onTabChange={setActiveTab}
-  onClose={() => setSidebarOpen(false)}
-  isDemo
-/>
+## Zmiany techniczne
+
+### Plik: `src/components/admin/DashboardHome.tsx`
+
+Zmiana kolejności bloków w JSX (bez zmiany logiki):
+
+```
+1. CommunicationAlert + SetupChecklist
+2. Header + QuickProductSale
+3. KPI Cards (4x grid)
+4. Bottom section (appointments list + top services/staff sidebar)
+5. RevenuePredictionCard
+6. RetentionFlowWidget
+7. TodayStaffCard
+8. WeeklyBriefWidget
+9. StockAlertsCard (przeniesiony z sidebara na osobny wiersz)
 ```
 
-### Zakres zmian
-- `src/components/admin/AdminSidebar.tsx` — dodać prop `isDemo`, pominąć filtrowanie
-- `src/pages/DemoPage.tsx` — przekazać `isDemo` do `AdminSidebar`
+StockAlertsCard zostaje wyciągnięty z prawej kolumny bottom section i umieszczony jako samodzielny widget na dole — rzadko wymaga natychmiastowej uwagi.
 
