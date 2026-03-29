@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane"];
 
@@ -68,8 +69,8 @@ interface SalonSettings {
   };
 }
 
-// Recommendations mapping
-const serviceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
+// Demo recommendations mapping (only used in demo mode)
+const demoServiceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
   "1": [
     { id: "2", name: "Mezoterapia igłowa", price: 350, duration: 60 },
     { id: "3", name: "Mikrodermabrazja", price: 180, duration: 50 },
@@ -275,11 +276,44 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const isFormStep = currentStepId === "form";
   const isPaymentStep = currentStepId === "payment";
 
+  // Dynamic recommendations query for real salons
+  const { data: dbRecommendations } = useQuery({
+    queryKey: ["service-recommendations", salonId, selectedService?.id, selectedService?.category],
+    queryFn: async () => {
+      if (!salonId || salonId === "demo" || !selectedService) return [];
+      
+      // Try same category first
+      let query = supabase
+        .from("services")
+        .select("id, name, price, duration")
+        .eq("salon_id", salonId)
+        .neq("id", selectedService.id)
+        .limit(3);
+
+      if (selectedService.category) {
+        query = query.eq("category_id", selectedService.category);
+      }
+
+      const { data } = await query;
+      
+      // Fallback: if no results from same category, get any other services
+      if (!data || data.length === 0) {
+        const { data: fallback } = await supabase
+          .from("services")
+          .select("id, name, price, duration")
+          .eq("salon_id", salonId)
+          .neq("id", selectedService.id)
+          .limit(3);
+        return fallback || [];
+      }
+      return data;
+    },
+    enabled: !!salonId && salonId !== "demo" && !!selectedService,
+  });
+
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
-    if (serviceRecommendations[service.id]) {
-      setShowRecommendations(true);
-    }
+    setShowRecommendations(true);
   };
 
   const handleNext = () => {
@@ -601,7 +635,19 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     );
   }
 
-  const recommendations = selectedService ? serviceRecommendations[selectedService.id] : [];
+  const recommendations = useMemo(() => {
+    if (!selectedService) return [];
+    if (isDemo) {
+      return demoServiceRecommendations[selectedService.id] || [];
+    }
+    return (dbRecommendations || []).map(r => ({
+      id: r.id,
+      name: r.name,
+      price: r.price,
+      duration: r.duration,
+    }));
+  }, [selectedService, isDemo, dbRecommendations]);
+
   const progressStepIndex = stepMapping.indexOf(currentStepId);
 
   return (
@@ -624,7 +670,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               isDemo={isDemo}
             />
             
-            {showRecommendations && recommendations && recommendations.length > 0 && (
+            {showRecommendations && recommendations.length > 0 && (
               <div className="mt-6 p-4 bg-secondary/5 border border-secondary/20 rounded-xl animate-fade-in">
                 <p className="text-sm font-medium mb-3 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-secondary" />
@@ -637,9 +683,17 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                       variant="secondary"
                       className="cursor-pointer hover:bg-secondary/20 transition-colors py-2 px-3"
                       onClick={() => {
+                        handleServiceSelect({
+                          id: rec.id,
+                          name: rec.name,
+                          price: rec.price,
+                          duration: rec.duration,
+                          category: "",
+                          description: "",
+                        });
                         toast({
-                          title: "Dodaj następnym razem",
-                          description: `${rec.name} możesz dodać przy kolejnej wizycie.`,
+                          title: "Zmieniono usługę",
+                          description: `Wybrano: ${rec.name}`,
                         });
                       }}
                     >
@@ -649,7 +703,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Kliknij, aby dodać do listy życzeń na przyszłość
+                  Kliknij, aby zmienić na tę usługę
                 </p>
               </div>
             )}
