@@ -177,7 +177,7 @@ export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManag
 
       {activeView === "smart" && (
         <div className="space-y-6">
-          <SmartScheduleHelpers isDemo={isDemo} />
+          <SmartScheduleHelpers isDemo={isDemo} onNavigate={onNavigate} />
         </div>
       )}
 

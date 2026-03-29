@@ -62,7 +62,7 @@ export default function DemoPage() {
         case "home":
           return <DashboardHome isDemo={true} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
         case "calendar":
-          return <ScheduleManagement isDemo={true} />;
+          return <ScheduleManagement isDemo={true} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
         case "widgets":
           return <WidgetsManagement isDemo={true} />;
         case "clients":
