@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   { title: "O salonie", emoji: "🏢", icon: Building2 },
   { title: "AI Skan", emoji: "🔍", icon: Sparkles },
+  { title: "Komunikacja", emoji: "📡", icon: Mail },
   { title: "Autopilot", emoji: "🤖", icon: Bot },
   { title: "Twój link", emoji: "🔗", icon: Link2 },
   { title: "Klientki", emoji: "👥", icon: Users },
