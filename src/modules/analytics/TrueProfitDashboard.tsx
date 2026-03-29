@@ -49,8 +49,8 @@ export function TrueProfitDashboard({ isDemo, onNavigate }: Props) {
         </TabsList>
         <TabsContent value="services"><ServiceProfitRanking services={profit.serviceProfits} hasMaterialData={profit.hasMaterialData} /></TabsContent>
         <TabsContent value="clients"><ClientLTVRanking clients={profit.clientLTVs} /></TabsContent>
-        <TabsContent value="forecast"><CashflowForecast monthlySummary={profit.monthlySummary} /></TabsContent>
-        <TabsContent value="benchmarks"><IndustryBenchmarks summary={profit.monthlySummary} /></TabsContent>
+        <TabsContent value="forecast"><CashflowForecast monthlySummary={profit.monthlySummary} onNavigate={onNavigate} /></TabsContent>
+        <TabsContent value="benchmarks"><IndustryBenchmarks summary={profit.monthlySummary} onNavigate={onNavigate} /></TabsContent>
       </Tabs>
     </div>
   );
