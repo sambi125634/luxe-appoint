@@ -87,8 +87,6 @@ export default function DemoPage() {
           return <SupportModule />;
         case "retention":
           return <RetentionDashboard isDemo />;
-        case "pixel":
-          return <PixelDashboard isDemo />;
         case "analytics":
           return <TrueProfitDashboard isDemo />;
         case "consultation":
