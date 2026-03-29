@@ -69,7 +69,7 @@ export function ExportAppointments({ open, onOpenChange, salonId, salonName }: E
         .eq("salon_id", salonId)
         .gte("start_time", `${dateFrom}T00:00:00`)
         .lte("start_time", `${dateTo}T23:59:59`)
-        .in("status", selectedStatuses)
+        .in("status", selectedStatuses as ("booked" | "cancelled" | "completed" | "confirmed" | "no_show")[])
         .order("start_time", { ascending: false });
 
       if (error) throw error;
