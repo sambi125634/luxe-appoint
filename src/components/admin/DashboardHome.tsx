@@ -422,7 +422,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
               </div>
             ) : (
               <div className="space-y-3">
-                {todayAppointments.slice(0, 6).map((appointment) => {
+                {todayAppointments.slice(0, 8).map((appointment) => {
                   const client = appointment.clients as { first_name: string; last_name: string; phone: string } | null;
                   const service = appointment.services as { name: string } | null;
                   const staff = appointment.staff_members as { name: string } | null;
