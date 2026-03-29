@@ -91,6 +91,14 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               onSaveIntegration={(updates) => updateSettings("integrations", updates)}
             />
           </TabsContent>
+          <TabsContent value="communication" className="m-0">
+            <CommunicationSettings
+              isLoading={isLoading}
+              isSaving={isSaving}
+              isDemo={isDemo}
+              onNavigateToModule={onNavigateToModule}
+            />
+          </TabsContent>
           <TabsContent value="integrations" className="m-0">
             <IntegrationSettings
               settings={settings.integrations}
