@@ -479,9 +479,10 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
                     </div>
                   );
                 })}
-                {todayAppointments.length > 8 && (
-                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => handleNavigate("calendar")}>
-                    + {todayAppointments.length - 8} więcej wizyt — zobacz wszystkie
+                </div>
+                {todayAppointments.length > 5 && (
+                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground mt-2" onClick={() => handleNavigate("calendar")}>
+                    + {todayAppointments.length - 5} więcej wizyt — zobacz wszystkie
                   </Button>
                 )}
               </div>
