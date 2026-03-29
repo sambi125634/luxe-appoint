@@ -84,6 +84,21 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
   const monthStart = startOfMonth(today).toISOString();
   const monthEnd = endOfMonth(today).toISOString();
 
+  // Salon slug for booking widget link
+  const { data: salonSlug } = useQuery({
+    queryKey: ["dashboard-salon-slug", salonId, isDemo],
+    queryFn: async () => {
+      if (isDemo) return "demo-salon";
+      const { data } = await supabase
+        .from("salons")
+        .select("slug")
+        .eq("id", salonId!)
+        .single();
+      return (data as any)?.slug as string | null;
+    },
+    enabled: isDemo || !!salonId,
+  });
+
   // Today's appointments
   const { data: todayAppointments = [], isLoading: apptLoading } = useQuery({
     queryKey: ["dashboard-today-appointments", salonId, isDemo],
@@ -263,7 +278,10 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
             <ShoppingBag className="w-4 h-4" />
             <span className="hidden sm:inline">{t('products.quickSale')}</span>
           </Button>
-          <Button size="sm" className="gap-2" onClick={() => handleNavigate("calendar")}>
+          <Button size="sm" className="gap-2" onClick={() => {
+            const slug = salonSlug || 'demo-salon';
+            window.open(`${window.location.origin}/book/${slug}`, '_blank');
+          }}>
             <Calendar className="w-4 h-4" />
             <span className="hidden sm:inline">Otwórz kalendarz</span>
             <span className="sm:hidden">Kalendarz</span>
