@@ -106,8 +106,15 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
     }
   }, [salonData, isDemo]);
 
+  const getDemoOrRealUrl = (widget: BookingWidget) => {
+    if (isDemo) {
+      return `${window.location.origin}/book/demo-salon`;
+    }
+    return getWidgetUrl(widget.slug);
+  };
+
   const handleCopyLink = (widget: BookingWidget) => {
-    const link = getWidgetUrl(widget.slug);
+    const link = getDemoOrRealUrl(widget);
     navigator.clipboard.writeText(link);
     toast.success("Link skopiowany!", {
       description: link,
