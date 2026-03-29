@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
-  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus
+  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus, Radio, AlertTriangle
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
