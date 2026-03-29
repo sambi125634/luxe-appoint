@@ -110,7 +110,7 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case "home": return <DashboardHome onNavigate={(tab) => setActiveTab(tab as TabType)} />;
-      case "calendar": return <ScheduleManagement />;
+      case "calendar": return <ScheduleManagement onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "widgets": return <WidgetsManagement />;
       case "clients": return <ClientsManagement />;
       case "conversations": return <ConversationsModule onNavigate={(tab) => {
