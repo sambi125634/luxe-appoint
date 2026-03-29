@@ -45,7 +45,7 @@ export default function DemoPage() {
       case "products": return t("admin.products");
       case "staff": return t("admin.staff");
       case "services": return t("admin.services");
-      case "time-off": return t("timeOff.title");
+      
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
       
