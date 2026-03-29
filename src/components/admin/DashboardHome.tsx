@@ -421,8 +421,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
                 </Button>
               </div>
             ) : (
-              <div className="space-y-3">
-                {todayAppointments.slice(0, 8).map((appointment) => {
+              <div className="space-y-2">
+                <div className="max-h-[320px] overflow-y-auto space-y-3 pr-1">
+                {todayAppointments.slice(0, 5).map((appointment) => {
                   const client = appointment.clients as { first_name: string; last_name: string; phone: string } | null;
                   const service = appointment.services as { name: string } | null;
                   const staff = appointment.staff_members as { name: string } | null;
@@ -478,9 +479,10 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
                     </div>
                   );
                 })}
-                {todayAppointments.length > 8 && (
-                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => handleNavigate("calendar")}>
-                    + {todayAppointments.length - 8} więcej wizyt — zobacz wszystkie
+                </div>
+                {todayAppointments.length > 5 && (
+                  <Button variant="ghost" size="sm" className="w-full text-muted-foreground mt-2" onClick={() => handleNavigate("calendar")}>
+                    + {todayAppointments.length - 5} więcej wizyt — zobacz wszystkie
                   </Button>
                 )}
               </div>
