@@ -302,7 +302,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
                     <p className="text-xs font-medium text-muted-foreground">Link do rezerwacji online</p>
                     <div className="flex gap-2">
                       <div className="flex-1 px-3 py-1.5 bg-muted rounded-md text-xs font-mono truncate">
-                        {getWidgetUrl(widget.slug)}
+                        {getDemoOrRealUrl(widget)}
                       </div>
                       <Button variant="outline" size="sm" className="gap-1.5 shrink-0" onClick={() => handleCopyLink(widget)}>
                         <Copy className="w-3 h-3" />
