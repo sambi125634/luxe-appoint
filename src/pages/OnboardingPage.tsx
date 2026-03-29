@@ -319,7 +319,7 @@ export default function OnboardingPage() {
         setCreatedSlug(salon.slug);
         setSalonName(salon.name ?? "");
         setSalonCity(salon.city ?? "");
-        setStep(Math.min(salon.onboarding_step ?? 0, 5));
+        setStep(Math.min(salon.onboarding_step ?? 0, 6));
       }
       setCheckingAuth(false);
     });
@@ -327,7 +327,7 @@ export default function OnboardingPage() {
 
   // Confetti on final step
   useEffect(() => {
-    if (step === 5) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
+    if (step === 6) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
   }, [step]);
 
   // ---- Step handlers ----
@@ -567,10 +567,10 @@ export default function OnboardingPage() {
     });
 
     setSaving(false);
-    goTo(3);
+    goTo(4);
   };
 
-  const handleWidgetDone = () => goTo(4);
+  const handleWidgetDone = () => goTo(5);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -622,13 +622,13 @@ export default function OnboardingPage() {
     setImportedCount(imported);
     setSaving(false);
     toast.success(`Zaimportowano ${imported} klientek`);
-    goTo(5);
+    goTo(6);
   };
 
   const handleComplete = async () => {
     if (!createdSalonId) return;
     setSaving(true);
-    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 6 }).eq("id", createdSalonId);
+    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 7 }).eq("id", createdSalonId);
     toast.success("🎉 Salon skonfigurowany! Witamy w Beauty Calendar.");
     navigate("/admin");
   };
@@ -859,8 +859,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 2: Autopilot (PRO gate) ===== */}
-          {step === 2 && (
+          {/* ===== STEP 3: Autopilot (PRO gate) ===== */}
+          {step === 3 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
                 <div className="text-center">
@@ -893,7 +893,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep((instagramUrl || googleMapsUrl || websiteUrl) ? 1 : 0)} size="sm">
+                  <Button variant="outline" onClick={() => setStep(3)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
                   <Button onClick={() => {
@@ -905,7 +905,7 @@ export default function OnboardingPage() {
                         ai_suggestions_enabled: false,
                       });
                     }
-                    goTo(3);
+                    goTo(4);
                   }} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
                     <Mail className="mr-2 h-4 w-4" />
                     Umów konsultację i aktywuj Autopilot →
@@ -915,8 +915,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 3: Twój link jest gotowy ===== */}
-          {step === 3 && (
+          {/* ===== STEP 4: Twój link jest gotowy ===== */}
+          {step === 4 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
                 <div className="text-center">
@@ -994,8 +994,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 4: Import Clients ===== */}
-          {step === 4 && (
+          {/* ===== STEP 5: Import Clients ===== */}
+          {step === 5 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
                 <div>
@@ -1044,10 +1044,10 @@ export default function OnboardingPage() {
                 )}
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(3)} size="sm">
+                  <Button variant="outline" onClick={() => setStep(4)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
-                  <Button variant="ghost" onClick={() => goTo(5)} className="flex-1 text-muted-foreground">
+                  <Button variant="ghost" onClick={() => goTo(6)} className="flex-1 text-muted-foreground">
                     Zacznę od nowa — pomiń
                   </Button>
                 </div>
@@ -1055,8 +1055,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 5: Celebration ===== */}
-          {step === 5 && (
+          {/* ===== STEP 6: Celebration ===== */}
+          {step === 6 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-6">
                 <div className="text-center py-4">
