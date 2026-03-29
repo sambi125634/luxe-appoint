@@ -21,6 +21,7 @@ import {
   QuickBlockModal,
   SmartScheduleHelpers 
 } from "./schedule";
+import { TimeOffManagement } from "./TimeOffManagement";
 import { useTranslation } from "react-i18next";
 import { SectionGuide } from "./SectionGuide";
 import { useSalonId } from "@/hooks/useSalonId";
