@@ -60,7 +60,7 @@ export default function DemoPage() {
     const content = (() => {
       switch (activeTab) {
         case "home":
-          return <DashboardHome isDemo={true} onNavigate={setActiveTab} />;
+          return <DashboardHome isDemo={true} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
         case "calendar":
           return <ScheduleManagement isDemo={true} />;
         case "widgets":
