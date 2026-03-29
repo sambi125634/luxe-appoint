@@ -39,7 +39,7 @@ const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   export: "can_view_finances",
 };
 
-export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
+export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName, isDemo }: AdminSidebarProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
