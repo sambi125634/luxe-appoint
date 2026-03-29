@@ -14,6 +14,7 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane"];
 
