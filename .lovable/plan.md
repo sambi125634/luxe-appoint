@@ -1,28 +1,46 @@
 
 
-# Przeniesienie Time Off do zakładki Kalendarz
+# Nowa zakładka "Preferencje zakupowe" w module Klienci
 
-## Problem
-"Urlopy i dni wolne" jest osobną pozycją w sidebarze, ale logicznie należy do sekcji Kalendarz. Mylące dla użytkownika.
+## Cel
+Trzecia zakładka obok "Lista klientów" i "Grupy zakupowe", która grupuje klientów wg ulubionych kategorii usług (na podstawie historii wizyt). Kliknięcie w kategorię pokazuje listę klientów z liczbą wizyt, wydaną kwotą i ulubionymi usługami w tej kategorii.
 
 ## Zmiany
 
-### 1. `src/components/admin/ScheduleManagement.tsx`
-- Dodać nową zakładkę `"time-off"` do `activeView` (obok calendar, grid, templates, smart)
-- Rozszerzyć `TabsList` z `grid-cols-4` na `grid-cols-5`
-- Dodać `TabsTrigger value="time-off"` z ikoną `CalendarOff` i labelką "Urlopy"
-- Import `TimeOffManagement` i renderować gdy `activeView === "time-off"`
+### Plik 1: `src/components/admin/clients/ServicePreferences.tsx` (nowy)
+Nowy komponent wyświetlający:
+- **Karty kategorii** — każda kategoria usługowa (np. "Mezoterapia", "Manicure & Pedicure") jako karta z:
+  - Ikoną/emoji kategorii
+  - Liczbą klientów
+  - Łącznym przychodem z tej kategorii
+  - Średnią liczbą wizyt na klienta
+  - Progress bar pokazujący udział % w całości
+- **Kliknięcie karty** → rozwija listę klientów przypisanych do tej kategorii (posortowanych wg wydanej kwoty), z:
+  - Imieniem i nazwiskiem
+  - Liczbą wizyt w tej kategorii
+  - Kwotą wydaną w tej kategorii
+  - Ostatnią wizytą
+  - Najpopularniejszą usługą klienta w tej kategorii
+- **Wskazówka remarketingowa** przy każdej kategorii — np. "12 klientek nie korzystało z Mezoterapii od 60+ dni — rozważ kampanię reaktywacyjną"
 
-### 2. `src/components/admin/AdminSidebar.tsx`
-- Usunąć `{ icon: CalendarOff, labelKey: "time-off", tab: "time-off" }` z sekcji "Codzienna praca"
-- Usunąć `"time-off"` z typu `TabType`
+Props:
+```typescript
+interface ServicePreferencesProps {
+  clients: Client[];
+  onSelectClient?: (clientId: string) => void;
+}
+```
 
-### 3. `src/pages/AdminDashboard.tsx`
-- Usunąć `case "time-off"` z `renderContent()` i `getPageTitle()`
-- Usunąć import `TimeOffManagement` (bo teraz importuje go ScheduleManagement)
+Logika grupowania: iteracja po `client.visits` → grupowanie po `visit.category` → zliczanie per klient per kategoria, z wyciągnięciem top usługi i dat.
 
-### 4. `src/pages/DemoPage.tsx`
-- Analogicznie usunąć `case "time-off"` jeśli istnieje
+### Plik 2: `src/components/admin/ClientsManagement.tsx`
+- Rozszerzyć `mainViewTab` state z `"list" | "groups"` na `"list" | "groups" | "preferences"`
+- Dodać trzeci przycisk-tab "Preferencje zakupowe" z ikoną `Heart` lub `BarChart3`
+- Renderować `<ServicePreferences>` gdy `mainViewTab === "preferences"`
+- Przekazać `clients` i `onSelectClient` (otwiera dialog klienta)
 
-### Zakres: 4 pliki
+### Plik 3: `src/components/admin/clients/index.ts`
+Dodać eksport `ServicePreferences`.
+
+### Zakres: 3 pliki (1 nowy, 2 edycje)
 
