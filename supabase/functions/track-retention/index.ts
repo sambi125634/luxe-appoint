@@ -24,12 +24,21 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const token = url.searchParams.get("t");
     const event = url.searchParams.get("e"); // "open" or "click"
+    const messageId = url.searchParams.get("m"); // message_id (unique per email)
+    const salonId = url.searchParams.get("s");
+    const clientId = url.searchParams.get("c");
+    const sequenceName = url.searchParams.get("seq");
     const redirect = url.searchParams.get("r");
 
-    if (!token || !event) {
-      return new Response("Invalid", { status: 400, headers: corsHeaders });
+    if (!event || !messageId || !salonId) {
+      // For open pixels, still return the GIF even on bad params
+      if (event === "open") {
+        return new Response(PIXEL, {
+          headers: { "Content-Type": "image/gif", "Cache-Control": "no-cache, no-store" },
+        });
+      }
+      return new Response("Missing params", { status: 400, headers: corsHeaders });
     }
 
     const supabase = createClient(
@@ -37,34 +46,20 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    // Find message by tracking token
-    const { data: message } = await supabase
-      .from("retention_messages")
-      .select("id, salon_id")
-      .eq("tracking_token", token)
-      .single();
-
-    if (message) {
-      // Record tracking event
-      await supabase.from("retention_tracking").insert({
-        message_id: message.id,
-        event_type: event === "open" ? "opened" : "clicked",
-        ip_address: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
-        user_agent: req.headers.get("user-agent"),
-        link_url: redirect,
-      });
-
-      // Update retention_messages timestamps
-      const updateField = event === "open"
-        ? { opened_at: new Date().toISOString() }
-        : { clicked_at: new Date().toISOString() };
-
-      await supabase
-        .from("retention_messages")
-        .update(updateField)
-        .eq("id", message.id)
-        .is(event === "open" ? "opened_at" : "clicked_at", null); // Only set first time
-    }
+    // Insert tracking event
+    const eventType = event === "open" ? "open" : "click";
+    await supabase.from("email_tracking_events").insert({
+      salon_id: salonId,
+      client_id: clientId || null,
+      message_id: messageId,
+      sequence_name: sequenceName || null,
+      event_type: eventType,
+      link_url: redirect || null,
+      metadata: {
+        ip: req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip"),
+        ua: req.headers.get("user-agent"),
+      },
+    });
 
     // For opens — return 1px transparent GIF
     if (event === "open") {
@@ -72,18 +67,23 @@ Deno.serve(async (req) => {
         headers: {
           "Content-Type": "image/gif",
           "Cache-Control": "no-cache, no-store, must-revalidate",
-          ...corsHeaders,
+          "Pragma": "no-cache",
+          "Expires": "0",
         },
       });
     }
 
-    // For clicks — redirect
-    return Response.redirect(
-      redirect || "https://calendar.beauty-funnels.com",
-      302
-    );
+    // For clicks — redirect to target URL
+    const targetUrl = redirect || "https://beautyfunnel.pl";
+    return new Response(null, {
+      status: 302,
+      headers: { "Location": targetUrl, ...corsHeaders },
+    });
   } catch (error) {
     console.error("Tracking error:", error);
-    return new Response("Error", { status: 500, headers: corsHeaders });
+    // Always return something useful — don't break the email experience
+    return new Response(PIXEL, {
+      headers: { "Content-Type": "image/gif", "Cache-Control": "no-cache" },
+    });
   }
 });

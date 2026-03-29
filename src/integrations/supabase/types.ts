@@ -810,6 +810,60 @@ export type Database = {
           },
         ]
       }
+      email_tracking_events: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          link_url: string | null
+          message_id: string
+          metadata: Json | null
+          salon_id: string
+          sequence_name: string | null
+          tracked_at: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          link_url?: string | null
+          message_id: string
+          metadata?: Json | null
+          salon_id: string
+          sequence_name?: string | null
+          tracked_at?: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          link_url?: string | null
+          message_id?: string
+          metadata?: Json | null
+          salon_id?: string
+          sequence_name?: string | null
+          tracked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_tracking_events_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_tracking_events_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followup_queue: {
         Row: {
           channel: string
