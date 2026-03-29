@@ -133,6 +133,7 @@ export default function AdminDashboard() {
       case "analytics": return <TrueProfitDashboard onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
+      case "export": return <ExportModule />;
       default: return null;
     }
   };
