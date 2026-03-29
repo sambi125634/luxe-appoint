@@ -278,7 +278,10 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
             <ShoppingBag className="w-4 h-4" />
             <span className="hidden sm:inline">{t('products.quickSale')}</span>
           </Button>
-          <Button size="sm" className="gap-2" onClick={() => handleNavigate("calendar")}>
+          <Button size="sm" className="gap-2" onClick={() => {
+            const slug = salonSlug || 'demo-salon';
+            window.open(`${window.location.origin}/book/${slug}`, '_blank');
+          }}>
             <Calendar className="w-4 h-4" />
             <span className="hidden sm:inline">Otwórz kalendarz</span>
             <span className="sm:hidden">Kalendarz</span>
