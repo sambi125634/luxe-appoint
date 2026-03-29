@@ -1,65 +1,28 @@
 
 
-# Poprawa Asystenta Grafiku — 3 problemy
+# Przeniesienie Time Off do zakładki Kalendarz
 
-## Problem 1: Ostrzeżenie o niskim obłożeniu za mało szczegółowe
-Obecnie: "Wykryto 2 dni z obłożeniem poniżej 30%. Rozważ kampanię promocyjną." — brak konkretów.
+## Problem
+"Urlopy i dni wolne" jest osobną pozycją w sidebarze, ale logicznie należy do sekcji Kalendarz. Mylące dla użytkownika.
 
-**Rozwiązanie**: Zastąpić jednolinijkowy alert rozbudowaną sekcją z:
-- Listą konkretnych dni z niskim obłożeniem (np. "Środa: Maria 22%, Anna 18%")
-- 3 konkretne akcje do podjęcia:
-  1. "Wyślij SMS do klientek z ostatniego miesiąca" → link do Retencji
-  2. "Dodaj promocję -20% na te dni" → link do Widgetów
-  3. "Przenieś wizytę z pełnego dnia" → sugestia konkretnego przeniesienia
+## Zmiany
 
-## Problem 2: "Szukaj" — wynik nie aktualizuje się
-Obecnie: hardcoded "Środa, 11 grudnia o 14:30, Maria Nowakowska" — nie reaguje na zmianę filtrów.
+### 1. `src/components/admin/ScheduleManagement.tsx`
+- Dodać nową zakładkę `"time-off"` do `activeView` (obok calendar, grid, templates, smart)
+- Rozszerzyć `TabsList` z `grid-cols-4` na `grid-cols-5`
+- Dodać `TabsTrigger value="time-off"` z ikoną `CalendarOff` i labelką "Urlopy"
+- Import `TimeOffManagement` i renderować gdy `activeView === "time-off"`
 
-**Rozwiązanie**: 
-- Dodać stan `searchResult` i `hasSearched`
-- Po kliknięciu "Znajdź najbliższy termin" — generować dynamiczny wynik na podstawie wybranych filtrów (pracownik, usługa, preferencja czasowa)
-- W demo: algorytm znajduje najbliższy wolny slot z mock danych (gaps + occupancy) pasujący do kryteriów
-- W produkcji: to samo, ale z danych z bazy (przyszłościowo)
-- Wynik pokazuje: datę, godzinę, pracownika — wszystko spójne z wybranymi filtrami
-- Przed kliknięciem "Znajdź" — brak wyniku (ukryty)
+### 2. `src/components/admin/AdminSidebar.tsx`
+- Usunąć `{ icon: CalendarOff, labelKey: "time-off", tab: "time-off" }` z sekcji "Codzienna praca"
+- Usunąć `"time-off"` z typu `TabType`
 
-## Problem 3: Wynik wyszukiwania powinien być klikalny
-Po znalezieniu terminu, kliknięcie w niego powinno otworzyć główny widget rezerwacyjny z pre-filled danymi.
+### 3. `src/pages/AdminDashboard.tsx`
+- Usunąć `case "time-off"` z `renderContent()` i `getPageTitle()`
+- Usunąć import `TimeOffManagement` (bo teraz importuje go ScheduleManagement)
 
-**Rozwiązanie**:
-- Dodać prop `onNavigateToBooking` do `SmartScheduleHelpers`
-- Kliknięcie wyniku otwiera `/book/demo-salon` (demo) lub `/book/{slug}` (produkcja) w nowej karcie
-- Dodać wizualny hint (kursor pointer, strzałka, tekst "Kliknij aby zarezerwować")
+### 4. `src/pages/DemoPage.tsx`
+- Analogicznie usunąć `case "time-off"` jeśli istnieje
 
-## Zmiany techniczne
-
-### Plik: `src/components/admin/schedule/SmartScheduleHelpers.tsx`
-
-**Occupancy tab (linie 339-346)** — zastąpić prosty alert rozbudowaną sekcją:
-- Wylistować `lowOccupancyDays` z konkretnymi danymi (dzień, pracownik, %)
-- 3 karty akcji z ikonami i onClick → `onNavigate?.("retention")`, `onNavigate?.("widgets")`, itp.
-
-**Next-available tab (linie 408-478)**:
-- Dodać `searchResult` state i logikę generowania wyniku z mock danych
-- Przycisk "Znajdź" uruchamia algorytm → ustawia `searchResult`
-- Wynik: dynamiczna data/godzina/pracownik na podstawie filtrów
-- Kliknięcie wyniku → `window.open('/book/demo-salon', '_blank')` w demo
-
-**Props** — dodać:
-```typescript
-interface SmartScheduleHelpersProps {
-  isDemo?: boolean;
-  salonSlug?: string;
-  onNavigate?: (tab: string) => void;
-  onSlotSelect?: (slot: SmartSlot) => void;
-  onGapSelect?: (gap: ScheduleGap) => void;
-}
-```
-
-### Plik: `src/components/admin/ScheduleManagement.tsx`
-Przekazać `onNavigate` i `salonSlug` do `SmartScheduleHelpers`.
-
-### Zakres: 2 pliki
-- `src/components/admin/schedule/SmartScheduleHelpers.tsx`
-- `src/components/admin/ScheduleManagement.tsx`
+### Zakres: 4 pliki
 
