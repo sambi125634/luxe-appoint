@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { 
   Search, Plus, Phone, Mail, Calendar, Clock, 
   Star, AlertTriangle, Edit2, Trash2, User,
-  History, StickyNote, Tag, Users, FolderOpen, Upload
+  History, StickyNote, Tag, Users, FolderOpen, Upload, Heart
 } from "lucide-react";
 import { classifyPurchaseGroup, getGroupStats, PURCHASE_GROUPS, type PurchaseGroup } from "@/lib/purchase-groups";
 import { Button } from "@/components/ui/button";
