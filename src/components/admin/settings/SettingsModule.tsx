@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { AutomationSettings } from "./AutomationSettings";
+import { CommunicationSettings } from "./CommunicationSettings";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 import { SectionGuide } from "../SectionGuide";
