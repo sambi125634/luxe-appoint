@@ -224,6 +224,11 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
     <div className="space-y-6">
       <SectionGuide sectionKey="home" />
 
+      {/* Communication setup alert */}
+      {!isDemo && salonId && (
+        <CommunicationAlert salonId={salonId} onNavigate={handleNavigate} />
+      )}
+
       {/* Setup Checklist */}
       {!isDemo && salonId && <SetupChecklist salonId={salonId} onNavigate={handleNavigate} />}
 
