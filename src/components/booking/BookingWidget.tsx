@@ -635,7 +635,19 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     );
   }
 
-  const recommendations = selectedService ? serviceRecommendations[selectedService.id] : [];
+  const recommendations = useMemo(() => {
+    if (!selectedService) return [];
+    if (isDemo) {
+      return demoServiceRecommendations[selectedService.id] || [];
+    }
+    return (dbRecommendations || []).map(r => ({
+      id: r.id,
+      name: r.name,
+      price: r.price,
+      duration: r.duration,
+    }));
+  }, [selectedService, isDemo, dbRecommendations]);
+
   const progressStepIndex = stepMapping.indexOf(currentStepId);
 
   return (
@@ -658,7 +670,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               isDemo={isDemo}
             />
             
-            {showRecommendations && recommendations && recommendations.length > 0 && (
+            {showRecommendations && recommendations.length > 0 && (
               <div className="mt-6 p-4 bg-secondary/5 border border-secondary/20 rounded-xl animate-fade-in">
                 <p className="text-sm font-medium mb-3 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-secondary" />
@@ -671,9 +683,17 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                       variant="secondary"
                       className="cursor-pointer hover:bg-secondary/20 transition-colors py-2 px-3"
                       onClick={() => {
+                        handleServiceSelect({
+                          id: rec.id,
+                          name: rec.name,
+                          price: rec.price,
+                          duration: rec.duration,
+                          category: "",
+                          description: "",
+                        });
                         toast({
-                          title: "Dodaj następnym razem",
-                          description: `${rec.name} możesz dodać przy kolejnej wizycie.`,
+                          title: "Zmieniono usługę",
+                          description: `Wybrano: ${rec.name}`,
                         });
                       }}
                     >
@@ -683,7 +703,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                   ))}
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Kliknij, aby dodać do listy życzeń na przyszłość
+                  Kliknij, aby zmienić na tę usługę
                 </p>
               </div>
             )}
