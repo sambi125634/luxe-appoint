@@ -50,6 +50,25 @@ const DEMO_TOP_STAFF = [
   { name: "Joanna Lewandowska", appointments: 38, revenue: 7600 },
 ];
 
+function CommunicationAlert({ salonId, onNavigate }: { salonId: string; onNavigate: (tab: string) => void }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    supabase.from("salons").select("communication_setup_completed").eq("id", salonId).single().then(({ data }) => {
+      if (data && !(data as Record<string, unknown>).communication_setup_completed) setShow(true);
+    });
+  }, [salonId]);
+  if (!show) return null;
+  return (
+    <Alert className="cursor-pointer border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20" onClick={() => onNavigate("settings")}>
+      <Radio className="h-4 w-4 text-amber-600" />
+      <AlertTitle className="text-amber-800 dark:text-amber-200">Skonfiguruj komunikację z klientkami</AlertTitle>
+      <AlertDescription className="text-amber-700 dark:text-amber-300">
+        Bez emaila i SMS klientki nie dostają przypomnień o wizytach → więcej no-show
+      </AlertDescription>
+    </Alert>
+  );
+}
+
 export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps) {
   const { t, i18n } = useTranslation();
   const [quickSaleOpen, setQuickSaleOpen] = useState(false);
