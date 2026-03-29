@@ -20,6 +20,7 @@ interface AdminSidebarProps {
   onClose?: () => void;
   userRole?: string | null;
   salonName?: string | null;
+  isDemo?: boolean;
 }
 
 // Permission-based tab visibility mapping
