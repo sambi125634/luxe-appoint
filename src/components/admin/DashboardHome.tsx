@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, TrendingUp, AlertCircle, Clock, 
   DollarSign, UserX, Sparkles, ArrowUpRight, ArrowDownRight,
-  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus, Radio, AlertTriangle
+  Phone, CheckCircle2, XCircle, ShoppingBag, Package, Plus, Radio, AlertTriangle, Repeat, ChevronRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -369,6 +369,21 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
 
       {/* AI Revenue Prediction */}
       <RevenuePredictionCard salonId={salonId ?? undefined} isDemo={isDemo} />
+
+      {/* Retention alert */}
+      {isDemo && (
+        <div
+          className="flex items-center gap-3 px-4 py-3 rounded-xl bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-900 cursor-pointer"
+          onClick={() => handleNavigate("retention")}
+        >
+          <Repeat className="w-5 h-5 text-purple-500 flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-purple-800 dark:text-purple-200">Aktywuj sekwencje reaktywacji</p>
+            <p className="text-xs text-purple-700 dark:text-purple-300 mt-0.5">Salony używające retencji AI odzyskują średnio 2,400 zł miesięcznie z nieaktywnych klientek</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-purple-500" />
+        </div>
+      )}
 
       {/* Retention Health Board */}
       {(() => {

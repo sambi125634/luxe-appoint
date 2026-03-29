@@ -1748,40 +1748,58 @@ export type Database = {
       }
       retention_messages: {
         Row: {
+          bounced_at: string | null
           channel: string
           clicked_at: string | null
           client_id: string
           created_at: string | null
+          delivered_at: string | null
           id: string
           message_content: string | null
+          metadata: Json | null
           opened_at: string | null
+          preview_text: string | null
           salon_id: string
           sequence_id: string | null
           status: string | null
+          subject: string | null
+          tracking_token: string | null
         }
         Insert: {
+          bounced_at?: string | null
           channel?: string
           clicked_at?: string | null
           client_id: string
           created_at?: string | null
+          delivered_at?: string | null
           id?: string
           message_content?: string | null
+          metadata?: Json | null
           opened_at?: string | null
+          preview_text?: string | null
           salon_id: string
           sequence_id?: string | null
           status?: string | null
+          subject?: string | null
+          tracking_token?: string | null
         }
         Update: {
+          bounced_at?: string | null
           channel?: string
           clicked_at?: string | null
           client_id?: string
           created_at?: string | null
+          delivered_at?: string | null
           id?: string
           message_content?: string | null
+          metadata?: Json | null
           opened_at?: string | null
+          preview_text?: string | null
           salon_id?: string
           sequence_id?: string | null
           status?: string | null
+          subject?: string | null
+          tracking_token?: string | null
         }
         Relationships: [
           {
@@ -1856,6 +1874,44 @@ export type Database = {
             columns: ["salon_id"]
             isOneToOne: false
             referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      retention_tracking: {
+        Row: {
+          event_at: string | null
+          event_type: string
+          id: string
+          ip_address: string | null
+          link_url: string | null
+          message_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          event_at?: string | null
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          link_url?: string | null
+          message_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          event_at?: string | null
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          link_url?: string | null
+          message_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retention_tracking_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "retention_messages"
             referencedColumns: ["id"]
           },
         ]

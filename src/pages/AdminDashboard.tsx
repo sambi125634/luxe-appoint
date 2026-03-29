@@ -128,7 +128,7 @@ export default function AdminDashboard() {
       case "time-off": return <TimeOffManagement />;
       case "settings": return <SettingsModule onNavigateToModule={(tab) => setActiveTab(tab as TabType)} initialTab={settingsInitialTab} />;
       case "support": return <SupportModule />;
-      case "retention": return <RetentionDashboard />;
+      case "retention": return <RetentionDashboard salonId={salonId ?? undefined} isDemo={false} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "pixel": return <PixelDashboard />;
       case "analytics": return <TrueProfitDashboard onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "consultation": return <ConsultationModule />;
