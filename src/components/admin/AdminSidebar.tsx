@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, TrendingUp, ClipboardList, Heart
+  LogOut, Sparkles, CalendarOff, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, TrendingUp, ClipboardList, Heart, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "settings" | "support" | "retention" | "pixel" | "analytics" | "consultation" | "referral";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "time-off" | "settings" | "support" | "retention" | "pixel" | "analytics" | "consultation" | "referral" | "export";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -35,6 +35,7 @@ const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   pixel: "can_manage_marketing",
   products: "can_manage_products",
   services: "can_edit_services",
+  export: "can_view_finances",
 };
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName }: AdminSidebarProps) {
@@ -82,6 +83,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       items: [
         { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
         { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
+        { icon: Download, labelKey: "admin.export", tab: "export" },
       ],
     },
     {

@@ -349,7 +349,8 @@
     "stats": "Statystyki",
     "trueProfit": "True Profit",
     "consultation": "Konsultacje",
-    "retention": "Retencja"
+    "retention": "Retencja",
+    "export": "Eksport danych"
   },
   "products": {
     "catalog": "Katalog produktów",

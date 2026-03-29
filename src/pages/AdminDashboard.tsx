@@ -27,6 +27,7 @@ import { PixelDashboard } from "@/modules/pixel";
 import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
+import { ExportModule } from "@/components/admin/export";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
@@ -101,6 +102,7 @@ export default function AdminDashboard() {
       case "analytics": return "True Profit Analytics";
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
+      case "export": return "Eksport danych";
       default: return "Dashboard";
     }
   };
@@ -131,6 +133,7 @@ export default function AdminDashboard() {
       case "analytics": return <TrueProfitDashboard onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
+      case "export": return <ExportModule />;
       default: return null;
     }
   };
