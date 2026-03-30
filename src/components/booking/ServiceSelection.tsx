@@ -10,6 +10,21 @@ import { supabase } from "@/integrations/supabase/client";
 import manicureVideoAsset from "@/assets/service-video-manicure.mp4.asset.json";
 import facialVideoAsset from "@/assets/service-video-facial.mp4.asset.json";
 import browsVideoAsset from "@/assets/service-video-brows.mp4.asset.json";
+import servicePeeling from "@/assets/service-peeling.jpg";
+import serviceMezoterapia from "@/assets/service-mezoterapia.jpg";
+import serviceMikrodermabrazja from "@/assets/service-mikrodermabrazja.jpg";
+import serviceHydrafacial from "@/assets/service-hydrafacial.jpg";
+import serviceHifu from "@/assets/service-hifu.jpg";
+import serviceMasazRelaks from "@/assets/service-masaz-relaks.jpg";
+import serviceMasazLimfa from "@/assets/service-masaz-limfa.jpg";
+import serviceFalaUderzeniowa from "@/assets/service-fala-uderzeniowa.jpg";
+import serviceDepilacjaLaser from "@/assets/service-depilacja-laser.jpg";
+import serviceDepilacjaWosk from "@/assets/service-depilacja-wosk.jpg";
+import serviceLaminacjaRzesy from "@/assets/service-laminacja-rzesy.jpg";
+import serviceLaminacjaBrwi from "@/assets/service-laminacja-brwi.jpg";
+import serviceHennaBrwi from "@/assets/service-henna-brwi.jpg";
+import serviceManicure from "@/assets/service-manicure.jpg";
+import servicePedicure from "@/assets/service-pedicure.jpg";
 
 interface Service {
   id: string;
@@ -51,6 +66,7 @@ const demoCategories = [
 
 const demoServices: Service[] = [
   // ── TWARZ ──
+  // s1: Peeling — facialVideo (unique)
   {
     id: "s1",
     name: "Peeling kawitacyjny",
@@ -63,7 +79,7 @@ const demoServices: Service[] = [
     popular: true,
     hasVideo: true,
     video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80",
+    image: servicePeeling,
   },
   {
     id: "s2",
@@ -75,9 +91,8 @@ const demoServices: Service[] = [
     benefits: ["Nawilża głęboko", "Redukuje zmarszczki", "Poprawia owal twarzy"],
     badge: "Hit",
     popular: true,
-    hasVideo: true,
-    video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&q=80",
+    hasVideo: false,
+    image: serviceMezoterapia,
   },
   {
     id: "s3",
@@ -88,9 +103,8 @@ const demoServices: Service[] = [
     description: "Mechaniczny peeling diamentowy dla gładkiej, promiennej skóry. Stymuluje produkcję kolagenu i usuwa martwy naskórek.",
     benefits: ["Usuwa martwy naskórek", "Stymuluje kolagen", "Wygładza blizny"],
     badge: null,
-    hasVideo: true,
-    video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400&q=80",
+    hasVideo: false,
+    image: serviceMikrodermabrazja,
   },
   {
     id: "s4",
@@ -101,9 +115,8 @@ const demoServices: Service[] = [
     description: "Rewolucyjna technologia HydraFacial — jednoczesne oczyszczanie, złuszczanie i nawilżanie skóry strumieniem wody pod ciśnieniem.",
     benefits: ["Natychmiastowy efekt", "Bez podrażnień", "Dla każdej cery"],
     badge: "Nowość",
-    hasVideo: true,
-    video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1552693673-1bf958298935?w=400&q=80",
+    hasVideo: false,
+    image: serviceHydrafacial,
   },
   {
     id: "s5",
@@ -114,9 +127,8 @@ const demoServices: Service[] = [
     description: "Nieinwazyjny lifting ultradźwiękowy — alternatywa dla chirurgii plastycznej. Napina skórę i modeluje owal twarzy bez skalpela.",
     benefits: ["Efekt liftingu", "Bez rekonwalescencji", "Trwałość 12–18 miesięcy"],
     badge: "Premium",
-    hasVideo: true,
-    video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1519415510236-718bfd68f661?w=400&q=80",
+    hasVideo: false,
+    image: serviceHifu,
   },
   // ── CIAŁO ──
   {
@@ -130,7 +142,7 @@ const demoServices: Service[] = [
     badge: "Hit",
     popular: true,
     hasVideo: false,
-    image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80",
+    image: serviceMasazRelaks,
   },
   {
     id: "s7",
@@ -141,9 +153,8 @@ const demoServices: Service[] = [
     description: "Specjalistyczny drenaż limfatyczny redukujący obrzęki i wspomagający detoks organizmu.",
     benefits: ["Redukuje obrzęki", "Detoks organizmu", "Poprawia odporność"],
     badge: null,
-    hasVideo: true,
-    video: manicureVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=400&q=80",
+    hasVideo: false,
+    image: serviceMasazLimfa,
   },
   {
     id: "s8",
@@ -154,9 +165,8 @@ const demoServices: Service[] = [
     description: "Skuteczna redukcja cellulitu i modelowanie sylwetki falą uderzeniową. Rozbija tkankę tłuszczową i wygładza skórę.",
     benefits: ["Redukuje cellulit", "Modeluje sylwetkę", "Wygładza skórę"],
     badge: null,
-    hasVideo: true,
-    video: manicureVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=400&q=80",
+    hasVideo: false,
+    image: serviceFalaUderzeniowa,
   },
   // ── DEPILACJA ──
   {
@@ -169,9 +179,8 @@ const demoServices: Service[] = [
     benefits: ["Trwały efekt", "Bezbolesna", "Każdy typ skóry"],
     badge: "Hit",
     popular: true,
-    hasVideo: true,
-    video: manicureVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1598440947619-584077e7c28c?w=400&q=80",
+    hasVideo: false,
+    image: serviceDepilacjaLaser,
   },
   {
     id: "s10",
@@ -183,7 +192,7 @@ const demoServices: Service[] = [
     benefits: ["Do 4 tygodni gładkości", "Delikatna formuła", "Każda partia ciała"],
     badge: null,
     hasVideo: false,
-    image: "https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&q=80",
+    image: serviceDepilacjaWosk,
   },
   // ── BRWI I RZĘSY ──
   {
@@ -197,8 +206,9 @@ const demoServices: Service[] = [
     badge: "Hit",
     popular: true,
     hasVideo: false,
-    image: "https://images.unsplash.com/photo-1583001931096-959e9a1a6223?w=400&q=80",
+    image: serviceLaminacjaRzesy,
   },
+  // s12: Laminacja brwi — browsVideo (unique)
   {
     id: "s12",
     name: "Laminacja brwi",
@@ -208,9 +218,9 @@ const demoServices: Service[] = [
     description: "Modelowanie i utrwalanie brwi w idealnym kształcie. Efekt zadbanych, gęstych brwi utrzymuje się 4–6 tygodni.",
     benefits: ["Idealne wypełnienie", "4–6 tygodni efektu", "Naturalny wygląd"],
     badge: null,
-    hasVideo: false,
+    hasVideo: true,
     video: browsVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?w=400&q=80",
+    image: serviceLaminacjaBrwi,
   },
   {
     id: "s13",
@@ -222,9 +232,10 @@ const demoServices: Service[] = [
     benefits: ["Idealny kształt", "Wypełnienie henną", "Efekt 2–3 tygodnie"],
     badge: null,
     hasVideo: false,
-    image: "https://images.unsplash.com/photo-1622253692010-d89de1a5b999?w=400&q=80",
+    image: serviceHennaBrwi,
   },
   // ── PAZNOKCIE ──
+  // s14: Manicure — manicureVideo (unique)
   {
     id: "s14",
     name: "Manicure hybrydowy",
@@ -235,9 +246,9 @@ const demoServices: Service[] = [
     benefits: ["3–4 tygodnie trwałości", "300+ kolorów", "Pielęgnacja dłoni w cenie"],
     badge: "Hit",
     popular: true,
-    hasVideo: false,
+    hasVideo: true,
     video: manicureVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&q=80",
+    image: serviceManicure,
   },
   {
     id: "s15",
@@ -249,7 +260,7 @@ const demoServices: Service[] = [
     benefits: ["Miękkie stopy", "Zdrowe paznokcie", "Pełna regeneracja"],
     badge: null,
     hasVideo: false,
-    image: "https://images.unsplash.com/photo-1519751138087-f74a2dd23a7b?w=400&q=80",
+    image: servicePedicure,
   },
 ];
 
