@@ -370,11 +370,14 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
       {/* Services grid */}
       <div className="grid gap-3">
         {filteredServices.map((service, index) => (
-          <button
+          <div
             key={service.id}
+            role="button"
+            tabIndex={0}
             onClick={() => { onSelect(service); onProceed?.(); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect(service); onProceed?.(); } }}
             className={cn(
-              "group w-full text-left rounded-xl border transition-all duration-300",
+              "group w-full text-left rounded-xl border transition-all duration-300 cursor-pointer",
               "animate-fade-in",
               selectedService?.id === service.id
                 ? "border-primary bg-primary/5 shadow-glow ring-2 ring-primary/20"
