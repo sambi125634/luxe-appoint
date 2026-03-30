@@ -469,7 +469,7 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                 </div>
               </div>
             </div>
-          </button>
+          </div>
         ))}
       </div>
 
