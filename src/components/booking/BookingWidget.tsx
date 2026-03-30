@@ -40,6 +40,9 @@ interface Service {
   duration: number;
   price: number;
   description: string;
+  thumbnailUrl?: string;
+  badge?: string | null;
+  categoryEmoji?: string;
 }
 
 interface StaffMember {
