@@ -1,28 +1,29 @@
 
 
-## Plan: Uproszczenie wyboru usługi — 1 klik + usunięcie multi-service
+## Plan: Zawsze rozwijaj kartę usługi + przycisk "Rezerwuj"
 
 ### Problem
-1. **Podwójne kliknięcie**: Karta usługi najpierw się rozwija, potem trzeba kliknąć "Rezerwuj" — nielogiczne dla usług bez wariantów
-2. **Multi-service nie działa poprawnie**: Dodawanie usług nie sumuje koszyka prawidłowo, UI jest zagmatwany
-3. **Runtime error**: `showServiceAddedBar is not defined` — pozostałość po częściowym usunięciu kodu
+Usługi bez wariantów przechodzą od razu do kalendarza po 1 kliknięciu — użytkownik nie widzi multimediów, opisu ani benefitów. Chcemy, żeby KAŻDA usługa (z wariantami i bez) najpierw się rozwinęła, pokazała pełny opis/wideo/zdjęcie, a dopiero po kliknięciu "Rezerwuj" przechodziła dalej.
 
 ### Rozwiązanie
 
-**Plik 1: `ServiceSelection.tsx`**
-- Usługi **bez wariantów**: jedno kliknięcie na kartę = natychmiastowy wybór i przejście dalej (bez rozwijania)
-- Usługi **z wariantami**: kliknięcie rozwija kartę, użytkownik wybiera wariant, kliknięcie wariantu = natychmiastowy wybór i przejście dalej (bez dodatkowego przycisku "Rezerwuj")
-- Usunięcie nieużywanych importów (`CalendarPlus`, `ArrowRight`, `Plus`)
+**Plik: `ServiceSelection.tsx`**
 
-**Plik 2: `BookingWidget.tsx`**
-- Usunięcie całej logiki multi-service: `additionalServices`, `showServicePicker`, `SERVICE_SUGGESTIONS`, `showAllServices`, `serviceSearch`, `recommendations`
-- Usunięcie przycisku "Dodaj kolejną usługę" i pickera sugestii z kroku datetime
-- Uproszczenie `totalPrice`/`totalDuration` — po prostu `selectedService.price` / `selectedService.duration`
-- Usunięcie podsumowania dodatkowych usług z karty wizyty
+1. **Kliknięcie na kartę = zawsze rozwiń/zwiń** (linie 487-495)
+   - Usunąć warunek `if (!service.variants)` który od razu wywołuje `handleServiceSelect`
+   - Każde kliknięcie toggleuje `expandedServiceId` — niezależnie od liczby wariantów
+
+2. **Dodać przycisk "Rezerwuj" w rozwiniętej karcie** (po benefitach, ok. linia 675)
+   - Dla usług **bez wariantów**: przycisk "Rezerwuj · {price} zł" na dole rozwiniętej sekcji
+   - Dla usług **z wariantami**: przycisk pojawi się dopiero po wybraniu wariantu (zmiana logiki wariantów — kliknięcie wariantu zaznacza go, ale NIE wywołuje `onProceed`)
+
+3. **Zmiana logiki wariantów** (linie 627-641)
+   - Kliknięcie wariantu = tylko `setSelectedVariants` (zaznacz radio button)
+   - Usunąć `onSelect` i `onProceed` z onClick wariantu
+   - Przejście dalej dopiero przez przycisk "Rezerwuj"
 
 ### Efekt
-- 1 klik = rezerwacja (dla usług bez wariantów)
-- 2 kliki max (rozwiń → wybierz wariant) dla usług z wariantami
-- Czysty, prosty flow bez zbędnych komplikacji
-- Naprawiony runtime error
+- 1 klik = rozwiń kartę (multimedia, opis, benefity)
+- 2 klik = "Rezerwuj" (lub: wybierz wariant → "Rezerwuj")
+- Każda usługa prezentuje się w pełni przed rezerwacją
 
