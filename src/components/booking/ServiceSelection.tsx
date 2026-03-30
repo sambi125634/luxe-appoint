@@ -308,11 +308,14 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {popularServices.slice(0, 2).map((service) => (
-              <button
+              <div
                 key={service.id}
+                role="button"
+                tabIndex={0}
                 onClick={() => { onSelect(service); onProceed?.(); }}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect(service); onProceed?.(); } }}
                 className={cn(
-                  "relative overflow-hidden rounded-xl border transition-all duration-300 text-left p-4",
+                  "relative overflow-hidden rounded-xl border transition-all duration-300 text-left p-4 cursor-pointer",
                   "bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20",
                   selectedService?.id === service.id
                     ? "border-primary shadow-glow ring-2 ring-primary/20"
