@@ -120,75 +120,65 @@ export default function BookingPage() {
     );
   }
 
-  // On intro step, render widget full-screen without header/footer
-  if (isIntro) {
-    return (
-      <BookingWidget 
-        widgetConfig={widgetConfig} 
-        salonId={salonInfo.id} 
-        onStepChange={(stepId) => setIsIntro(stepId === "intro")}
-      />
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 border-b border-border">
-        <div className="container mx-auto px-4 py-8">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-sm">powered by Beauty Calendar</span>
-          </Link>
-          
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2">
-                {widgetConfig?.theme?.headerText || salonInfo.name}
-              </h1>
-              {salonInfo.description && (
-                <p className="text-muted-foreground max-w-xl">{salonInfo.description}</p>
-              )}
-            </div>
-            
-            <div className="flex flex-col gap-2 text-sm">
-              {salonInfo.address && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="w-4 h-4 text-primary" />
-                  {salonInfo.address}{salonInfo.city ? `, ${salonInfo.city}` : ""}
-                </div>
-              )}
-              {salonInfo.phone && (
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="w-4 h-4 text-primary" />
-                  {salonInfo.phone}
-                </div>
-              )}
+    <div className={isIntro ? "min-h-screen bg-background overflow-hidden" : "min-h-screen bg-background"}>
+      {!isIntro && (
+        <header className="bg-gradient-to-r from-primary/10 via-secondary/5 to-accent/10 border-b border-border">
+          <div className="container mx-auto px-4 py-8">
+            <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm">powered by Beauty Calendar</span>
+            </Link>
+
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2">
+                  {widgetConfig?.theme?.headerText || salonInfo.name}
+                </h1>
+                {salonInfo.description && (
+                  <p className="text-muted-foreground max-w-xl">{salonInfo.description}</p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2 text-sm">
+                {salonInfo.address && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <MapPin className="w-4 h-4 text-primary" />
+                    {salonInfo.address}{salonInfo.city ? `, ${salonInfo.city}` : ""}
+                  </div>
+                )}
+                {salonInfo.phone && (
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Phone className="w-4 h-4 text-primary" />
+                    {salonInfo.phone}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      {/* Booking Widget */}
-      <main className="container mx-auto px-4 py-12">
-        <BookingWidget 
-          widgetConfig={widgetConfig} 
-          salonId={salonInfo.id} 
+      <main className={isIntro ? "min-h-screen" : "container mx-auto px-4 py-12"}>
+        <BookingWidget
+          widgetConfig={widgetConfig}
+          salonId={salonInfo.id}
           onStepChange={(stepId) => setIsIntro(stepId === "intro")}
         />
       </main>
 
-      {/* Footer */}
-      <footer className="py-6 px-4 border-t border-border mt-auto">
-        <div className="container mx-auto text-center">
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-sm">
-              {widgetConfig?.theme?.footerText || "Rezerwacje powered by Beauty Calendar"}
-            </span>
-          </Link>
-        </div>
-      </footer>
+      {!isIntro && (
+        <footer className="py-6 px-4 border-t border-border mt-auto">
+          <div className="container mx-auto text-center">
+            <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <Sparkles className="w-4 h-4" />
+              <span className="text-sm">
+                {widgetConfig?.theme?.footerText || "Rezerwacje powered by Beauty Calendar"}
+              </span>
+            </Link>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
