@@ -968,7 +968,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                                     <button
                                       key={service.id}
                                       onClick={() => {
-                                        setAdditionalServices(prev => [...prev, { ...service, category: service.category || "", description: service.description || "" }]);
+                                        setAdditionalServices(prev => [...prev, { ...service, category: (service as any).category || "", description: (service as any).description || "" }]);
                                         setShowServicePicker(false);
                                         setShowAllServices(false);
                                         setServiceSearch('');
