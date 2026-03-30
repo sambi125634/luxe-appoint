@@ -196,6 +196,46 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [benefitInput, setBenefitInput] = useState("");
 
+  // Variant data for editing (needs editingService to be declared first)
+  const { data: editingVariants } = useServiceVariants(editingService?.id);
+
+  // Sync variant form state when editing variants load
+  useEffect(() => {
+    if (editingVariants && editingVariants.length > 0) {
+      setHasVariants(true);
+      setVariants(editingVariants.map(v => ({
+        id: v.id,
+        name: v.name,
+        description: v.description || "",
+        duration: v.duration,
+        price: Number(v.price),
+        is_active: v.is_active,
+        sort_order: v.sort_order,
+      })));
+    }
+  }, [editingVariants]);
+
+  const addVariant = () => {
+    setVariants(prev => [...prev, {
+      name: '',
+      description: '',
+      duration: serviceForm.duration || 60,
+      price: serviceForm.price || 0,
+      is_active: true,
+      sort_order: prev.length,
+    }]);
+  };
+
+  const removeVariant = (index: number) => {
+    setVariants(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateVariant = (index: number, field: string, value: string | number) => {
+    setVariants(prev => prev.map((v, i) =>
+      i === index ? { ...v, [field]: value } : v
+    ));
+  };
+
   const [serviceForm, setServiceForm] = useState({
     name: "", category: "", duration: 60, price: 0, description: "", staffIds: [] as string[], media: [] as MediaFile[], benefits: [] as string[], vatRate: 23,
   });
