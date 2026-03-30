@@ -9,7 +9,7 @@ interface SmartSlotsResult {
   appointmentCount: number;
 }
 
-export function useSmartSlots(salonId: string | null, date: Date | null, serviceId?: string) {
+export function useSmartSlots(salonId: string | null, date: Date | null, serviceId?: string, serviceDuration?: number) {
   return useQuery({
     queryKey: ["smart-slots", salonId, date ? format(date, "yyyy-MM-dd") : null, serviceId],
     queryFn: async (): Promise<SmartSlotsResult> => {
@@ -22,7 +22,8 @@ export function useSmartSlots(salonId: string | null, date: Date | null, service
           body: {
             salonId,
             date: format(date, "yyyy-MM-dd"),
-            serviceId
+            serviceId,
+            serviceDuration
           }
         });
 
