@@ -10,6 +10,21 @@ import { supabase } from "@/integrations/supabase/client";
 import manicureVideoAsset from "@/assets/service-video-manicure.mp4.asset.json";
 import facialVideoAsset from "@/assets/service-video-facial.mp4.asset.json";
 import browsVideoAsset from "@/assets/service-video-brows.mp4.asset.json";
+import servicePeeling from "@/assets/service-peeling.jpg";
+import serviceMezoterapia from "@/assets/service-mezoterapia.jpg";
+import serviceMikrodermabrazja from "@/assets/service-mikrodermabrazja.jpg";
+import serviceHydrafacial from "@/assets/service-hydrafacial.jpg";
+import serviceHifu from "@/assets/service-hifu.jpg";
+import serviceMasazRelaks from "@/assets/service-masaz-relaks.jpg";
+import serviceMasazLimfa from "@/assets/service-masaz-limfa.jpg";
+import serviceFalaUderzeniowa from "@/assets/service-fala-uderzeniowa.jpg";
+import serviceDepilacjaLaser from "@/assets/service-depilacja-laser.jpg";
+import serviceDepilacjaWosk from "@/assets/service-depilacja-wosk.jpg";
+import serviceLaminacjaRzesy from "@/assets/service-laminacja-rzesy.jpg";
+import serviceLaminacjaBrwi from "@/assets/service-laminacja-brwi.jpg";
+import serviceHennaBrwi from "@/assets/service-henna-brwi.jpg";
+import serviceManicure from "@/assets/service-manicure.jpg";
+import servicePedicure from "@/assets/service-pedicure.jpg";
 
 interface Service {
   id: string;
