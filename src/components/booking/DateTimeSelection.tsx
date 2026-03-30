@@ -25,6 +25,8 @@ interface DateTimeSelectionProps {
   serviceDuration?: number;
   onProceed?: () => void;
   onStaffSelect?: (staffId: string | null, staffName: string | null) => void;
+  salonId?: string | null;
+  serviceId?: string;
 }
 
 const generateTimeSlots = () => {
