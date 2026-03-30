@@ -870,6 +870,92 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                 salonId={isDemo ? undefined : salonId || undefined}
               />
             </div>
+
+            {/* Warianty usługi */}
+            <div className="flex items-center justify-between py-3 border-t border-border">
+              <div>
+                <p className="font-semibold text-sm">Warianty usługi</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Np. różne czasy trwania, strefy ciała lub poziomy zaawansowania
+                </p>
+              </div>
+              <Switch checked={hasVariants} onCheckedChange={setHasVariants} />
+            </div>
+
+            {hasVariants && (
+              <div className="space-y-3">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
+                  <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700">
+                    Gdy usługa ma warianty — cena i czas trwania z głównego formularza będą ignorowane. Klientka wybierze wariant przed rezerwacją.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {variants.map((variant, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 border rounded-xl bg-muted/30">
+                      <div className="mt-2.5 cursor-grab text-muted-foreground">
+                        <GripVertical className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 grid grid-cols-2 gap-2">
+                        <div className="col-span-2">
+                          <Input
+                            placeholder="Nazwa wariantu *"
+                            value={variant.name}
+                            onChange={e => updateVariant(index, 'name', e.target.value)}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <Input
+                            placeholder="Opis (opcjonalny)"
+                            value={variant.description || ''}
+                            onChange={e => updateVariant(index, 'description', e.target.value)}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Czas (min) *</Label>
+                          <Input
+                            type="number"
+                            placeholder="60"
+                            value={variant.duration}
+                            onChange={e => updateVariant(index, 'duration', Number(e.target.value))}
+                            className="text-sm"
+                            min={5}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Cena (zł) *</Label>
+                          <Input
+                            type="number"
+                            placeholder="150"
+                            value={variant.price}
+                            onChange={e => updateVariant(index, 'price', Number(e.target.value))}
+                            className="text-sm"
+                            min={0}
+                          />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeVariant(index)}
+                        className="mt-2 w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={addVariant}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-primary/30 text-primary text-sm font-medium hover:border-primary/60 hover:bg-primary/5 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Dodaj wariant
+                </button>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsServiceDialogOpen(false)}>{t('common.cancel')}</Button>
