@@ -300,8 +300,6 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
   const [showFilters, setShowFilters] = useState(false);
   const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
-  const [showServiceAddedBar, setShowServiceAddedBar] = useState(false);
-  const [lastAddedService, setLastAddedService] = useState<Service | null>(null);
 
   // Fetch real categories from DB
   const { data: dbCategories, isLoading: loadingCategories } = useQuery({
