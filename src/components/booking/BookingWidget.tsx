@@ -213,6 +213,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
+  const [selectedStaffName, setSelectedStaffName] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
