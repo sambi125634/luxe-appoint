@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Clock, ChevronRight, Sparkles, Star, Play, Filter, Check } from "lucide-react";
+import { Clock, Sparkles, Star, Play, Filter, Check, ChevronDown, CalendarPlus, Plus, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
@@ -26,6 +26,14 @@ import serviceHennaBrwi from "@/assets/service-henna-brwi.jpg";
 import serviceManicure from "@/assets/service-manicure.jpg";
 import servicePedicure from "@/assets/service-pedicure.jpg";
 
+interface ServiceVariant {
+  id: string;
+  name: string;
+  description?: string;
+  duration: number;
+  price: number;
+}
+
 interface Service {
   id: string;
   name: string;
@@ -39,6 +47,8 @@ interface Service {
   popular?: boolean;
   badge?: string | null;
   hasVideo?: boolean;
+  variants?: ServiceVariant[];
+  selectedVariantName?: string;
 }
 
 interface ServiceSelectionProps {
@@ -65,8 +75,6 @@ const demoCategories = [
 ];
 
 const demoServices: Service[] = [
-  // ── TWARZ ──
-  // s1: Peeling — facialVideo (unique)
   {
     id: "s1",
     name: "Peeling kawitacyjny",
@@ -130,7 +138,6 @@ const demoServices: Service[] = [
     hasVideo: false,
     image: serviceHifu,
   },
-  // ── CIAŁO ──
   {
     id: "s6",
     name: "Masaż relaksacyjny",
@@ -143,6 +150,11 @@ const demoServices: Service[] = [
     popular: true,
     hasVideo: false,
     image: serviceMasazRelaks,
+    variants: [
+      { id: "s6v1", name: "30 minut", description: "Plecy i szyja", duration: 30, price: 110 },
+      { id: "s6v2", name: "60 minut", description: "Całe ciało", duration: 60, price: 200 },
+      { id: "s6v3", name: "90 minut", description: "Całe ciało + aromaterapia", duration: 90, price: 280 },
+    ],
   },
   {
     id: "s7",
@@ -168,7 +180,6 @@ const demoServices: Service[] = [
     hasVideo: false,
     image: serviceFalaUderzeniowa,
   },
-  // ── DEPILACJA ──
   {
     id: "s9",
     name: "Depilacja laserowa",
@@ -181,6 +192,12 @@ const demoServices: Service[] = [
     popular: true,
     hasVideo: false,
     image: serviceDepilacjaLaser,
+    variants: [
+      { id: "s9v1", name: "Wąsik", duration: 15, price: 99 },
+      { id: "s9v2", name: "Pachy", duration: 20, price: 149 },
+      { id: "s9v3", name: "Bikini klasyczne", duration: 30, price: 199 },
+      { id: "s9v4", name: "Nogi całe", duration: 60, price: 349 },
+    ],
   },
   {
     id: "s10",
@@ -194,7 +211,6 @@ const demoServices: Service[] = [
     hasVideo: false,
     image: serviceDepilacjaWosk,
   },
-  // ── BRWI I RZĘSY ──
   {
     id: "s11",
     name: "Laminacja rzęs",
@@ -208,7 +224,6 @@ const demoServices: Service[] = [
     hasVideo: false,
     image: serviceLaminacjaRzesy,
   },
-  // s12: Laminacja brwi — browsVideo (unique)
   {
     id: "s12",
     name: "Laminacja brwi",
@@ -234,8 +249,6 @@ const demoServices: Service[] = [
     hasVideo: false,
     image: serviceHennaBrwi,
   },
-  // ── PAZNOKCIE ──
-  // s14: Manicure — manicureVideo (unique)
   {
     id: "s14",
     name: "Manicure hybrydowy",
@@ -249,6 +262,11 @@ const demoServices: Service[] = [
     hasVideo: true,
     video: manicureVideoAsset.url,
     image: serviceManicure,
+    variants: [
+      { id: "s14v1", name: "Klasyczny", description: "Jeden kolor, bez zdobień", duration: 75, price: 120 },
+      { id: "s14v2", name: "Z zdobieniem", description: "Klasyczny + nail art", duration: 90, price: 150 },
+      { id: "s14v3", name: "Z przedłużeniem", description: "Żel lub akryl + kolor", duration: 120, price: 200 },
+    ],
   },
   {
     id: "s15",
@@ -261,6 +279,11 @@ const demoServices: Service[] = [
     badge: null,
     hasVideo: false,
     image: servicePedicure,
+    variants: [
+      { id: "s15v1", name: "Podstawowy", description: "Pielęgnacja bez lakieru", duration: 60, price: 110 },
+      { id: "s15v2", name: "Z hybrydą", description: "Pielęgnacja + lakier hybrydowy", duration: 75, price: 130 },
+      { id: "s15v3", name: "Premium", description: "Pełna regeneracja + maska + hybryda", duration: 90, price: 170 },
+    ],
   },
 ];
 
@@ -274,8 +297,11 @@ const durationFilters = [
 export function ServiceSelection({ onSelect, selectedService, onProceed, salonId, isDemo = false }: ServiceSelectionProps) {
   const [activeCategory, setActiveCategory] = useState("all");
   const [activeDuration, setActiveDuration] = useState("all");
-  const [previewService, setPreviewService] = useState<Service | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [expandedServiceId, setExpandedServiceId] = useState<string | null>(null);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+  const [showServiceAddedBar, setShowServiceAddedBar] = useState(false);
+  const [lastAddedService, setLastAddedService] = useState<Service | null>(null);
 
   // Fetch real categories from DB
   const { data: dbCategories, isLoading: loadingCategories } = useQuery({
@@ -348,7 +374,25 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
     return categoryMatch && durationMatch;
   });
 
-  const popularServices = filteredServices.filter(s => s.popular);
+  const getEffectiveService = (service: Service): Service => {
+    const variantId = selectedVariants[service.id];
+    if (!variantId || !service.variants) return service;
+    const variant = service.variants.find(v => v.id === variantId);
+    if (!variant) return service;
+    return {
+      ...service,
+      duration: variant.duration,
+      price: variant.price,
+      selectedVariantName: variant.name,
+    };
+  };
+
+  const handleServiceSelect = (service: Service) => {
+    const effective = getEffectiveService(service);
+    setLastAddedService(effective);
+    setShowServiceAddedBar(true);
+    onSelect(effective);
+  };
 
   if (isLoading) {
     return (
@@ -380,7 +424,7 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
               "px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2",
               activeCategory === cat.id
                 ? "bg-primary text-primary-foreground shadow-soft scale-105"
-                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:scale-102"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
             <span>{cat.icon}</span>
@@ -416,194 +460,232 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
         )}
       </div>
 
-      {/* Popular services highlight */}
-      {popularServices.length > 0 && activeCategory === "all" && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-            <Star className="w-4 h-4 text-amber-500" />
-            Popularne zabiegi
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {popularServices.slice(0, 2).map((service) => (
-              <div
-                key={service.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => { onSelect(service); onProceed?.(); }}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect(service); onProceed?.(); } }}
-                className={cn(
-                  "relative overflow-hidden rounded-xl border transition-all duration-300 text-left p-4 cursor-pointer",
-                  "bg-gradient-to-br from-amber-50 to-amber-100/50 dark:from-amber-950/30 dark:to-amber-900/20",
-                  selectedService?.id === service.id
-                    ? "border-primary shadow-glow ring-2 ring-primary/20"
-                    : "border-amber-200 dark:border-amber-800/50 hover:border-primary/50 hover:shadow-md"
-                )}
+      {/* Services list — expandable cards */}
+      <div className="grid gap-3">
+        {filteredServices.map((service, index) => {
+          const isExpanded = expandedServiceId === service.id;
+          const selectedVariantId = selectedVariants[service.id];
+          const selectedVariant = service.variants?.find(v => v.id === selectedVariantId);
+          const displayPrice = selectedVariant?.price ?? service.price;
+          const displayDuration = selectedVariant?.duration ?? service.duration;
+          const thumbnailUrl = service.image;
+
+          return (
+            <motion.div
+              key={service.id}
+              layout
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.04 }}
+              className={cn(
+                "rounded-2xl border-2 overflow-hidden transition-all duration-200",
+                isExpanded
+                  ? "border-primary/30 shadow-lg"
+                  : "border-border hover:border-primary/20 hover:shadow-sm"
+              )}
+            >
+              {/* ── HEADER (always visible) ── */}
+              <button
+                onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                className="w-full flex items-center gap-4 p-4 text-left"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      {service.badge && (
-                        <span className={cn(
-                          "text-xs font-bold px-2 py-0.5 rounded-full",
-                          service.badge === "Hit" && "bg-orange-100 text-orange-700",
-                          service.badge === "Premium" && "bg-purple-100 text-purple-700",
-                          service.badge === "Nowość" && "bg-green-100 text-green-700",
-                        )}>
-                          {service.badge === "Hit" ? "⭐ " : service.badge === "Premium" ? "💎 " : "✨ "}
-                          {service.badge}
-                        </span>
-                      )}
-                      {(service.video || service.hasVideo) && (
-                        <Badge variant="secondary" className="text-xs">Wideo</Badge>
-                      )}
+                {/* Thumbnail */}
+                <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                  {thumbnailUrl ? (
+                    <img src={thumbnailUrl} alt={service.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <Sparkles className="w-5 h-5 text-muted-foreground" />
                     </div>
-                    <h3 className="font-semibold text-base mb-1">{service.name}</h3>
-                    <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{service.description}</p>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1 text-sm text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        {service.duration} min
-                      </span>
-                      <span className="font-bold text-primary text-lg">{service.price} zł</span>
-                    </div>
-                  </div>
-                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 relative">
-                    {service.video ? (
-                      <video
-                        src={service.video}
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                    ) : service.image ? (
-                      <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
-                    ) : null}
-                    {service.video && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                        <Play className="w-5 h-5 text-white" />
+                  )}
+                  {(service.hasVideo || service.video) && (
+                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-full bg-white/90 flex items-center justify-center">
+                        <Play className="w-3 h-3 text-foreground ml-0.5" />
                       </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-sm leading-tight">{service.name}</p>
+                    {service.badge && (
+                      <span className={cn(
+                        "text-xs px-1.5 py-0.5 rounded-full font-medium flex-shrink-0",
+                        service.badge === "Hit" && "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
+                        service.badge === "Premium" && "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
+                        service.badge === "Nowość" && "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
+                      )}>
+                        {service.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {displayDuration} min
+                    </span>
+                    {service.variants && service.variants.length > 0 && (
+                      <span className="text-xs text-primary font-medium">
+                        {service.variants.length} wariantów
+                      </span>
+                    )}
+                    {selectedVariant && (
+                      <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                        {selectedVariant.name}
+                      </span>
                     )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {/* Services grid */}
-      <div className="grid gap-3">
-        {filteredServices.map((service, index) => (
-          <div
-            key={service.id}
-            role="button"
-            tabIndex={0}
-            onClick={() => { onSelect(service); onProceed?.(); }}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { onSelect(service); onProceed?.(); } }}
-            className={cn(
-              "group w-full text-left rounded-xl border transition-all duration-300 cursor-pointer",
-              "animate-fade-in",
-              selectedService?.id === service.id
-                ? "border-primary bg-primary/5 shadow-glow ring-2 ring-primary/20"
-                : "border-border bg-card hover:border-primary/50 hover:shadow-soft"
-            )}
-            style={{ animationDelay: `${index * 30}ms` }}
-          >
-            <div className="flex">
-              {(service.image || service.video) && (
-                <div className="relative w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-l-xl">
-                  {service.video ? (
-                    <video
-                      src={service.video}
-                      className="w-full h-full object-cover aspect-square"
-                      autoPlay
-                      loop
-                      muted
-                      playsInline
-                      preload="metadata"
-                    />
-                  ) : (
-                    <img src={service.image} alt={service.name} className="w-full h-full object-cover aspect-square" />
-                  )}
-                  {service.video && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                      <Play className="w-6 h-6 text-white" />
-                    </div>
-                  )}
+                {/* Price + chevron */}
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <p className="font-bold text-base">{displayPrice} zł</p>
+                  <motion.div
+                    animate={{ rotate: isExpanded ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                  </motion.div>
                 </div>
-              )}
-              
-              <div className="flex-1 p-4">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold group-hover:text-primary transition-colors">
-                        {service.name}
-                      </h3>
-                      {service.badge && (
-                        <span className={cn(
-                          "text-xs font-bold px-2 py-0.5 rounded-full",
-                          service.badge === "Hit" && "bg-orange-100 text-orange-700",
-                          service.badge === "Premium" && "bg-purple-100 text-purple-700",
-                          service.badge === "Nowość" && "bg-green-100 text-green-700",
-                        )}>
-                          {service.badge === "Hit" ? "⭐ " : service.badge === "Premium" ? "💎 " : "✨ "}
-                          {service.badge}
-                        </span>
-                      )}
-                      {(service.video || service.hasVideo) && (
-                        <Badge variant="outline" className="text-xs">Wideo</Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
-                      {service.description}
-                    </p>
-                    
-                    {service.benefits && service.benefits.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {service.benefits.slice(0, 2).map((benefit, i) => (
-                          <span key={i} className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                            ✓ {benefit}
-                          </span>
-                        ))}
-                        {service.benefits.length > 2 && (
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); setPreviewService(service); }}
-                            className="text-xs text-primary hover:underline"
-                          >
-                            +{service.benefits.length - 2} więcej
-                          </button>
+              </button>
+
+              {/* ── EXPANDED CONTENT ── */}
+              <AnimatePresence>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="border-t border-border">
+                      {/* Multimedia — video or large image */}
+                      <div className="relative w-full aspect-video bg-muted">
+                        {service.video ? (
+                          <video
+                            src={service.video}
+                            className="w-full h-full object-cover"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                        ) : thumbnailUrl ? (
+                          <img src={thumbnailUrl} alt={service.name} className="w-full h-full object-cover" />
+                        ) : null}
+                        {service.video && (
+                          <div className="absolute top-3 left-3">
+                            <span className="text-xs font-bold bg-primary text-primary-foreground px-2 py-1 rounded-lg">
+                              ▶ Wideo zabiegu
+                            </span>
+                          </div>
                         )}
                       </div>
-                    )}
-                    
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="flex items-center gap-1.5 text-muted-foreground">
-                        <Clock className="w-4 h-4" />
-                        {service.duration} min
-                      </span>
-                      <span className="font-bold text-primary text-lg">
-                        {service.price} zł
-                      </span>
+
+                      <div className="p-4 space-y-4">
+                        {/* Description */}
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {service.description}
+                        </p>
+
+                        {/* Benefits */}
+                        {service.benefits && service.benefits.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {service.benefits.map((b, i) => (
+                              <span
+                                key={i}
+                                className="flex items-center gap-1.5 text-xs bg-primary/10 text-primary px-2.5 py-1.5 rounded-full font-medium"
+                              >
+                                <Check className="w-3 h-3" />
+                                {b}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Variants */}
+                        {service.variants && service.variants.length > 0 && (
+                          <div>
+                            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                              Wybierz wariant
+                            </p>
+                            <div className="space-y-2">
+                              {service.variants.map(variant => (
+                                <button
+                                  key={variant.id}
+                                  onClick={() => setSelectedVariants(prev => ({
+                                    ...prev,
+                                    [service.id]: variant.id
+                                  }))}
+                                  className={cn(
+                                    "w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left",
+                                    selectedVariantId === variant.id
+                                      ? "border-primary bg-primary/5"
+                                      : "border-border hover:border-primary/30"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className={cn(
+                                      "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                      selectedVariantId === variant.id
+                                        ? "border-primary bg-primary"
+                                        : "border-muted-foreground"
+                                    )}>
+                                      {selectedVariantId === variant.id && (
+                                        <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+                                      )}
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-sm">{variant.name}</p>
+                                      {variant.description && (
+                                        <p className="text-xs text-muted-foreground">{variant.description}</p>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="text-right flex-shrink-0 ml-4">
+                                    <p className="font-bold text-sm">{variant.price} zł</p>
+                                    <p className="text-xs text-muted-foreground">{variant.duration} min</p>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* CTA */}
+                        <div className="flex gap-3 pt-2">
+                          <Button
+                            className="flex-1 gap-2"
+                            disabled={
+                              !!(service.variants && service.variants.length > 0 && !selectedVariantId)
+                            }
+                            onClick={() => handleServiceSelect(service)}
+                          >
+                            <CalendarPlus className="w-4 h-4" />
+                            {service.variants && service.variants.length > 0 && !selectedVariantId
+                              ? "Wybierz wariant"
+                              : "Rezerwuj"}
+                          </Button>
+                        </div>
+
+                        {service.variants && service.variants.length > 0 && !selectedVariantId && (
+                          <p className="text-xs text-center text-muted-foreground -mt-2">
+                            Wybierz wariant aby przejść do rezerwacji
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 flex-shrink-0",
-                    selectedService?.id === service.id
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
-                  )}>
-                    <ChevronRight className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
       </div>
 
       {filteredServices.length === 0 && (
@@ -614,57 +696,63 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
         </div>
       )}
 
-      {/* Service preview dialog */}
-      <Dialog open={!!previewService} onOpenChange={() => setPreviewService(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="font-serif">{previewService?.name}</DialogTitle>
-          </DialogHeader>
-          {previewService?.video ? (
-            <video
-              src={previewService.video}
-              controls
-              autoPlay
-              muted
-              className="w-full h-48 object-cover rounded-lg"
-              playsInline
-              preload="metadata"
-            />
-          ) : previewService?.image ? (
-            <img src={previewService.image} alt={previewService.name} className="w-full h-48 object-cover rounded-lg" />
-          ) : null}
-          <p className="text-muted-foreground">{previewService?.description}</p>
-          {previewService?.benefits && (
-            <div className="space-y-2">
-              <p className="font-medium text-sm">Korzyści:</p>
-              <ul className="space-y-1">
-                {previewService.benefits.map((benefit, i) => (
-                  <li key={i} className="flex items-center gap-2 text-sm">
-                    <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs">✓</span>
-                    {benefit}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Clock className="w-4 h-4" />
-              {previewService?.duration} min
-            </div>
-            <span className="text-xl font-bold text-primary">{previewService?.price} zł</span>
-          </div>
-          <Button 
-            className="w-full" 
-            onClick={() => { 
-              if (previewService) onSelect(previewService); 
-              setPreviewService(null); 
-            }}
+      {/* Sticky bar after service selection */}
+      <AnimatePresence>
+        {showServiceAddedBar && lastAddedService && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-primary/20 shadow-2xl p-4 z-50"
           >
-            Wybierz tę usługę
-          </Button>
-        </DialogContent>
-      </Dialog>
+            <div className="max-w-2xl mx-auto">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm truncate">
+                    {lastAddedService.name}
+                    {lastAddedService.selectedVariantName && (
+                      <span className="text-muted-foreground font-normal">
+                        {' '}· {lastAddedService.selectedVariantName}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {lastAddedService.duration} min · {lastAddedService.price} zł
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 gap-1.5 text-xs"
+                  onClick={() => {
+                    setShowServiceAddedBar(false);
+                    setExpandedServiceId(null);
+                  }}
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Dodaj kolejną usługę
+                </Button>
+                <Button
+                  size="sm"
+                  className="flex-1 gap-1.5 text-xs"
+                  onClick={() => {
+                    setShowServiceAddedBar(false);
+                    onProceed?.();
+                  }}
+                >
+                  Przejdź dalej
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
