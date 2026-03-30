@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ServiceMediaUpload, MediaFile } from "./ServiceMediaUpload";
@@ -18,6 +19,17 @@ import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAllServiceVariants, useServiceVariants, useSyncServiceVariants } from "@/hooks/useServiceVariants";
+
+interface VariantFormItem {
+  id?: string;
+  name: string;
+  description: string;
+  duration: number;
+  price: number;
+  is_active: boolean;
+  sort_order: number;
+}
 
 interface Service {
   id: string;
@@ -116,6 +128,30 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
   const syncStaffServicesMutation = useSyncStaffServices();
+  const syncVariantsMutation = useSyncServiceVariants();
+
+  // Fetch all variants for display
+  const serviceIds = useMemo(() => (dbServices || []).map(s => s.id), [dbServices]);
+  const { data: allVariants } = useAllServiceVariants(isDemo ? [] : serviceIds);
+  const variantsByService = useMemo(() => {
+    const map: Record<string, { count: number; minPrice: number }> = {};
+    if (allVariants) {
+      for (const v of allVariants) {
+        if (!map[v.service_id]) {
+          map[v.service_id] = { count: 0, minPrice: Infinity };
+        }
+        map[v.service_id].count++;
+        if (v.price < map[v.service_id].minPrice) {
+          map[v.service_id].minPrice = v.price;
+        }
+      }
+    }
+    return map;
+  }, [allVariants]);
+
+  // Variant form state (editingVariants hook moved after editingService declaration below)
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variants, setVariants] = useState<VariantFormItem[]>([]);
 
   const services: Service[] = useMemo(() => {
     if (isDemo) return DEMO_SERVICES;
@@ -160,6 +196,46 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [benefitInput, setBenefitInput] = useState("");
 
+  // Variant data for editing (needs editingService to be declared first)
+  const { data: editingVariants } = useServiceVariants(editingService?.id);
+
+  // Sync variant form state when editing variants load
+  useEffect(() => {
+    if (editingVariants && editingVariants.length > 0) {
+      setHasVariants(true);
+      setVariants(editingVariants.map(v => ({
+        id: v.id,
+        name: v.name,
+        description: v.description || "",
+        duration: v.duration,
+        price: Number(v.price),
+        is_active: v.is_active,
+        sort_order: v.sort_order,
+      })));
+    }
+  }, [editingVariants]);
+
+  const addVariant = () => {
+    setVariants(prev => [...prev, {
+      name: '',
+      description: '',
+      duration: serviceForm.duration || 60,
+      price: serviceForm.price || 0,
+      is_active: true,
+      sort_order: prev.length,
+    }]);
+  };
+
+  const removeVariant = (index: number) => {
+    setVariants(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateVariant = (index: number, field: string, value: string | number) => {
+    setVariants(prev => prev.map((v, i) =>
+      i === index ? { ...v, [field]: value } : v
+    ));
+  };
+
   const [serviceForm, setServiceForm] = useState({
     name: "", category: "", duration: 60, price: 0, description: "", staffIds: [] as string[], media: [] as MediaFile[], benefits: [] as string[], vatRate: 23,
   });
@@ -182,9 +258,19 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         price: service.price, description: service.description, staffIds: service.staffIds,
         media: service.media || [], benefits: service.benefits || [], vatRate: service.vatRate || 23,
       });
+      // Variants will be loaded via useEffect on editingVariants
+      const svcVariants = variantsByService[service.id];
+      if (svcVariants && svcVariants.count > 0) {
+        setHasVariants(true);
+      } else {
+        setHasVariants(false);
+        setVariants([]);
+      }
     } else {
       setEditingService(null);
       setServiceForm({ name: "", category: categories[0]?.id || "", duration: 60, price: 0, description: "", staffIds: [], media: [], benefits: [], vatRate: 23 });
+      setHasVariants(false);
+      setVariants([]);
     }
     setBenefitInput("");
     setIsServiceDialogOpen(true);
@@ -261,6 +347,24 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
       // Sync staff_services
       if (serviceForm.staffIds.length > 0) {
         await syncStaffServicesMutation.mutateAsync({ serviceId: savedId, staffIds: serviceForm.staffIds });
+      }
+
+      // Sync variants
+      if (hasVariants && variants.length > 0) {
+        const validVariants = variants
+          .filter(v => v.name.trim())
+          .map((v, i) => ({
+            name: v.name.trim(),
+            description: v.description || null,
+            duration: v.duration,
+            price: v.price,
+            is_active: v.is_active ?? true,
+            sort_order: i,
+          }));
+        await syncVariantsMutation.mutateAsync({ serviceId: savedId, variants: validVariants });
+      } else {
+        // Remove all variants if toggled off
+        await syncVariantsMutation.mutateAsync({ serviceId: savedId, variants: [] });
       }
 
       toast({ title: "Usługa zapisana", description: `"${serviceForm.name}" została zapisana pomyślnie.` });
@@ -539,6 +643,15 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium">{service.name}</p>
                   <p className="text-sm text-muted-foreground">{getCategoryName(service.category)}</p>
+                  {variantsByService[service.id] && variantsByService[service.id].count > 0 && (
+                    <span className="text-xs text-primary font-medium flex items-center gap-1 mt-0.5">
+                      <Layers className="w-3 h-3" />
+                      {variantsByService[service.id].count} wariantów
+                      <span className="text-muted-foreground font-normal">
+                        · od {variantsByService[service.id].minPrice} zł
+                      </span>
+                    </span>
+                  )}
                   {service.benefits && service.benefits.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                       {service.benefits.slice(0, 3).map(b => (
@@ -757,6 +870,92 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                 salonId={isDemo ? undefined : salonId || undefined}
               />
             </div>
+
+            {/* Warianty usługi */}
+            <div className="flex items-center justify-between py-3 border-t border-border">
+              <div>
+                <p className="font-semibold text-sm">Warianty usługi</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Np. różne czasy trwania, strefy ciała lub poziomy zaawansowania
+                </p>
+              </div>
+              <Switch checked={hasVariants} onCheckedChange={setHasVariants} />
+            </div>
+
+            {hasVariants && (
+              <div className="space-y-3">
+                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
+                  <Info className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-700">
+                    Gdy usługa ma warianty — cena i czas trwania z głównego formularza będą ignorowane. Klientka wybierze wariant przed rezerwacją.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {variants.map((variant, index) => (
+                    <div key={index} className="flex items-start gap-3 p-3 border rounded-xl bg-muted/30">
+                      <div className="mt-2.5 cursor-grab text-muted-foreground">
+                        <GripVertical className="w-4 h-4" />
+                      </div>
+                      <div className="flex-1 grid grid-cols-2 gap-2">
+                        <div className="col-span-2">
+                          <Input
+                            placeholder="Nazwa wariantu *"
+                            value={variant.name}
+                            onChange={e => updateVariant(index, 'name', e.target.value)}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <Input
+                            placeholder="Opis (opcjonalny)"
+                            value={variant.description || ''}
+                            onChange={e => updateVariant(index, 'description', e.target.value)}
+                            className="text-sm"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Czas (min) *</Label>
+                          <Input
+                            type="number"
+                            placeholder="60"
+                            value={variant.duration}
+                            onChange={e => updateVariant(index, 'duration', Number(e.target.value))}
+                            className="text-sm"
+                            min={5}
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Cena (zł) *</Label>
+                          <Input
+                            type="number"
+                            placeholder="150"
+                            value={variant.price}
+                            onChange={e => updateVariant(index, 'price', Number(e.target.value))}
+                            className="text-sm"
+                            min={0}
+                          />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removeVariant(index)}
+                        className="mt-2 w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  onClick={addVariant}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 border-dashed border-primary/30 text-primary text-sm font-medium hover:border-primary/60 hover:bg-primary/5 transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  Dodaj wariant
+                </button>
+              </div>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsServiceDialogOpen(false)}>{t('common.cancel')}</Button>
