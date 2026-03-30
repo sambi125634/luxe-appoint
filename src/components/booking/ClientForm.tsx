@@ -143,12 +143,25 @@ export function ClientForm({
           </Select>
         </div>
 
-        {/* Notes */}
+        {/* Message to salon */}
         <div className="space-y-2">
-          <Label htmlFor="notes">
-            Uwagi do wizyty <span className="text-muted-foreground">(opcjonalnie)</span>
+          <Label htmlFor="notes" className="flex items-center gap-2">
+            <MessageSquare className="w-4 h-4 text-muted-foreground" />
+            Wiadomość do salonu
+            <span className="text-muted-foreground font-normal text-xs">(opcjonalnie)</span>
           </Label>
-          <Textarea id="notes" placeholder="Dodatkowe informacje, preferencje, alergie..." value={data.notes} onChange={e => handleChange('notes', e.target.value)} className="min-h-[80px] resize-none" maxLength={1000} />
+          <Textarea
+            id="notes"
+            placeholder="Np. mam uczulenie na lateks, proszę o paragon, preferuję ciszę podczas zabiegu..."
+            value={data.notes}
+            onChange={e => handleChange('notes', e.target.value)}
+            className="min-h-[80px] resize-none text-sm"
+            maxLength={300}
+            rows={3}
+          />
+          <p className="text-xs text-muted-foreground text-right">
+            {data.notes.length}/300
+          </p>
         </div>
 
         {/* Consents */}
