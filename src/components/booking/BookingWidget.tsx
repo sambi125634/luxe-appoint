@@ -723,15 +723,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
             )}
           </>
         )}
-        {currentStepId === "staff" && (
-          <StaffSelection
-            onSelect={setSelectedStaff}
-            selectedStaff={selectedStaff}
-            onProceed={handleNext}
-            salonId={salonId !== "demo" ? salonId : undefined}
-            isDemo={isDemo}
-          />
-        )}
         {currentStepId === "datetime" && (
           <>
             <DateTimeSelection
