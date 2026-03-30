@@ -128,6 +128,31 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const updateCategoryMutation = useUpdateCategory();
   const deleteCategoryMutation = useDeleteCategory();
   const syncStaffServicesMutation = useSyncStaffServices();
+  const syncVariantsMutation = useSyncServiceVariants();
+
+  // Fetch all variants for display
+  const serviceIds = useMemo(() => (dbServices || []).map(s => s.id), [dbServices]);
+  const { data: allVariants } = useAllServiceVariants(isDemo ? [] : serviceIds);
+  const variantsByService = useMemo(() => {
+    const map: Record<string, { count: number; minPrice: number }> = {};
+    if (allVariants) {
+      for (const v of allVariants) {
+        if (!map[v.service_id]) {
+          map[v.service_id] = { count: 0, minPrice: Infinity };
+        }
+        map[v.service_id].count++;
+        if (v.price < map[v.service_id].minPrice) {
+          map[v.service_id].minPrice = v.price;
+        }
+      }
+    }
+    return map;
+  }, [allVariants]);
+
+  // Variant form state for editing
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variants, setVariants] = useState<VariantFormItem[]>([]);
+  const { data: editingVariants } = useServiceVariants(editingService?.id);
 
   const services: Service[] = useMemo(() => {
     if (isDemo) return DEMO_SERVICES;
