@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
 
 interface ScheduleManagementProps {
   isDemo?: boolean;
