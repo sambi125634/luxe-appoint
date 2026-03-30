@@ -66,6 +66,7 @@ const demoCategories = [
 
 const demoServices: Service[] = [
   // ── TWARZ ──
+  // s1: Peeling — facialVideo (unique)
   {
     id: "s1",
     name: "Peeling kawitacyjny",
@@ -78,7 +79,7 @@ const demoServices: Service[] = [
     popular: true,
     hasVideo: true,
     video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80",
+    image: servicePeeling,
   },
   {
     id: "s2",
@@ -90,9 +91,8 @@ const demoServices: Service[] = [
     benefits: ["Nawilża głęboko", "Redukuje zmarszczki", "Poprawia owal twarzy"],
     badge: "Hit",
     popular: true,
-    hasVideo: true,
-    video: facialVideoAsset.url,
-    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&q=80",
+    hasVideo: false,
+    image: serviceMezoterapia,
   },
   {
     id: "s3",
