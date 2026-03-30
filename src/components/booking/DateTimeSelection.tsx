@@ -78,13 +78,16 @@ export function DateTimeSelection({
   selectedDate, 
   selectedTime,
   serviceDuration = 60,
-  onProceed
+  onProceed,
+  onStaffSelect
 }: DateTimeSelectionProps) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pl' ? pl : enUS;
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const timeSlotsRef = useRef<HTMLDivElement>(null);
+  const [staffMode, setStaffMode] = useState<'fastest' | 'pick'>('fastest');
+  const [selectedStaffFilter, setSelectedStaffFilter] = useState<string | null>(null);
 
   // Smooth scroll to time slots when date is selected
   useEffect(() => {
