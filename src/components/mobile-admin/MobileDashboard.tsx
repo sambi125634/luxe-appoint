@@ -115,13 +115,24 @@ export function MobileDashboard() {
           <h1 className="text-2xl font-serif font-bold">{greeting()} 👋</h1>
           {salonName && <p className="text-sm text-primary font-medium">{salonName}</p>}
         </div>
-        <Button
-          size="icon"
-          className="rounded-full w-12 h-12 bg-primary shadow-lg"
-          onClick={() => navigate("/m/calendar?new=true")}
-        >
-          <Plus className="w-5 h-5 text-primary-foreground" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="rounded-full border-primary/30 text-primary text-xs"
+            onClick={() => window.open("/book/demo-salon", "_blank")}
+          >
+            <Calendar className="w-3.5 h-3.5 mr-1" />
+            Wypróbuj rezerwację
+          </Button>
+          <Button
+            size="icon"
+            className="rounded-full w-12 h-12 bg-primary shadow-lg"
+            onClick={() => navigate("/m/calendar?new=true")}
+          >
+            <Plus className="w-5 h-5 text-primary-foreground" />
+          </Button>
+        </div>
       </div>
 
       {/* Next appointment hero card */}
