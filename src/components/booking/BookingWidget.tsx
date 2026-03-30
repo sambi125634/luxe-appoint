@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, Plus, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, Plus, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "./BookingProgress";
 import { ServiceSelection } from "./ServiceSelection";
-import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
 import { BookingConfirmation } from "./BookingConfirmation";
@@ -16,13 +15,12 @@ import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types"
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane"];
+const defaultSteps = ["Usługa", "Termin", "Dane"];
 
 // Map step IDs to component names
 const stepIdToName: Record<string, string> = {
   intro: "Wprowadzenie",
   services: "Usługa",
-  staff: "Specjalista",
   datetime: "Termin",
   form: "Dane",
   payment: "Płatność",
