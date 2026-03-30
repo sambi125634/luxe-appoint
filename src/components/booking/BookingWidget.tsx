@@ -173,7 +173,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     }
     
     const enabledSteps = widgetConfig.steps
-      .filter(s => s.enabled && s.id !== "summary")
+      .filter(s => s.enabled && s.id !== "summary" && s.id !== "staff")
       .sort((a, b) => a.order - b.order);
     
     const stepNames = enabledSteps
