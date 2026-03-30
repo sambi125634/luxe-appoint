@@ -158,7 +158,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   // Build dynamic steps from widget configuration
   const { steps, stepMapping } = useMemo(() => {
     if (!widgetConfig?.steps) {
-      const baseMapping = ["intro", "services", "staff", "datetime", "form"];
+      const baseMapping = ["intro", "services", "datetime", "form"];
       const baseSteps = defaultSteps;
       
       // Add payment step if enabled
