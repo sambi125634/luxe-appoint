@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Sun, Sunset, Moon, Info, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sun, Sunset, Moon, Info, Users, ChevronLeft, ChevronRight, Zap, User } from "lucide-react";
 import { format, addDays, isSameDay, isBefore, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useTranslation } from "react-i18next";
 import { QuickPicks } from "./QuickPicks";
 import { TimeSlotCard, getSlotType } from "./TimeSlotCard";
+import { motion, AnimatePresence } from "framer-motion";
+
+const DEMO_STAFF = [
+  { id: "s1", name: "Anna K.", initials: "AK", role: "Kosmetolog", rating: 4.9, nextAvailable: "Dziś" },
+  { id: "s2", name: "Karolina W.", initials: "KW", role: "Stylistka brwi", rating: 5.0, nextAvailable: "Dziś" },
+  { id: "s3", name: "Maria N.", initials: "MN", role: "Specjalistka depilacji", rating: 4.8, nextAvailable: "Jutro" },
+  { id: "s4", name: "Joanna L.", initials: "JL", role: "Masażystka", rating: 4.7, nextAvailable: "Jutro" },
+];
 
 interface DateTimeSelectionProps {
   onSelect: (date: Date, time: string) => void;
@@ -15,6 +23,7 @@ interface DateTimeSelectionProps {
   selectedTime: string | null;
   serviceDuration?: number;
   onProceed?: () => void;
+  onStaffSelect?: (staffId: string | null, staffName: string | null) => void;
 }
 
 const generateTimeSlots = () => {
