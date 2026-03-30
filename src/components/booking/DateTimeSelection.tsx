@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { QuickPicks } from "./QuickPicks";
 import { TimeSlotCard, getSlotType } from "./TimeSlotCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSmartSlots } from "@/hooks/useSmartSlots";
 
 const DEMO_STAFF = [
   { id: "s1", name: "Anna K.", initials: "AK", role: "Kosmetolog", rating: 4.9, nextAvailable: "Dziś" },
@@ -24,6 +25,8 @@ interface DateTimeSelectionProps {
   serviceDuration?: number;
   onProceed?: () => void;
   onStaffSelect?: (staffId: string | null, staffName: string | null) => void;
+  salonId?: string | null;
+  serviceId?: string;
 }
 
 const generateTimeSlots = () => {
@@ -59,10 +62,9 @@ const generateBusySlots = () => {
 
 const busySlots = generateBusySlots();
 
-// Slots that fill gaps in schedule (recommended for salon)
-const recommendedSlots = ['10:00', '14:00', '14:30'];
-// Popular after-work slots
-const popularSlots = ['17:00', '17:30', '18:00', '18:30'];
+// Fallback slots for demo mode
+const fallbackRecommendedSlots = ['10:00', '14:00', '14:30'];
+const fallbackPopularSlots = ['17:00', '17:30', '18:00', '18:30'];
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening';
 
@@ -79,8 +81,18 @@ export function DateTimeSelection({
   selectedTime,
   serviceDuration = 60,
   onProceed,
-  onStaffSelect
+  onStaffSelect,
+  salonId,
+  serviceId
 }: DateTimeSelectionProps) {
+  // AI-powered smart slots
+  const { data: smartSlotsData } = useSmartSlots(salonId ?? null, selectedDate, serviceId);
+  const recommendedSlots = smartSlotsData?.recommendedSlots?.length 
+    ? smartSlotsData.recommendedSlots 
+    : fallbackRecommendedSlots;
+  const popularSlots = smartSlotsData?.popularSlots?.length 
+    ? smartSlotsData.popularSlots 
+    : fallbackPopularSlots;
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pl' ? pl : enUS;
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);

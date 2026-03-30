@@ -676,6 +676,8 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               selectedTime={selectedTime}
               serviceDuration={totalDuration}
               onProceed={handleNext}
+              salonId={salonId || widgetConfig?.salonId || null}
+              serviceId={selectedService?.id}
               onStaffSelect={(id, name) => {
                 setSelectedStaffName(name);
                 if (id) {
