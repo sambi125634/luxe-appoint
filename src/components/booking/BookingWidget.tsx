@@ -660,7 +660,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
           : "opacity-100 translate-x-0"
       )}>
         {currentStepId === "services" && (
-          <>
             <ServiceSelection
               onSelect={handleServiceSelect}
               selectedService={selectedService}
@@ -668,45 +667,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               salonId={salonId !== "demo" ? salonId : undefined}
               isDemo={isDemo}
             />
-            
-            {showRecommendations && recommendations.length > 0 && (
-              <div className="mt-6 p-4 bg-secondary/5 border border-secondary/20 rounded-xl animate-fade-in">
-                <p className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-secondary" />
-                  Często łączone z tym zabiegiem:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {recommendations.map((rec) => (
-                    <Badge 
-                      key={rec.id}
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-secondary/20 transition-colors py-2 px-3"
-                      onClick={() => {
-                        handleServiceSelect({
-                          id: rec.id,
-                          name: rec.name,
-                          price: rec.price,
-                          duration: rec.duration,
-                          category: "",
-                          description: "",
-                        });
-                        toast({
-                          title: "Zmieniono usługę",
-                          description: `Wybrano: ${rec.name}`,
-                        });
-                      }}
-                    >
-                      {rec.name} 
-                      <span className="ml-2 text-xs opacity-70">+{rec.price} zł</span>
-                    </Badge>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Kliknij, aby zmienić na tę usługę
-                </p>
-              </div>
-            )}
-          </>
         )}
         {currentStepId === "datetime" && (
           <>
