@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "./BookingProgress";
 import { ServiceSelection } from "./ServiceSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
