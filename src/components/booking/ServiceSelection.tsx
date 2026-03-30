@@ -431,11 +431,18 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge variant="secondary" className="bg-amber-500 text-white text-xs">
-                        <Star className="w-3 h-3 mr-1" />
-                        Hit
-                      </Badge>
-                      {service.video && (
+                      {service.badge && (
+                        <span className={cn(
+                          "text-xs font-bold px-2 py-0.5 rounded-full",
+                          service.badge === "Hit" && "bg-orange-100 text-orange-700",
+                          service.badge === "Premium" && "bg-purple-100 text-purple-700",
+                          service.badge === "Nowość" && "bg-green-100 text-green-700",
+                        )}>
+                          {service.badge === "Hit" ? "⭐ " : service.badge === "Premium" ? "💎 " : "✨ "}
+                          {service.badge}
+                        </span>
+                      )}
+                      {(service.video || service.hasVideo) && (
                         <Badge variant="secondary" className="text-xs">Wideo</Badge>
                       )}
                     </div>
