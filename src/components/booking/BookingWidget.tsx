@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
 
 const defaultSteps = ["Usługa", "Termin", "Dane"];
 
@@ -403,12 +404,30 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
         clientId = newClient.id;
       }
 
+      // Check for conflicts before creating appointment
+      const staffId = selectedStaff?.id || "00000000-0000-0000-0000-000000000020";
+      const conflictResult = await checkAppointmentConflict({
+        salonId,
+        staffId,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+      });
+
+      if (conflictResult.conflict) {
+        toast({
+          title: "Termin zajęty",
+          description: formatConflictMessage(conflictResult),
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Create appointment with pending payment status if payment enabled
       const appointmentData: any = {
         salon_id: salonId,
         client_id: clientId,
         service_id: selectedService.id,
-        staff_id: selectedStaff?.id || "00000000-0000-0000-0000-000000000020",
+        staff_id: staffId,
         start_time: startTime.toISOString(),
         end_time: endTime.toISOString(),
         price: selectedService.price,

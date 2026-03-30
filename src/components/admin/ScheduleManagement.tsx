@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
 
 interface ScheduleManagementProps {
   isDemo?: boolean;
@@ -213,9 +214,22 @@ export function ScheduleManagement({ isDemo = false, salonSlug, onNavigate }: Sc
             return;
           }
           if (!salonId) return;
-          try {
+           try {
             const startDate = new Date(`${appointment.date}T${appointment.time}`);
             const endDate = new Date(startDate.getTime() + appointment.duration * 60000);
+
+            // Check for conflicts
+            const conflictResult = await checkAppointmentConflict({
+              salonId,
+              staffId: appointment.staffId,
+              startTime: startDate.toISOString(),
+              endTime: endDate.toISOString(),
+            });
+            if (conflictResult.conflict) {
+              toast({ title: "Konflikt terminów", description: formatConflictMessage(conflictResult), variant: "destructive" });
+              return;
+            }
+
             const { error } = await supabase.from("appointments").insert({
               salon_id: salonId,
               client_id: appointment.clientId || null,
