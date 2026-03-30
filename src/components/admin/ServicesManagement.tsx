@@ -149,10 +149,9 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
     return map;
   }, [allVariants]);
 
-  // Variant form state for editing
+  // Variant form state (editingVariants hook moved after editingService declaration below)
   const [hasVariants, setHasVariants] = useState(false);
   const [variants, setVariants] = useState<VariantFormItem[]>([]);
-  const { data: editingVariants } = useServiceVariants(editingService?.id);
 
   const services: Service[] = useMemo(() => {
     if (isDemo) return DEMO_SERVICES;
