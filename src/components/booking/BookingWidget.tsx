@@ -953,7 +953,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                                 s.name.toLowerCase().includes(serviceSearch.toLowerCase())
                               );
                               const grouped = filtered.reduce((acc, service) => {
-                                const cat = service.category || "Inne";
+                                const cat = (service as any).category || "Inne";
                                 if (!acc[cat]) acc[cat] = [];
                                 acc[cat].push(service);
                                 return acc;
