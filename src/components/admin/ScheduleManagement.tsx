@@ -32,10 +32,11 @@ import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface ScheduleManagementProps {
   isDemo?: boolean;
+  salonSlug?: string | null;
   onNavigate?: (tab: string) => void;
 }
 
-export function ScheduleManagement({ isDemo = false, onNavigate }: ScheduleManagementProps) {
+export function ScheduleManagement({ isDemo = false, salonSlug, onNavigate }: ScheduleManagementProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
