@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, Sparkles, Star, Play, Filter, Check, ChevronDown, CalendarPlus, Plus, ArrowRight } from "lucide-react";
+import { Clock, Sparkles, Star, Play, Filter, Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
