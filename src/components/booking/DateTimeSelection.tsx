@@ -81,8 +81,18 @@ export function DateTimeSelection({
   selectedTime,
   serviceDuration = 60,
   onProceed,
-  onStaffSelect
+  onStaffSelect,
+  salonId,
+  serviceId
 }: DateTimeSelectionProps) {
+  // AI-powered smart slots
+  const { data: smartSlotsData } = useSmartSlots(salonId ?? null, selectedDate, serviceId);
+  const recommendedSlots = smartSlotsData?.recommendedSlots?.length 
+    ? smartSlotsData.recommendedSlots 
+    : fallbackRecommendedSlots;
+  const popularSlots = smartSlotsData?.popularSlots?.length 
+    ? smartSlotsData.popularSlots 
+    : fallbackPopularSlots;
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pl' ? pl : enUS;
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
