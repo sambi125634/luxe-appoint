@@ -19,6 +19,17 @@ import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAllServiceVariants, useServiceVariants, useSyncServiceVariants } from "@/hooks/useServiceVariants";
+
+interface VariantFormItem {
+  id?: string;
+  name: string;
+  description: string;
+  duration: number;
+  price: number;
+  is_active: boolean;
+  sort_order: number;
+}
 
 interface Service {
   id: string;
