@@ -5,6 +5,33 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { MessageSquare, Mail, Phone as PhoneIcon } from "lucide-react";
+import { useState } from "react";
+
+// Validation helpers
+const validateEmail = (email: string): string | null => {
+  if (!email.trim()) return "Adres e-mail jest wymagany";
+  if (email.length > 255) return "Adres e-mail jest zbyt długi";
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.trim())) return "Nieprawidłowy adres e-mail";
+  return null;
+};
+
+const validatePhone = (phone: string): string | null => {
+  if (!phone.trim()) return "Numer telefonu jest wymagany";
+  const cleaned = phone.replace(/[\s\-()]/g, "");
+  if (cleaned.length < 9 || cleaned.length > 15) return "Numer telefonu powinien mieć 9-15 cyfr";
+  const phoneRegex = /^[+]?[0-9]{9,15}$/;
+  if (!phoneRegex.test(cleaned)) return "Nieprawidłowy format numeru telefonu";
+  return null;
+};
+
+const validateName = (name: string, label: string): string | null => {
+  if (!name.trim()) return `${label} jest wymagane`;
+  if (name.trim().length < 2) return `${label} musi mieć co najmniej 2 znaki`;
+  if (name.length > 100) return `${label} jest zbyt długie`;
+  return null;
+};
+
 export interface ClientData {
   firstName: string;
   lastName: string;
@@ -43,12 +70,26 @@ export function ClientForm({
   onUpdate,
   data
 }: ClientFormProps) {
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  const errors = {
+    firstName: touched.firstName ? validateName(data.firstName, "Imię") : null,
+    lastName: touched.lastName ? validateName(data.lastName, "Nazwisko") : null,
+    phone: touched.phone ? validatePhone(data.phone) : null,
+    email: touched.email ? validateEmail(data.email) : null,
+  };
+
   const handleChange = (field: keyof ClientData, value: string | boolean) => {
     onUpdate({
       ...data,
-      [field]: value
+      [field]: typeof value === "string" ? value : value,
     });
   };
+
+  const handleBlur = (field: string) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
+
   return <div className="space-y-6 animate-fade-in">
       <div>
         <h2 className="text-2xl font-serif font-semibold mb-2">Twoje dane</h2>
@@ -60,22 +101,26 @@ export function ClientForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="firstName">Imię *</Label>
-            <Input id="firstName" placeholder="Anna" value={data.firstName} onChange={e => handleChange('firstName', e.target.value)} className="h-12" />
+            <Input id="firstName" placeholder="Anna" value={data.firstName} onChange={e => handleChange('firstName', e.target.value)} onBlur={() => handleBlur('firstName')} className={`h-12 ${errors.firstName ? 'border-destructive' : ''}`} maxLength={100} />
+            {errors.firstName && <p className="text-xs text-destructive">{errors.firstName}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName">Nazwisko *</Label>
-            <Input id="lastName" placeholder="Kowalska" value={data.lastName} onChange={e => handleChange('lastName', e.target.value)} className="h-12" />
+            <Input id="lastName" placeholder="Kowalska" value={data.lastName} onChange={e => handleChange('lastName', e.target.value)} onBlur={() => handleBlur('lastName')} className={`h-12 ${errors.lastName ? 'border-destructive' : ''}`} maxLength={100} />
+            {errors.lastName && <p className="text-xs text-destructive">{errors.lastName}</p>}
           </div>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="phone">Numer telefonu *</Label>
-          <Input id="phone" type="tel" placeholder="+48 123 456 789" value={data.phone} onChange={e => handleChange('phone', e.target.value)} className="h-12" />
+          <Input id="phone" type="tel" placeholder="+48 123 456 789" value={data.phone} onChange={e => handleChange('phone', e.target.value)} onBlur={() => handleBlur('phone')} className={`h-12 ${errors.phone ? 'border-destructive' : ''}`} maxLength={20} />
+          {errors.phone && <p className="text-xs text-destructive">{errors.phone}</p>}
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="email">Adres e-mail *</Label>
-          <Input id="email" type="email" placeholder="anna.kowalska@example.com" value={data.email} onChange={e => handleChange('email', e.target.value)} className="h-12" />
+          <Input id="email" type="email" placeholder="anna.kowalska@example.com" value={data.email} onChange={e => handleChange('email', e.target.value)} onBlur={() => handleBlur('email')} className={`h-12 ${errors.email ? 'border-destructive' : ''}`} maxLength={255} />
+          {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
         </div>
 
         {/* Confirmation method */}
@@ -103,7 +148,7 @@ export function ClientForm({
           <Label htmlFor="notes">
             Uwagi do wizyty <span className="text-muted-foreground">(opcjonalnie)</span>
           </Label>
-          <Textarea id="notes" placeholder="Dodatkowe informacje, preferencje, alergie..." value={data.notes} onChange={e => handleChange('notes', e.target.value)} className="min-h-[80px] resize-none" />
+          <Textarea id="notes" placeholder="Dodatkowe informacje, preferencje, alergie..." value={data.notes} onChange={e => handleChange('notes', e.target.value)} className="min-h-[80px] resize-none" maxLength={1000} />
         </div>
 
         {/* Consents */}
