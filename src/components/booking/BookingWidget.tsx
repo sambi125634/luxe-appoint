@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, Plus, X, User, Search, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -258,7 +258,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const [selectedStaffName, setSelectedStaffName] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [showRecommendations, setShowRecommendations] = useState(false);
   const [clientData, setClientData] = useState<ClientData>({
     firstName: "",
     lastName: "",
@@ -271,17 +270,9 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [additionalServices, setAdditionalServices] = useState<Service[]>([]);
-  const [showServicePicker, setShowServicePicker] = useState(false);
-  const [showAllServices, setShowAllServices] = useState(false);
-  const [serviceSearch, setServiceSearch] = useState('');
 
-  const removeAdditionalService = (index: number) => {
-    setAdditionalServices(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const totalPrice = (selectedService?.price || 0) + additionalServices.reduce((sum, s) => sum + s.price, 0);
-  const totalDuration = (selectedService?.duration || 0) + additionalServices.reduce((sum, s) => sum + s.duration, 0);
+  const totalPrice = selectedService?.price || 0;
+  const totalDuration = selectedService?.duration || 0;
 
   const changeStep = (newStep: number) => {
     setPreviousStep(currentStep);
@@ -335,49 +326,12 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const isFormStep = currentStepId === "form";
   const isPaymentStep = currentStepId === "payment";
 
-  // Dynamic recommendations query for real salons
-  const { data: dbRecommendations } = useQuery({
-    queryKey: ["service-recommendations", salonId, selectedService?.id, selectedService?.category],
-    queryFn: async () => {
-      if (!salonId || salonId === "demo" || !selectedService) return [];
-      
-      // Try same category first
-      let query = supabase
-        .from("services")
-        .select("id, name, price, duration")
-        .eq("salon_id", salonId)
-        .neq("id", selectedService.id)
-        .limit(3);
-
-      if (selectedService.category) {
-        query = query.eq("category_id", selectedService.category);
-      }
-
-      const { data } = await query;
-      
-      // Fallback: if no results from same category, get any other services
-      if (!data || data.length === 0) {
-        const { data: fallback } = await supabase
-          .from("services")
-          .select("id, name, price, duration")
-          .eq("salon_id", salonId)
-          .neq("id", selectedService.id)
-          .limit(3);
-        return fallback || [];
-      }
-      return data;
-    },
-    enabled: !!salonId && salonId !== "demo" && !!selectedService,
-  });
-
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
-    setShowRecommendations(true);
   };
 
   const handleNext = () => {
     if (!isLastStep && canProceed()) {
-      setShowRecommendations(false);
       const nextIndex = getNextStepIndex();
       changeStep(hasIntro ? nextIndex : nextIndex + 1);
     }
@@ -386,7 +340,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const handleBack = () => {
     const currentIndex = stepMapping.indexOf(currentStepId);
     if (currentIndex > 0) {
-      setShowRecommendations(false);
       const prevIndex = getPrevStepIndex();
       changeStep(hasIntro ? prevIndex : prevIndex + 1);
     }
@@ -551,19 +504,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
 
   const transitionDirection = currentStep > previousStep ? 'forward' : 'backward';
 
-  const recommendations = useMemo(() => {
-    if (!selectedService) return [];
-    if (isDemo) {
-      return demoServiceRecommendations[selectedService.id] || [];
-    }
-    return (dbRecommendations || []).map(r => ({
-      id: r.id,
-      name: r.name,
-      price: r.price,
-      duration: r.duration,
-    }));
-  }, [selectedService, isDemo, dbRecommendations]);
-
   if (!isDemo && !salonId) {
     return (
       <div className="w-full max-w-xl mx-auto p-6">
@@ -720,7 +660,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
           : "opacity-100 translate-x-0"
       )}>
         {currentStepId === "services" && (
-          <>
             <ServiceSelection
               onSelect={handleServiceSelect}
               selectedService={selectedService}
@@ -728,45 +667,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               salonId={salonId !== "demo" ? salonId : undefined}
               isDemo={isDemo}
             />
-            
-            {showRecommendations && recommendations.length > 0 && (
-              <div className="mt-6 p-4 bg-secondary/5 border border-secondary/20 rounded-xl animate-fade-in">
-                <p className="text-sm font-medium mb-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-secondary" />
-                  Często łączone z tym zabiegiem:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {recommendations.map((rec) => (
-                    <Badge 
-                      key={rec.id}
-                      variant="secondary"
-                      className="cursor-pointer hover:bg-secondary/20 transition-colors py-2 px-3"
-                      onClick={() => {
-                        handleServiceSelect({
-                          id: rec.id,
-                          name: rec.name,
-                          price: rec.price,
-                          duration: rec.duration,
-                          category: "",
-                          description: "",
-                        });
-                        toast({
-                          title: "Zmieniono usługę",
-                          description: `Wybrano: ${rec.name}`,
-                        });
-                      }}
-                    >
-                      {rec.name} 
-                      <span className="ml-2 text-xs opacity-70">+{rec.price} zł</span>
-                    </Badge>
-                  ))}
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  Kliknij, aby zmienić na tę usługę
-                </p>
-              </div>
-            )}
-          </>
         )}
         {currentStepId === "datetime" && (
           <>
@@ -785,239 +685,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                 }
               }}
             />
-
-            {/* Additional services section - visible after time selected */}
-            {selectedService && selectedTime && (
-              <div className="mt-6 space-y-3 animate-fade-in">
-                {/* Selected service summary */}
-                <div className="bg-muted/50 rounded-xl p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Sparkles className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">{selectedService.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {selectedTime} · {selectedService.duration} min
-                        </p>
-                      </div>
-                    </div>
-                    <p className="font-bold text-sm">{selectedService.price} zł</p>
-                  </div>
-
-                  {additionalServices.map((svc, i) => (
-                    <div key={i} className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
-                          <Plus className="w-4 h-4 text-secondary-foreground" />
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm">{svc.name}</p>
-                          <p className="text-xs text-muted-foreground">{svc.duration} min</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-bold text-sm">{svc.price} zł</p>
-                        <button
-                          onClick={() => removeAdditionalService(i)}
-                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center hover:bg-destructive/10 transition-colors"
-                        >
-                          <X className="w-3 h-3 text-muted-foreground" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  {additionalServices.length > 0 && (
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                      <p className="font-semibold text-sm">Razem</p>
-                      <div className="text-right">
-                        <p className="font-bold text-primary">{totalPrice} zł</p>
-                        <p className="text-xs text-muted-foreground">{totalDuration} min</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Add another service button */}
-                {!showServicePicker && (
-                  <button
-                    onClick={() => setShowServicePicker(true)}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-primary/30 text-primary text-sm font-medium hover:border-primary/60 hover:bg-primary/5 transition-all"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Dodaj kolejną usługę
-                  </button>
-                )}
-
-                {/* Intelligent service suggestion picker */}
-                <AnimatePresence>
-                {showServicePicker && (() => {
-                  const suggestionIds = SERVICE_SUGGESTIONS[selectedService!.id] || [];
-                  const excludeIds = new Set([selectedService!.id, ...additionalServices.map(s => s.id)]);
-                  
-                  const suggested = recommendations
-                    .filter(s => suggestionIds.includes(s.id) && !excludeIds.has(s.id))
-                    .slice(0, 4);
-                  
-                  const others = recommendations
-                    .filter(s => !suggestionIds.includes(s.id) && !excludeIds.has(s.id));
-
-                  const allForSearch = [...suggested, ...others];
-
-                  return (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.2 }}
-                      className="border-2 border-primary/20 rounded-2xl overflow-hidden"
-                    >
-                      {/* Header */}
-                      <div className="flex items-center justify-between px-4 py-3 bg-primary/5 border-b border-primary/10">
-                        <div>
-                          <p className="font-semibold text-sm">Dodaj do wizyty</p>
-                          <p className="text-xs text-muted-foreground">Polecane zestawienia</p>
-                        </div>
-                        <button
-                          onClick={() => {
-                            setShowServicePicker(false);
-                            setShowAllServices(false);
-                            setServiceSearch('');
-                          }}
-                          className="w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      {/* Suggested services */}
-                      {!showAllServices && (
-                        <div className="p-3 space-y-2">
-                          {suggested.length === 0 ? (
-                            <p className="text-sm text-center text-muted-foreground py-4">
-                              Wszystkie polecane usługi już dodane ✓
-                            </p>
-                          ) : (
-                            suggested.map((service, i) => (
-                              <motion.button
-                                key={service.id}
-                                initial={{ opacity: 0, x: -8 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.05 }}
-                                onClick={() => {
-                                   setAdditionalServices(prev => [...prev, { ...service, category: (service as any).category || "", description: (service as any).description || "" }]);
-                                  setShowServicePicker(false);
-                                  setShowAllServices(false);
-                                }}
-                                className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/40 hover:bg-primary/5 hover:border-primary/20 border-2 border-transparent transition-all text-left group"
-                              >
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1.5 mb-0.5">
-                                    <p className="font-semibold text-sm truncate">{service.name}</p>
-                                  </div>
-                                  <p className="text-xs text-muted-foreground">{service.duration} min</p>
-                                </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                  <p className="font-bold text-sm">{service.price} zł</p>
-                                  <div className="w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-muted group-hover:bg-primary">
-                                    <Plus className="w-3.5 h-3.5 transition-colors text-muted-foreground group-hover:text-primary-foreground" />
-                                  </div>
-                                </div>
-                              </motion.button>
-                            ))
-                          )}
-
-                          {others.length > 0 && (
-                            <button
-                              onClick={() => setShowAllServices(true)}
-                              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                              <span>Pokaż wszystkie usługi ({allForSearch.length})</span>
-                              <ChevronDown className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      )}
-
-                      {/* All services with search */}
-                      {showAllServices && (
-                        <div className="p-3">
-                          <div className="relative mb-3">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                            <input
-                              type="text"
-                              placeholder="Szukaj usługi..."
-                              value={serviceSearch}
-                              onChange={e => setServiceSearch(e.target.value)}
-                              className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
-                              autoFocus
-                            />
-                          </div>
-
-                          <div className="max-h-64 overflow-y-auto space-y-1">
-                            {(() => {
-                              const filtered = allForSearch.filter(s =>
-                                serviceSearch === '' ||
-                                s.name.toLowerCase().includes(serviceSearch.toLowerCase())
-                              );
-                              const grouped = filtered.reduce((acc, service) => {
-                                const cat = (service as any).category || "Inne";
-                                if (!acc[cat]) acc[cat] = [];
-                                acc[cat].push(service);
-                                return acc;
-                              }, {} as Record<string, typeof filtered>);
-
-                              return Object.entries(grouped).map(([category, services]) => (
-                                <div key={category}>
-                                  <p className="text-xs font-semibold text-muted-foreground px-2 py-1.5 uppercase tracking-wide">
-                                    {CATEGORY_EMOJI[category] || "📋"} {category}
-                                  </p>
-                                  {services.map(service => (
-                                    <button
-                                      key={service.id}
-                                      onClick={() => {
-                                        setAdditionalServices(prev => [...prev, { ...service, category: (service as any).category || "", description: (service as any).description || "" }]);
-                                        setShowServicePicker(false);
-                                        setShowAllServices(false);
-                                        setServiceSearch('');
-                                      }}
-                                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left"
-                                    >
-                                      <div>
-                                        <p className="font-medium text-sm">{service.name}</p>
-                                        <p className="text-xs text-muted-foreground">{service.duration} min</p>
-                                      </div>
-                                      <div className="flex items-center gap-2 ml-4">
-                                        <p className="font-semibold text-sm text-primary">{service.price} zł</p>
-                                        <Plus className="w-4 h-4 text-muted-foreground" />
-                                      </div>
-                                    </button>
-                                  ))}
-                                </div>
-                              ));
-                            })()}
-                          </div>
-
-                          <button
-                            onClick={() => {
-                              setShowAllServices(false);
-                              setServiceSearch('');
-                            }}
-                            className="w-full flex items-center justify-center gap-2 mt-2 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                          >
-                            <ChevronUp className="w-3.5 h-3.5" />
-                            Wróć do polecanych
-                          </button>
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })()}
-                </AnimatePresence>
-              </div>
-            )}
           </>
         )}
         {currentStepId === "form" && (
@@ -1050,7 +717,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               <div>
                 <p className="font-medium text-sm">
                   {selectedService.name}
-                  {additionalServices.length > 0 && ` +${additionalServices.length}`}
                 </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, Sparkles, Star, Play, Filter, Check, ChevronDown, CalendarPlus, Plus, ArrowRight } from "lucide-react";
+import { Clock, Sparkles, Star, Play, Filter, Check, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -484,7 +484,15 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
             >
               {/* ── HEADER (always visible) ── */}
               <button
-                onClick={() => setExpandedServiceId(isExpanded ? null : service.id)}
+                onClick={() => {
+                  // Services without variants: single click = select & proceed
+                  if (!service.variants || service.variants.length === 0) {
+                    handleServiceSelect(service);
+                    return;
+                  }
+                  // Services with variants: toggle expand
+                  setExpandedServiceId(isExpanded ? null : service.id);
+                }}
                 className="w-full flex items-center gap-4 p-4 text-left"
               >
                 {/* Thumbnail */}
@@ -606,7 +614,7 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                           </div>
                         )}
 
-                        {/* Variants */}
+                        {/* Variants — click variant = select & proceed */}
                         {service.variants && service.variants.length > 0 && (
                           <div>
                             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
@@ -616,15 +624,26 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                               {service.variants.map(variant => (
                                 <button
                                   key={variant.id}
-                                  onClick={() => setSelectedVariants(prev => ({
-                                    ...prev,
-                                    [service.id]: variant.id
-                                  }))}
+                                  onClick={() => {
+                                    setSelectedVariants(prev => ({
+                                      ...prev,
+                                      [service.id]: variant.id,
+                                    }));
+                                    // Immediately select with this variant and proceed
+                                    const effective: Service = {
+                                      ...service,
+                                      duration: variant.duration,
+                                      price: variant.price,
+                                      selectedVariantName: variant.name,
+                                    };
+                                    onSelect(effective);
+                                    onProceed?.();
+                                  }}
                                   className={cn(
-                                    "w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left",
+                                    "w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left hover:border-primary/50 hover:bg-primary/5",
                                     selectedVariantId === variant.id
                                       ? "border-primary bg-primary/5"
-                                      : "border-border hover:border-primary/30"
+                                      : "border-border"
                                   )}
                                 >
                                   <div className="flex items-center gap-3">
@@ -653,28 +672,6 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                               ))}
                             </div>
                           </div>
-                        )}
-
-                        {/* CTA */}
-                        <div className="flex gap-3 pt-2">
-                          <Button
-                            className="flex-1 gap-2"
-                            disabled={
-                              !!(service.variants && service.variants.length > 0 && !selectedVariantId)
-                            }
-                            onClick={() => handleServiceSelect(service)}
-                          >
-                            <CalendarPlus className="w-4 h-4" />
-                            {service.variants && service.variants.length > 0 && !selectedVariantId
-                              ? "Wybierz wariant"
-                              : "Rezerwuj"}
-                          </Button>
-                        </div>
-
-                        {service.variants && service.variants.length > 0 && !selectedVariantId && (
-                          <p className="text-xs text-center text-muted-foreground -mt-2">
-                            Wybierz wariant aby przejść do rezerwacji
-                          </p>
                         )}
                       </div>
                     </div>
