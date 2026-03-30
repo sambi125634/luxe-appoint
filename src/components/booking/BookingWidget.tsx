@@ -874,10 +874,13 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">{selectedService.name}</p>
+                <p className="font-medium text-sm">
+                  {selectedService.name}
+                  {additionalServices.length > 0 && ` +${additionalServices.length}`}
+                </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" />
-                  {selectedService.duration} min
+                  {totalDuration} min
                   {selectedDate && selectedTime && (
                     <span className="ml-2">• {selectedTime}</span>
                   )}
@@ -885,7 +888,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               </div>
             </div>
             <div className="text-right">
-              <p className="font-bold text-primary">{selectedService.price} zł</p>
+              <p className="font-bold text-primary">{totalPrice} zł</p>
             </div>
           </div>
         </div>
