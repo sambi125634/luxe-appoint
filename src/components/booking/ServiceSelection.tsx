@@ -616,56 +616,82 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                             </p>
                             <div className="space-y-2">
                               {service.variants.map(variant => (
-                                <button
-                                  key={variant.id}
-                                  onClick={() => {
-                                    setSelectedVariants(prev => ({
-                                      ...prev,
-                                      [service.id]: variant.id,
-                                    }));
-                                    // Immediately select with this variant and proceed
-                                    const effective: Service = {
-                                      ...service,
-                                      duration: variant.duration,
-                                      price: variant.price,
-                                      selectedVariantName: variant.name,
-                                    };
-                                    onSelect(effective);
-                                    onProceed?.();
-                                  }}
-                                  className={cn(
-                                    "w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left hover:border-primary/50 hover:bg-primary/5",
-                                    selectedVariantId === variant.id
-                                      ? "border-primary bg-primary/5"
-                                      : "border-border"
-                                  )}
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <div className={cn(
-                                      "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0",
-                                      selectedVariantId === variant.id
-                                        ? "border-primary bg-primary"
-                                        : "border-muted-foreground"
-                                    )}>
-                                      {selectedVariantId === variant.id && (
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
-                                      )}
-                                    </div>
-                                    <div>
-                                      <p className="font-semibold text-sm">{variant.name}</p>
-                                      {variant.description && (
-                                        <p className="text-xs text-muted-foreground">{variant.description}</p>
-                                      )}
-                                    </div>
-                                  </div>
-                                  <div className="text-right flex-shrink-0 ml-4">
-                                    <p className="font-bold text-sm">{variant.price} zł</p>
-                                    <p className="text-xs text-muted-foreground">{variant.duration} min</p>
-                                  </div>
-                                </button>
-                              ))}
-                            </div>
-                          </div>
+                                 <button
+                                   key={variant.id}
+                                   onClick={() => {
+                                     setSelectedVariants(prev => ({
+                                       ...prev,
+                                       [service.id]: variant.id,
+                                     }));
+                                   }}
+                                   className={cn(
+                                     "w-full flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left hover:border-primary/50 hover:bg-primary/5",
+                                     selectedVariantId === variant.id
+                                       ? "border-primary bg-primary/5"
+                                       : "border-border"
+                                   )}
+                                 >
+                                   <div className="flex items-center gap-3">
+                                     <div className={cn(
+                                       "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0",
+                                       selectedVariantId === variant.id
+                                         ? "border-primary bg-primary"
+                                         : "border-muted-foreground"
+                                     )}>
+                                       {selectedVariantId === variant.id && (
+                                         <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground" />
+                                       )}
+                                     </div>
+                                     <div>
+                                       <p className="font-semibold text-sm">{variant.name}</p>
+                                       {variant.description && (
+                                         <p className="text-xs text-muted-foreground">{variant.description}</p>
+                                       )}
+                                     </div>
+                                   </div>
+                                   <div className="text-right flex-shrink-0 ml-4">
+                                     <p className="font-bold text-sm">{variant.price} zł</p>
+                                     <p className="text-xs text-muted-foreground">{variant.duration} min</p>
+                                   </div>
+                                 </button>
+                               ))}
+                             </div>
+                           </div>
+                         )}
+
+                        {/* ── BOOK BUTTON ── */}
+                        {(!service.variants || service.variants.length === 0) ? (
+                          <Button
+                            className="w-full gap-2"
+                            size="lg"
+                            onClick={() => handleServiceSelect(service)}
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            Rezerwuj · {service.price} zł
+                          </Button>
+                        ) : (
+                          <Button
+                            className="w-full gap-2"
+                            size="lg"
+                            disabled={!selectedVariantId}
+                            onClick={() => {
+                              const variant = service.variants!.find(v => v.id === selectedVariantId);
+                              if (!variant) return;
+                              const effective: Service = {
+                                ...service,
+                                duration: variant.duration,
+                                price: variant.price,
+                                selectedVariantName: variant.name,
+                              };
+                              onSelect(effective);
+                              onProceed?.();
+                            }}
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            {selectedVariantId
+                              ? `Rezerwuj · ${selectedVariant?.price} zł`
+                              : "Wybierz wariant powyżej"}
+                          </Button>
                         )}
                       </div>
                     </div>
