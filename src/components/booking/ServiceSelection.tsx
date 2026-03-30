@@ -694,63 +694,6 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
         </div>
       )}
 
-      {/* Sticky bar after service selection */}
-      <AnimatePresence>
-        {showServiceAddedBar && lastAddedService && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-0 left-0 right-0 bg-card border-t-2 border-primary/20 shadow-2xl p-4 z-50"
-          >
-            <div className="max-w-2xl mx-auto">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-                  <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm truncate">
-                    {lastAddedService.name}
-                    {lastAddedService.selectedVariantName && (
-                      <span className="text-muted-foreground font-normal">
-                        {' '}· {lastAddedService.selectedVariantName}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {lastAddedService.duration} min · {lastAddedService.price} zł
-                  </p>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-1.5 text-xs"
-                  onClick={() => {
-                    setShowServiceAddedBar(false);
-                    setExpandedServiceId(null);
-                  }}
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Dodaj kolejną usługę
-                </Button>
-                <Button
-                  size="sm"
-                  className="flex-1 gap-1.5 text-xs"
-                  onClick={() => {
-                    setShowServiceAddedBar(false);
-                    onProceed?.();
-                  }}
-                >
-                  Przejdź dalej
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
