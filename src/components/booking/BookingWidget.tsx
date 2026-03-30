@@ -821,8 +821,8 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                       </button>
                     </div>
                     <div className="max-h-48 overflow-y-auto divide-y divide-border">
-                      {(isDemo ? (await import("./ServiceSelection")).default ? [] : [] : []).length === 0 && recommendations
-                        .filter(s => s.id !== selectedService.id && !additionalServices.find(a => a.id === s.id))
+                      {recommendations
+                        .filter(s => s.id !== selectedService!.id && !additionalServices.find(a => a.id === s.id))
                         .map(service => (
                           <button
                             key={service.id}
