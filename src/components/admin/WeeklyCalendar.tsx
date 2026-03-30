@@ -310,6 +310,22 @@ export function WeeklyCalendar({ isDemo = false, onNewAppointment }: WeeklyCalen
       const dateStr = (appointmentData.date as string) || new Date().toISOString().split("T")[0];
       const startTime = new Date(`${dateStr}T${appointmentData.time}:00`);
       const endTime = new Date(startTime.getTime() + (appointmentData.duration as number) * 60 * 1000);
+
+      // Check for conflicts
+      if (salonId) {
+        const conflictResult = await checkAppointmentConflict({
+          salonId,
+          staffId: appointmentData.staffId as string,
+          startTime: startTime.toISOString(),
+          endTime: endTime.toISOString(),
+          excludeId: editingAppointment?.id !== Date.now().toString() ? editingAppointment?.id : undefined,
+        });
+        if (conflictResult.conflict) {
+          toast({ title: "Konflikt terminów", description: formatConflictMessage(conflictResult), variant: "destructive" });
+          return;
+        }
+      }
+
       if (editingAppointment && editingAppointment.id !== Date.now().toString()) {
         const { error } = await supabase
           .from("appointments")
