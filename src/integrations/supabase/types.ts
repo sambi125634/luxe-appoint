@@ -125,6 +125,13 @@ export type Database = {
             referencedRelation: "staff_members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "appointments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       audience_mappings: {
@@ -2709,6 +2716,13 @@ export type Database = {
             referencedRelation: "staff_members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "staff_services_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       stock_movements: {
@@ -2780,6 +2794,13 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stock_movements_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
             referencedColumns: ["id"]
           },
           {
@@ -2893,6 +2914,13 @@ export type Database = {
             referencedRelation: "staff_members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "time_off_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       transactions: {
@@ -2995,6 +3023,13 @@ export type Database = {
             referencedRelation: "staff_members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -3082,6 +3117,13 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "voice_notes_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
             referencedColumns: ["id"]
           },
         ]
@@ -3196,11 +3238,64 @@ export type Database = {
             referencedRelation: "staff_members"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "working_hours_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
     Views: {
-      [_ in never]: never
+      staff_public_view: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          color: string | null
+          id: string | null
+          is_active: boolean | null
+          name: string | null
+          role: string | null
+          salon_id: string | null
+          specializations: Json | null
+          visible_in_widget: boolean | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          color?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          name?: string | null
+          role?: string | null
+          salon_id?: string | null
+          specializations?: Json | null
+          visible_in_widget?: boolean | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          color?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          name?: string | null
+          role?: string | null
+          salon_id?: string | null
+          specializations?: Json | null
+          visible_in_widget?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_members_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       get_user_salon_id: { Args: { _user_id: string }; Returns: string }
