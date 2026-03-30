@@ -280,6 +280,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     setTimeout(() => {
       setCurrentStep(newStep);
       setIsTransitioning(false);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }, 150);
   };
 
