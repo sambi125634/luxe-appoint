@@ -126,6 +126,7 @@ const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
 
 interface SmartScheduleHelpersProps {
   isDemo?: boolean;
+  salonSlug?: string | null;
   onNavigate?: (tab: string) => void;
   onSlotSelect?: (slot: SmartSlot) => void;
   onGapSelect?: (gap: ScheduleGap) => void;
@@ -140,7 +141,7 @@ interface SearchResult {
   serviceDuration: number;
 }
 
-export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false, onNavigate }: SmartScheduleHelpersProps) {
+export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false, salonSlug, onNavigate }: SmartScheduleHelpersProps) {
   const { data: dbStaff } = useStaffMembers();
   const staffMembers: StaffItem[] = isDemo 
     ? mockStaffMembers 
