@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
 
 const defaultSteps = ["Usługa", "Termin", "Dane"];
 
