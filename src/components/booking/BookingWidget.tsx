@@ -897,7 +897,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: i * 0.05 }}
                                 onClick={() => {
-                                  setAdditionalServices(prev => [...prev, { ...service, category: service.category || "", description: service.description || "" }]);
+                                   setAdditionalServices(prev => [...prev, { ...service, category: (service as any).category || "", description: (service as any).description || "" }]);
                                   setShowServicePicker(false);
                                   setShowAllServices(false);
                                 }}
