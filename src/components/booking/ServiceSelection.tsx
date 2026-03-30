@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import manicureVideoAsset from "@/assets/service-video-manicure.mp4.asset.json";
+import facialVideoAsset from "@/assets/service-video-facial.mp4.asset.json";
+import browsVideoAsset from "@/assets/service-video-brows.mp4.asset.json";
 
 interface Service {
   id: string;
@@ -29,6 +32,11 @@ interface ServiceSelectionProps {
   isDemo?: boolean;
 }
 
+type ServiceMediaItem = {
+  type?: "image" | "video" | string;
+  url?: string;
+};
+
 // Demo data — used only when isDemo=true
 const demoCategories = [
   { id: "all", name: "Wszystkie", icon: "✨" },
@@ -39,15 +47,104 @@ const demoCategories = [
 ];
 
 const demoServices: Service[] = [
-  { id: "1", name: "Peeling kawitacyjny", category: "twarz", duration: 45, price: 150, description: "Głębokie oczyszczanie skóry twarzy", benefits: ["Oczyszcza pory", "Wygładza skórę", "Redukuje zaskórniki"], popular: true, image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=300&fit=crop" },
-  { id: "2", name: "Mezoterapia igłowa", category: "twarz", duration: 60, price: 350, description: "Odmładzanie i intensywne nawilżanie skóry od wewnątrz", benefits: ["Nawilża głębokie warstwy skóry", "Redukuje zmarszczki", "Poprawia koloryt"], popular: true, image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400&h=300&fit=crop" },
-  { id: "3", name: "Mikrodermabrazja", category: "twarz", duration: 50, price: 180, description: "Mechaniczny peeling diamentowy dla gładkiej skóry", benefits: ["Usuwa martwy naskórek", "Stymuluje kolagen", "Wyrównuje koloryt"], image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&h=300&fit=crop" },
-  { id: "4", name: "Masaż relaksacyjny", category: "cialo", duration: 60, price: 200, description: "Pełny masaż ciała aromatycznymi olejkami", benefits: ["Redukuje stres", "Rozluźnia mięśnie", "Poprawia krążenie"], popular: true, image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=300&fit=crop" },
-  { id: "5", name: "Masaż gorącymi kamieniami", category: "cialo", duration: 75, price: 280, description: "Luksusowa terapia ciepłem i dotykiem", benefits: ["Głęboki relaks", "Łagodzi napięcia", "Detoks organizmu"], image: "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=400&h=300&fit=crop" },
-  { id: "6", name: "Depilacja woskowa nogi", category: "depilacja", duration: 45, price: 120, description: "Pełne nogi naturalnym woskiem miodowym", benefits: ["Gładka skóra do 4 tygodni", "Osłabia włoski", "Delikatna dla skóry"], image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=300&fit=crop" },
-  { id: "7", name: "Depilacja laserowa bikini", category: "depilacja", duration: 30, price: 250, description: "Trwałe usuwanie owłosienia laserem diodowym", benefits: ["Trwałe efekty", "Bezbolesna metoda", "Gładka skóra na lata"], popular: true, image: "https://images.unsplash.com/photo-1598531195855-2ab6ed0fc53a?w=400&h=300&fit=crop" },
-  { id: "8", name: "Stylizacja brwi", category: "brwi", duration: 40, price: 100, description: "Profesjonalna regulacja i henna brwi", benefits: ["Idealny kształt", "Wyraziste spojrzenie", "Efekt do 6 tygodni"], image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop" },
-  { id: "9", name: "Przedłużanie rzęs 1:1", category: "brwi", duration: 120, price: 350, description: "Klasyczna metoda przedłużania dla naturalnego efektu", benefits: ["Naturalny wygląd", "Trwałość 3-4 tygodnie", "Nie wymaga tuszu"], image: "https://images.unsplash.com/photo-1583001931096-959e9a1a6223?w=400&h=300&fit=crop" },
+  {
+    id: "1",
+    name: "Peeling kawitacyjny",
+    category: "twarz",
+    duration: 45,
+    price: 150,
+    description: "Głębokie oczyszczanie skóry twarzy",
+    benefits: ["Oczyszcza pory", "Wygładza skórę", "Redukuje zaskórniki"],
+    popular: true,
+    image: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=300&fit=crop",
+    video: facialVideoAsset.url,
+  },
+  {
+    id: "2",
+    name: "Mezoterapia igłowa",
+    category: "twarz",
+    duration: 60,
+    price: 350,
+    description: "Odmładzanie i intensywne nawilżanie skóry od wewnątrz",
+    benefits: ["Nawilża głębokie warstwy skóry", "Redukuje zmarszczki", "Poprawia koloryt"],
+    popular: true,
+    image: "https://images.unsplash.com/photo-1512290923902-8a9f81dc236c?w=400&h=300&fit=crop",
+    video: facialVideoAsset.url,
+  },
+  {
+    id: "3",
+    name: "Mikrodermabrazja",
+    category: "twarz",
+    duration: 50,
+    price: 180,
+    description: "Mechaniczny peeling diamentowy dla gładkiej skóry",
+    benefits: ["Usuwa martwy naskórek", "Stymuluje kolagen", "Wyrównuje koloryt"],
+    image: "https://images.unsplash.com/photo-1616394584738-fc6e612e71b9?w=400&h=300&fit=crop",
+  },
+  {
+    id: "4",
+    name: "Masaż relaksacyjny",
+    category: "cialo",
+    duration: 60,
+    price: 200,
+    description: "Pełny masaż ciała aromatycznymi olejkami",
+    benefits: ["Redukuje stres", "Rozluźnia mięśnie", "Poprawia krążenie"],
+    popular: true,
+    image: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&h=300&fit=crop",
+    video: manicureVideoAsset.url,
+  },
+  {
+    id: "5",
+    name: "Masaż gorącymi kamieniami",
+    category: "cialo",
+    duration: 75,
+    price: 280,
+    description: "Luksusowa terapia ciepłem i dotykiem",
+    benefits: ["Głęboki relaks", "Łagodzi napięcia", "Detoks organizmu"],
+    image: "https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=400&h=300&fit=crop",
+  },
+  {
+    id: "6",
+    name: "Depilacja woskowa nogi",
+    category: "depilacja",
+    duration: 45,
+    price: 120,
+    description: "Pełne nogi naturalnym woskiem miodowym",
+    benefits: ["Gładka skóra do 4 tygodni", "Osłabia włoski", "Delikatna dla skóry"],
+    image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=400&h=300&fit=crop",
+  },
+  {
+    id: "7",
+    name: "Depilacja laserowa bikini",
+    category: "depilacja",
+    duration: 30,
+    price: 250,
+    description: "Trwałe usuwanie owłosienia laserem diodowym",
+    benefits: ["Trwałe efekty", "Bezbolesna metoda", "Gładka skóra na lata"],
+    popular: true,
+    image: "https://images.unsplash.com/photo-1598531195855-2ab6ed0fc53a?w=400&h=300&fit=crop",
+  },
+  {
+    id: "8",
+    name: "Stylizacja brwi",
+    category: "brwi",
+    duration: 40,
+    price: 100,
+    description: "Profesjonalna regulacja i henna brwi",
+    benefits: ["Idealny kształt", "Wyraziste spojrzenie", "Efekt do 6 tygodni"],
+    image: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=300&fit=crop",
+    video: browsVideoAsset.url,
+  },
+  {
+    id: "9",
+    name: "Przedłużanie rzęs 1:1",
+    category: "brwi",
+    duration: 120,
+    price: 350,
+    description: "Klasyczna metoda przedłużania dla naturalnego efektu",
+    benefits: ["Naturalny wygląd", "Trwałość 3-4 tygodnie", "Nie wymaga tuszu"],
+    image: "https://images.unsplash.com/photo-1583001931096-959e9a1a6223?w=400&h=300&fit=crop",
+  },
 ];
 
 const durationFilters = [
@@ -106,8 +203,9 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
   const services: Service[] = isDemo
     ? demoServices
     : (dbServices ?? []).map(s => {
-        const media = Array.isArray(s.media) ? s.media : [];
-        const firstImage = media.find((m: any) => m?.type === "image") as any;
+        const media = Array.isArray(s.media) ? (s.media as ServiceMediaItem[]) : [];
+        const firstImage = media.find((m) => m?.type === "image");
+        const firstVideo = media.find((m) => m?.type === "video");
         const benefits = Array.isArray(s.benefits) ? (s.benefits as string[]) : [];
         return {
           id: s.id,
@@ -118,6 +216,7 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
           description: s.description || "",
           benefits,
           image: firstImage?.url,
+          video: firstVideo?.url,
         };
       });
 
@@ -227,6 +326,9 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                         <Star className="w-3 h-3 mr-1" />
                         Hit
                       </Badge>
+                      {service.video && (
+                        <Badge variant="secondary" className="text-xs">Wideo</Badge>
+                      )}
                     </div>
                     <h3 className="font-semibold text-base mb-1">{service.name}</h3>
                     <p className="text-sm text-muted-foreground line-clamp-1 mb-2">{service.description}</p>
@@ -238,11 +340,26 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                       <span className="font-bold text-primary text-lg">{service.price} zł</span>
                     </div>
                   </div>
-                  {service.image && (
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                  <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0 relative">
+                    {service.video ? (
+                      <video
+                        src={service.video}
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                    ) : service.image ? (
                       <img src={service.image} alt={service.name} className="w-full h-full object-cover" />
-                    </div>
-                  )}
+                    ) : null}
+                    {service.video && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <Play className="w-5 h-5 text-white" />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </button>
             ))}
@@ -266,9 +383,21 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
             style={{ animationDelay: `${index * 30}ms` }}
           >
             <div className="flex">
-              {service.image && (
+              {(service.image || service.video) && (
                 <div className="relative w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-l-xl">
-                  <img src={service.image} alt={service.name} className="w-full h-full object-cover aspect-square" />
+                  {service.video ? (
+                    <video
+                      src={service.video}
+                      className="w-full h-full object-cover aspect-square"
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                  ) : (
+                    <img src={service.image} alt={service.name} className="w-full h-full object-cover aspect-square" />
+                  )}
                   {service.video && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                       <Play className="w-6 h-6 text-white" />
@@ -288,6 +417,9 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                         <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 text-xs">
                           Hit
                         </Badge>
+                      )}
+                      {service.video && (
+                        <Badge variant="outline" className="text-xs">Wideo</Badge>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
@@ -352,9 +484,19 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
           <DialogHeader>
             <DialogTitle className="font-serif">{previewService?.name}</DialogTitle>
           </DialogHeader>
-          {previewService?.image && (
+          {previewService?.video ? (
+            <video
+              src={previewService.video}
+              controls
+              autoPlay
+              muted
+              className="w-full h-48 object-cover rounded-lg"
+              playsInline
+              preload="metadata"
+            />
+          ) : previewService?.image ? (
             <img src={previewService.image} alt={previewService.name} className="w-full h-48 object-cover rounded-lg" />
-          )}
+          ) : null}
           <p className="text-muted-foreground">{previewService?.description}</p>
           {previewService?.benefits && (
             <div className="space-y-2">
