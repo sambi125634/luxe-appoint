@@ -71,6 +71,34 @@ interface SalonSettings {
   };
 }
 
+// Intelligent suggestion map per service
+const SERVICE_SUGGESTIONS: Record<string, string[]> = {
+  "s1": ["s2", "s3", "s11", "s12"],
+  "s2": ["s1", "s3", "s4", "s12"],
+  "s3": ["s1", "s2", "s4", "s11"],
+  "s4": ["s2", "s3", "s12", "s13"],
+  "s5": ["s2", "s4", "s7", "s12"],
+  "s6": ["s7", "s8", "s11", "s13"],
+  "s7": ["s6", "s8", "s2", "s4"],
+  "s8": ["s6", "s7", "s9", "s10"],
+  "s9": ["s10", "s6", "s14", "s13"],
+  "s10": ["s9", "s14", "s15", "s13"],
+  "s11": ["s12", "s13", "s1", "s14"],
+  "s12": ["s11", "s13", "s1", "s4"],
+  "s13": ["s11", "s12", "s14", "s1"],
+  "s14": ["s15", "s11", "s12", "s13"],
+  "s15": ["s14", "s11", "s9", "s6"],
+};
+
+// Category emoji map
+const CATEGORY_EMOJI: Record<string, string> = {
+  "Twarz": "✨",
+  "Ciało": "💆",
+  "Depilacja": "⚡",
+  "Brwi i rzęsy": "👁️",
+  "Paznokcie": "💅",
+};
+
 // Demo recommendations mapping (only used in demo mode)
 const demoServiceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
   "s1": [
