@@ -485,12 +485,6 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
               {/* ── HEADER (always visible) ── */}
               <button
                 onClick={() => {
-                  // Services without variants: single click = select & proceed
-                  if (!service.variants || service.variants.length === 0) {
-                    handleServiceSelect(service);
-                    return;
-                  }
-                  // Services with variants: toggle expand
                   setExpandedServiceId(isExpanded ? null : service.id);
                 }}
                 className="w-full flex items-center gap-4 p-4 text-left"
