@@ -126,6 +126,7 @@ const generateSmartSlots = (staff: StaffItem[]): SmartSlot[] => {
 
 interface SmartScheduleHelpersProps {
   isDemo?: boolean;
+  salonSlug?: string | null;
   onNavigate?: (tab: string) => void;
   onSlotSelect?: (slot: SmartSlot) => void;
   onGapSelect?: (gap: ScheduleGap) => void;
@@ -140,7 +141,7 @@ interface SearchResult {
   serviceDuration: number;
 }
 
-export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false, onNavigate }: SmartScheduleHelpersProps) {
+export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false, salonSlug, onNavigate }: SmartScheduleHelpersProps) {
   const { data: dbStaff } = useStaffMembers();
   const staffMembers: StaffItem[] = isDemo 
     ? mockStaffMembers 
@@ -256,12 +257,9 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
 
   const handleSlotClick = () => {
     if (!searchResult) return;
-    // Navigate to booking widget
-    if (isDemo) {
-      window.open("/book/demo-salon", "_blank");
-    } else {
-      window.open("/book/salon", "_blank");
-    }
+
+    const targetSlug = isDemo ? "demo-salon" : (salonSlug || "demo-salon");
+    window.open(`/book/${targetSlug}`, "_blank", "noopener,noreferrer");
   };
 
   return (
