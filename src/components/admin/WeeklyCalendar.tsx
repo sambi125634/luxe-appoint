@@ -10,6 +10,7 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { useSalonId } from "@/hooks/useSalonId";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
 import { DayColumnView } from "./calendar/DayColumnView";
 import { MonthGridView } from "./calendar/MonthGridView";
 import type { AppointmentBlockData } from "./calendar/AppointmentBlock";
