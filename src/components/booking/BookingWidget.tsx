@@ -33,6 +33,14 @@ interface BookingWidgetProps {
   onStepChange?: (stepId: string) => void;
 }
 
+interface ServiceVariant {
+  id: string;
+  name: string;
+  description?: string;
+  duration: number;
+  price: number;
+}
+
 interface Service {
   id: string;
   name: string;
@@ -43,6 +51,8 @@ interface Service {
   thumbnailUrl?: string;
   badge?: string | null;
   categoryEmoji?: string;
+  variants?: ServiceVariant[];
+  selectedVariantName?: string;
 }
 
 interface StaffMember {
