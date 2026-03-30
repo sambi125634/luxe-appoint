@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "./BookingProgress";
@@ -230,6 +230,15 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [additionalServices, setAdditionalServices] = useState<Service[]>([]);
+  const [showServicePicker, setShowServicePicker] = useState(false);
+
+  const removeAdditionalService = (index: number) => {
+    setAdditionalServices(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const totalPrice = (selectedService?.price || 0) + additionalServices.reduce((sum, s) => sum + s.price, 0);
+  const totalDuration = (selectedService?.duration || 0) + additionalServices.reduce((sum, s) => sum + s.duration, 0);
 
   const changeStep = (newStep: number) => {
     setPreviousStep(currentStep);
@@ -728,13 +737,114 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
           />
         )}
         {currentStepId === "datetime" && (
-          <DateTimeSelection
-            onSelect={handleDateTimeSelect}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            serviceDuration={selectedService?.duration}
-            onProceed={handleNext}
-          />
+          <>
+            <DateTimeSelection
+              onSelect={handleDateTimeSelect}
+              selectedDate={selectedDate}
+              selectedTime={selectedTime}
+              serviceDuration={totalDuration}
+              onProceed={handleNext}
+            />
+
+            {/* Additional services section - visible after time selected */}
+            {selectedService && selectedTime && (
+              <div className="mt-6 space-y-3 animate-fade-in">
+                {/* Selected service summary */}
+                <div className="bg-muted/50 rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <Sparkles className="w-4 h-4 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm">{selectedService.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {selectedTime} · {selectedService.duration} min
+                        </p>
+                      </div>
+                    </div>
+                    <p className="font-bold text-sm">{selectedService.price} zł</p>
+                  </div>
+
+                  {additionalServices.map((svc, i) => (
+                    <div key={i} className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-secondary/10 flex items-center justify-center">
+                          <Plus className="w-4 h-4 text-secondary-foreground" />
+                        </div>
+                        <div>
+                          <p className="font-semibold text-sm">{svc.name}</p>
+                          <p className="text-xs text-muted-foreground">{svc.duration} min</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-sm">{svc.price} zł</p>
+                        <button
+                          onClick={() => removeAdditionalService(i)}
+                          className="w-6 h-6 rounded-full bg-muted flex items-center justify-center hover:bg-destructive/10 transition-colors"
+                        >
+                          <X className="w-3 h-3 text-muted-foreground" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {additionalServices.length > 0 && (
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                      <p className="font-semibold text-sm">Razem</p>
+                      <div className="text-right">
+                        <p className="font-bold text-primary">{totalPrice} zł</p>
+                        <p className="text-xs text-muted-foreground">{totalDuration} min</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Add another service button */}
+                {!showServicePicker && (
+                  <button
+                    onClick={() => setShowServicePicker(true)}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-primary/30 text-primary text-sm font-medium hover:border-primary/60 hover:bg-primary/5 transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Dodaj kolejną usługę
+                  </button>
+                )}
+
+                {/* Mini service picker */}
+                {showServicePicker && (
+                  <div className="border-2 border-primary/20 rounded-xl overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 bg-primary/5 border-b border-primary/10">
+                      <p className="font-semibold text-sm">Wybierz dodatkową usługę</p>
+                      <button onClick={() => setShowServicePicker(false)} className="text-muted-foreground hover:text-foreground">
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto divide-y divide-border">
+                      {recommendations
+                        .filter(s => s.id !== selectedService!.id && !additionalServices.find(a => a.id === s.id))
+                        .map(service => (
+                          <button
+                            key={service.id}
+                            onClick={() => {
+                              setAdditionalServices(prev => [...prev, { ...service, category: "", description: "" }]);
+                              setShowServicePicker(false);
+                            }}
+                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors text-left"
+                          >
+                            <div>
+                              <p className="font-medium text-sm">{service.name}</p>
+                              <p className="text-xs text-muted-foreground">{service.duration} min</p>
+                            </div>
+                            <p className="font-semibold text-sm text-primary ml-4">{service.price} zł</p>
+                          </button>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
         {currentStepId === "form" && (
           <ClientForm onUpdate={setClientData} data={clientData} />
@@ -764,10 +874,13 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                 <Sparkles className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="font-medium text-sm">{selectedService.name}</p>
+                <p className="font-medium text-sm">
+                  {selectedService.name}
+                  {additionalServices.length > 0 && ` +${additionalServices.length}`}
+                </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" />
-                  {selectedService.duration} min
+                  {totalDuration} min
                   {selectedDate && selectedTime && (
                     <span className="ml-2">• {selectedTime}</span>
                   )}
@@ -775,7 +888,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               </div>
             </div>
             <div className="text-right">
-              <p className="font-bold text-primary">{selectedService.price} zł</p>
+              <p className="font-bold text-primary">{totalPrice} zł</p>
             </div>
           </div>
         </div>

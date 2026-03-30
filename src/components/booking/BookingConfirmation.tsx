@@ -102,6 +102,40 @@ export function BookingConfirmation({
     window.open(googleUrl, "_blank");
   };
 
+  const downloadIcal = () => {
+    if (!date || !time || !service) return;
+
+    const startDate = new Date(date);
+    const [hours, minutes] = time.split(":").map(Number);
+    startDate.setHours(hours, minutes, 0, 0);
+
+    const endDate = new Date(startDate);
+    endDate.setMinutes(endDate.getMinutes() + service.duration);
+
+    const formatIcal = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const icalContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "BEGIN:VEVENT",
+      `DTSTART:${formatIcal(startDate)}`,
+      `DTEND:${formatIcal(endDate)}`,
+      `SUMMARY:${service.name} — ${salonInfo.name}`,
+      `LOCATION:${salonInfo.address}`,
+      `DESCRIPTION:Numer rezerwacji: ${bookingRef}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n");
+
+    const blob = new Blob([icalContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "wizyta.ics";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const openMaps = () => {
     window.open(`https://maps.google.com/?q=${encodeURIComponent(salonInfo.address)}`, "_blank");
   };
@@ -241,17 +275,39 @@ export function BookingConfirmation({
           </div>
 
           {/* Footer actions */}
-          <div className="px-5 pb-5">
-            <div className="grid grid-cols-3 gap-2">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-col h-auto py-3 gap-1"
-                onClick={addToCalendar}
-              >
-                <CalendarPlus className="w-4 h-4" />
-                <span className="text-[10px]">Kalendarz</span>
-              </Button>
+          <div className="px-5 pb-5 space-y-4">
+            {/* Add to calendar */}
+            <div>
+              <p className="text-xs text-center text-muted-foreground mb-3">Dodaj wizytę do kalendarza</p>
+              <div className="flex gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 px-4 py-2.5 h-auto"
+                  onClick={addToCalendar}
+                >
+                  <img
+                    src="https://www.gstatic.com/calendar/images/dynamiclogo_2020q4/calendar_31_2x.png"
+                    alt="Google Calendar"
+                    className="w-5 h-5"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+                  />
+                  Google
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 px-4 py-2.5 h-auto"
+                  onClick={downloadIcal}
+                >
+                  <CalendarPlus className="w-5 h-5 text-muted-foreground" />
+                  Apple / Inne
+                </Button>
+              </div>
+            </div>
+
+            {/* Other actions */}
+            <div className="grid grid-cols-2 gap-2">
               <Button 
                 variant="outline" 
                 size="sm" 
