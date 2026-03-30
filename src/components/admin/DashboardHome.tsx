@@ -300,7 +300,7 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
           }}>
             <Calendar className="w-4 h-4" />
             <span className="hidden sm:inline">Otwórz kalendarz</span>
-            <span className="sm:hidden">Kalendarz</span>
+            <span className="sm:hidden">Wypróbuj rezerwację</span>
           </Button>
           <Badge variant="outline" className="gap-1">
             <Calendar className="w-3 h-3" />
