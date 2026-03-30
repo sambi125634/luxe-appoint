@@ -263,6 +263,8 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [additionalServices, setAdditionalServices] = useState<Service[]>([]);
   const [showServicePicker, setShowServicePicker] = useState(false);
+  const [showAllServices, setShowAllServices] = useState(false);
+  const [serviceSearch, setServiceSearch] = useState('');
 
   const removeAdditionalService = (index: number) => {
     setAdditionalServices(prev => prev.filter((_, i) => i !== index));
