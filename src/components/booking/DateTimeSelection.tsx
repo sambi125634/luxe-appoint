@@ -62,10 +62,9 @@ const generateBusySlots = () => {
 
 const busySlots = generateBusySlots();
 
-// Slots that fill gaps in schedule (recommended for salon)
-const recommendedSlots = ['10:00', '14:00', '14:30'];
-// Popular after-work slots
-const popularSlots = ['17:00', '17:30', '18:00', '18:30'];
+// Fallback slots for demo mode
+const fallbackRecommendedSlots = ['10:00', '14:00', '14:30'];
+const fallbackPopularSlots = ['17:00', '17:30', '18:00', '18:30'];
 
 type TimeOfDay = 'morning' | 'afternoon' | 'evening';
 
