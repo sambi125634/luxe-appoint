@@ -340,7 +340,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const handleBack = () => {
     const currentIndex = stepMapping.indexOf(currentStepId);
     if (currentIndex > 0) {
-      setShowRecommendations(false);
       const prevIndex = getPrevStepIndex();
       changeStep(hasIntro ? prevIndex : prevIndex + 1);
     }
