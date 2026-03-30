@@ -253,9 +253,13 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
       case "form":
         return (
           clientData.firstName.trim() !== "" &&
+          clientData.firstName.trim().length >= 2 &&
           clientData.lastName.trim() !== "" &&
+          clientData.lastName.trim().length >= 2 &&
           clientData.phone.trim() !== "" &&
+          /^[+]?[0-9]{9,15}$/.test(clientData.phone.replace(/[\s\-()]/g, "")) &&
           clientData.email.trim() !== "" &&
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientData.email.trim()) &&
           clientData.acceptRodo
         );
       case "payment":
