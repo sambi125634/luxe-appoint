@@ -258,9 +258,19 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         price: service.price, description: service.description, staffIds: service.staffIds,
         media: service.media || [], benefits: service.benefits || [], vatRate: service.vatRate || 23,
       });
+      // Variants will be loaded via useEffect on editingVariants
+      const svcVariants = variantsByService[service.id];
+      if (svcVariants && svcVariants.count > 0) {
+        setHasVariants(true);
+      } else {
+        setHasVariants(false);
+        setVariants([]);
+      }
     } else {
       setEditingService(null);
       setServiceForm({ name: "", category: categories[0]?.id || "", duration: 60, price: 0, description: "", staffIds: [], media: [], benefits: [], vatRate: 23 });
+      setHasVariants(false);
+      setVariants([]);
     }
     setBenefitInput("");
     setIsServiceDialogOpen(true);
