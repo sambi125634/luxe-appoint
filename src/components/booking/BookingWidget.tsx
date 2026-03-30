@@ -841,37 +841,171 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                   </button>
                 )}
 
-                {/* Mini service picker */}
-                {showServicePicker && (
-                  <div className="border-2 border-primary/20 rounded-xl overflow-hidden">
-                    <div className="flex items-center justify-between px-4 py-3 bg-primary/5 border-b border-primary/10">
-                      <p className="font-semibold text-sm">Wybierz dodatkową usługę</p>
-                      <button onClick={() => setShowServicePicker(false)} className="text-muted-foreground hover:text-foreground">
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="max-h-48 overflow-y-auto divide-y divide-border">
-                      {recommendations
-                        .filter(s => s.id !== selectedService!.id && !additionalServices.find(a => a.id === s.id))
-                        .map(service => (
+                {/* Intelligent service suggestion picker */}
+                <AnimatePresence>
+                {showServicePicker && (() => {
+                  const suggestionIds = SERVICE_SUGGESTIONS[selectedService!.id] || [];
+                  const excludeIds = new Set([selectedService!.id, ...additionalServices.map(s => s.id)]);
+                  
+                  const suggested = recommendations
+                    .filter(s => suggestionIds.includes(s.id) && !excludeIds.has(s.id))
+                    .slice(0, 4);
+                  
+                  const others = recommendations
+                    .filter(s => !suggestionIds.includes(s.id) && !excludeIds.has(s.id));
+
+                  const allForSearch = [...suggested, ...others];
+
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="border-2 border-primary/20 rounded-2xl overflow-hidden"
+                    >
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-4 py-3 bg-primary/5 border-b border-primary/10">
+                        <div>
+                          <p className="font-semibold text-sm">Dodaj do wizyty</p>
+                          <p className="text-xs text-muted-foreground">Polecane zestawienia</p>
+                        </div>
+                        <button
+                          onClick={() => {
+                            setShowServicePicker(false);
+                            setShowAllServices(false);
+                            setServiceSearch('');
+                          }}
+                          className="w-7 h-7 rounded-full bg-muted flex items-center justify-center hover:bg-muted/80"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Suggested services */}
+                      {!showAllServices && (
+                        <div className="p-3 space-y-2">
+                          {suggested.length === 0 ? (
+                            <p className="text-sm text-center text-muted-foreground py-4">
+                              Wszystkie polecane usługi już dodane ✓
+                            </p>
+                          ) : (
+                            suggested.map((service, i) => (
+                              <motion.button
+                                key={service.id}
+                                initial={{ opacity: 0, x: -8 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: i * 0.05 }}
+                                onClick={() => {
+                                  setAdditionalServices(prev => [...prev, { ...service, category: service.category || "", description: service.description || "" }]);
+                                  setShowServicePicker(false);
+                                  setShowAllServices(false);
+                                }}
+                                className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/40 hover:bg-primary/5 hover:border-primary/20 border-2 border-transparent transition-all text-left group"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5 mb-0.5">
+                                    <p className="font-semibold text-sm truncate">{service.name}</p>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground">{service.duration} min</p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <p className="font-bold text-sm">{service.price} zł</p>
+                                  <div className="w-7 h-7 rounded-full flex items-center justify-center transition-colors bg-muted group-hover:bg-primary">
+                                    <Plus className="w-3.5 h-3.5 transition-colors text-muted-foreground group-hover:text-primary-foreground" />
+                                  </div>
+                                </div>
+                              </motion.button>
+                            ))
+                          )}
+
+                          {others.length > 0 && (
+                            <button
+                              onClick={() => setShowAllServices(true)}
+                              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                              <span>Pokaż wszystkie usługi ({allForSearch.length})</span>
+                              <ChevronDown className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* All services with search */}
+                      {showAllServices && (
+                        <div className="p-3">
+                          <div className="relative mb-3">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                            <input
+                              type="text"
+                              placeholder="Szukaj usługi..."
+                              value={serviceSearch}
+                              onChange={e => setServiceSearch(e.target.value)}
+                              className="w-full pl-8 pr-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20"
+                              autoFocus
+                            />
+                          </div>
+
+                          <div className="max-h-64 overflow-y-auto space-y-1">
+                            {(() => {
+                              const filtered = allForSearch.filter(s =>
+                                serviceSearch === '' ||
+                                s.name.toLowerCase().includes(serviceSearch.toLowerCase())
+                              );
+                              const grouped = filtered.reduce((acc, service) => {
+                                const cat = service.category || "Inne";
+                                if (!acc[cat]) acc[cat] = [];
+                                acc[cat].push(service);
+                                return acc;
+                              }, {} as Record<string, typeof filtered>);
+
+                              return Object.entries(grouped).map(([category, services]) => (
+                                <div key={category}>
+                                  <p className="text-xs font-semibold text-muted-foreground px-2 py-1.5 uppercase tracking-wide">
+                                    {CATEGORY_EMOJI[category] || "📋"} {category}
+                                  </p>
+                                  {services.map(service => (
+                                    <button
+                                      key={service.id}
+                                      onClick={() => {
+                                        setAdditionalServices(prev => [...prev, { ...service, category: service.category || "", description: service.description || "" }]);
+                                        setShowServicePicker(false);
+                                        setShowAllServices(false);
+                                        setServiceSearch('');
+                                      }}
+                                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                                    >
+                                      <div>
+                                        <p className="font-medium text-sm">{service.name}</p>
+                                        <p className="text-xs text-muted-foreground">{service.duration} min</p>
+                                      </div>
+                                      <div className="flex items-center gap-2 ml-4">
+                                        <p className="font-semibold text-sm text-primary">{service.price} zł</p>
+                                        <Plus className="w-4 h-4 text-muted-foreground" />
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              ));
+                            })()}
+                          </div>
+
                           <button
-                            key={service.id}
                             onClick={() => {
-                              setAdditionalServices(prev => [...prev, { ...service, category: "", description: "" }]);
-                              setShowServicePicker(false);
+                              setShowAllServices(false);
+                              setServiceSearch('');
                             }}
-                            className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors text-left"
+                            className="w-full flex items-center justify-center gap-2 mt-2 py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
                           >
-                            <div>
-                              <p className="font-medium text-sm">{service.name}</p>
-                              <p className="text-xs text-muted-foreground">{service.duration} min</p>
-                            </div>
-                            <p className="font-semibold text-sm text-primary ml-4">{service.price} zł</p>
+                            <ChevronUp className="w-3.5 h-3.5" />
+                            Wróć do polecanych
                           </button>
-                        ))}
-                    </div>
-                  </div>
-                )}
+                        </div>
+                      )}
+                    </motion.div>
+                  );
+                })()}
+                </AnimatePresence>
               </div>
             )}
           </>
