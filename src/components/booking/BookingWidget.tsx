@@ -732,6 +732,14 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               selectedTime={selectedTime}
               serviceDuration={totalDuration}
               onProceed={handleNext}
+              onStaffSelect={(id, name) => {
+                setSelectedStaffName(name);
+                if (id) {
+                  setSelectedStaff({ id, name: name || '', role: '', rating: 0 });
+                } else {
+                  setSelectedStaff(null);
+                }
+              }}
             />
 
             {/* Additional services section - visible after time selected */}
