@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { QuickPicks } from "./QuickPicks";
 import { TimeSlotCard, getSlotType } from "./TimeSlotCard";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSmartSlots } from "@/hooks/useSmartSlots";
 
 const DEMO_STAFF = [
   { id: "s1", name: "Anna K.", initials: "AK", role: "Kosmetolog", rating: 4.9, nextAvailable: "Dziś" },
