@@ -253,8 +253,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
         return true;
       case "services":
         return selectedService !== null;
-      case "staff":
-        return true;
       case "datetime":
         return selectedDate !== null && selectedTime !== null;
       case "form":
