@@ -102,6 +102,40 @@ export function BookingConfirmation({
     window.open(googleUrl, "_blank");
   };
 
+  const downloadIcal = () => {
+    if (!date || !time || !service) return;
+
+    const startDate = new Date(date);
+    const [hours, minutes] = time.split(":").map(Number);
+    startDate.setHours(hours, minutes, 0, 0);
+
+    const endDate = new Date(startDate);
+    endDate.setMinutes(endDate.getMinutes() + service.duration);
+
+    const formatIcal = (d: Date) => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+    const icalContent = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "BEGIN:VEVENT",
+      `DTSTART:${formatIcal(startDate)}`,
+      `DTEND:${formatIcal(endDate)}`,
+      `SUMMARY:${service.name} — ${salonInfo.name}`,
+      `LOCATION:${salonInfo.address}`,
+      `DESCRIPTION:Numer rezerwacji: ${bookingRef}`,
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\n");
+
+    const blob = new Blob([icalContent], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "wizyta.ics";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const openMaps = () => {
     window.open(`https://maps.google.com/?q=${encodeURIComponent(salonInfo.address)}`, "_blank");
   };
