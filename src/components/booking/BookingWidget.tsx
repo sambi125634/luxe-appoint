@@ -717,7 +717,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               <div>
                 <p className="font-medium text-sm">
                   {selectedService.name}
-                  {additionalServices.length > 0 && ` +${additionalServices.length}`}
                 </p>
                 <p className="text-xs text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" />
