@@ -532,12 +532,18 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
                       <h3 className="font-semibold group-hover:text-primary transition-colors">
                         {service.name}
                       </h3>
-                      {service.popular && (
-                        <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/50 text-xs">
-                          Hit
-                        </Badge>
+                      {service.badge && (
+                        <span className={cn(
+                          "text-xs font-bold px-2 py-0.5 rounded-full",
+                          service.badge === "Hit" && "bg-orange-100 text-orange-700",
+                          service.badge === "Premium" && "bg-purple-100 text-purple-700",
+                          service.badge === "Nowość" && "bg-green-100 text-green-700",
+                        )}>
+                          {service.badge === "Hit" ? "⭐ " : service.badge === "Premium" ? "💎 " : "✨ "}
+                          {service.badge}
+                        </span>
                       )}
-                      {service.video && (
+                      {(service.video || service.hasVideo) && (
                         <Badge variant="outline" className="text-xs">Wideo</Badge>
                       )}
                     </div>
