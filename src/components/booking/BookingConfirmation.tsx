@@ -250,10 +250,15 @@ export function BookingConfirmation({
                 <div>
                   <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">ZABIEG</p>
                   <p className="font-semibold">{service?.name}</p>
-                  {staff && (
+                  {staff ? (
                     <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
                       <User className="w-3 h-3" />
                       {staff.name}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground flex items-center gap-1 mt-1">
+                      <Sparkles className="w-3 h-3" />
+                      Specjalista zostanie potwierdzony SMS-em
                     </p>
                   )}
                 </div>

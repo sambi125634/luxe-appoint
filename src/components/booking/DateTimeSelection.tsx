@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import { Sun, Sunset, Moon, Info, Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sun, Sunset, Moon, Info, Users, ChevronLeft, ChevronRight, Zap, User } from "lucide-react";
 import { format, addDays, isSameDay, isBefore, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addMonths, subMonths } from "date-fns";
 import { pl, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -8,6 +8,14 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useTranslation } from "react-i18next";
 import { QuickPicks } from "./QuickPicks";
 import { TimeSlotCard, getSlotType } from "./TimeSlotCard";
+import { motion, AnimatePresence } from "framer-motion";
+
+const DEMO_STAFF = [
+  { id: "s1", name: "Anna K.", initials: "AK", role: "Kosmetolog", rating: 4.9, nextAvailable: "Dziś" },
+  { id: "s2", name: "Karolina W.", initials: "KW", role: "Stylistka brwi", rating: 5.0, nextAvailable: "Dziś" },
+  { id: "s3", name: "Maria N.", initials: "MN", role: "Specjalistka depilacji", rating: 4.8, nextAvailable: "Jutro" },
+  { id: "s4", name: "Joanna L.", initials: "JL", role: "Masażystka", rating: 4.7, nextAvailable: "Jutro" },
+];
 
 interface DateTimeSelectionProps {
   onSelect: (date: Date, time: string) => void;
@@ -15,6 +23,7 @@ interface DateTimeSelectionProps {
   selectedTime: string | null;
   serviceDuration?: number;
   onProceed?: () => void;
+  onStaffSelect?: (staffId: string | null, staffName: string | null) => void;
 }
 
 const generateTimeSlots = () => {
@@ -69,13 +78,16 @@ export function DateTimeSelection({
   selectedDate, 
   selectedTime,
   serviceDuration = 60,
-  onProceed
+  onProceed,
+  onStaffSelect
 }: DateTimeSelectionProps) {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === 'pl' ? pl : enUS;
   const [viewingUsers] = useState(Math.floor(Math.random() * 3) + 1);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const timeSlotsRef = useRef<HTMLDivElement>(null);
+  const [staffMode, setStaffMode] = useState<'fastest' | 'pick'>('fastest');
+  const [selectedStaffFilter, setSelectedStaffFilter] = useState<string | null>(null);
 
   // Smooth scroll to time slots when date is selected
   useEffect(() => {
@@ -219,6 +231,125 @@ export function DateTimeSelection({
         <h2 className="text-2xl font-serif font-semibold mb-2">{t('booking.selectDateTime')}</h2>
         <p className="text-muted-foreground">{t('booking.findConvenientTime')}</p>
       </div>
+
+      {/* ── Staff mode toggle ── */}
+      <div className="flex gap-2 p-1 bg-muted rounded-xl">
+        <button
+          onClick={() => {
+            setStaffMode('fastest');
+            setSelectedStaffFilter(null);
+            onStaffSelect?.(null, null);
+          }}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+            staffMode === 'fastest'
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <Zap className={cn("w-4 h-4", staffMode === 'fastest' ? "text-primary" : "text-muted-foreground")} />
+          Najszybszy termin
+        </button>
+        <button
+          onClick={() => setStaffMode('pick')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+            staffMode === 'pick'
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          <User className={cn("w-4 h-4", staffMode === 'pick' ? "text-primary" : "text-muted-foreground")} />
+          Wybieram specjalistę
+        </button>
+      </div>
+
+      {/* ── Staff list (pick mode) ── */}
+      <AnimatePresence>
+        {staffMode === 'pick' && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <p className="text-xs text-muted-foreground mb-2">Wybierz specjalistę:</p>
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <button
+                onClick={() => {
+                  setSelectedStaffFilter(null);
+                  onStaffSelect?.(null, null);
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-2 rounded-xl border-2 whitespace-nowrap transition-all flex-shrink-0 text-sm",
+                  selectedStaffFilter === null
+                    ? "border-primary bg-primary/5 text-primary font-medium"
+                    : "border-border text-muted-foreground"
+                )}
+              >
+                <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Users className="w-3 h-3 text-primary" />
+                </div>
+                Dowolny
+              </button>
+              {DEMO_STAFF.map(staff => (
+                <button
+                  key={staff.id}
+                  onClick={() => {
+                    setSelectedStaffFilter(staff.id);
+                    onStaffSelect?.(staff.id, staff.name);
+                  }}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-xl border-2 whitespace-nowrap transition-all flex-shrink-0 text-sm",
+                    selectedStaffFilter === staff.id
+                      ? "border-primary bg-primary/5 text-primary font-medium"
+                      : "border-border text-muted-foreground"
+                  )}
+                >
+                  <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
+                    {staff.initials}
+                  </div>
+                  <span>{staff.name}</span>
+                  <span className="text-xs text-muted-foreground">⭐ {staff.rating}</span>
+                  {staff.nextAvailable && (
+                    <span className="text-xs text-emerald-600 font-medium">{staff.nextAvailable}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Fastest available slot highlight */}
+      {staffMode === 'fastest' && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-200 dark:border-emerald-800 rounded-xl p-3 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div>
+              <p className="font-semibold text-sm text-emerald-800 dark:text-emerald-200">Najbliższy wolny termin</p>
+              <p className="text-xs text-emerald-700 dark:text-emerald-300">Dziś, 14:00 — Anna K.</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              const today = new Date();
+              onSelect(today, '14:00');
+              setTimeout(() => onProceed?.(), 200);
+            }}
+            className="bg-emerald-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition-colors whitespace-nowrap"
+          >
+            Zarezerwuj →
+          </button>
+        </motion.div>
+      )}
 
       {/* Quick Picks Section */}
       <QuickPicks 

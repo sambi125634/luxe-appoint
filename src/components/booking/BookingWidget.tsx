@@ -1,10 +1,9 @@
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, Plus, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Sparkles, Calendar, Clock, UserCheck, Heart, Plus, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { BookingProgress } from "./BookingProgress";
 import { ServiceSelection } from "./ServiceSelection";
-import { StaffSelection } from "./StaffSelection";
 import { DateTimeSelection } from "./DateTimeSelection";
 import { ClientForm, ClientData } from "./ClientForm";
 import { BookingConfirmation } from "./BookingConfirmation";
@@ -16,13 +15,12 @@ import { BookingWidget as WidgetConfig } from "@/components/admin/widgets/types"
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
-const defaultSteps = ["Usługa", "Specjalista", "Termin", "Dane"];
+const defaultSteps = ["Usługa", "Termin", "Dane"];
 
 // Map step IDs to component names
 const stepIdToName: Record<string, string> = {
   intro: "Wprowadzenie",
   services: "Usługa",
-  staff: "Specjalista",
   datetime: "Termin",
   form: "Dane",
   payment: "Płatność",
@@ -160,7 +158,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   // Build dynamic steps from widget configuration
   const { steps, stepMapping } = useMemo(() => {
     if (!widgetConfig?.steps) {
-      const baseMapping = ["intro", "services", "staff", "datetime", "form"];
+      const baseMapping = ["intro", "services", "datetime", "form"];
       const baseSteps = defaultSteps;
       
       // Add payment step if enabled
@@ -215,6 +213,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
 
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null);
+  const [selectedStaffName, setSelectedStaffName] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [showRecommendations, setShowRecommendations] = useState(false);
@@ -255,8 +254,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
         return true;
       case "services":
         return selectedService !== null;
-      case "staff":
-        return true;
       case "datetime":
         return selectedDate !== null && selectedTime !== null;
       case "form":
@@ -727,15 +724,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
             )}
           </>
         )}
-        {currentStepId === "staff" && (
-          <StaffSelection
-            onSelect={setSelectedStaff}
-            selectedStaff={selectedStaff}
-            onProceed={handleNext}
-            salonId={salonId !== "demo" ? salonId : undefined}
-            isDemo={isDemo}
-          />
-        )}
         {currentStepId === "datetime" && (
           <>
             <DateTimeSelection
@@ -744,6 +732,14 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               selectedTime={selectedTime}
               serviceDuration={totalDuration}
               onProceed={handleNext}
+              onStaffSelect={(id, name) => {
+                setSelectedStaffName(name);
+                if (id) {
+                  setSelectedStaff({ id, name: name || '', role: '', rating: 0 });
+                } else {
+                  setSelectedStaff(null);
+                }
+              }}
             />
 
             {/* Additional services section - visible after time selected */}
@@ -885,6 +881,15 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                     <span className="ml-2">• {selectedTime}</span>
                   )}
                 </p>
+                {currentStepId === "form" && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                    <User className="w-3 h-3" />
+                    {selectedStaffName
+                      ? `Specjalista: ${selectedStaffName}`
+                      : "Specjalista: dopasujemy najlepszą osobę"
+                    }
+                  </p>
+                )}
               </div>
             </div>
             <div className="text-right">
