@@ -257,12 +257,9 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
 
   const handleSlotClick = () => {
     if (!searchResult) return;
-    // Navigate to booking widget
-    if (isDemo) {
-      window.open("/book/demo-salon", "_blank");
-    } else {
-      window.open("/book/salon", "_blank");
-    }
+
+    const targetSlug = isDemo ? "demo-salon" : (salonSlug || "demo-salon");
+    window.open(`/book/${targetSlug}`, "_blank", "noopener,noreferrer");
   };
 
   return (
