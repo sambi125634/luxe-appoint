@@ -332,7 +332,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
 
   const handleNext = () => {
     if (!isLastStep && canProceed()) {
-      setShowRecommendations(false);
       const nextIndex = getNextStepIndex();
       changeStep(hasIntro ? nextIndex : nextIndex + 1);
     }
