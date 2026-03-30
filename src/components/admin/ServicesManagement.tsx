@@ -349,6 +349,24 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         await syncStaffServicesMutation.mutateAsync({ serviceId: savedId, staffIds: serviceForm.staffIds });
       }
 
+      // Sync variants
+      if (hasVariants && variants.length > 0) {
+        const validVariants = variants
+          .filter(v => v.name.trim())
+          .map((v, i) => ({
+            name: v.name.trim(),
+            description: v.description || null,
+            duration: v.duration,
+            price: v.price,
+            is_active: v.is_active ?? true,
+            sort_order: i,
+          }));
+        await syncVariantsMutation.mutateAsync({ serviceId: savedId, variants: validVariants });
+      } else {
+        // Remove all variants if toggled off
+        await syncVariantsMutation.mutateAsync({ serviceId: savedId, variants: [] });
+      }
+
       toast({ title: "Usługa zapisana", description: `"${serviceForm.name}" została zapisana pomyślnie.` });
       setIsServiceDialogOpen(false);
     } catch {
