@@ -643,6 +643,15 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                 <div className="flex-1 min-w-0">
                   <p className="font-medium">{service.name}</p>
                   <p className="text-sm text-muted-foreground">{getCategoryName(service.category)}</p>
+                  {variantsByService[service.id] && variantsByService[service.id].count > 0 && (
+                    <span className="text-xs text-primary font-medium flex items-center gap-1 mt-0.5">
+                      <Layers className="w-3 h-3" />
+                      {variantsByService[service.id].count} wariantów
+                      <span className="text-muted-foreground font-normal">
+                        · od {variantsByService[service.id].minPrice} zł
+                      </span>
+                    </span>
+                  )}
                   {service.benefits && service.benefits.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-1">
                       {service.benefits.slice(0, 3).map(b => (
