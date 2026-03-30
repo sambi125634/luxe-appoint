@@ -389,9 +389,9 @@ export function ServiceSelection({ onSelect, selectedService, onProceed, salonId
 
   const handleServiceSelect = (service: Service) => {
     const effective = getEffectiveService(service);
-    setLastAddedService(effective);
-    setShowServiceAddedBar(true);
     onSelect(effective);
+    // Immediately proceed to next step
+    onProceed?.();
   };
 
   if (isLoading) {
