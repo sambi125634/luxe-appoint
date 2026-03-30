@@ -71,21 +71,26 @@ interface SalonSettings {
 
 // Demo recommendations mapping (only used in demo mode)
 const demoServiceRecommendations: Record<string, { id: string; name: string; price: number; duration: number }[]> = {
-  "1": [
-    { id: "2", name: "Mezoterapia igłowa", price: 350, duration: 60 },
-    { id: "3", name: "Mikrodermabrazja", price: 180, duration: 50 },
+  "s1": [
+    { id: "s2", name: "Mezoterapia igłowa", price: 350, duration: 60 },
+    { id: "s3", name: "Mikrodermabrazja", price: 180, duration: 50 },
   ],
-  "2": [
-    { id: "1", name: "Peeling kawitacyjny", price: 150, duration: 45 },
+  "s2": [
+    { id: "s1", name: "Peeling kawitacyjny", price: 150, duration: 45 },
+    { id: "s4", name: "Oczyszczanie wodorowe", price: 250, duration: 60 },
   ],
-  "4": [
-    { id: "5", name: "Masaż gorącymi kamieniami", price: 280, duration: 75 },
+  "s6": [
+    { id: "s7", name: "Masaż limfatyczny", price: 250, duration: 75 },
   ],
-  "6": [
-    { id: "7", name: "Depilacja laserowa bikini", price: 250, duration: 30 },
+  "s9": [
+    { id: "s10", name: "Depilacja woskiem", price: 80, duration: 30 },
   ],
-  "8": [
-    { id: "9", name: "Przedłużanie rzęs 1:1", price: 350, duration: 120 },
+  "s11": [
+    { id: "s12", name: "Laminacja brwi", price: 150, duration: 45 },
+    { id: "s13", name: "Henna + regulacja brwi", price: 70, duration: 30 },
+  ],
+  "s14": [
+    { id: "s15", name: "Pedicure leczniczy", price: 130, duration: 75 },
   ],
 };
 
