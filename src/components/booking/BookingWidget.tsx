@@ -230,6 +230,15 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [additionalServices, setAdditionalServices] = useState<Service[]>([]);
+  const [showServicePicker, setShowServicePicker] = useState(false);
+
+  const removeAdditionalService = (index: number) => {
+    setAdditionalServices(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const totalPrice = (selectedService?.price || 0) + additionalServices.reduce((sum, s) => sum + s.price, 0);
+  const totalDuration = (selectedService?.duration || 0) + additionalServices.reduce((sum, s) => sum + s.duration, 0);
 
   const changeStep = (newStep: number) => {
     setPreviousStep(currentStep);
