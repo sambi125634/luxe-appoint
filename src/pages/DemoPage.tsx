@@ -24,7 +24,6 @@ import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 
-import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
 
