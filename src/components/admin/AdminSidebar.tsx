@@ -63,7 +63,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
         { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
         { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
-        { icon: Workflow, labelKey: "admin.pipeline", tab: "pipeline" },
+        { icon: Workflow, labelKey: "admin.clientJourney", tab: "pipeline" },
       ],
     },
     {

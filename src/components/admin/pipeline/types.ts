@@ -53,84 +53,84 @@ export const defaultPipelineStages: PipelineStage[] = [
     name: 'Zarezerwowane',
     color: 'bg-blue-500',
     order: 1,
-    description: 'Klient dokonał rezerwacji pierwszej wizyty'
+    description: 'Klientka zarezerwowała pierwszą wizytę z Twojej reklamy'
   },
   {
     id: 'no-show',
     name: 'Nie stawił się',
     color: 'bg-red-500',
     order: 2,
-    description: 'Klient nie przyszedł na umówioną wizytę'
+    description: 'AI podejmuje próby odzyskania klientki'
   },
   {
     id: 'visit-1-done',
     name: 'Wizyta 1 ✓',
     color: 'bg-green-500',
     order: 3,
-    description: 'Pierwsza wizyta odbyta'
+    description: 'Pierwsza wizyta zakończona sukcesem'
   },
   {
     id: 'between-1-2',
     name: 'Między 1 a 2',
     color: 'bg-amber-500',
     order: 4,
-    description: 'Follow-up po pierwszej wizycie'
+    description: 'Automatyczny follow-up w toku — dbamy o powrót'
   },
   {
     id: 'visit-2-done',
     name: 'Wizyta 2 ✓',
     color: 'bg-green-500',
     order: 5,
-    description: 'Druga wizyta odbyta'
+    description: 'Druga wizyta potwierdza zaangażowanie klientki'
   },
   {
     id: 'between-2-3',
     name: 'Między 2 a 3',
     color: 'bg-amber-500',
     order: 6,
-    description: 'Follow-up po drugiej wizycie'
+    description: 'System buduje lojalność — klientka wraca regularnie'
   },
   {
     id: 'visit-3-done',
     name: 'Wizyta 3 ✓',
     color: 'bg-green-500',
     order: 7,
-    description: 'Trzecia wizyta odbyta'
+    description: 'Klientka na dobrej drodze do ukończenia cyklu'
   },
   {
     id: 'between-3-4',
     name: 'Między 3 a 4',
     color: 'bg-amber-500',
     order: 8,
-    description: 'Follow-up po trzeciej wizycie'
+    description: 'Klientka blisko celu — utrzymujemy momentum'
   },
   {
     id: 'visit-4-done',
     name: 'Wizyta 4 ✓',
     color: 'bg-green-500',
     order: 9,
-    description: 'Czwarta wizyta odbyta'
+    description: 'Jeszcze jedna wizyta do pełnego sukcesu'
   },
   {
     id: 'between-4-5',
     name: 'Między 4 a 5',
     color: 'bg-amber-500',
     order: 10,
-    description: 'Follow-up po czwartej wizycie'
+    description: 'Ostatni follow-up przed zakończeniem cyklu'
   },
   {
     id: 'visit-5-done',
     name: 'Wizyta 5 ✓',
     color: 'bg-emerald-600',
     order: 11,
-    description: 'Piąta wizyta odbyta - pakiet ukończony!'
+    description: 'Pełny cykl zabiegów ukończony!'
   },
   {
     id: 'completed',
     name: 'Ukończone',
     color: 'bg-purple-500',
     order: 12,
-    description: 'Klient ukończył cały pakiet'
+    description: 'Cel osiągnięty — klientka ukończyła pełny cykl zabiegów'
   }
 ];
 
