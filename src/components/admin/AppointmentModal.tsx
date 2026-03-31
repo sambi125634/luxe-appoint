@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Scissors, Search, ShoppingBag } from "lucide-react";
+import { Calendar, Clock, User, Scissors, Search, ShoppingBag, CalendarPlus, Check, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,7 +90,19 @@ const timeSlots = Array.from({ length: 24 }, (_, i) => {
   const hour = Math.floor(i / 2) + 8;
   const minutes = i % 2 === 0 ? "00" : "30";
   return `${hour.toString().padStart(2, "0")}:${minutes}`;
-}).filter((_, i) => i < 22); // 8:00 - 19:00
+}).filter((_, i) => i < 22);
+
+function getInitials(name: string) {
+  return name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase();
+}
+
+const staffBgColors = [
+  "bg-primary/20 text-primary",
+  "bg-secondary/20 text-secondary",
+  "bg-accent/20 text-accent-foreground",
+  "bg-chart-1/20 text-chart-1",
+  "bg-chart-2/20 text-chart-2",
+];
 
 export function AppointmentModal({ 
   isOpen, 
@@ -105,12 +117,10 @@ export function AppointmentModal({
 }: AppointmentModalProps) {
   const { t } = useTranslation();
 
-  // Real data from DB for production mode
   const { data: dbStaff } = useStaffMembers();
   const { data: dbClients } = useClients();
   const { data: dbServices } = useServices();
 
-  // Use real or mock data
   const staffColors = ["bg-primary", "bg-secondary", "bg-accent", "bg-chart-1"];
   const clients: Client[] = isDemo
     ? mockClients
@@ -138,6 +148,7 @@ export function AppointmentModal({
         name: s.name,
         color: staffColors[i % staffColors.length],
       }));
+
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const [isNewClient, setIsNewClient] = useState(false);
@@ -253,6 +264,9 @@ export function AppointmentModal({
     onClose();
   };
 
+  const productTotal = productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0);
+  const grandTotal = (selectedService?.price || 0) + productTotal;
+
   return (
     <Dialog
       open={isOpen}
@@ -260,18 +274,24 @@ export function AppointmentModal({
         if (!open) onClose();
       }}
     >
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-serif text-xl">
-            {appointment ? t('appointment.editAppointment') : t('appointment.newAppointment')}
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0">
+        {/* Premium Header */}
+        <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-secondary/10 px-6 pt-6 pb-4 rounded-t-lg">
+          <DialogHeader>
+            <DialogTitle className="font-serif text-xl flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center">
+                <CalendarPlus className="w-5 h-5 text-primary" />
+              </div>
+              {appointment ? t('appointment.editAppointment') : t('appointment.newAppointment')}
+            </DialogTitle>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-5 py-2">
+        <div className="space-y-5 px-6 py-4">
           {/* Client Selection */}
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <User className="w-4 h-4 text-primary" />
+            <Label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+              <User className="w-3.5 h-3.5 text-primary" />
               {t('appointment.client')}
             </Label>
             <div className="relative">
@@ -284,22 +304,27 @@ export function AppointmentModal({
                   setShowClientDropdown(true);
                 }}
                 onFocus={() => setShowClientDropdown(true)}
-                className="pl-9"
+                className="pl-9 rounded-xl"
               />
               {showClientDropdown && clientSearch && (
-                <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-1 bg-card border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
                   {filteredClients.map(client => (
                     <button
                       key={client.id}
-                      className="w-full px-4 py-3 text-left hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0"
+                      className="w-full px-4 py-3 text-left hover:bg-primary/5 transition-colors border-b border-border/30 last:border-0 flex items-center gap-3"
                       onClick={() => selectClient(client)}
                     >
-                      <p className="font-medium">{client.name}</p>
-                      <p className="text-sm text-muted-foreground">{client.phone} • {client.email}</p>
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shrink-0">
+                        {getInitials(client.name)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{client.name}</p>
+                        <p className="text-xs text-muted-foreground">{client.phone}</p>
+                      </div>
                     </button>
                   ))}
                   <button
-                    className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors text-primary font-medium"
+                    className="w-full px-4 py-3 text-left hover:bg-primary/10 transition-colors text-primary font-medium text-sm"
                     onClick={handleNewClient}
                   >
                     + {t('appointment.addNewClient')}: "{clientSearch}"
@@ -308,76 +333,99 @@ export function AppointmentModal({
               )}
             </div>
             {isNewClient && (
-              <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 rounded-lg">
+              <div className="grid grid-cols-2 gap-3 p-3 bg-muted/30 rounded-xl">
                 <Input
                   placeholder={t('appointment.phone')}
                   value={form.clientPhone}
                   onChange={(e) => setForm(prev => ({ ...prev, clientPhone: e.target.value }))}
+                  className="rounded-xl"
                 />
                 <Input
                   placeholder={t('appointment.email')}
                   value={form.clientEmail}
                   onChange={(e) => setForm(prev => ({ ...prev, clientEmail: e.target.value }))}
+                  className="rounded-xl"
                 />
               </div>
             )}
           </div>
 
-          {/* Service Selection */}
+          {/* Service Selection — Cards */}
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <Scissors className="w-4 h-4 text-primary" />
+            <Label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+              <Scissors className="w-3.5 h-3.5 text-primary" />
               {t('appointment.service')}
             </Label>
-            <Select
-              value={form.serviceId}
-              onValueChange={(value) => setForm(prev => ({ ...prev, serviceId: value }))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t('appointment.selectService')} />
-              </SelectTrigger>
-              <SelectContent>
-                {services.length === 0 ? (
-                  <div className="px-4 py-3 text-sm text-muted-foreground text-center">
-                    Brak usług — dodaj je w zakładce Usługi
-                  </div>
-                ) : (
-                  services.map(service => (
-                    <SelectItem key={service.id} value={service.id}>
-                      <div className="flex items-center justify-between w-full gap-4">
-                        <span>{service.name}</span>
-                        <span className="text-muted-foreground text-sm">
-                          {service.duration} min • {service.price} zł
-                        </span>
+            {services.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                Brak usług — dodaj je w zakładce Usługi
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1">
+                {services.map(service => (
+                  <button
+                    key={service.id}
+                    type="button"
+                    onClick={() => setForm(prev => ({ ...prev, serviceId: service.id }))}
+                    className={cn(
+                      "flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left group",
+                      form.serviceId === service.id
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border/50 hover:border-primary/30 hover:bg-muted/30"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center transition-colors",
+                        form.serviceId === service.id
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                      )}>
+                        <Sparkles className="w-4 h-4" />
                       </div>
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+                      <div>
+                        <p className="text-sm font-medium">{service.name}</p>
+                        <p className="text-xs text-muted-foreground">{service.duration} min</p>
+                      </div>
+                    </div>
+                    <span className={cn(
+                      "text-sm font-bold tabular-nums",
+                      form.serviceId === service.id ? "text-primary" : "text-foreground"
+                    )}>
+                      {service.price} zł
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Staff Selection */}
+          {/* Staff Selection — Avatar Cards */}
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <User className="w-4 h-4 text-primary" />
+            <Label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+              <User className="w-3.5 h-3.5 text-primary" />
               {t('appointment.specialist')}
             </Label>
             <div className="grid grid-cols-2 gap-2">
-              {staffMembers.map(staff => (
+              {staffMembers.map((staff, idx) => (
                 <button
                   key={staff.id}
                   type="button"
                   onClick={() => setForm(prev => ({ ...prev, staffId: staff.id }))}
                   className={cn(
-                    "flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left",
+                    "flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all text-left shadow-sm",
                     form.staffId === staff.id
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "border-border/50 hover:border-primary/30"
                   )}
                 >
-                  <div className={cn("w-3 h-3 rounded-full", staff.color)} />
-                  <span className="text-sm font-medium">{staff.name}</span>
+                  <div className={cn(
+                    "w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0",
+                    staffBgColors[idx % staffBgColors.length]
+                  )}>
+                    {getInitials(staff.name)}
+                  </div>
+                  <span className="text-sm font-medium leading-tight">{staff.name}</span>
                 </button>
               ))}
             </div>
@@ -386,26 +434,27 @@ export function AppointmentModal({
           {/* Date & Time */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
+              <Label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                <Calendar className="w-3.5 h-3.5 text-primary" />
                 {t('appointment.date')}
               </Label>
               <Input
                 type="date"
                 value={form.date}
                 onChange={(e) => setForm(prev => ({ ...prev, date: e.target.value }))}
+                className="rounded-xl"
               />
             </div>
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-primary" />
+              <Label className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                <Clock className="w-3.5 h-3.5 text-primary" />
                 {t('appointment.time')}
               </Label>
               <Select
                 value={form.time}
                 onValueChange={(value) => setForm(prev => ({ ...prev, time: value }))}
               >
-                <SelectTrigger>
+                <SelectTrigger className="rounded-xl">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -419,19 +468,20 @@ export function AppointmentModal({
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label>{t('appointment.notes')}</Label>
+            <Label className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">{t('appointment.notes')}</Label>
             <Textarea
               placeholder={t('appointment.notesPlaceholder')}
               value={form.notes}
               onChange={(e) => setForm(prev => ({ ...prev, notes: e.target.value }))}
               rows={3}
+              className="rounded-xl"
             />
           </div>
 
           {/* Product Sales Section */}
           <Collapsible open={showProducts} onOpenChange={setShowProducts}>
             <CollapsibleTrigger asChild>
-              <Button variant="outline" className="w-full gap-2 justify-between">
+              <Button variant="outline" className="w-full gap-2 justify-between rounded-xl">
                 <span className="flex items-center gap-2">
                   <ShoppingBag className="w-4 h-4" />
                   {t('products.addProductsToSale')}
@@ -448,43 +498,47 @@ export function AppointmentModal({
             </CollapsibleContent>
           </Collapsible>
 
-          {/* Summary */}
+          {/* Premium Summary */}
           {selectedService && selectedStaff && (
-            <div className="p-4 bg-primary/5 rounded-xl border border-primary/20">
-              <p className="text-sm text-muted-foreground mb-2">{t('appointment.summary')}</p>
-              <div className="space-y-1 text-sm">
-                <p><span className="font-medium">{t('appointment.service')}:</span> {selectedService.name}</p>
-                <p><span className="font-medium">{t('appointment.duration')}:</span> {selectedService.duration} min</p>
+            <div className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground rounded-2xl p-5 shadow-lg">
+              <p className="text-xs uppercase tracking-wider opacity-80 mb-3">{t('appointment.summary')}</p>
+              <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="font-medium">{t('appointment.servicePrice')}:</span>
-                  <span>{selectedService.price} zł</span>
+                  <span className="opacity-80">{t('appointment.service')}</span>
+                  <span className="font-medium">{selectedService.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="opacity-80">{t('appointment.duration')}</span>
+                  <span className="font-medium">{selectedService.duration} min</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="opacity-80">{t('appointment.specialist')}</span>
+                  <span className="font-medium">{selectedStaff.name}</span>
                 </div>
                 {productCart.length > 0 && (
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>{t('products.productsTotal')} ({productCart.length}):</span>
-                    <span>{productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0).toLocaleString()} zł</span>
+                  <div className="flex justify-between opacity-80">
+                    <span>{t('products.productsTotal')} ({productCart.length})</span>
+                    <span>{productTotal.toLocaleString()} zł</span>
                   </div>
                 )}
-                <Separator className="my-2" />
-                <div className="flex justify-between font-bold text-base">
-                  <span>{t('appointment.total')}:</span>
-                  <span className="text-primary">
-                    {(selectedService.price + productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0)).toLocaleString()} zł
-                  </span>
+                <Separator className="my-2 bg-primary-foreground/20" />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>{t('appointment.total')}</span>
+                  <span>{grandTotal.toLocaleString()} zł</span>
                 </div>
-                <p className="pt-1"><span className="font-medium">{t('appointment.specialist')}:</span> {selectedStaff.name}</p>
               </div>
             </div>
           )}
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>{t('common.cancel')}</Button>
+        <DialogFooter className="px-6 pb-6 pt-2">
+          <Button variant="outline" onClick={onClose} className="rounded-xl">{t('common.cancel')}</Button>
           <Button 
-            variant="luxury" 
+            className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl transition-all px-8 rounded-xl gap-2"
             onClick={handleSave}
             disabled={!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)}
           >
+            <Check className="w-4 h-4" />
             {appointment ? t('appointment.saveChanges') : t('appointment.createAppointment')}
           </Button>
         </DialogFooter>
