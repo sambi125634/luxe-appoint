@@ -10,7 +10,13 @@ import {
   Kanban,
   BarChart3,
   GitBranch,
-  Settings
+  Settings,
+  Sparkles,
+  RefreshCw,
+  Eye,
+  Zap,
+  Target,
+  ShieldCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -53,10 +59,8 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
       const maxScroll = viewport.scrollWidth - viewport.clientWidth;
       if (maxScroll <= 0) return;
 
-      // Scroll right over 2s
       viewport.scrollTo({ left: maxScroll, behavior: 'smooth' });
 
-      // Scroll back after 2.5s
       setTimeout(() => {
         viewport.scrollTo({ left: 0, behavior: 'smooth' });
       }, 2500);
@@ -65,15 +69,13 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
     return () => clearTimeout(timer);
   }, [contacts.length]);
 
-  // Handle stage nav click — scroll to column
   const handleStageNavClick = (_stageId: string, index: number) => {
     const viewport = scrollRef.current?.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement | null;
     if (!viewport) return;
-    const columnWidth = 280 + 16; // w-[280px] + gap-4
+    const columnWidth = 280 + 16;
     viewport.scrollTo({ left: index * columnWidth, behavior: 'smooth' });
   };
   
-  // Filter contacts by search query
   const filteredContacts = contacts.filter(contact => {
     const searchLower = searchQuery.toLowerCase();
     return (
@@ -84,7 +86,6 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
     );
   });
   
-  // Group contacts by stage
   const contactsByStage = defaultPipelineStages.reduce((acc, stage) => {
     acc[stage.id] = filteredContacts.filter(c => c.stageId === stage.id);
     return acc;
@@ -209,9 +210,9 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <GitBranch className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-serif text-xl font-semibold mb-2">Pipeline wymaga konfiguracji</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2">Ścieżka Klientki™ wymaga konfiguracji</h3>
             <p className="text-muted-foreground text-sm mb-4">
-              Pipeline sprzedażowy automatycznie śledzi postęp klientek przez etapy zabiegów. Skonfiguruj integrację CRM w ustawieniach, aby aktywować ten moduł.
+              Ścieżka Klientki™ automatycznie śledzi postęp klientek przez etapy zabiegów. Skonfiguruj integrację w ustawieniach, aby aktywować ten moduł.
             </p>
             <Button variant="outline" className="gap-2">
               <Settings className="w-4 h-4" />
@@ -237,6 +238,69 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
       </TabsList>
 
       <TabsContent value="board" className="space-y-4">
+        {/* Hero Banner — only in demo */}
+        {isDemo && (
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900 via-indigo-900 to-primary/90 p-6 md:p-8 text-white">
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/20 blur-3xl -translate-y-1/2 translate-x-1/4" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/10 blur-2xl translate-y-1/3 -translate-x-1/4" />
+            </div>
+            
+            <div className="relative z-10 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-amber-300" />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-serif font-bold">Ścieżka Klientki™</h2>
+                  <p className="text-white/70 text-sm">Autorski system maksymalizacji wizyt</p>
+                </div>
+              </div>
+
+              <p className="text-white/90 text-base md:text-lg max-w-2xl leading-relaxed">
+                Każda klientka z reklamy przechodzi przez sprawdzony proces, który zamienia jednorazową wizytę w lojalną, powracającą klientkę.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-3">
+                    <Target className="w-5 h-5 text-emerald-300" />
+                  </div>
+                  <h3 className="font-semibold text-sm mb-1">Więcej powrotów</h3>
+                  <p className="text-white/60 text-xs leading-relaxed">
+                    Automatyczny system sprawia, że klientki wracają na kolejne wizyty zamiast odpadać po pierwszej.
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3">
+                    <Zap className="w-5 h-5 text-blue-300" />
+                  </div>
+                  <h3 className="font-semibold text-sm mb-1">Zero ręcznej pracy</h3>
+                  <p className="text-white/60 text-xs leading-relaxed">
+                    Potwierdzenia, przypomnienia i follow-upy działają same — Ty zajmujesz się zabiegami.
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
+                  <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center mb-3">
+                    <Eye className="w-5 h-5 text-purple-300" />
+                  </div>
+                  <h3 className="font-semibold text-sm mb-1">Pełna kontrola</h3>
+                  <p className="text-white/60 text-xs leading-relaxed">
+                    Widzisz dokładnie, na jakim etapie jest każda klientka i ile przychodu generuje Twój lejek.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-amber-300" />
+                <span className="text-xs text-white/60">W zestawie z pakietem kampanii reklamowej</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Section Guide */}
         <SectionGuide sectionKey="pipeline" />
 
@@ -252,7 +316,7 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalContacts}</p>
-                <p className="text-xs text-muted-foreground">{t('pipeline.inPipeline')}</p>
+                <p className="text-xs text-muted-foreground">Klientki w lejku</p>
               </div>
             </div>
           </div>
@@ -264,19 +328,19 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalValue.toLocaleString()} <span className="text-sm font-normal">zł</span></p>
-                <p className="text-xs text-muted-foreground">{t('pipeline.pipelineValue')}</p>
+                <p className="text-xs text-muted-foreground">Wartość lejka</p>
               </div>
             </div>
           </div>
           
           <div className="glass-card p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
+              <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+                <RefreshCw className="w-5 h-5 text-amber-500" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{noShowCount}</p>
-                <p className="text-xs text-muted-foreground">{t('pipeline.didNotShow')}</p>
+                <p className="text-xs text-muted-foreground">Odzyskiwane</p>
               </div>
             </div>
           </div>
@@ -288,7 +352,7 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold">{completedCount}</p>
-                <p className="text-xs text-muted-foreground">{t('pipeline.completedPackages')}</p>
+                <p className="text-xs text-muted-foreground">Ukończone cykle</p>
               </div>
             </div>
           </div>
@@ -315,7 +379,7 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
         {isDemo && (
           <div className="glass-card p-3 bg-primary/5 border-primary/20">
             <p className="text-sm text-center">
-              <span className="font-medium">{t('pipeline.demoMode')}</span> – {t('pipeline.demoDescription')}
+              <span className="font-medium">Podgląd Twojego lejka kampanii</span> – Każda klientka z reklamy automatycznie trafia tutaj i przechodzi przez sprawdzony proces maksymalizacji wizyt.
             </p>
           </div>
         )}

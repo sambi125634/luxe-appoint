@@ -86,7 +86,7 @@ export default function AdminDashboard() {
       case "widgets": return "Widgety rezerwacji";
       case "clients": return "Klienci";
       case "conversations": return "Konwersacje";
-      case "pipeline": return "Pipeline sprzedażowy";
+      case "pipeline": return "Ścieżka Klientki™";
       case "accounting": return "Księgowość & Raporty";
       case "products": return "Produkty";
       
