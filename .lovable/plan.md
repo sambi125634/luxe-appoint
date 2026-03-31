@@ -1,92 +1,41 @@
 
 
-## Plan: Wyszukiwarka usług w modalu admin + pewność integracji kalendarzy
+## Plan: Usunięcie True Profit z sidebara + Przeniesienie Eksportu do Ustawień
 
-### Problem
-1. Lista usług w `AppointmentModal` nie ma wyszukiwarki — przy wielu usługach trudno znaleźć właściwą
-2. Potrzeba potwierdzenia, że conflict check działa spójnie we wszystkich punktach zapisu
+### Zmiany
 
-### Rozwiązanie
+#### 1. Usunięcie True Profit z nawigacji
+**Plik: `src/components/admin/AdminSidebar.tsx`**
+- Usunąć `{ icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" }` z sekcji "Finanse"
+- Usunąć `analytics` z `TAB_PERMISSION_MAP`
+- Usunąć import `TrendingUp`
 
-#### Zmiana 1 — Wyszukiwarka usług w AppointmentModal
+#### 2. Usunięcie Eksportu z nawigacji
+**Plik: `src/components/admin/AdminSidebar.tsx`**
+- Usunąć `{ icon: Download, labelKey: "admin.export", tab: "export" }` z sekcji "Finanse"
+- Usunąć `export` z `TAB_PERMISSION_MAP` i typu `TabType`
+- Usunąć import `Download`
 
-**Plik: `src/components/admin/AppointmentModal.tsx`**
+#### 3. Przeniesienie Eksportu do Ustawień
+**Plik: `src/components/admin/settings/types.ts`**
+- Dodać `"export"` do `SettingsTabType`
 
-Dodać stan `serviceSearch` i pole `Input` z ikoną `Search` nad listą kart usług. Filtrować listę po nazwie:
+**Plik: `src/components/admin/settings/SettingsModule.tsx`**
+- Dodać tab `{ id: "export", label: "Eksport danych", icon: Download }` do listy tabów
+- Dodać `TabsContent value="export"` renderujący `<ExportModule />`
+- Import `Download` z lucide i `ExportModule`
 
-```typescript
-const [serviceSearch, setServiceSearch] = useState("");
+#### 4. Aktualizacja DemoPage i AdminDashboard
+**Plik: `src/pages/DemoPage.tsx`**
+- Usunąć case `"analytics"` i `"export"` z `renderContent` i `getPageTitle`
+- Usunąć importy `TrueProfitDashboard` i `ExportModule`
 
-const filteredServices = services.filter(s =>
-  s.name.toLowerCase().includes(serviceSearch.toLowerCase())
-);
-```
-
-Nad `grid grid-cols-1` (linia ~364) wstawić input:
-```tsx
-<div className="relative">
-  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-  <Input
-    placeholder="Szukaj usługi..."
-    value={serviceSearch}
-    onChange={(e) => setServiceSearch(e.target.value)}
-    className="pl-9 rounded-xl mb-2"
-  />
-</div>
-```
-
-Następnie renderować `filteredServices` zamiast `services` w mapowaniu kart. Reset `serviceSearch` przy otwarciu modalu (w istniejącym `useEffect`).
-
-#### Zmiana 2 — Audyt conflict check we wszystkich punktach zapisu
-
-Aktualny stan integracji:
-
-| Punkt zapisu | Plik | Conflict check |
-|---|---|---|
-| Widżet klienta | `BookingWidget.tsx` | ✅ `checkAppointmentConflict` przed insertem |
-| Kalendarz admin | `WeeklyCalendar.tsx` | ✅ `checkAppointmentConflict` przed insert/update |
-| Nowa wizyta (header) | `ScheduleManagement.tsx` | ✅ `checkAppointmentConflict` przed insertem |
-| Quick Block | `ScheduleManagement.tsx` | ⚠️ Tworzy cancelled appointment — nie koliduje |
-| AppointmentModal (onSave) | Zależy od wywołującego | ✅ Każdy caller sprawdza |
-
-System jest spójny — edge function `check-appointment-conflict` jest wywoływana w **każdym** punkcie zapisu wizyty. Żaden insert nie przejdzie bez weryfikacji.
-
-Jedyne usprawnienie: dodać conflict check **bezpośrednio** w `handleSave` wewnątrz `AppointmentModal` (zamiast polegać na callerze), żeby mieć 100% pewność niezależnie od tego, kto wywołuje modal.
-
-**Plik: `src/components/admin/AppointmentModal.tsx`** (linia ~248, `handleSave`)
-
-Przed wywołaniem `onSave()`, dodać:
-```typescript
-const handleSave = async () => {
-  if (!form.serviceId || !form.staffId) return;
-  
-  // Conflict check
-  if (salonId) {
-    const startDate = new Date(`${form.date}T${form.time}`);
-    const endDate = new Date(startDate.getTime() + (selectedService?.duration || 60) * 60000);
-    const result = await checkAppointmentConflict({
-      salonId,
-      staffId: form.staffId,
-      startTime: startDate.toISOString(),
-      endTime: endDate.toISOString(),
-      excludeId: appointment?.id,
-    });
-    if (result.conflict) {
-      // Pokazać toast z komunikatem o konflikcie
-      return;
-    }
-  }
-  
-  onSave({ ... });
-};
-```
-
-Wymaga dodania importu `checkAppointmentConflict` i `formatConflictMessage`, oraz przekazania `useToast` (lub callback).
-
-### Pliki do edycji
-1. `src/components/admin/AppointmentModal.tsx` — wyszukiwarka usług + conflict check w handleSave
+**Plik: `src/pages/AdminDashboard.tsx`**
+- Usunąć case `"analytics"` i `"export"` z `renderContent` i `getPageTitle`
+- Usunąć importy `TrueProfitDashboard` i `ExportModule`
 
 ### Efekt
-- Admin szybko znajduje usługę wpisując nazwę
-- Podwójna ochrona przed overbookingiem: modal sam weryfikuje konflikty niezależnie od callera
+- True Profit znika z sidebara (dane dostępne w Raportach)
+- Eksport danych dostępny w Ustawienia → nowa zakładka "Eksport danych"
+- Czystsza nawigacja w sekcji Finanse (zostaje tylko "Raporty")
 
