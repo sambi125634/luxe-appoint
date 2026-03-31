@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap, Radio } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio, Download } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
