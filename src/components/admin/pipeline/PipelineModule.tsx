@@ -94,6 +94,8 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   const totalValue = contacts.reduce((acc, c) => acc + c.value, 0);
   const noShowCount = contacts.filter(c => c.stageId === 'no-show').length;
   const completedCount = contacts.filter(c => c.stageId === 'completed').length;
+  const newThisWeek = isDemo ? 2 : 0;
+  const avgClientValue = completedCount > 0 ? Math.round(totalValue / (contacts.length || 1)) : 0;
   
   // Drag & Drop handlers
   const handleDragStart = (e: React.DragEvent, contactId: string) => {
