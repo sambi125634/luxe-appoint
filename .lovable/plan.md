@@ -1,63 +1,38 @@
 
 
-## Plan: Walidacja konfliktów terminów we wszystkich punktach rezerwacji
+## Plan: Przeprojektowanie modalu "Nowa wizyta" w panelu admin
 
 ### Problem
-Żaden z 3 punktów tworzenia wizyt nie sprawdza, czy wybrany termin jest już zajęty:
-1. **Widżet rezerwacji** (`BookingWidget.tsx`) — klient może zarezerwować termin, który jest już zajęty
-2. **Kalendarz admin** (`WeeklyCalendar.tsx`) — admin może dodać wizytę nakładającą się na istniejącą
-3. **Zarządzanie grafikiem** (`ScheduleManagement.tsx`) — to samo co wyżej
-
-Efekt: możliwe podwójne rezerwacje u tego samego pracownika w tym samym czasie.
+Modal dodawania wizyty (`AppointmentModal.tsx`) wygląda generycznie — szare formularze, standardowe selecty, brak koloru. Klient widzi piękny widżet rezerwacji, a admin widzi nudny formularz.
 
 ### Rozwiązanie
+Przeprojektować modal wizualnie, zachowując 100% obecnej funkcjonalności. Inspiracja z `BookingWidget` — kolorowe karty, gradient w podsumowaniu, ikonki, animowane sekcje.
 
-**Krok 1: Edge function `check-appointment-conflict`**
+**Plik: `src/components/admin/AppointmentModal.tsx`**
 
-Nowa funkcja backendowa, która przed zapisem wizyty sprawdza, czy istnieje nakładający się termin:
+#### Zmiany wizualne:
 
-```sql
-SELECT id FROM appointments
-WHERE salon_id = $salonId
-  AND staff_id = $staffId
-  AND status NOT IN ('cancelled')
-  AND start_time < $newEndTime
-  AND end_time > $newStartTime
-  AND ($excludeId IS NULL OR id != $excludeId)
-LIMIT 1;
-```
+1. **Nagłówek** — gradient tło z ikoną `CalendarPlus`, większy tytuł
+2. **Sekcja klienta** — zachować search, ale ładniejszy dropdown z awatarami (inicjały w kolorowych kółkach)
+3. **Sekcja usługi** — zamiast `<Select>` → klikalne karty usług z ceną i czasem, kolorowy border przy zaznaczeniu (jak w BookingWidget)
+4. **Sekcja pracownika** — obecne buttony z kolorowymi kropkami → awatary z inicjałami i kolorowym tłem, większe karty
+5. **Data i czas** — zachować obecne inputy ale dodać kolorowe ikony i lepszy spacing
+6. **Podsumowanie** — gradient card (primary → secondary) z białym tekstem zamiast bladego bg-primary/5
+7. **Przycisk zapisu** — pełny gradient, większy, z ikoną `Check`
 
-Zwraca `{ conflict: true/false, conflictingAppointment: {...} }`.
+#### Konkretne zmiany CSS/JSX:
 
-**Krok 2: Hook `useConflictCheck`**
-
-Reużywalny hook wywoływany przed każdym insertem:
-```typescript
-async function checkConflict(salonId, staffId, startTime, endTime, excludeId?)
-```
-
-**Krok 3: Integracja w 3 punktach zapisu**
-
-- **`BookingWidget.tsx`** (`handleFormSubmit`, linia ~406): Przed `supabase.from("appointments").insert(...)` — wywołaj check, jeśli konflikt → toast z błędem i blokada zapisu
-- **`WeeklyCalendar.tsx`** (`handleSaveAppointment`, linia ~325): Przed insertem i update'em — sprawdź konflikt
-- **`ScheduleManagement.tsx`** (`onSave`, linia ~219): Przed insertem — sprawdź konflikt
-
-Komunikat przy konflikcie:
-> "Ten termin jest już zajęty przez [nazwa usługi] o [godzina]. Wybierz inny termin."
-
-**Krok 4: Filtrowanie zajętych slotów w widżecie (bonus)**
-
-W `DateTimeSelection.tsx` — sloty, które kolidują z istniejącymi wizytami danego pracownika, powinny być wyszarzone/niedostępne. To już częściowo działa przez `ai-slot-scoring` (sloty z `score: -1` są "blocked"), ale trzeba upewnić się, że UI faktycznie je ukrywa/wyszarzya.
-
-### Pliki do utworzenia/edycji
-1. **Nowy**: `supabase/functions/check-appointment-conflict/index.ts`
-2. **Nowy**: `src/hooks/useConflictCheck.ts`
-3. **Edycja**: `src/components/booking/BookingWidget.tsx` — dodaj check przed insertem
-4. **Edycja**: `src/components/admin/WeeklyCalendar.tsx` — dodaj check przed insert/update
-5. **Edycja**: `src/components/admin/ScheduleManagement.tsx` — dodaj check przed insertem
+- Dialog header: dodać `bg-gradient-to-r from-primary/10 to-secondary/10 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg`
+- Karty usług: `grid grid-cols-1 gap-2` z kartami `border-2 rounded-xl p-3 hover:border-primary/50 transition-all` zamiast `<Select>`
+- Karty pracowników: zwiększyć z `p-3` do `p-3.5`, dodać `shadow-sm`, inicjały w kolorowym kółku zamiast kropki
+- Podsumowanie: `bg-gradient-to-br from-primary to-primary/80 text-white rounded-2xl p-5` z białymi labelami
+- Footer: przycisk `bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg hover:shadow-xl transition-all px-8 py-3 rounded-xl`
 
 ### Efekt
-- Nie da się stworzyć dwóch wizyt nakładających się na siebie u tego samego pracownika
-- Spójne zabezpieczenie we WSZYSTKICH punktach rezerwacji (klient + admin)
-- Czytelny komunikat o konflikcie po polsku
+- Admin czuje się jak klient — premium, kolorowo, przyjemnie
+- Zero zmian w logice / hookach / zapisie danych
+- Spójna estetyka z widżetem rezerwacji online
+
+### Pliki do edycji
+1. `src/components/admin/AppointmentModal.tsx` — redesign wizualny
 
