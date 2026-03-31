@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Scissors, Search, ShoppingBag, CalendarPlus, Check, Sparkles } from "lucide-react";
+import { Calendar, Clock, User, Scissors, Search, ShoppingBag, CalendarPlus, Check, Sparkles, Loader2 } from "lucide-react";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
