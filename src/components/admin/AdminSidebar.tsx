@@ -26,17 +26,14 @@ interface AdminSidebarProps {
 // Permission-based tab visibility mapping
 const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   accounting: "can_view_finances",
-  analytics: "can_view_finances",
   pipeline: "can_view_finances",
   settings: "can_manage_staff",
   staff: "can_manage_staff",
   widgets: "can_manage_marketing",
   retention: "can_manage_marketing",
   referral: "can_manage_marketing",
-  
   products: "can_manage_products",
   services: "can_edit_services",
-  export: "can_view_finances",
 };
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName, isDemo }: AdminSidebarProps) {
