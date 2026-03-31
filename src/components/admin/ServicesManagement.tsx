@@ -1097,6 +1097,17 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <RecipeEditorDrawer
+        open={isRecipeEditorOpen}
+        onOpenChange={setIsRecipeEditorOpen}
+        services={services.map(s => ({ id: s.id, name: s.name, price: s.price, duration: s.duration }))}
+        products={(recipeProducts || []).map(p => ({ id: p.id, name: p.name, purchase_price_net: p.purchase_price_net }))}
+        editingRecipe={recipeEditData}
+        preSelectedServiceId={recipePreSelectedServiceId}
+        onSave={handleRecipeSave}
+        isDemo={isDemo}
+      />
     </div>
   );
 }
