@@ -156,6 +156,8 @@ export function AppointmentModal({
   const [isNewClient, setIsNewClient] = useState(false);
   const [productCart, setProductCart] = useState<CartItem[]>([]);
   const [showProducts, setShowProducts] = useState(false);
+  const [serviceSearch, setServiceSearch] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   
   const [form, setForm] = useState({
     clientId: "",
