@@ -24,10 +24,8 @@ import { SupportModule } from "@/components/admin/support";
 import { RetentionDashboard } from "@/modules/retention";
 
 
-import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
-import { ExportModule } from "@/components/admin/export";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
