@@ -584,9 +584,9 @@ export function AppointmentModal({
           <Button 
             className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl transition-all px-8 rounded-xl gap-2"
             onClick={handleSave}
-            disabled={!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)}
+            disabled={!form.serviceId || !form.staffId || (!form.clientId && !isNewClient) || isSaving}
           >
-            <Check className="w-4 h-4" />
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
             {appointment ? t('appointment.saveChanges') : t('appointment.createAppointment')}
           </Button>
         </DialogFooter>
