@@ -17,14 +17,13 @@ import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
-import { ExportModule } from "@/components/admin/export";
+
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
 
-import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
 
@@ -49,11 +48,8 @@ export default function DemoPage() {
       
       case "settings": return t("admin.settings");
       case "retention": return "Retencja klientek";
-      
-      case "analytics": return "True Profit Analytics";
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
-      case "export": return "Eksport danych";
       default: return "Dashboard";
     }
   };
@@ -87,14 +83,10 @@ export default function DemoPage() {
           return <SupportModule />;
         case "retention":
           return <RetentionDashboard isDemo />;
-        case "analytics":
-          return <TrueProfitDashboard isDemo />;
         case "consultation":
           return <ConsultationModule isDemo />;
         case "referral":
           return <ReferralEngine isDemo />;
-        case "export":
-          return <ExportModule />;
         default:
           return null;
       }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap, Radio } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio, Download } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
@@ -8,6 +8,7 @@ import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { AutomationSettings } from "./AutomationSettings";
 import { CommunicationSettings } from "./CommunicationSettings";
+import { ExportModule } from "@/components/admin/export";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 import { SectionGuide } from "../SectionGuide";
@@ -45,13 +46,14 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     { id: "communication" as const, label: "Komunikacja", icon: Radio },
     { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
     { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
+    { id: "export" as const, label: "Eksport danych", icon: Download },
   ];
 
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto gap-2 bg-transparent p-0">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -116,6 +118,9 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               onNavigateToModule={onNavigateToModule}
               isDemo={isDemo}
             />
+          </TabsContent>
+          <TabsContent value="export" className="m-0">
+            <ExportModule />
           </TabsContent>
         </div>
       </Tabs>

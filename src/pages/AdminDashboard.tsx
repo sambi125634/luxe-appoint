@@ -24,10 +24,8 @@ import { SupportModule } from "@/components/admin/support";
 import { RetentionDashboard } from "@/modules/retention";
 
 
-import { TrueProfitDashboard } from "@/modules/analytics";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
-import { ExportModule } from "@/components/admin/export";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 
@@ -98,11 +96,8 @@ export default function AdminDashboard() {
       case "settings": return "Ustawienia";
       case "support": return "Pomoc & AI Asystent";
       case "retention": return "Retencja klientek";
-      
-      case "analytics": return "True Profit Analytics";
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
-      case "export": return "Eksport danych";
       default: return "Dashboard";
     }
   };
@@ -130,10 +125,8 @@ export default function AdminDashboard() {
       case "support": return <SupportModule />;
       case "retention": return <RetentionDashboard salonId={salonId ?? undefined} isDemo={false} onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       
-      case "analytics": return <TrueProfitDashboard onNavigate={(tab) => setActiveTab(tab as TabType)} />;
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
-      case "export": return <ExportModule />;
       default: return null;
     }
   };

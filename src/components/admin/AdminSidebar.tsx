@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, TrendingUp, ClipboardList, Heart, Download
+  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "analytics" | "consultation" | "referral" | "export";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "consultation" | "referral";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -26,17 +26,14 @@ interface AdminSidebarProps {
 // Permission-based tab visibility mapping
 const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   accounting: "can_view_finances",
-  analytics: "can_view_finances",
   pipeline: "can_view_finances",
   settings: "can_manage_staff",
   staff: "can_manage_staff",
   widgets: "can_manage_marketing",
   retention: "can_manage_marketing",
   referral: "can_manage_marketing",
-  
   products: "can_manage_products",
   services: "can_edit_services",
-  export: "can_view_finances",
 };
 
 export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonName, isDemo }: AdminSidebarProps) {
@@ -82,8 +79,6 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       titleKey: "sidebar.finance",
       items: [
         { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
-        { icon: TrendingUp, labelKey: "admin.trueProfit", tab: "analytics" },
-        { icon: Download, labelKey: "admin.export", tab: "export" },
       ],
     },
     {
