@@ -215,6 +215,8 @@ export function AppointmentModal({
     setIsNewClient(false);
     setProductCart([]);
     setShowProducts(false);
+    setServiceSearch("");
+    setIsSaving(false);
   }, [appointment, selectedDate, selectedTime, isOpen]);
 
   const filteredClients = clients.filter(client =>
