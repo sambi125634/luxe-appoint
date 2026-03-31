@@ -119,6 +119,64 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const { t } = useTranslation();
   const { toast } = useToast();
   const { salonId } = useSalonId();
+  const { products: recipeProducts } = useProducts(salonId || '');
+  const { recipes: allRecipes, addRecipe, removeRecipe, getMaterialCost } = useServiceRecipes(salonId || '');
+  const [isRecipeEditorOpen, setIsRecipeEditorOpen] = useState(false);
+  const [recipePreSelectedServiceId, setRecipePreSelectedServiceId] = useState<string | undefined>();
+  const [recipeEditData, setRecipeEditData] = useState<import("@/modules/inventory/RecipeEditorDrawer").RecipeForEdit | null>(null);
+
+  const openRecipeEditor = (service: Service) => {
+    const serviceRecipes = (allRecipes || []).filter(r => r.service_id === service.id);
+    if (serviceRecipes.length > 0) {
+      setRecipeEditData({
+        serviceId: service.id,
+        ingredients: serviceRecipes.map(r => ({
+          id: r.id,
+          productId: r.product_id,
+          quantityValue: r.quantity_value,
+          quantityUnit: r.quantity_unit,
+          isOptional: r.is_optional,
+          mixRatio: r.mix_ratio,
+          notes: r.notes || '',
+        })),
+      });
+    } else {
+      setRecipeEditData(null);
+      setRecipePreSelectedServiceId(service.id);
+    }
+    setIsRecipeEditorOpen(true);
+  };
+
+  const handleRecipeSave = async (data: { serviceId: string; ingredients: { id?: string; productId: string; quantityValue: number; quantityUnit: string; isOptional: boolean; mixRatio: number | null; notes: string }[] }) => {
+    if (isDemo || !salonId) return;
+    try {
+      const oldRecipes = (allRecipes || []).filter(r => r.service_id === data.serviceId);
+      for (const r of oldRecipes) removeRecipe(r.id);
+      for (const ing of data.ingredients) {
+        await addRecipe({
+          salon_id: salonId,
+          service_id: data.serviceId,
+          product_id: ing.productId,
+          quantity_used: ing.quantityValue,
+          unit: ing.quantityUnit,
+          quantity_value: ing.quantityValue,
+          quantity_unit: ing.quantityUnit,
+          is_optional: ing.isOptional,
+          mix_ratio: ing.mixRatio,
+          notes: ing.notes || undefined,
+        });
+      }
+    } catch {
+      toast({ title: "Błąd", description: "Nie udało się zapisać receptury", variant: "destructive" });
+    }
+  };
+
+  const getRecipeInfo = (serviceId: string) => {
+    const serviceRecipes = (allRecipes || []).filter(r => r.service_id === serviceId);
+    if (serviceRecipes.length === 0) return null;
+    const cost = getMaterialCost(serviceId);
+    return { count: serviceRecipes.length, cost };
+  };
 
   // Supabase data
   const { data: dbServices, isLoading: loadingServices } = useServices();
