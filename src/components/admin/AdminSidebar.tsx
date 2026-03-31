@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "analytics" | "consultation" | "referral" | "export";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "consultation" | "referral";
 
 interface AdminSidebarProps {
   activeTab: TabType;
