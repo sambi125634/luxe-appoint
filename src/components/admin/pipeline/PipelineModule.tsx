@@ -45,10 +45,6 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasAutoScrolled = useRef(false);
 
-  // Count new this week (mock: 2 for demo)
-  const newThisWeek = isDemo ? 2 : 0;
-  const avgClientValue = completedCount > 0 ? Math.round(totalValue / (contacts.length || 1)) : 0;
-
   // Auto-scroll on first load to reveal all columns
   useEffect(() => {
     if (hasAutoScrolled.current || contacts.length === 0) return;
