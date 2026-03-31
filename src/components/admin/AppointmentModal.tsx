@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, User, Scissors, Search, ShoppingBag, CalendarPlus, Check, Sparkles } from "lucide-react";
+import { Calendar, Clock, User, Scissors, Search, ShoppingBag, CalendarPlus, Check, Sparkles, Loader2 } from "lucide-react";
+import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
+import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -154,6 +156,8 @@ export function AppointmentModal({
   const [isNewClient, setIsNewClient] = useState(false);
   const [productCart, setProductCart] = useState<CartItem[]>([]);
   const [showProducts, setShowProducts] = useState(false);
+  const [serviceSearch, setServiceSearch] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   
   const [form, setForm] = useState({
     clientId: "",
@@ -211,6 +215,8 @@ export function AppointmentModal({
     setIsNewClient(false);
     setProductCart([]);
     setShowProducts(false);
+    setServiceSearch("");
+    setIsSaving(false);
   }, [appointment, selectedDate, selectedTime, isOpen]);
 
   const filteredClients = clients.filter(client =>
@@ -245,23 +251,54 @@ export function AppointmentModal({
   const selectedService = services.find(s => s.id === form.serviceId);
   const selectedStaff = staffMembers.find(s => s.id === form.staffId);
 
-  const handleSave = () => {
+  const filteredServices = services.filter(s =>
+    s.name.toLowerCase().includes(serviceSearch.toLowerCase())
+  );
+
+  const handleSave = async () => {
     if (!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)) return;
     
-    onSave({
-      clientId: form.clientId || "new",
-      clientName: isNewClient ? form.clientName : clients.find(c => c.id === form.clientId)?.name || "",
-      serviceId: form.serviceId,
-      serviceName: selectedService?.name || "",
-      staffId: form.staffId,
-      staffName: selectedStaff?.name || "",
-      date: form.date,
-      time: form.time,
-      duration: selectedService?.duration || 60,
-      notes: form.notes,
-      status: "confirmed",
-    });
-    onClose();
+    setIsSaving(true);
+    try {
+      // Conflict check
+      if (salonId) {
+        const startDate = new Date(`${form.date}T${form.time}`);
+        const endDate = new Date(startDate.getTime() + (selectedService?.duration || 60) * 60000);
+        const result = await checkAppointmentConflict({
+          salonId,
+          staffId: form.staffId,
+          startTime: startDate.toISOString(),
+          endTime: endDate.toISOString(),
+          excludeId: appointment?.id,
+        });
+        if (result.conflict) {
+          toast({
+            title: "Konflikt terminów",
+            description: formatConflictMessage(result),
+            variant: "destructive",
+          });
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      onSave({
+        clientId: form.clientId || "new",
+        clientName: isNewClient ? form.clientName : clients.find(c => c.id === form.clientId)?.name || "",
+        serviceId: form.serviceId,
+        serviceName: selectedService?.name || "",
+        staffId: form.staffId,
+        staffName: selectedStaff?.name || "",
+        date: form.date,
+        time: form.time,
+        duration: selectedService?.duration || 60,
+        notes: form.notes,
+        status: "confirmed",
+      });
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const productTotal = productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0);
@@ -361,8 +398,18 @@ export function AppointmentModal({
                 Brak usług — dodaj je w zakładce Usługi
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1">
-                {services.map(service => (
+              <>
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Szukaj usługi..."
+                    value={serviceSearch}
+                    onChange={(e) => setServiceSearch(e.target.value)}
+                    className="pl-9 rounded-xl mb-2"
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1">
+                {filteredServices.map(service => (
                   <button
                     key={service.id}
                     type="button"
@@ -397,6 +444,7 @@ export function AppointmentModal({
                   </button>
                 ))}
               </div>
+              </>
             )}
           </div>
 
@@ -536,9 +584,9 @@ export function AppointmentModal({
           <Button 
             className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-lg hover:shadow-xl transition-all px-8 rounded-xl gap-2"
             onClick={handleSave}
-            disabled={!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)}
+            disabled={!form.serviceId || !form.staffId || (!form.clientId && !isNewClient) || isSaving}
           >
-            <Check className="w-4 h-4" />
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
             {appointment ? t('appointment.saveChanges') : t('appointment.createAppointment')}
           </Button>
         </DialogFooter>
