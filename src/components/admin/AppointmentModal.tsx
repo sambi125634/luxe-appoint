@@ -251,23 +251,54 @@ export function AppointmentModal({
   const selectedService = services.find(s => s.id === form.serviceId);
   const selectedStaff = staffMembers.find(s => s.id === form.staffId);
 
-  const handleSave = () => {
+  const filteredServices = services.filter(s =>
+    s.name.toLowerCase().includes(serviceSearch.toLowerCase())
+  );
+
+  const handleSave = async () => {
     if (!form.serviceId || !form.staffId || (!form.clientId && !isNewClient)) return;
     
-    onSave({
-      clientId: form.clientId || "new",
-      clientName: isNewClient ? form.clientName : clients.find(c => c.id === form.clientId)?.name || "",
-      serviceId: form.serviceId,
-      serviceName: selectedService?.name || "",
-      staffId: form.staffId,
-      staffName: selectedStaff?.name || "",
-      date: form.date,
-      time: form.time,
-      duration: selectedService?.duration || 60,
-      notes: form.notes,
-      status: "confirmed",
-    });
-    onClose();
+    setIsSaving(true);
+    try {
+      // Conflict check
+      if (salonId) {
+        const startDate = new Date(`${form.date}T${form.time}`);
+        const endDate = new Date(startDate.getTime() + (selectedService?.duration || 60) * 60000);
+        const result = await checkAppointmentConflict({
+          salonId,
+          staffId: form.staffId,
+          startTime: startDate.toISOString(),
+          endTime: endDate.toISOString(),
+          excludeId: appointment?.id,
+        });
+        if (result.conflict) {
+          toast({
+            title: "Konflikt terminów",
+            description: formatConflictMessage(result),
+            variant: "destructive",
+          });
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      onSave({
+        clientId: form.clientId || "new",
+        clientName: isNewClient ? form.clientName : clients.find(c => c.id === form.clientId)?.name || "",
+        serviceId: form.serviceId,
+        serviceName: selectedService?.name || "",
+        staffId: form.staffId,
+        staffName: selectedStaff?.name || "",
+        date: form.date,
+        time: form.time,
+        duration: selectedService?.duration || 60,
+        notes: form.notes,
+        status: "confirmed",
+      });
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const productTotal = productCart.reduce((sum, item) => sum + item.product.sale_price_gross * item.quantity, 0);
