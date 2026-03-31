@@ -398,8 +398,18 @@ export function AppointmentModal({
                 Brak usług — dodaj je w zakładce Usługi
               </p>
             ) : (
-              <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1">
-                {services.map(service => (
+              <>
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Szukaj usługi..."
+                    value={serviceSearch}
+                    onChange={(e) => setServiceSearch(e.target.value)}
+                    className="pl-9 rounded-xl mb-2"
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto pr-1">
+                {filteredServices.map(service => (
                   <button
                     key={service.id}
                     type="button"
