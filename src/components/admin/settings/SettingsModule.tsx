@@ -8,6 +8,7 @@ import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { AutomationSettings } from "./AutomationSettings";
 import { CommunicationSettings } from "./CommunicationSettings";
+import { ExportModule } from "@/components/admin/export";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
 import { SectionGuide } from "../SectionGuide";
