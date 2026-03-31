@@ -5,18 +5,15 @@ import {
   Search, 
   Users,
   TrendingUp,
-  AlertTriangle,
+  AlertCircle,
   CheckCircle2,
   Kanban,
   BarChart3,
   GitBranch,
   Settings,
   Sparkles,
-  RefreshCw,
-  Eye,
-  Zap,
-  Target,
-  ShieldCheck
+  Route,
+  Trophy
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +24,7 @@ import { ContactDetailModal } from "./ContactDetailModal";
 import { PipelineReports } from "./PipelineReports";
 import { PipelineStageNav } from "./PipelineStageNav";
 import { SectionGuide } from "../SectionGuide";
+import { cn } from "@/lib/utils";
 import {
   PipelineContact,
   defaultPipelineStages,
@@ -46,6 +44,10 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const hasAutoScrolled = useRef(false);
+
+  // Count new this week (mock: 2 for demo)
+  const newThisWeek = isDemo ? 2 : 0;
+  const avgClientValue = completedCount > 0 ? Math.round(totalValue / (contacts.length || 1)) : 0;
 
   // Auto-scroll on first load to reveal all columns
   useEffect(() => {
@@ -208,11 +210,11 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
         <div className="glass-card p-12 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-              <GitBranch className="w-8 h-8 text-primary" />
+              <Route className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-serif text-xl font-semibold mb-2">Ścieżka Klientki™ wymaga konfiguracji</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2">Ścieżka Klientki wymaga konfiguracji</h3>
             <p className="text-muted-foreground text-sm mb-4">
-              Ścieżka Klientki™ automatycznie śledzi postęp klientek przez etapy zabiegów. Skonfiguruj integrację w ustawieniach, aby aktywować ten moduł.
+              Ścieżka Klientki automatycznie śledzi postęp klientek przez etapy zabiegów. Skonfiguruj integrację w ustawieniach, aby aktywować ten moduł.
             </p>
             <Button variant="outline" className="gap-2">
               <Settings className="w-4 h-4" />
@@ -238,68 +240,67 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
       </TabsList>
 
       <TabsContent value="board" className="space-y-4">
-        {/* Hero Banner — only in demo */}
-        {isDemo && (
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900 via-indigo-900 to-primary/90 p-6 md:p-8 text-white">
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/20 blur-3xl -translate-y-1/2 translate-x-1/4" />
-              <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/10 blur-2xl translate-y-1/3 -translate-x-1/4" />
-            </div>
-            
-            <div className="relative z-10 space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-amber-300" />
+        {/* Hero Banner — always visible */}
+        <div className="bg-gradient-to-r from-violet-50 via-purple-50 to-pink-50 dark:from-violet-950/30 dark:via-purple-950/30 dark:to-pink-950/30 border border-purple-100 dark:border-purple-900/50 rounded-2xl p-6 mb-2">
+          <div className="flex items-start justify-between gap-6">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Route className="w-4 h-4 text-primary" />
                 </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-serif font-bold">Ścieżka Klientki™</h2>
-                  <p className="text-white/70 text-sm">Autorski system maksymalizacji wizyt</p>
-                </div>
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">
+                  Beauty Funnels — System Powrotów
+                </span>
               </div>
-
-              <p className="text-white/90 text-base md:text-lg max-w-2xl leading-relaxed">
-                Każda klientka z reklamy przechodzi przez sprawdzony proces, który zamienia jednorazową wizytę w lojalną, powracającą klientkę.
+              
+              <h2 className="font-serif font-bold text-xl mb-2 text-foreground">
+                Każda klientka ma swoją ścieżkę powrotu
+              </h2>
+              
+              <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
+                System automatycznie prowadzi każdą klientkę przez kolejne etapy — od pierwszej wizyty do lojalnej stałej bywalczyni. Ty widzisz gdzie jest każda z nich. Resztą zajmuje się autopilot.
               </p>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center mb-3">
-                    <Target className="w-5 h-5 text-emerald-300" />
-                  </div>
-                  <h3 className="font-semibold text-sm mb-1">Więcej powrotów</h3>
-                  <p className="text-white/60 text-xs leading-relaxed">
-                    Automatyczny system sprawia, że klientki wracają na kolejne wizyty zamiast odpadać po pierwszej.
-                  </p>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                  <div className="w-9 h-9 rounded-lg bg-blue-500/20 flex items-center justify-center mb-3">
-                    <Zap className="w-5 h-5 text-blue-300" />
-                  </div>
-                  <h3 className="font-semibold text-sm mb-1">Zero ręcznej pracy</h3>
-                  <p className="text-white/60 text-xs leading-relaxed">
-                    Potwierdzenia, przypomnienia i follow-upy działają same — Ty zajmujesz się zabiegami.
-                  </p>
-                </div>
-
-                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10">
-                  <div className="w-9 h-9 rounded-lg bg-purple-500/20 flex items-center justify-center mb-3">
-                    <Eye className="w-5 h-5 text-purple-300" />
-                  </div>
-                  <h3 className="font-semibold text-sm mb-1">Pełna kontrola</h3>
-                  <p className="text-white/60 text-xs leading-relaxed">
-                    Widzisz dokładnie, na jakim etapie jest każda klientka i ile przychodu generuje Twój lejek.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-amber-300" />
-                <span className="text-xs text-white/60">W zestawie z pakietem kampanii reklamowej</span>
-              </div>
+            {/* Hero stat */}
+            <div className="bg-background rounded-2xl p-4 border border-purple-100 dark:border-purple-900/50 shadow-sm text-center flex-shrink-0 min-w-[140px] hidden md:block">
+              <p className="text-3xl font-bold text-primary">5×</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-tight">
+                więcej wizyt od klientki która przeszła pełną ścieżkę
+              </p>
             </div>
           </div>
-        )}
+
+          {/* 3 value pillars */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+            {[
+              {
+                icon: "👁️",
+                title: "Pełna widoczność",
+                desc: "Widzisz gdzie jest każda klientka — bez zgadywania i ręcznego śledzenia.",
+              },
+              {
+                icon: "⚡",
+                title: "Autopilot działa za Ciebie",
+                desc: "System sam reaguje na każdy etap — powiadomienia, follow-upy, przypomnienia.",
+              },
+              {
+                icon: "💰",
+                title: "Przewidywalny przychód",
+                desc: "Im więcej klientek w ścieżce — tym bardziej przewidywalny miesięczny dochód.",
+              },
+            ].map((item, i) => (
+              <div 
+                key={i}
+                className="bg-background/70 rounded-xl p-4 border border-purple-50 dark:border-purple-900/30"
+              >
+                <span className="text-2xl block mb-2">{item.icon}</span>
+                <p className="font-semibold text-sm mb-1">{item.title}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Section Guide */}
         <SectionGuide sectionKey="pipeline" />
@@ -307,8 +308,9 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
         {/* Animated Stage Navigation */}
         <PipelineStageNav onStageClick={handleStageNavClick} />
 
-        {/* Stats Bar */}
+        {/* KPI Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {/* Card 1 — W ścieżce */}
           <div className="glass-card p-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -316,45 +318,67 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalContacts}</p>
-                <p className="text-xs text-muted-foreground">Klientki w lejku</p>
+                <p className="text-xs text-muted-foreground">aktywnych klientek</p>
               </div>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-2 pl-[52px]">
+              +{newThisWeek} nowych w tym tygodniu
+            </p>
           </div>
           
+          {/* Card 2 — Wartość ścieżki */}
           <div className="glass-card p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-500" />
+              <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-emerald-500" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{totalValue.toLocaleString()} <span className="text-sm font-normal">zł</span></p>
-                <p className="text-xs text-muted-foreground">Wartość lejka</p>
+                <p className="text-xs text-muted-foreground">potencjalny przychód</p>
               </div>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-2 pl-[52px]">
+              przy 100% konwersji do 5. wizyty
+            </p>
           </div>
           
+          {/* Card 3 — Nie stawiły się */}
           <div className="glass-card p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
-                <RefreshCw className="w-5 h-5 text-amber-500" />
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center",
+                noShowCount > 0 ? "bg-red-500/10" : "bg-muted"
+              )}>
+                <AlertCircle className={cn("w-5 h-5", noShowCount > 0 ? "text-red-500" : "text-muted-foreground")} />
               </div>
               <div>
-                <p className="text-2xl font-bold">{noShowCount}</p>
-                <p className="text-xs text-muted-foreground">Odzyskiwane</p>
+                <p className={cn("text-2xl font-bold", noShowCount > 0 && "text-red-500")}>{noShowCount}</p>
+                <p className="text-xs text-muted-foreground">wymaga kontaktu</p>
               </div>
             </div>
+            {noShowCount > 0 && (
+              <p className="text-[10px] text-red-500/80 mt-2 pl-[52px]">
+                Działaj w ciągu 24h od wizyty
+              </p>
+            )}
           </div>
           
+          {/* Card 4 — Ukończyły ścieżkę */}
           <div className="glass-card p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-5 h-5 text-purple-500" />
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <Trophy className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{completedCount}</p>
-                <p className="text-xs text-muted-foreground">Ukończone cykle</p>
+                <p className="text-xs text-muted-foreground">stałych bywalczyń</p>
               </div>
             </div>
+            {completedCount > 0 && (
+              <p className="text-[10px] text-muted-foreground mt-2 pl-[52px]">
+                Każda warta ~{avgClientValue.toLocaleString()} zł/rok
+              </p>
+            )}
           </div>
         </div>
         
@@ -375,11 +399,12 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
           </Button>
         </div>
         
-        {/* Info Banner - only in demo */}
+        {/* Demo Info Banner */}
         {isDemo && (
-          <div className="glass-card p-3 bg-primary/5 border-primary/20">
-            <p className="text-sm text-center">
-              <span className="font-medium">Podgląd Twojego lejka kampanii</span> – Każda klientka z reklamy automatycznie trafia tutaj i przechodzi przez sprawdzony proces maksymalizacji wizyt.
+          <div className="flex items-center gap-3 bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+            <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-sm text-primary">
+              <strong>Tryb podglądu</strong> — W Twoim salonie klientki przechodzą przez etapy automatycznie po każdej wizycie. Przeciągaj karty aby zobaczyć jak działa system.
             </p>
           </div>
         )}

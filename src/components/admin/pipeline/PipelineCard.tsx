@@ -4,10 +4,8 @@ import {
   Mail, 
   Calendar, 
   Star, 
-  MessageSquare,
   ChevronDown,
   ChevronUp,
-  Clock,
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
@@ -50,11 +48,25 @@ const SurveyIndicator = ({ surveys, totalVisits }: { surveys: ContactSurvey[], t
   );
 };
 
+const getAutopilotStatus = (stageId: string) => {
+  if (stageId === 'no-show') {
+    return { type: 'danger' as const, label: 'Wymaga kontaktu' };
+  }
+  if (stageId.startsWith('between-')) {
+    return { type: 'active' as const, label: 'Autopilot aktywny' };
+  }
+  if (stageId === 'completed' || stageId === 'visit-5-done') {
+    return { type: 'done' as const, label: 'Ścieżka ukończona' };
+  }
+  return { type: 'waiting' as const, label: 'Oczekuje' };
+};
+
 export function PipelineCard({ contact, onDragStart, onClick }: PipelineCardProps) {
   const [expanded, setExpanded] = useState(false);
   const progressPercent = (contact.completedVisits / contact.totalVisits) * 100;
   
   const pendingSurvey = contact.surveys.find(s => !s.completed);
+  const autopilot = getAutopilotStatus(contact.stageId);
   
   return (
     <div
@@ -117,6 +129,31 @@ export function PipelineCard({ contact, onDragStart, onClick }: PipelineCardProp
           </div>
         )}
         <SurveyIndicator surveys={contact.surveys} totalVisits={contact.totalVisits} />
+      </div>
+
+      {/* Autopilot status */}
+      <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-border">
+        {autopilot.type === 'danger' ? (
+          <div className="flex items-center gap-1.5 text-xs text-red-600">
+            <AlertCircle className="w-3 h-3" />
+            {autopilot.label}
+          </div>
+        ) : autopilot.type === 'active' ? (
+          <div className="flex items-center gap-1.5 text-xs text-green-600">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+            {autopilot.label}
+          </div>
+        ) : autopilot.type === 'done' ? (
+          <div className="flex items-center gap-1.5 text-xs text-primary">
+            <CheckCircle2 className="w-3 h-3" />
+            {autopilot.label}
+          </div>
+        ) : (
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground/30" />
+            {autopilot.label}
+          </div>
+        )}
       </div>
       
       {/* Pending Survey Alert */}
