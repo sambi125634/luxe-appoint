@@ -83,14 +83,10 @@ export default function DemoPage() {
           return <SupportModule />;
         case "retention":
           return <RetentionDashboard isDemo />;
-        case "analytics":
-          return <TrueProfitDashboard isDemo />;
         case "consultation":
           return <ConsultationModule isDemo />;
         case "referral":
           return <ReferralEngine isDemo />;
-        case "export":
-          return <ExportModule />;
         default:
           return null;
       }
