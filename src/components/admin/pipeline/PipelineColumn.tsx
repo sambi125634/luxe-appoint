@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
 import { PipelineStage, PipelineContact } from "./types";
 import { PipelineCard } from "./PipelineCard";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Info } from "lucide-react";
 
 interface PipelineColumnProps {
   stage: PipelineStage;
@@ -40,6 +42,18 @@ export function PipelineColumn({
           <span className="ml-auto text-xs text-muted-foreground bg-background px-2 py-0.5 rounded-full">
             {contacts.length}
           </span>
+          {stage.tooltip && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-3.5 h-3.5 text-muted-foreground/50 cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[250px] text-xs">
+                  {stage.tooltip}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
         {stage.description && (
           <p className="text-xs text-muted-foreground pl-5">{stage.description}</p>
@@ -63,8 +77,10 @@ export function PipelineColumn({
         ))}
         
         {contacts.length === 0 && (
-          <div className="h-24 border-2 border-dashed border-border/50 rounded-lg flex items-center justify-center">
-            <p className="text-xs text-muted-foreground">Przeciągnij tutaj</p>
+          <div className="h-24 border-2 border-dashed border-border/50 rounded-lg flex items-center justify-center px-3">
+            <p className="text-xs text-muted-foreground text-center">
+              {stage.emptyMessage || 'Przeciągnij tutaj'}
+            </p>
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Workflow, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart
+  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -63,7 +63,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
         { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
         { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
-        { icon: Workflow, labelKey: "admin.clientJourney", tab: "pipeline" },
+        { icon: Route, labelKey: "admin.clientJourney", tab: "pipeline" },
       ],
     },
     {

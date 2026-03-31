@@ -4,6 +4,8 @@ export interface PipelineStage {
   color: string;
   order: number;
   description?: string;
+  tooltip?: string;
+  emptyMessage?: string;
 }
 
 export interface PipelineContact {
@@ -15,13 +17,13 @@ export interface PipelineContact {
   avatar?: string;
   stageId: string;
   serviceName: string;
-  packageType: string; // np. "Pakiet 3 zabiegów", "Pakiet 5 zabiegów"
+  packageType: string;
   totalVisits: number;
   completedVisits: number;
   nextVisitDate?: string;
   lastVisitDate?: string;
   reservationDate: string;
-  value: number; // wartość pakietu
+  value: number;
   notes?: string;
   tags: string[];
   surveys: ContactSurvey[];
@@ -32,7 +34,7 @@ export interface ContactSurvey {
   id: string;
   visitNumber: number;
   completed: boolean;
-  rating?: number; // 1-5
+  rating?: number;
   feedback?: string;
   completedAt?: string;
 }
@@ -46,91 +48,108 @@ export interface StageHistory {
   note?: string;
 }
 
-// Domyślne stage'e pipeline'u dla pakietów wizyt
 export const defaultPipelineStages: PipelineStage[] = [
   {
     id: 'reserved',
     name: 'Zarezerwowane',
     color: 'bg-blue-500',
     order: 1,
-    description: 'Klientka zarezerwowała pierwszą wizytę z Twojej reklamy'
+    description: 'Czeka na pierwszą wizytę',
+    tooltip: 'Klientki które zarezerwowały ale jeszcze nie odbyły pierwszej wizyty. System wyśle potwierdzenie automatycznie.',
+    emptyMessage: 'Brak nadchodzących rezerwacji. Udostępnij link do rezerwacji →'
   },
   {
     id: 'no-show',
-    name: 'Nie stawił się',
+    name: 'Nie stawiła się',
     color: 'bg-red-500',
     order: 2,
-    description: 'AI podejmuje próby odzyskania klientki'
+    description: 'Wymaga kontaktu',
+    tooltip: 'Klientka nie pojawiła się na wizycie. Działaj szybko — pierwsze 24h są kluczowe dla odzyskania kontaktu.',
+    emptyMessage: '🎉 Wszystkie klientki się stawiają!'
   },
   {
     id: 'visit-1-done',
-    name: 'Wizyta 1 ✓',
+    name: '1. Wizyta ✓',
     color: 'bg-green-500',
     order: 3,
-    description: 'Pierwsza wizyta zakończona sukcesem'
+    description: 'Pierwsza wizyta odbyta',
+    tooltip: 'Klientka była po raz pierwszy. Teraz najważniejsze — sprawić żeby wróciła. System prowadzi follow-up automatycznie.',
+    emptyMessage: 'Czeka na pierwszą ukończoną wizytę'
   },
   {
     id: 'between-1-2',
     name: 'Między 1 a 2',
     color: 'bg-amber-500',
     order: 4,
-    description: 'Automatyczny follow-up w toku — dbamy o powrót'
+    description: 'W drodze na drugą wizytę',
+    tooltip: 'Klientka po pierwszej wizycie. Statystycznie 60% nie wraca bez dodatkowego impulsu — autopilot to zmienia.',
+    emptyMessage: 'Autopilot czeka na klientki z tego etapu'
   },
   {
     id: 'visit-2-done',
-    name: 'Wizyta 2 ✓',
+    name: '2. Wizyta ✓',
     color: 'bg-green-500',
     order: 5,
-    description: 'Druga wizyta potwierdza zaangażowanie klientki'
+    description: 'Wraca — dobry znak',
+    tooltip: 'Klientka wróciła po raz drugi. Ryzyko rezygnacji spada o 40%. Cel: doprowadzić ją do 5. wizyty.',
+    emptyMessage: 'Czeka na klientki po drugiej wizycie'
   },
   {
     id: 'between-2-3',
     name: 'Między 2 a 3',
     color: 'bg-amber-500',
     order: 6,
-    description: 'System buduje lojalność — klientka wraca regularnie'
+    description: 'Budowanie nawyku',
+    emptyMessage: 'Autopilot czeka na klientki z tego etapu'
   },
   {
     id: 'visit-3-done',
-    name: 'Wizyta 3 ✓',
+    name: '3. Wizyta ✓',
     color: 'bg-green-500',
     order: 7,
-    description: 'Klientka na dobrej drodze do ukończenia cyklu'
+    description: 'Staje się regularna',
+    emptyMessage: 'Czeka na klientki po trzeciej wizycie'
   },
   {
     id: 'between-3-4',
     name: 'Między 3 a 4',
     color: 'bg-amber-500',
     order: 8,
-    description: 'Klientka blisko celu — utrzymujemy momentum'
+    description: 'Już prawie stała',
+    emptyMessage: 'Autopilot czeka na klientki z tego etapu'
   },
   {
     id: 'visit-4-done',
-    name: 'Wizyta 4 ✓',
+    name: '4. Wizyta ✓',
     color: 'bg-green-500',
     order: 9,
-    description: 'Jeszcze jedna wizyta do pełnego sukcesu'
+    description: 'Lojalna klientka',
+    emptyMessage: 'Czeka na klientki po czwartej wizycie'
   },
   {
     id: 'between-4-5',
     name: 'Między 4 a 5',
     color: 'bg-amber-500',
     order: 10,
-    description: 'Ostatni follow-up przed zakończeniem cyklu'
+    description: 'Ostatni krok',
+    emptyMessage: 'Autopilot czeka na klientki z tego etapu'
   },
   {
     id: 'visit-5-done',
-    name: 'Wizyta 5 ✓',
-    color: 'bg-emerald-600',
+    name: '5. Wizyta ✓ — Stała bywalczyni',
+    color: 'bg-primary',
     order: 11,
-    description: 'Pełny cykl zabiegów ukończony!'
+    description: 'Cel osiągnięty 🎉',
+    tooltip: 'Gratulacje! Ta klientka jest teraz Twoją stałą bywalczynią. Średnia wartość takiej klientki to 5× więcej niż jednorazowej.',
+    emptyMessage: 'Tu pojawią się Twoje stałe bywalczyni'
   },
   {
     id: 'completed',
     name: 'Ukończone',
     color: 'bg-purple-500',
     order: 12,
-    description: 'Cel osiągnięty — klientka ukończyła pełny cykl zabiegów'
+    description: 'Pełny cykl zakończony',
+    emptyMessage: 'Tu pojawią się klientki po ukończeniu pełnego cyklu'
   }
 ];
 

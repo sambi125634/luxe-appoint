@@ -40,7 +40,7 @@ export default function DemoPage() {
       case "widgets": return t("admin.widgets");
       case "clients": return t("admin.clients");
       case "conversations": return t("admin.conversations");
-      case "pipeline": return "Ścieżka Klientki™";
+      case "pipeline": return "Ścieżka Klientki";
       case "accounting": return t("accounting.charts");
       case "products": return t("admin.products");
       case "staff": return t("admin.staff");
