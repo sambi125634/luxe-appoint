@@ -53,7 +53,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 h-auto gap-2 bg-transparent p-0">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
