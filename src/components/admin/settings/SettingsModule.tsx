@@ -119,6 +119,9 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               isDemo={isDemo}
             />
           </TabsContent>
+          <TabsContent value="export" className="m-0">
+            <ExportModule />
+          </TabsContent>
         </div>
       </Tabs>
     </div>

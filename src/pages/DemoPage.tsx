@@ -17,7 +17,7 @@ import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
-import { ExportModule } from "@/components/admin/export";
+
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
