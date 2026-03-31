@@ -46,6 +46,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     { id: "communication" as const, label: "Komunikacja", icon: Radio },
     { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
     { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
+    { id: "export" as const, label: "Eksport danych", icon: Download },
   ];
 
   return (
