@@ -1,7 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import RecipeEditorDrawer from "@/modules/inventory/RecipeEditorDrawer";
+import { useProducts } from "@/hooks/useProducts";
+import { useServiceRecipes } from "@/hooks/useServiceRecipes";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -116,6 +119,64 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const { t } = useTranslation();
   const { toast } = useToast();
   const { salonId } = useSalonId();
+  const { products: recipeProducts } = useProducts(salonId || '');
+  const { recipes: allRecipes, addRecipe, removeRecipe, getMaterialCost } = useServiceRecipes(salonId || '');
+  const [isRecipeEditorOpen, setIsRecipeEditorOpen] = useState(false);
+  const [recipePreSelectedServiceId, setRecipePreSelectedServiceId] = useState<string | undefined>();
+  const [recipeEditData, setRecipeEditData] = useState<import("@/modules/inventory/RecipeEditorDrawer").RecipeForEdit | null>(null);
+
+  const openRecipeEditor = (service: Service) => {
+    const serviceRecipes = (allRecipes || []).filter(r => r.service_id === service.id);
+    if (serviceRecipes.length > 0) {
+      setRecipeEditData({
+        serviceId: service.id,
+        ingredients: serviceRecipes.map(r => ({
+          id: r.id,
+          productId: r.product_id,
+          quantityValue: r.quantity_value,
+          quantityUnit: r.quantity_unit,
+          isOptional: r.is_optional,
+          mixRatio: r.mix_ratio,
+          notes: r.notes || '',
+        })),
+      });
+    } else {
+      setRecipeEditData(null);
+      setRecipePreSelectedServiceId(service.id);
+    }
+    setIsRecipeEditorOpen(true);
+  };
+
+  const handleRecipeSave = async (data: { serviceId: string; ingredients: { id?: string; productId: string; quantityValue: number; quantityUnit: string; isOptional: boolean; mixRatio: number | null; notes: string }[] }) => {
+    if (isDemo || !salonId) return;
+    try {
+      const oldRecipes = (allRecipes || []).filter(r => r.service_id === data.serviceId);
+      for (const r of oldRecipes) removeRecipe(r.id);
+      for (const ing of data.ingredients) {
+        await addRecipe({
+          salon_id: salonId,
+          service_id: data.serviceId,
+          product_id: ing.productId,
+          quantity_used: ing.quantityValue,
+          unit: ing.quantityUnit,
+          quantity_value: ing.quantityValue,
+          quantity_unit: ing.quantityUnit,
+          is_optional: ing.isOptional,
+          mix_ratio: ing.mixRatio,
+          notes: ing.notes || undefined,
+        });
+      }
+    } catch {
+      toast({ title: "Błąd", description: "Nie udało się zapisać receptury", variant: "destructive" });
+    }
+  };
+
+  const getRecipeInfo = (serviceId: string) => {
+    const serviceRecipes = (allRecipes || []).filter(r => r.service_id === serviceId);
+    if (serviceRecipes.length === 0) return null;
+    const cost = getMaterialCost(serviceId);
+    return { count: serviceRecipes.length, cost };
+  };
 
   // Supabase data
   const { data: dbServices, isLoading: loadingServices } = useServices();
@@ -668,6 +729,27 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                   <Banknote className="w-4 h-4 text-accent" />
                   {service.price} zł
                 </div>
+                {(() => {
+                  const recipeInfo = getRecipeInfo(service.id);
+                  return (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn("gap-1.5 h-8 text-xs", recipeInfo ? "text-primary" : "text-muted-foreground")}
+                      onClick={() => openRecipeEditor(service)}
+                    >
+                      <FlaskConical className="w-3.5 h-3.5" />
+                      {recipeInfo ? (
+                        <>
+                          Receptura
+                          <Badge variant="secondary" className="text-[10px] py-0 h-4 ml-0.5">
+                            {recipeInfo.cost.toFixed(2)} zł
+                          </Badge>
+                        </>
+                      ) : "Dodaj recepturę"}
+                    </Button>
+                  );
+                })()}
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon" onClick={() => openServiceDialog(service)}>
                     <Pencil className="w-4 h-4" />
@@ -1015,6 +1097,17 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <RecipeEditorDrawer
+        open={isRecipeEditorOpen}
+        onOpenChange={setIsRecipeEditorOpen}
+        services={services.map(s => ({ id: s.id, name: s.name, price: s.price, duration: s.duration }))}
+        products={(recipeProducts || []).map(p => ({ id: p.id, name: p.name, purchase_price_net: p.purchase_price_net }))}
+        editingRecipe={recipeEditData}
+        preSelectedServiceId={recipePreSelectedServiceId}
+        onSave={handleRecipeSave}
+        isDemo={isDemo}
+      />
     </div>
   );
 }
