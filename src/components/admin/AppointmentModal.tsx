@@ -444,6 +444,7 @@ export function AppointmentModal({
                   </button>
                 ))}
               </div>
+              </>
             )}
           </div>
 
