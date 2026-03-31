@@ -729,6 +729,27 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                   <Banknote className="w-4 h-4 text-accent" />
                   {service.price} zł
                 </div>
+                {(() => {
+                  const recipeInfo = getRecipeInfo(service.id);
+                  return (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn("gap-1.5 h-8 text-xs", recipeInfo ? "text-primary" : "text-muted-foreground")}
+                      onClick={() => openRecipeEditor(service)}
+                    >
+                      <FlaskConical className="w-3.5 h-3.5" />
+                      {recipeInfo ? (
+                        <>
+                          Receptura
+                          <Badge variant="secondary" className="text-[10px] py-0 h-4 ml-0.5">
+                            {recipeInfo.cost.toFixed(2)} zł
+                          </Badge>
+                        </>
+                      ) : "Dodaj recepturę"}
+                    </Button>
+                  );
+                })()}
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon" onClick={() => openServiceDialog(service)}>
                     <Pencil className="w-4 h-4" />
