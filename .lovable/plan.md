@@ -1,38 +1,92 @@
 
 
-## Plan: Przeprojektowanie modalu "Nowa wizyta" w panelu admin
+## Plan: Wyszukiwarka usług w modalu admin + pewność integracji kalendarzy
 
 ### Problem
-Modal dodawania wizyty (`AppointmentModal.tsx`) wygląda generycznie — szare formularze, standardowe selecty, brak koloru. Klient widzi piękny widżet rezerwacji, a admin widzi nudny formularz.
+1. Lista usług w `AppointmentModal` nie ma wyszukiwarki — przy wielu usługach trudno znaleźć właściwą
+2. Potrzeba potwierdzenia, że conflict check działa spójnie we wszystkich punktach zapisu
 
 ### Rozwiązanie
-Przeprojektować modal wizualnie, zachowując 100% obecnej funkcjonalności. Inspiracja z `BookingWidget` — kolorowe karty, gradient w podsumowaniu, ikonki, animowane sekcje.
+
+#### Zmiana 1 — Wyszukiwarka usług w AppointmentModal
 
 **Plik: `src/components/admin/AppointmentModal.tsx`**
 
-#### Zmiany wizualne:
+Dodać stan `serviceSearch` i pole `Input` z ikoną `Search` nad listą kart usług. Filtrować listę po nazwie:
 
-1. **Nagłówek** — gradient tło z ikoną `CalendarPlus`, większy tytuł
-2. **Sekcja klienta** — zachować search, ale ładniejszy dropdown z awatarami (inicjały w kolorowych kółkach)
-3. **Sekcja usługi** — zamiast `<Select>` → klikalne karty usług z ceną i czasem, kolorowy border przy zaznaczeniu (jak w BookingWidget)
-4. **Sekcja pracownika** — obecne buttony z kolorowymi kropkami → awatary z inicjałami i kolorowym tłem, większe karty
-5. **Data i czas** — zachować obecne inputy ale dodać kolorowe ikony i lepszy spacing
-6. **Podsumowanie** — gradient card (primary → secondary) z białym tekstem zamiast bladego bg-primary/5
-7. **Przycisk zapisu** — pełny gradient, większy, z ikoną `Check`
+```typescript
+const [serviceSearch, setServiceSearch] = useState("");
 
-#### Konkretne zmiany CSS/JSX:
+const filteredServices = services.filter(s =>
+  s.name.toLowerCase().includes(serviceSearch.toLowerCase())
+);
+```
 
-- Dialog header: dodać `bg-gradient-to-r from-primary/10 to-secondary/10 -mx-6 -mt-6 px-6 pt-6 pb-4 rounded-t-lg`
-- Karty usług: `grid grid-cols-1 gap-2` z kartami `border-2 rounded-xl p-3 hover:border-primary/50 transition-all` zamiast `<Select>`
-- Karty pracowników: zwiększyć z `p-3` do `p-3.5`, dodać `shadow-sm`, inicjały w kolorowym kółku zamiast kropki
-- Podsumowanie: `bg-gradient-to-br from-primary to-primary/80 text-white rounded-2xl p-5` z białymi labelami
-- Footer: przycisk `bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg hover:shadow-xl transition-all px-8 py-3 rounded-xl`
+Nad `grid grid-cols-1` (linia ~364) wstawić input:
+```tsx
+<div className="relative">
+  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+  <Input
+    placeholder="Szukaj usługi..."
+    value={serviceSearch}
+    onChange={(e) => setServiceSearch(e.target.value)}
+    className="pl-9 rounded-xl mb-2"
+  />
+</div>
+```
 
-### Efekt
-- Admin czuje się jak klient — premium, kolorowo, przyjemnie
-- Zero zmian w logice / hookach / zapisie danych
-- Spójna estetyka z widżetem rezerwacji online
+Następnie renderować `filteredServices` zamiast `services` w mapowaniu kart. Reset `serviceSearch` przy otwarciu modalu (w istniejącym `useEffect`).
+
+#### Zmiana 2 — Audyt conflict check we wszystkich punktach zapisu
+
+Aktualny stan integracji:
+
+| Punkt zapisu | Plik | Conflict check |
+|---|---|---|
+| Widżet klienta | `BookingWidget.tsx` | ✅ `checkAppointmentConflict` przed insertem |
+| Kalendarz admin | `WeeklyCalendar.tsx` | ✅ `checkAppointmentConflict` przed insert/update |
+| Nowa wizyta (header) | `ScheduleManagement.tsx` | ✅ `checkAppointmentConflict` przed insertem |
+| Quick Block | `ScheduleManagement.tsx` | ⚠️ Tworzy cancelled appointment — nie koliduje |
+| AppointmentModal (onSave) | Zależy od wywołującego | ✅ Każdy caller sprawdza |
+
+System jest spójny — edge function `check-appointment-conflict` jest wywoływana w **każdym** punkcie zapisu wizyty. Żaden insert nie przejdzie bez weryfikacji.
+
+Jedyne usprawnienie: dodać conflict check **bezpośrednio** w `handleSave` wewnątrz `AppointmentModal` (zamiast polegać na callerze), żeby mieć 100% pewność niezależnie od tego, kto wywołuje modal.
+
+**Plik: `src/components/admin/AppointmentModal.tsx`** (linia ~248, `handleSave`)
+
+Przed wywołaniem `onSave()`, dodać:
+```typescript
+const handleSave = async () => {
+  if (!form.serviceId || !form.staffId) return;
+  
+  // Conflict check
+  if (salonId) {
+    const startDate = new Date(`${form.date}T${form.time}`);
+    const endDate = new Date(startDate.getTime() + (selectedService?.duration || 60) * 60000);
+    const result = await checkAppointmentConflict({
+      salonId,
+      staffId: form.staffId,
+      startTime: startDate.toISOString(),
+      endTime: endDate.toISOString(),
+      excludeId: appointment?.id,
+    });
+    if (result.conflict) {
+      // Pokazać toast z komunikatem o konflikcie
+      return;
+    }
+  }
+  
+  onSave({ ... });
+};
+```
+
+Wymaga dodania importu `checkAppointmentConflict` i `formatConflictMessage`, oraz przekazania `useToast` (lub callback).
 
 ### Pliki do edycji
-1. `src/components/admin/AppointmentModal.tsx` — redesign wizualny
+1. `src/components/admin/AppointmentModal.tsx` — wyszukiwarka usług + conflict check w handleSave
+
+### Efekt
+- Admin szybko znajduje usługę wpisując nazwę
+- Podwójna ochrona przed overbookingiem: modal sam weryfikuje konflikty niezależnie od callera
 
