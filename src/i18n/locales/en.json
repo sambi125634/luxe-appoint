@@ -1847,7 +1847,11 @@
       "q5": "Is there a mobile app?",
       "a5": "Yes, Beauty Calendar works as a PWA (Progressive Web App). Add to home screen and use it like a native app on iOS and Android.",
       "q6": "What if I need help?",
-      "a6": "We offer support via chat, email, and phone. We respond within a maximum of 4 hours on business days."
+      "a6": "We offer support via chat, email, and phone. We respond within a maximum of 4 hours on business days.",
+      "q7": "Is it really 0% commission? Always?",
+      "a7": "Yes, absolutely. Beauty Calendar charges a fixed monthly fee depending on your plan (0 PLN / 99 PLN / 199 PLN). Zero commission on bookings — whether your client books 1 or 1000 appointments per month. This is our fundamental difference from Booksy and similar platforms.",
+      "q8": "Does it integrate with Google Calendar?",
+      "a8": "Yes. On PRO and VIP plans you get two-way sync with Google Calendar. Appointments from Beauty Calendar automatically appear in your Google Calendar and vice versa — blocks from Google Calendar block slots in your booking widget."
     },
     "newFinalCta": {
       "urgency": "First 30 days with full access to all AI features — no credit card required.",
