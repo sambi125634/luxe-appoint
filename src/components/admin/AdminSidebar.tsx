@@ -130,44 +130,52 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
 
       {/* Navigation */}
       <nav className="flex-1 p-4 overflow-y-auto">
-        {visibleSections.map((section) => (
-          <div key={section.titleKey}>
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 pt-4 pb-1">
-              {t(section.titleKey)}
-            </p>
-            <ul className="space-y-1">
-              {section.items.map((item) => (
-                <li key={item.tab}>
-                  <button
-                    onClick={() => {
-                      onTabChange(item.tab);
-                      onClose?.();
-                    }}
-                    className={cn(
-                      "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
-                      activeTab === item.tab
-                        ? "bg-primary text-primary-foreground shadow-soft" 
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                    )}
-                  >
-                    <item.icon className="w-5 h-5" />
-                    <span className="flex-1 text-left">{t(item.labelKey)}</span>
-                    {item.badge && item.badge > 0 && (
-                      <span className={cn(
-                        "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
-                        activeTab === item.tab 
-                          ? "bg-primary-foreground/20 text-primary-foreground" 
-                          : "bg-secondary text-secondary-foreground"
-                      )}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+        {visibleSections.map((section) => {
+          const sectionHasActiveTab = section.items.some(item => item.tab === activeTab);
+          return (
+            <Collapsible key={section.titleKey} defaultOpen className="group/collapsible">
+              <CollapsibleTrigger className="w-full flex items-center justify-between px-4 pt-4 pb-1 hover:bg-muted/50 rounded-lg transition-colors">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  {t(section.titleKey)}
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 group-data-[state=closed]/collapsible:rotate-[-90deg]" />
+              </CollapsibleTrigger>
+              <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+                <ul className="space-y-1 mt-1">
+                  {section.items.map((item) => (
+                    <li key={item.tab}>
+                      <button
+                        onClick={() => {
+                          onTabChange(item.tab);
+                          onClose?.();
+                        }}
+                        className={cn(
+                          "w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                          activeTab === item.tab
+                            ? "bg-primary text-primary-foreground shadow-soft" 
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        )}
+                      >
+                        <item.icon className="w-5 h-5" />
+                        <span className="flex-1 text-left">{t(item.labelKey)}</span>
+                        {item.badge && item.badge > 0 && (
+                          <span className={cn(
+                            "w-5 h-5 rounded-full text-xs font-medium flex items-center justify-center",
+                            activeTab === item.tab 
+                              ? "bg-primary-foreground/20 text-primary-foreground" 
+                              : "bg-secondary text-secondary-foreground"
+                          )}>
+                            {item.badge}
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </CollapsibleContent>
+            </Collapsible>
+          );
+        })}
       </nav>
 
       {/* Language Switcher */}
