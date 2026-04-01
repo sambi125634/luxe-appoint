@@ -827,17 +827,34 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     <div className="border-t border-border pt-4 space-y-4">
                       <p className="text-sm font-medium text-muted-foreground">Warunki zaliczki (opcjonalne)</p>
                       
-                      <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div>
-                          <Label>Tylko dla klientów high-risk</Label>
-                          <p className="text-xs text-muted-foreground">
-                            Wymagaj tylko gdy AI Risk Score = HIGH
-                          </p>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                          <div>
+                            <Label>Tylko dla klientów wysokiego ryzyka</Label>
+                            <p className="text-xs text-muted-foreground">
+                              Zaliczka wymagana automatycznie, gdy AI oceni klienta jako ryzykownego
+                            </p>
+                          </div>
+                          <Switch
+                            checked={formData.prepayment?.requireForHighRisk || false}
+                            onCheckedChange={(v) => updatePrepayment('requireForHighRisk', v)}
+                          />
                         </div>
-                        <Switch
-                          checked={formData.prepayment?.requireForHighRisk || false}
-                          onCheckedChange={(v) => updatePrepayment('requireForHighRisk', v)}
-                        />
+                        {formData.prepayment?.requireForHighRisk && (
+                          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-muted-foreground space-y-1 ml-1">
+                            <p className="font-medium text-amber-700 dark:text-amber-300">
+                              ⚠️ Kiedy klient jest uznawany za high-risk?
+                            </p>
+                            <ul className="list-disc list-inside space-y-0.5">
+                              <li>2 lub więcej nieobecności (no-show) w historii</li>
+                              <li>Częste anulacje w ostatniej chwili (&gt;20% wizyt)</li>
+                              <li>Brak wizyty od ponad 180 dni</li>
+                            </ul>
+                            <p className="pt-1 text-[11px]">
+                              AI oblicza wskaźnik ryzyka (0-100 pkt) po każdej wizycie. Klient z wynikiem <strong>powyżej 60 pkt</strong> jest automatycznie oznaczany jako high-risk.
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
