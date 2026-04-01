@@ -47,14 +47,8 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       items: [
         { icon: LayoutDashboard, labelKey: "admin.dashboard", tab: "home" },
         { icon: Calendar, labelKey: "admin.calendar", tab: "calendar" },
+        { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
         { icon: Users, labelKey: "admin.staff", tab: "staff" },
-      ],
-    },
-    {
-      titleKey: "sidebar.offer",
-      items: [
-        { icon: Scissors, labelKey: "admin.services", tab: "services" },
-        { icon: Package, labelKey: "admin.products", tab: "products" },
       ],
     },
     {
@@ -63,22 +57,22 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
         { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
         { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
-        { icon: Route, labelKey: "admin.clientJourney", tab: "pipeline" },
+      ],
+    },
+    {
+      titleKey: "sidebar.offerFinance",
+      items: [
+        { icon: Scissors, labelKey: "admin.services", tab: "services" },
+        { icon: Package, labelKey: "admin.products", tab: "products" },
+        { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
       ],
     },
     {
       titleKey: "sidebar.marketing",
       items: [
+        { icon: Route, labelKey: "admin.clientJourney", tab: "pipeline" },
         { icon: Radar, labelKey: "admin.retention", tab: "retention" },
         { icon: Heart, labelKey: "admin.referral", tab: "referral" },
-        
-        { icon: Code, labelKey: "admin.widgets", tab: "widgets" },
-      ],
-    },
-    {
-      titleKey: "sidebar.finance",
-      items: [
-        { icon: Calculator, labelKey: "admin.reports", tab: "accounting" },
       ],
     },
     {
