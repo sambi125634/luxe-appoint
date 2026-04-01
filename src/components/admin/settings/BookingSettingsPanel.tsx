@@ -274,20 +274,38 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
               )}
 
               <div className="space-y-3 pt-2">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label className="flex items-center gap-2">
-                      <AlertTriangle className="w-4 h-4 text-amber-500" />
-                      {t("settingsModule.requireHighRisk")}
-                    </Label>
-                    <p className="text-xs text-muted-foreground">
-                      {t("settingsModule.requireHighRiskDesc")}
-                    </p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-0.5">
+                      <Label className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-amber-500" />
+                        {t("settingsModule.requireHighRisk")}
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        {t("settingsModule.requireHighRiskDesc")}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={formData.prepayment.requireForHighRisk}
+                      onCheckedChange={(checked) => updatePrepayment({ requireForHighRisk: checked })}
+                    />
                   </div>
-                  <Switch
-                    checked={formData.prepayment.requireForHighRisk}
-                    onCheckedChange={(checked) => updatePrepayment({ requireForHighRisk: checked })}
-                  />
+                  {formData.prepayment.requireForHighRisk && (
+                    <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs text-muted-foreground space-y-1">
+                      <p className="font-medium text-amber-700 dark:text-amber-300 flex items-center gap-1">
+                        <AlertTriangle className="w-3 h-3" />
+                        Kiedy klient jest uznawany za high-risk?
+                      </p>
+                      <ul className="list-disc list-inside space-y-0.5 ml-1">
+                        <li>2 lub więcej nieobecności (no-show) w historii</li>
+                        <li>Częste anulacje w ostatniej chwili (&gt;20% wizyt)</li>
+                        <li>Brak wizyty od ponad 180 dni</li>
+                      </ul>
+                      <p className="pt-1 text-[11px]">
+                        AI oblicza wskaźnik ryzyka (0-100 pkt) po każdej wizycie. Klient z wynikiem <strong>powyżej 60 pkt</strong> jest automatycznie oznaczany jako high-risk i wymagana jest od niego zaliczka.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center justify-between">
