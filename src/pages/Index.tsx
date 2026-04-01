@@ -10,6 +10,7 @@ import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { AudienceSection } from "@/components/landing/AudienceSection";
+import { MobileAppSection } from "@/components/landing/MobileAppSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { NewFAQSection } from "@/components/landing/NewFAQSection";
 import { NewFinalCTASection } from "@/components/landing/NewFinalCTASection";
@@ -29,7 +30,7 @@ const Index = () => {
       <main>
         <NewHeroSection onScrollToForm={scrollToForm} />
         <SocialProofBar />
-        <ProblemSection />
+        <ProblemSection onScrollToForm={scrollToForm} />
         <TransformationSection />
         <AIGameChangersSection />
         <ComparisonSection />
@@ -37,6 +38,7 @@ const Index = () => {
         <InteractiveDemoSection />
         <TestimonialsSection />
         <AudienceSection />
+        <MobileAppSection />
         <PricingSection onScrollToForm={scrollToForm} />
         
         <div ref={formRef}>
