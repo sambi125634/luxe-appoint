@@ -1,10 +1,9 @@
-import { lazy, Suspense } from "react";
-import { useTranslation } from "react-i18next";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, ArrowRight, Play } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Play, Smartphone } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
 const Hero3DScene = lazy(() => import("./Hero3DScene"));
 
@@ -12,31 +11,50 @@ interface NewHeroSectionProps {
   onScrollToForm: () => void;
 }
 
-export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
-  const { t } = useTranslation();
+const AnimatedSalonCount = () => {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const [count, setCount] = useState(0);
 
+  useEffect(() => {
+    if (!isInView) return;
+    const target = 150;
+    const duration = 2000;
+    const step = target / (duration / 16);
+    let current = 0;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(Math.floor(current));
+      }
+    }, 16);
+    return () => clearInterval(timer);
+  }, [isInView]);
+
+  return <span ref={ref} className="font-bold text-primary">{count}+ salonów</span>;
+};
+
+export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Deep gradient background */}
       <div className="absolute inset-0 bg-gradient-to-br from-violet-dark via-background to-muted/30" />
 
-      {/* 3D Scene */}
       <Suspense fallback={null}>
         <Hero3DScene />
       </Suspense>
 
-      {/* Gradient overlays for readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20 z-[1]" />
-      {/* Radial gradient — centrum czytelne, boki z 3D */}
       <div className="absolute inset-0 z-[1]" style={{
         background: "radial-gradient(ellipse 60% 70% at 50% 50%, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 60%, transparent 100%)"
       }} />
-      {/* Mobile extra dark overlay */}
       <div className="absolute inset-0 bg-background/50 md:bg-transparent z-[1]" />
 
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-          {/* Badge */}
+          {/* Animated Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -44,7 +62,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             <Badge
               variant="outline"
-              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
+              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               🚀 Jedyny kalendarz z AI dla salonów beauty
@@ -59,22 +77,24 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-              Twój system rezerwacji pracuje za Ciebie 24/7.{" "}
-              <span className="text-gradient-luxury">
-                I nie bierze prowizji od Twoich klientek.
+              Twój salon rezerwuje, przypomina
+              <br />
+              <span className="text-gradient-luxury">i odzyskuje klientki sam.</span>
+              <br />
+              <span className="text-muted-foreground text-3xl md:text-4xl lg:text-5xl">
+                Bez Booksy. Bez prowizji. Bez chaosu.
               </span>
             </h1>
           </motion.div>
 
-          {/* Subheadline */}
+          {/* Subheadline with live counter */}
           <motion.p
             className="text-lg md:text-xl text-muted-foreground max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            Pierwszy system z AI, który przewiduje przychody, eliminuje no-showy
-            i wypełnia luki w grafiku — automatycznie. Za 0% prowizji.
+            Dołącz do <AnimatedSalonCount /> które przestały płacić prowizje.
           </motion.p>
 
           {/* CTAs */}
@@ -87,13 +107,12 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <Button
               size="lg"
               onClick={onScrollToForm}
-              className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500"
+              className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Załóż konto za darmo
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] animate-shimmer opacity-0 group-hover:opacity-20" />
             </Button>
 
             <Button
@@ -134,6 +153,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               "Bez karty kredytowej",
               "Gotowe w 5 minut",
               "0% prowizji — zawsze",
+              "📱 Aplikacja mobilna iOS & Android",
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Building2, Calendar, Clock, Star } from "lucide-react";
+import { Building2, Calendar, Clock, Star, Smartphone } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 
 const stats = [
@@ -7,6 +7,7 @@ const stats = [
   { value: 25000, suffix: "+", label: "Rezerwacji miesięcznie", icon: Calendar },
   { value: 99.9, suffix: "%", label: "Uptime", icon: Clock },
   { value: 4.9, suffix: "★", label: "Ocena użytkowników", icon: Star },
+  { value: 2, suffix: " apki", label: "iOS & Android", icon: Smartphone },
 ];
 
 const AnimatedCounter = ({ target, suffix, active }: { target: number; suffix: string; active: boolean }) => {
@@ -63,7 +64,7 @@ export const SocialProofBar = () => {
           Zaufało nam już ponad 150+ salonów w całej Polsce
         </motion.p>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
