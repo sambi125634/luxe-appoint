@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart
+  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart, ChevronDown
 } from "lucide-react";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
