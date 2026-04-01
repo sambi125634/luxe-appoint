@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Calendar } from "lucide-react";
+import { Menu, X, Calendar, LogIn, MessageCircle } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 interface LandingNavbarProps {
@@ -48,9 +48,12 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
           <div className="hidden md:flex items-center gap-8">
             <button
               onClick={() => scrollToSection("features")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="relative text-muted-foreground hover:text-foreground transition-colors"
             >
               {t("nav.features")}
+              <span className="absolute -top-2 -right-8 text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full leading-none">
+                Nowe
+              </span>
             </button>
             <button
               onClick={() => scrollToSection("pricing")}
@@ -77,13 +80,14 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             <LanguageSwitcher />
             <a
               href="https://admin.beauty-funnels.com/auth"
-              className="text-muted-foreground hover:text-foreground transition-colors font-medium"
+              className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
-              Panel klienta
+              <LogIn className="w-4 h-4" />
+              Zaloguj się
             </a>
             <Button
               onClick={onScrollToForm}
-              className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500"
+              className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               {t("nav.bookDemo")}
             </Button>
@@ -92,6 +96,15 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
             <LanguageSwitcher variant="compact" />
+            <a
+              href="https://wa.me/48500000000"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-2 text-emerald-500 hover:text-emerald-400 transition-colors"
+              aria-label="WhatsApp"
+            >
+              <MessageCircle className="h-5 w-5" />
+            </a>
             <button
               className="text-foreground p-2"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -117,12 +130,13 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               <button onClick={() => scrollToSection("faq")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.faq")}
               </button>
-              <a href="https://admin.beauty-funnels.com/auth" className="text-left text-muted-foreground hover:text-foreground py-2 font-medium">
-                Panel klienta
+              <a href="https://admin.beauty-funnels.com/auth" className="flex items-center gap-1.5 text-left text-muted-foreground hover:text-foreground py-2 font-medium">
+                <LogIn className="w-4 h-4" />
+                Zaloguj się
               </a>
               <Button
                 onClick={() => { onScrollToForm(); setIsMobileMenuOpen(false); }}
-                className="bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2"
+                className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
               >
                 {t("nav.bookDemo")}
               </Button>

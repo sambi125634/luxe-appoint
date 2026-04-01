@@ -1957,7 +1957,11 @@
       "q5": "Czy jest aplikacja mobilna?",
       "a5": "Tak, Beauty Calendar działa jako PWA (Progressive Web App). Dodaj do ekranu głównego i korzystaj jak z natywnej aplikacji na iOS i Android.",
       "q6": "Co jeśli potrzebuję pomocy?",
-      "a6": "Oferujemy wsparcie przez chat, email i telefon. Odpowiadamy w ciągu maksymalnie 4 godzin w dni robocze. Po polsku, bez chatbotów."
+      "a6": "Oferujemy wsparcie przez chat, email i telefon. Odpowiadamy w ciągu maksymalnie 4 godzin w dni robocze. Po polsku, bez chatbotów.",
+      "q7": "Czy naprawdę 0% prowizji? Zawsze?",
+      "a7": "Tak, absolutnie. Beauty Calendar pobiera stałą opłatę miesięczną zależną od planu (0 zł / 99 zł / 199 zł). Zero prowizji od rezerwacji — nieważne czy klientka zarezerwuje 1 czy 1000 wizyt w miesiącu. To jest nasza fundamentalna różnica względem Booksy i podobnych platform.",
+      "q8": "Czy integruje się z Google Calendar?",
+      "a8": "Tak. W planie PRO i VIP masz dwukierunkową synchronizację z Google Calendar. Wizyty z Beauty Calendar pojawiają się automatycznie w Twoim kalendarzu Google i odwrotnie — blokady z Google Calendar blokują sloty w widgecie rezerwacji."
     },
     "newFinalCta": {
       "urgency": "Pierwsze 30 dni z pełnym dostępem do wszystkich funkcji AI — bez karty kredytowej.",
