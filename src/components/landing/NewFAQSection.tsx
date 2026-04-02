@@ -5,19 +5,34 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { FileText, Clock, Database, Brain, Smartphone, Headphones, Percent, Calendar } from "lucide-react";
+import { FileText, Clock, Database, Brain, Smartphone, Headphones, Percent, Calendar, ShieldCheck, Download, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-const faqIcons = [FileText, Clock, Database, Brain, Smartphone, Headphones, Percent, Calendar];
+const faqIcons = [FileText, Clock, Database, Brain, Smartphone, Headphones, Percent, Calendar, ShieldCheck, Download, HelpCircle];
 
 export const NewFAQSection = () => {
   const { t } = useTranslation();
 
-  const faqs = Array.from({ length: 8 }, (_, i) => ({
+  const extraFaqs = [
+    {
+      icon: ShieldCheck,
+      question: "Co się stanie z moimi klientkami jeśli zrezygnuję z Beauty Calendar?",
+      answer: "Zabierasz je ze sobą. W dowolnym momencie eksportujesz pełną bazę klientek do CSV/Excel — z historią wizyt, danymi kontaktowymi i notatkami. Twoje dane są Twoje. Zawsze. To fundamentalna różnica między nami a Booksy.",
+    },
+    {
+      icon: Download,
+      question: "Czy trudno przenieść dane z Booksy?",
+      answer: "5 minut. Serio. Mamy jedną-klikowy import z Booksy, Fresha i Versumu. Twoja baza klientek, usługi i grafik przeniosą się automatycznie. Uruchomisz Beauty Calendar jeszcze tego samego dnia.",
+    },
+  ];
+
+  const i18nFaqs = Array.from({ length: 8 }, (_, i) => ({
     icon: faqIcons[i],
     question: t(`landing.newFaq.q${i + 1}`),
     answer: t(`landing.newFaq.a${i + 1}`),
   }));
+
+  const faqs = [...i18nFaqs, ...extraFaqs];
 
   return (
     <section id="faq" className="py-20 lg:py-32">
