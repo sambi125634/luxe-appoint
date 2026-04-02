@@ -3,15 +3,17 @@ import { LandingNavbar, LeadFormSection } from "@/components/landing";
 import { NewHeroSection } from "@/components/landing/NewHeroSection";
 import { SocialProofBar } from "@/components/landing/SocialProofBar";
 import { ProblemSection } from "@/components/landing/ProblemSection";
+import { BookstyCostCalculator } from "@/components/landing/BookstyCostCalculator";
 import { TransformationSection } from "@/components/landing/TransformationSection";
 import { AIGameChangersSection } from "@/components/landing/AIGameChangersSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
-import { InteractiveDemoSection } from "@/components/landing/InteractiveDemoSection";
+import { ValueStackSection } from "@/components/landing/ValueStackSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
-import { AudienceSection } from "@/components/landing/AudienceSection";
 import { MobileAppSection } from "@/components/landing/MobileAppSection";
+import { AudienceSection } from "@/components/landing/AudienceSection";
 import { PricingSection } from "@/components/landing/PricingSection";
+import { GuaranteeSection } from "@/components/landing/GuaranteeSection";
 import { NewFAQSection } from "@/components/landing/NewFAQSection";
 import { NewFinalCTASection } from "@/components/landing/NewFinalCTASection";
 import { NewLandingFooter } from "@/components/landing/NewLandingFooter";
@@ -31,15 +33,17 @@ const Index = () => {
         <NewHeroSection onScrollToForm={scrollToForm} />
         <SocialProofBar />
         <ProblemSection onScrollToForm={scrollToForm} />
+        <BookstyCostCalculator onScrollToForm={scrollToForm} />
         <TransformationSection />
         <AIGameChangersSection />
         <ComparisonSection />
         <FeaturesSection />
-        <InteractiveDemoSection />
+        <ValueStackSection />
         <TestimonialsSection />
-        <AudienceSection />
         <MobileAppSection />
+        <AudienceSection />
         <PricingSection onScrollToForm={scrollToForm} />
+        <GuaranteeSection />
         
         <div ref={formRef}>
           <LeadFormSection />

@@ -5,11 +5,9 @@ import {
   TrendingUp, 
   DollarSign, 
   Instagram,
-  Sparkles,
   Check,
   ArrowRight
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -85,16 +83,13 @@ export const AIGameChangersSection = () => {
       <div className="container relative z-10">
         {/* Section header */}
         <div className="text-center mb-16">
-          <Badge 
-            variant="outline" 
-            className="mb-4 px-4 py-2 border-primary/30 bg-primary/5"
-          >
-            <Sparkles className="w-4 h-4 mr-2 text-primary" />
-            Powered by AI
-          </Badge>
+          <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 text-sm text-primary font-medium mb-4">
+            <Brain className="w-4 h-4" />
+            Autorskie funkcje AI — nie do kupienia nigdzie indziej
+          </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            5 funkcji AI,{" "}
-            <span className="text-gradient-luxury">których nie ma konkurencja</span>
+            5 funkcji AI które zastąpią{" "}
+            <span className="text-primary">pełnoetatowego managera</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Sztuczna inteligencja, która naprawdę rozumie Twój biznes i automatycznie go optymalizuje.
