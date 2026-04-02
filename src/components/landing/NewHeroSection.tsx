@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, ArrowRight, Play, Smartphone } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 
@@ -162,6 +162,25 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
                 <span>{item}</span>
               </div>
             ))}
+          </motion.div>
+
+          {/* Urgency bar */}
+          <motion.div
+            className="mt-6 flex items-center justify-center gap-3"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.3 }}
+          >
+            <div className="flex -space-x-2">
+              {['AK', 'MW', 'JP', 'KW', 'LS'].map((i, idx) => (
+                <div key={idx} className="w-7 h-7 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-bold text-primary">
+                  {i}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              <span className="font-bold text-foreground">23 salony</span>{' '}dołączyły w tym tygodniu
+            </p>
           </motion.div>
         </div>
       </div>

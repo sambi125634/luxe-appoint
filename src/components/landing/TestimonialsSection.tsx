@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const testimonials = [
   {
@@ -44,29 +45,21 @@ const testimonials = [
 const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] }) => (
   <div className="glass-card-elevated p-6 lg:p-8 h-full flex flex-col">
     <Quote className="w-8 h-8 text-primary/20 mb-4 shrink-0" />
-    
-    {/* Stars */}
     <div className="flex gap-1 mb-4">
       {[...Array(testimonial.rating)].map((_, i) => (
         <Star key={i} className="w-4 h-4 fill-accent text-accent" />
       ))}
     </div>
-
-    {/* Content */}
     <blockquote className="text-base lg:text-lg leading-relaxed mb-6 flex-grow font-serif italic">
       "{testimonial.content}"
     </blockquote>
-
-    {/* Author */}
     <div className="flex items-center gap-3 mt-auto">
       <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
         {testimonial.avatar}
       </div>
       <div>
         <div className="font-semibold">{testimonial.author}</div>
-        <div className="text-sm text-muted-foreground">
-          {testimonial.role}, {testimonial.location}
-        </div>
+        <div className="text-sm text-muted-foreground">{testimonial.role}, {testimonial.location}</div>
       </div>
     </div>
   </div>
@@ -85,18 +78,38 @@ export const TestimonialsSection = () => {
   return (
     <section className="py-20 lg:py-32 bg-gradient-to-b from-muted/20 to-background">
       <div className="container">
+        {/* Rating header */}
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-sm text-muted-foreground mb-2">
+            Co mówią właścicielki które przestały płacić prowizje:
+          </p>
+          <div className="flex items-center justify-center gap-1">
+            {[1, 2, 3, 4, 5].map(i => (
+              <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+            ))}
+            <span className="ml-2 font-bold">4.9/5</span>
+            <span className="text-muted-foreground ml-1 text-sm">(127 opinii)</span>
+          </div>
+        </motion.div>
+
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             Co mówią{" "}
-            <span className="text-gradient-luxury">właściciele salonów</span>
+            <span className="text-gradient-luxury">właścicielki salonów</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Dołącz do setek zadowolonych właścicieli salonów w całej Polsce
+            Dołącz do setek zadowolonych właścicielek salonów w całej Polsce
           </p>
         </div>
 
-        {/* Desktop: 3-column grid (show first 3) */}
+        {/* Desktop: 3-column grid */}
         <div className="hidden lg:grid lg:grid-cols-3 gap-6">
           {testimonials.slice(0, 3).map((testimonial) => (
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
@@ -106,8 +119,6 @@ export const TestimonialsSection = () => {
         {/* Mobile: Single card carousel */}
         <div className="lg:hidden max-w-xl mx-auto">
           <TestimonialCard testimonial={testimonials[activeIndex]} />
-          
-          {/* Dots */}
           <div className="flex justify-center gap-2 mt-6">
             {testimonials.map((_, index) => (
               <button
