@@ -110,7 +110,7 @@
       "step": "Krok {{current}} z {{total}}",
       "skip": "Pomiń przewodnik",
       "start": "Rozpocznij pracę",
-      "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając „Samouczek" w menu bocznym",
+      "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając 'Samouczek" w menu bocznym",
       "steps": {
         "welcome": { "title": "Witaj w Beauty Calendar! 🎉", "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty." },
         "dashboard": { "title": "Dashboard — Twoje centrum dowodzenia", "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela." },
@@ -480,7 +480,7 @@
     "step": "Krok {{current}} z {{total}}",
     "skip": "Pomiń",
     "start": "Rozpocznij pracę",
-    "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając „Samouczek" w menu bocznym",
+    "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając 'Samouczek" w menu bocznym",
     "steps": {
       "welcome": { "title": "Witaj w Beauty Calendar! 🎉", "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty." },
       "dashboard": { "title": "Dashboard — Twoje centrum dowodzenia", "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela." },
