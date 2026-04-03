@@ -137,7 +137,7 @@ const demoServiceRecommendations: Record<string, { id: string; name: string; pri
   ],
 };
 
-export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange, skipIntro = false }: BookingWidgetProps) {
+export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange, skipIntro = false, autoClientData }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
