@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isPast, parseISO, differenceInHours, differenceInDays } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays } from "lucide-react";
+import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays, Star } from "lucide-react";
 import { BookingsCalendarView } from "./BookingsCalendarView";
+import { ReviewModal } from "./ReviewModal";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
