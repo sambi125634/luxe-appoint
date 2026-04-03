@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutDashboard, MessageSquare, GitBranch, Receipt, Settings, Sparkles } from "lucide-react";
+import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutDashboard, Code, Settings, Sparkles, MessageSquare, ClipboardList, Package, Receipt, Route, Radar, Heart, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
@@ -9,16 +9,26 @@ interface TourStep {
   id: string;
   targetTab: TabType;
   icon: React.ReactNode;
-  position: "center" | "sidebar" | "content";
+  position: "center" | "content";
 }
 
 const tourSteps: TourStep[] = [
   { id: "welcome", targetTab: "home", icon: <Sparkles className="w-6 h-6" />, position: "center" },
   { id: "dashboard", targetTab: "home", icon: <LayoutDashboard className="w-6 h-6" />, position: "content" },
   { id: "calendar", targetTab: "calendar", icon: <Calendar className="w-6 h-6" />, position: "content" },
-  { id: "clients", targetTab: "clients", icon: <Users className="w-6 h-6" />, position: "content" },
-  { id: "services", targetTab: "services", icon: <Scissors className="w-6 h-6" />, position: "content" },
+  { id: "widgets", targetTab: "widgets", icon: <Code className="w-6 h-6" />, position: "content" },
   { id: "staff", targetTab: "staff", icon: <UserCheck className="w-6 h-6" />, position: "content" },
+  { id: "clients", targetTab: "clients", icon: <Users className="w-6 h-6" />, position: "content" },
+  { id: "conversations", targetTab: "conversations", icon: <MessageSquare className="w-6 h-6" />, position: "content" },
+  { id: "consultation", targetTab: "consultation", icon: <ClipboardList className="w-6 h-6" />, position: "content" },
+  { id: "services", targetTab: "services", icon: <Scissors className="w-6 h-6" />, position: "content" },
+  { id: "products", targetTab: "products", icon: <Package className="w-6 h-6" />, position: "content" },
+  { id: "accounting", targetTab: "accounting", icon: <Receipt className="w-6 h-6" />, position: "content" },
+  { id: "pipeline", targetTab: "pipeline", icon: <Route className="w-6 h-6" />, position: "content" },
+  { id: "retention", targetTab: "retention", icon: <Radar className="w-6 h-6" />, position: "content" },
+  { id: "referral", targetTab: "referral", icon: <Heart className="w-6 h-6" />, position: "content" },
+  { id: "settings", targetTab: "settings", icon: <Settings className="w-6 h-6" />, position: "content" },
+  { id: "support", targetTab: "support", icon: <HelpCircle className="w-6 h-6" />, position: "content" },
   { id: "cta", targetTab: "home", icon: <Sparkles className="w-6 h-6" />, position: "center" },
 ];
 
@@ -66,10 +76,6 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
     }
   };
 
-  const handleSkip = () => {
-    handleComplete();
-  };
-
   const handleComplete = () => {
     setIsVisible(false);
     localStorage.setItem("demo-tour-completed", "true");
@@ -80,10 +86,8 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
 
   return (
     <>
-      {/* Backdrop */}
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[60] animate-fade-in" />
       
-      {/* Tour Modal */}
       <div className={cn(
         "fixed z-[70] transition-all duration-300",
         step.position === "center" 
@@ -111,14 +115,14 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                  {t("demo.tour.step", { current: currentStep + 1, total: tourSteps.length })}
+                  {t("tour.step", { current: currentStep + 1, total: tourSteps.length })}
                 </p>
                 <h3 className="font-serif text-xl font-semibold">
-                  {t(`demo.tour.steps.${step.id}.title`)}
+                  {t(`tour.steps.${step.id}.title`)}
                 </h3>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleSkip} className="text-muted-foreground hover:text-foreground">
+            <Button variant="ghost" size="icon" onClick={handleComplete} className="text-muted-foreground hover:text-foreground">
               <X className="w-5 h-5" />
             </Button>
           </div>
@@ -126,30 +130,13 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
           {/* Content */}
           <div className="p-6">
             <p className="text-muted-foreground leading-relaxed">
-              {t(`demo.tour.steps.${step.id}.description`)}
+              {t(`tour.steps.${step.id}.description`)}
             </p>
 
-            {/* Feature highlights for specific steps */}
-            {step.id !== "welcome" && step.id !== "cta" && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {[1, 2, 3].map((i) => {
-                  const featureKey = `demo.tour.steps.${step.id}.feature${i}`;
-                  const feature = t(featureKey);
-                  if (feature === featureKey) return null;
-                  return (
-                    <span key={i} className="px-3 py-1 bg-primary/10 text-primary text-sm rounded-full">
-                      {feature}
-                    </span>
-                  );
-                })}
-              </div>
-            )}
-
-            {/* CTA for last step */}
             {isLastStep && (
-              <div className="mt-6 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
+              <div className="mt-4 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
                 <p className="text-sm font-medium text-center">
-                  {t("demo.tour.steps.cta.highlight")}
+                  {t("tour.restartHint")}
                 </p>
               </div>
             )}
@@ -159,10 +146,10 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
           <div className="p-6 pt-0 flex items-center justify-between">
             <Button 
               variant="ghost" 
-              onClick={handleSkip}
+              onClick={handleComplete}
               className="text-muted-foreground"
             >
-              {t("demo.tour.skip")}
+              {t("tour.skip")}
             </Button>
             
             <div className="flex items-center gap-2">
@@ -175,7 +162,7 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
               <Button onClick={handleNext} className="gap-2">
                 {isLastStep ? (
                   <>
-                    {t("demo.tour.start")}
+                    {t("tour.start")}
                     <Sparkles className="w-4 h-4" />
                   </>
                 ) : (
@@ -199,7 +186,6 @@ export function useTourState() {
   useEffect(() => {
     const tourCompleted = localStorage.getItem("demo-tour-completed");
     if (!tourCompleted) {
-      // Small delay to let the page render first
       const timer = setTimeout(() => setShowTour(true), 500);
       return () => clearTimeout(timer);
     }

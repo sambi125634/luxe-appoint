@@ -9,9 +9,11 @@ interface SectionGuideProps {
 }
 
 const SECTION_KEYS = [
-  "home", "calendar", "clients", "services", "staff", "widgets",
-  "timeOff", "stats", "settings", "conversations", "pipeline",
-  "accounting", "products", "recipes", "consultation", "support"
+  "home", "calendar", "widgets", "staff",
+  "clients", "conversations", "consultation",
+  "services", "products", "accounting",
+  "pipeline", "retention", "referral",
+  "settings", "support"
 ];
 
 export function SectionGuide({ sectionKey, className }: SectionGuideProps) {

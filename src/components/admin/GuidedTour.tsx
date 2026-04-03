@@ -1,98 +1,42 @@
 import { useState, useEffect, useCallback } from "react";
-import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutDashboard, Code, Settings, Sparkles } from "lucide-react";
+import { X, ArrowRight, ArrowLeft, Calendar, Users, Scissors, UserCheck, LayoutDashboard, Code, Settings, Sparkles, MessageSquare, ClipboardList, Package, Receipt, Route, Radar, Heart, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 import { TabType } from "./AdminSidebar";
 
 interface TourStep {
   id: string;
   targetTab: TabType;
   icon: React.ReactNode;
-  title: string;
-  description: string;
-  limitations?: string;
   position: "center" | "content";
 }
 
 const tourSteps: TourStep[] = [
-  {
-    id: "welcome",
-    targetTab: "home",
-    icon: <Sparkles className="w-6 h-6" />,
-    title: "Witaj w Beauty Calendar! 🎉",
-    description: "Przeprowadzimy Cię przez każdą sekcję panelu, żebyś wiedziała dokładnie co tu robisz, jakie dane wpisać i dlaczego to ważne. Zajmie to 2 minuty.",
-    position: "center",
-  },
-  {
-    id: "dashboard",
-    targetTab: "home",
-    icon: <LayoutDashboard className="w-6 h-6" />,
-    title: "Dashboard — centrum dowodzenia",
-    description: "Tutaj widzisz podsumowanie dnia: nadchodzące wizyty, przychody, alerty i statystyki. Im więcej danych dodasz, tym więcej informacji tutaj zobaczysz.",
-    limitations: "Bez wizyt i klientów dashboard będzie pusty — to normalne na start.",
-    position: "content",
-  },
-  {
-    id: "calendar",
-    targetTab: "calendar",
-    icon: <Calendar className="w-6 h-6" />,
-    title: "Kalendarz — serce salonu",
-    description: "Tutaj zarządzasz wizytami. Kliknij w wolny slot, aby dodać wizytę. Widzisz grafik wszystkich pracowników na jednym ekranie. Klientki mogą też rezerwować same przez widget.",
-    limitations: "Żeby widzieć sloty, musisz najpierw dodać pracowników i ustawić godziny pracy.",
-    position: "content",
-  },
-  {
-    id: "clients",
-    targetTab: "clients",
-    icon: <Users className="w-6 h-6" />,
-    title: "Klienci — Twoja baza",
-    description: "Lista wszystkich klientów salonu. Możesz dodać klientów ręcznie, importować z CSV, lub poczekać — system automatycznie tworzy profil przy pierwszej rezerwacji.",
-    limitations: "Bez klientów nie będziesz mogła tworzyć wizyt w kalendarzu.",
-    position: "content",
-  },
-  {
-    id: "services",
-    targetTab: "services",
-    icon: <Scissors className="w-6 h-6" />,
-    title: "Usługi — Twój cennik",
-    description: "Zarządzaj usługami: nazwy, ceny, czas trwania, kategorie. Te dane wyświetlają się w widgecie rezerwacji. Jeśli korzystałaś z szablonów w onboardingu, Twoje usługi już tu są.",
-    limitations: "Bez usług klientki nie będą mogły rezerwować wizyt.",
-    position: "content",
-  },
-  {
-    id: "staff",
-    targetTab: "staff",
-    icon: <UserCheck className="w-6 h-6" />,
-    title: "Pracownicy — Twój zespół",
-    description: "Dodaj członków zespołu, przypisz im usługi i ustaw godziny pracy. Każdy pracownik ma swój kolor w kalendarzu. Możesz też zaprosić ich do systemu.",
-    limitations: "Bez pracowników kalendarz nie pokaże żadnych slotów.",
-    position: "content",
-  },
-  {
-    id: "widgets",
-    targetTab: "widgets",
-    icon: <Code className="w-6 h-6" />,
-    title: "Widget — rezerwacje online",
-    description: "Skopiuj kod widgetu i wklej na swoją stronę www lub udostępnij bezpośredni link. Klientki rezerwują 24/7 — nawet o 23:00. To najważniejszy krok do automatyzacji.",
-    limitations: "Widget wymaga skonfigurowanych usług i pracowników, żeby pokazywać wolne terminy.",
-    position: "content",
-  },
-  {
-    id: "settings",
-    targetTab: "settings",
-    icon: <Settings className="w-6 h-6" />,
-    title: "Ustawienia — personalizacja",
-    description: "Skonfiguruj profil salonu, branding, powiadomienia SMS/email i integracje. Logo i kolory wyświetlają się w widgecie rezerwacji.",
-    position: "content",
-  },
-  {
-    id: "cta",
-    targetTab: "home",
-    icon: <Sparkles className="w-6 h-6" />,
-    title: "Gotowa do startu! 🚀",
-    description: "Znasz już wszystkie sekcje. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże Ci co jeszcze zostało. Możesz uruchomić ten samouczek ponownie w dowolnym momencie.",
-    position: "center",
-  },
+  // Welcome
+  { id: "welcome", targetTab: "home", icon: <Sparkles className="w-6 h-6" />, position: "center" },
+  // Codzienna praca
+  { id: "dashboard", targetTab: "home", icon: <LayoutDashboard className="w-6 h-6" />, position: "content" },
+  { id: "calendar", targetTab: "calendar", icon: <Calendar className="w-6 h-6" />, position: "content" },
+  { id: "widgets", targetTab: "widgets", icon: <Code className="w-6 h-6" />, position: "content" },
+  { id: "staff", targetTab: "staff", icon: <UserCheck className="w-6 h-6" />, position: "content" },
+  // Klienci
+  { id: "clients", targetTab: "clients", icon: <Users className="w-6 h-6" />, position: "content" },
+  { id: "conversations", targetTab: "conversations", icon: <MessageSquare className="w-6 h-6" />, position: "content" },
+  { id: "consultation", targetTab: "consultation", icon: <ClipboardList className="w-6 h-6" />, position: "content" },
+  // Oferta & Finanse
+  { id: "services", targetTab: "services", icon: <Scissors className="w-6 h-6" />, position: "content" },
+  { id: "products", targetTab: "products", icon: <Package className="w-6 h-6" />, position: "content" },
+  { id: "accounting", targetTab: "accounting", icon: <Receipt className="w-6 h-6" />, position: "content" },
+  // Marketing
+  { id: "pipeline", targetTab: "pipeline", icon: <Route className="w-6 h-6" />, position: "content" },
+  { id: "retention", targetTab: "retention", icon: <Radar className="w-6 h-6" />, position: "content" },
+  { id: "referral", targetTab: "referral", icon: <Heart className="w-6 h-6" />, position: "content" },
+  // System
+  { id: "settings", targetTab: "settings", icon: <Settings className="w-6 h-6" />, position: "content" },
+  { id: "support", targetTab: "support", icon: <HelpCircle className="w-6 h-6" />, position: "content" },
+  // CTA
+  { id: "cta", targetTab: "home", icon: <Sparkles className="w-6 h-6" />, position: "center" },
 ];
 
 interface GuidedTourProps {
@@ -101,6 +45,7 @@ interface GuidedTourProps {
 }
 
 export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -181,9 +126,11 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
-                  Krok {currentStep + 1} z {tourSteps.length}
+                  {t("tour.step", { current: currentStep + 1, total: tourSteps.length })}
                 </p>
-                <h3 className="font-serif text-xl font-semibold">{step.title}</h3>
+                <h3 className="font-serif text-xl font-semibold">
+                  {t(`tour.steps.${step.id}.title`)}
+                </h3>
               </div>
             </div>
             <Button variant="ghost" size="icon" onClick={handleComplete} className="text-muted-foreground hover:text-foreground">
@@ -193,21 +140,14 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
 
           {/* Content */}
           <div className="p-6">
-            <p className="text-muted-foreground leading-relaxed">{step.description}</p>
-
-            {step.limitations && (
-              <div className="mt-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
-                <p className="text-xs text-amber-800 dark:text-amber-200">
-                  ⚠️ {step.limitations}
-                </p>
-              </div>
-            )}
-
+            <p className="text-muted-foreground leading-relaxed">
+              {t(`tour.steps.${step.id}.description`)}
+            </p>
 
             {isLastStep && (
               <div className="mt-4 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl border border-primary/20">
                 <p className="text-sm font-medium text-center">
-                  💡 Samouczek możesz uruchomić ponownie klikając „Samouczek" w menu bocznym
+                  {t("tour.restartHint")}
                 </p>
               </div>
             )}
@@ -216,24 +156,24 @@ export function GuidedTour({ onTabChange, onComplete }: GuidedTourProps) {
           {/* Footer */}
           <div className="p-6 pt-0 flex items-center justify-between">
             <Button variant="ghost" onClick={handleComplete} className="text-muted-foreground">
-              Pomiń
+              {t("tour.skip")}
             </Button>
             <div className="flex items-center gap-2">
               {!isFirstStep && (
                 <Button variant="outline" onClick={handlePrev} className="gap-2">
                   <ArrowLeft className="w-4 h-4" />
-                  Wstecz
+                  {t("common.back")}
                 </Button>
               )}
               <Button onClick={handleNext} className="gap-2">
                 {isLastStep ? (
                   <>
-                    Rozpocznij pracę
+                    {t("tour.start")}
                     <Sparkles className="w-4 h-4" />
                   </>
                 ) : (
                   <>
-                    Dalej
+                    {t("common.next")}
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}
