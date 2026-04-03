@@ -141,7 +141,7 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed, salonId, is
         >
           <div className="flex items-center gap-4">
             <div className={cn(
-              "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300",
+              "w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center transition-all duration-300",
               isAnySelected
                 ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground"
                 : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
