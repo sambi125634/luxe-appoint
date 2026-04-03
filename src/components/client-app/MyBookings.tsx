@@ -330,6 +330,15 @@ export function MyBookings() {
             </TabsContent>
           </Tabs>
         )}
+
+        {/* Review modal */}
+        <ReviewModal
+          open={!!reviewBooking}
+          onClose={() => setReviewBooking(null)}
+          bookingId={reviewBooking?.id ?? ""}
+          serviceName={reviewBooking?.serviceName ?? ""}
+          salonName={reviewBooking?.salonName ?? ""}
+        />
       </div>
     </div>
   );

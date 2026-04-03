@@ -45,6 +45,8 @@ export default function ClientApp() {
         <Route path="for-you" element={<ForYou />} />
         <Route path="activity" element={<Activity />} />
         <Route path="profile" element={<ClientProfile />} />
+        <Route path="profile/favorites" element={<Favorites />} />
+        <Route path="profile/referrals" element={<ReferFriend />} />
         <Route path="salon/:salonId" element={<SalonProfile />} />
       </Routes>
       <BottomTabBar />
