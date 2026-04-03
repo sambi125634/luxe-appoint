@@ -89,8 +89,8 @@ export function ForYou() {
             className="border-border/40 rounded-2xl overflow-hidden hover:shadow-md transition-all cursor-pointer active:scale-[0.98]"
           >
             <CardContent className="flex items-center gap-4 p-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center shrink-0">
-                <Ticket className="h-6 w-6 text-amber-600" />
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/20 flex items-center justify-center shrink-0">
+                <Ticket className="h-6 w-6 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-foreground text-sm">{coupon.title}</h3>
