@@ -576,6 +576,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
         date={selectedDate}
         time={selectedTime}
         clientName={`${clientData.firstName} ${clientData.lastName}`}
+        showAppDownload={!autoClientData}
       />
     );
   }
