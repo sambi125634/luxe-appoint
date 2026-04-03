@@ -1,79 +1,65 @@
-## Plan: Finalna przebudowa Landing Page — Beauty Calendar
 
-### Podejście
-Mega-prompt zawiera 16 sekcji, nową strategię cenową, pełne copy i design system. Zrealizuję to w **4 fazach** (każda w osobnym kroku), żeby uniknąć błędów kompilacji i zachować kontrolę jakości.
 
----
+## Plan: Przeprojektowanie systemu poradników (SectionGuide + GuidedTour)
 
-### FAZA 1 — Strategia cenowa + Core copy (ten krok)
+### Problem
+1. **SectionGuide** (poradnik na każdej zakładce) — zawiera klucze dla nieistniejących zakładek (`timeOff`, `stats`, `recipes`) a brakuje kluczy dla `retention` i `referral`
+2. **GuidedTour (admin)** — hardcoded po polsku, pokrywa tylko 7 zakładek (stary model), nie wspomina o marketingu, retencji, konsultacjach
+3. **GuidedTour (demo)** — pokrywa jeszcze mniej (6 zakładek)
+4. Copy jest techniczno-instrukcyjne ("kliknij tu, dodaj tam") zamiast benefit-driven
 
-**Dokument DOCX** z:
-1. **3 pakiety cenowe** z pełnym uzasadnieniem psychologicznym:
-   - **STARTER (0 zł)** — 1 pracownik, 50 rez/mies, brak SMS, brak AI → naturalny upgrade wall
-   - **PRO (99 zł/mies)** — unlimited staff, pełne AI, SMS, 0% prowizji → sweet spot
-   - **ELITE (249 zł/mies + 497 zł setup)** — white-label, API, private onboarding call → kwalifikator do DFY
-   - Roczna opcja: -20% (PRO: 79 zł, ELITE: 199 zł)
-2. **Tabela 163 funkcji** rozdzielonych na pakiety
-3. **Upgrade hooks** (co wymusza FREE→PRO, PRO→ELITE)
+### Zmiany
 
----
+#### 1. SectionGuide — aktualizacja kluczy i copy (`pl.json` + `en.json`)
 
-### FAZA 2 — Sekcje 1-8 (Hero → Porównanie)
+**Usunąć**: `timeOff`, `stats`, `recipes` (nie są samodzielnymi tabami)
 
-Przepisanie/stworzenie komponentów:
-1. `LandingNavbar.tsx` — sticky blur, CTA "Zacznij za darmo — 0 zł"
-2. `NewHeroSection.tsx` — loss-aversion hook, urgency bar, animowany counter
-3. `SocialProofBar.tsx` — 4 statystyki z count-up
-4. `ProblemSection.tsx` — agitacja Jim Edwards + kalkulator strat inline
-5. `BookstyCostCalculator.tsx` — 3 slidery (rezerwacje, cena, prowizja%), wynik roczny
-6. `TransformationSection.tsx` — Before/After + "Twoje dane na zawsze"
-7. `AIGameChangersSection.tsx` — 5 killer AI features z tabs
-8. `ComparisonSection.tsx` — tabelka BC vs Booksy vs "Brak systemu"
+**Dodać**: `retention`, `referral`
 
----
+**Przepisać WSZYSTKIE 15 sekcji** językiem korzyści:
 
-### FAZA 3 — Sekcje 9-12 (Features → Cennik)
+| Klucz | Goal (korzyść) | Pain Point (wartość) |
+|-------|----------------|---------------------|
+| `home` | "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — bez otwierania Excela" | "Jeden rzut oka rano i wiesz jak stoi Twój biznes" |
+| `calendar` | "Klientki rezerwują same 24/7 — Ty zarządzasz tylko wyjątkami" | "Zero telefonów w trakcie zabiegu" |
+| `widgets` | "Twój link do rezerwacji działa jak pracownik, który nigdy nie śpi" | "Wklej link na Instagram i klientki rezerwują o 23:00" |
+| `staff` | "Każdy pracownik ma swój kalendarz, usługi i kolor — zero pomyłek" | "Nie musisz pamiętać kto co robi" |
+| `clients` | "Pełna historia każdej klientki — wiesz kto jest VIP, kto znika" | "Koniec z karteczkami i zeszytami" |
+| `conversations` | "Wszystkie rozmowy w jednym miejscu — SMS, email, WhatsApp" | "Nigdy nie zgubisz wątku z klientką" |
+| `consultation` | "Cyfrowe karty konsultacyjne z podpisem RODO — zawsze pod ręką" | "Profesjonalna dokumentacja bez papierowej biurokracji" |
+| `services` | "Twój cennik online — klientki widzą ceny i rezerwują od razu" | "Zmień cenę raz, widget aktualizuje się automatycznie" |
+| `products` | "Wiesz ile produktów zostało i kiedy zamówić — zero niespodzianek" | "Skanuj dostawy telefonem, system liczy marże za Ciebie" |
+| `accounting` | "Zamykasz salon, sprawdzasz raport — wszystko się zgadza" | "Eksport dla księgowej jednym kliknięciem" |
+| `pipeline` | "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają" | "Reagujesz zanim klientka odejdzie do konkurencji" |
+| `retention` | "System automatycznie dba o powroty klientek — Ty nie musisz pamiętać" | "Klientki wracają same, bo system reaguje we właściwym momencie" |
+| `referral` | "Zadowolone klientki polecają Cię znajomym — system to trackuje" | "Każde polecenie = nowa klientka bez kosztu reklamy" |
+| `settings` | "Twoje logo i kolory wyświetlają się w widgecie — profesjonalny wygląd" | "Konfiguracja raz, efekty na zawsze" |
+| `support` | "Pytasz po polsku, dostajesz odpowiedź natychmiast" | "Jak rozmowa z ekspertem, który zna cały system" |
 
-9. `FeaturesSection.tsx` — tabs per moduł (11 modułów)
-10. `TestimonialsSection.tsx` — 6 placeholder testimoniali z [PLACEHOLDER]
-11. `AudienceSection.tsx` — 4 segmenty (kosmetyczny, fryzjerski, klinika, SPA)
-12. `PricingSection.tsx` — 3 pakiety, toggle miesięczny/roczny, feature comparison
+**Kroki** (`steps`) — max 3-4, napisane jako korzyści, nie instrukcje.
 
----
+**Aktualizacja `SECTION_KEYS`** w `SectionGuide.tsx`.
 
-### FAZA 4 — Sekcje 13-16 + Finalizacja
+#### 2. GuidedTour (admin) — przebudowa na 15 zakładek
 
-13. `ValueStackSection.tsx` — Hormozi value stack
-14. `GuaranteeSection.tsx` — podwójna gwarancja
-15. `NewFAQSection.tsx` — 7 obiekcji z odpowiedziami
-16. `NewFinalCTASection.tsx` — urgency + social proof live
-17. `NewLandingFooter.tsx` — legal, social, company info
-18. `Index.tsx` — finalna kolejność sekcji
-19. Globalne animacje scroll (FadeInSection wrapper)
+**Plik**: `src/components/admin/GuidedTour.tsx`
 
----
+- Rozszerzyć `tourSteps` do pokrycia WSZYSTKICH 15 tabów w kolejności sidebara
+- Pogrupować kroki wg sekcji sidebara (Codzienna praca → Klienci → Oferta → Marketing → System)
+- Copy benefit-driven — każdy krok mówi CO ZYSKUJESZ, nie jak klikać
+- Dodać ikony pasujące do sidebara (Route, Radar, Heart, etc.)
 
-### Design System (stosowany we wszystkich fazach)
-- Background: `--background` (dark #0D0F12)
-- Text: `--foreground` (warm cream)
-- Accent gold: `--primary` (#C9A96E)
-- Accent copper: via CSS variable
-- Error/loss: `--destructive`
-- Success: emerald tokens
-- Cards: `bg-card` z `border-border`
-- Font: serif dla nagłówków (Playfair Display już zainstalowany)
+#### 3. GuidedTour (demo) — synchronizacja z admin
 
----
+**Plik**: `src/components/demo/GuidedTour.tsx`
 
-### Efekt końcowy
-- 16 sekcji w logicznej kolejności: Ból → Rozwiązanie → Dowód → Cena → Akcja
-- Interaktywny kalkulator strat z 3 sliderami
-- Pricing z toggle roczny/miesięczny
-- 6 placeholder testimoniali
-- FAQ accordion z 7 obiekcjami
-- Minimum 4× powtórzony CTA "Zacznij za darmo"
-- Mobile-first, responsywny, premium dark design
-- Wszystkie animacje scroll (framer-motion)
+- Zsynchronizować kroki z wersją admin (te same zakładki, to samo copy)
+- Używać kluczy i18n zamiast hardcoded tekstu
 
-### Uwaga
-Nie tworzę jednego pliku .jsx — projekt jest już w React/TypeScript z komponentami. Zastosuję mega-prompt jako strategię do istniejącej architektury komponentowej.
+### Pliki do edycji
+1. `src/i18n/locales/pl.json` — nowe klucze sectionGuide + tour
+2. `src/i18n/locales/en.json` — odpowiedniki EN
+3. `src/components/admin/SectionGuide.tsx` — aktualizacja SECTION_KEYS
+4. `src/components/admin/GuidedTour.tsx` — rozbudowa do 15 kroków
+5. `src/components/demo/GuidedTour.tsx` — synchronizacja
+
