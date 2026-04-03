@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { BottomTabBar } from "@/components/client-app/BottomTabBar";
 import { MySalons } from "@/components/client-app/MySalons";
 import { MyBookings } from "@/components/client-app/MyBookings";
-import { Favorites } from "@/components/client-app/Favorites";
+import { ForYou } from "@/components/client-app/ForYou";
+import { Activity } from "@/components/client-app/Activity";
 import { ClientProfile } from "@/components/client-app/ClientProfile";
 import { SalonProfile } from "@/components/client-app/SalonProfile";
 
@@ -39,7 +40,8 @@ export default function ClientApp() {
       <Routes>
         <Route index element={<MySalons />} />
         <Route path="bookings" element={<MyBookings />} />
-        <Route path="favorites" element={<Favorites />} />
+        <Route path="for-you" element={<ForYou />} />
+        <Route path="activity" element={<Activity />} />
         <Route path="profile" element={<ClientProfile />} />
         <Route path="salon/:salonId" element={<SalonProfile />} />
       </Routes>
