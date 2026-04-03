@@ -57,6 +57,7 @@ function getCountdown(startTime: string): string {
 
 export function MyBookings() {
   const queryClient = useQueryClient();
+  const [reviewBooking, setReviewBooking] = useState<{ id: string; serviceName: string; salonName: string } | null>(null);
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["client-bookings"],
