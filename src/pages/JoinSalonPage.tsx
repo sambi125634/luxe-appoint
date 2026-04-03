@@ -7,12 +7,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ClientOnboarding } from "@/components/client-app/ClientOnboarding";
 
 export default function JoinSalonPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const { data: salon, isLoading } = useQuery({
     queryKey: ["join-salon", slug],
@@ -55,7 +57,7 @@ export default function JoinSalonPage() {
 
       setJoined(true);
       toast.success(`Dołączono do ${salon.name}!`);
-      setTimeout(() => navigate("/app"), 1500);
+      setShowOnboarding(true);
     } catch (err) {
       toast.error("Nie udało się dołączyć do salonu");
     } finally {
@@ -81,6 +83,15 @@ export default function JoinSalonPage() {
           </CardContent>
         </Card>
       </div>
+    );
+  }
+
+  if (showOnboarding && salon) {
+    return (
+      <ClientOnboarding
+        salonName={salon.name}
+        onComplete={() => navigate("/app")}
+      />
     );
   }
 

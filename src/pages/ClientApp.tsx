@@ -8,6 +8,8 @@ import { ForYou } from "@/components/client-app/ForYou";
 import { Activity } from "@/components/client-app/Activity";
 import { ClientProfile } from "@/components/client-app/ClientProfile";
 import { SalonProfile } from "@/components/client-app/SalonProfile";
+import { ReferFriend } from "@/components/client-app/ReferFriend";
+import { Favorites } from "@/components/client-app/Favorites";
 
 export default function ClientApp() {
   const navigate = useNavigate();
@@ -43,6 +45,8 @@ export default function ClientApp() {
         <Route path="for-you" element={<ForYou />} />
         <Route path="activity" element={<Activity />} />
         <Route path="profile" element={<ClientProfile />} />
+        <Route path="profile/favorites" element={<Favorites />} />
+        <Route path="profile/referrals" element={<ReferFriend />} />
         <Route path="salon/:salonId" element={<SalonProfile />} />
       </Routes>
       <BottomTabBar />

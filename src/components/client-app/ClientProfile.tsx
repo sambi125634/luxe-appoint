@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut, Mail, Phone, Shield, ChevronRight,
-  Bell, Moon, HelpCircle, Star, Edit2, Check, X
+  Bell, Moon, HelpCircle, Star, Edit2, Check, X, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -231,6 +231,24 @@ export function ClientProfile() {
                 <Star className="h-4 w-4 text-red-500" />
               </div>
               <span className="text-sm font-medium text-foreground">Ulubione salony</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </button>
+
+      {/* Referral shortcut */}
+      <button
+        onClick={() => navigate("/app/profile/referrals")}
+        className="w-full mb-4"
+      >
+        <Card className="border-border/40 rounded-2xl overflow-hidden hover:shadow-md transition-all">
+          <CardContent className="flex items-center justify-between px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Gift className="h-4 w-4 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Poleć znajomej</span>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </CardContent>
