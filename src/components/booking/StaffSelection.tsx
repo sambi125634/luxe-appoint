@@ -128,7 +128,7 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed, salonId, is
         </div>
       )}
 
-      <div className="grid gap-4">
+      <div className="grid gap-3 max-h-[50vh] overflow-y-auto pr-1">
         {/* Any specialist option */}
         <button
           onClick={() => handleSelect(null)}
