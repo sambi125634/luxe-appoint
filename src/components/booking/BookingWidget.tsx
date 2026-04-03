@@ -237,7 +237,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     return { steps: stepNames, stepMapping: mapping };
   }, [widgetConfig?.steps, isPaymentEnabled]);
 
-  const hasIntro = stepMapping.includes("intro");
+  const hasIntro = stepMapping.includes("intro") && !skipIntro;
   const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
   const [previousStep, setPreviousStep] = useState(hasIntro ? 0 : 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
