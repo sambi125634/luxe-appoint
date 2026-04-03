@@ -62,7 +62,7 @@ const features = [
     icon: TrendingUp,
     title: "AI Upsell Engine",
     subtitle: "Automatyczne dosprzedawanie",
-    description: "Klientka rezerwuje manicure hybrydowy. System wie, że 60% klientek z tym zabiegiem dokupuje pielęgnację dłoni. Automatycznie sugeruje: „Dodaj spa dłoni za 45 zł?" Średni wzrost wartości wizyty: +18%.",
+    description: "Klientka rezerwuje manicure hybrydowy. System wie, \u017Ce 60% klientek z tym zabiegiem dokupuje piel\u0119gnacj\u0119 d\u0142oni. Automatycznie sugeruje: \u201EDodaj spa d\u0142oni za 45 z\u0142?\u201D \u015Aredni wzrost warto\u015Bci wizyty: +18%.",
     stat: "+18%",
     statLabel: "wzrost wartości wizyty",
     color: "from-blue-500 to-indigo-600",
