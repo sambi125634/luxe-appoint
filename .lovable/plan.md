@@ -1,33 +1,26 @@
-## Plan: Finalizacja aplikacji mobilnych Beauty Calendar
 
-### ETAP 1 — Dopracowanie UI/UX aplikacji klienckiej (/app)
 
-**Pliki do edycji**: komponenty w `src/components/client-app/`
+## Plan: Poprawka widoczności listy specjalistów na mobile
 
-1. **MySalons.tsx** — dodanie karty salonu z avatarem, oceną, ostatnią wizytą, animacja wejścia (framer-motion staggered)
-2. **MyBookings.tsx** — pull-to-refresh, karty wizyt z kolorowym statusem (upcoming=primary, completed=muted, cancelled=destructive), sekcja "Najbliższa wizyta" z countdown
-3. **ForYou.tsx** — animowana karta lojalnościowa (progress ring zamiast bara), karuzela kuponów z embla-carousel
-4. **Activity.tsx** — grupowanie powiadomień po dniach ("Dziś", "Wczoraj"), ikony per typ, swipe-to-dismiss
-5. **ClientProfile.tsx** — avatar z inicjałami, sekcje z ikonami, dark mode toggle
-6. **BottomTabBar.tsx** — badge na "Aktywność" (nieprzeczytane), haptic-ready active:scale, safe-area-inset
+### Problem
+W `DateTimeSelection.tsx` (linia 290) lista specjalistów jest wyświetlana jako poziomy pasek z `overflow-x-auto`. Na ekranie 390px widać tylko 1-2 chipsy, reszta jest ukryta bez widocznego wskaźnika przewijania.
 
-### ETAP 2 — Rozbudowa aplikacji właściciela (/m)
+### Rozwiązanie
+Zmienić layout specjalistów z poziomego paska na **siatkę 2 kolumny** (`grid grid-cols-2`) z kompaktowymi kafelkami. Każdy kafelek zawiera inicjały, imię i ocenę. Opcja "Dowolny" zajmuje pełną szerokość na górze.
 
-**Pliki do edycji**: komponenty w `src/components/mobile-admin/`
+### Zmiany w plikach
 
-1. **MobileDashboard.tsx** — Quick Actions (+ Wizyta, Zablokuj slot, Notatka), mini-wykres przychodu (sparkline), karty KPI z animacją liczników
-2. **MobileCalendar.tsx** — swipe między dniami (gesture), kolorowe bloki wizyt per status, floating "+" button
-3. **MobileClients.tsx** — wyszukiwarka z debounce, tagi klientów jako chips, szybkie akcje (zadzwoń, SMS)
-4. **MobileNotifications.tsx** — real-time badge sync, grupowanie, akcje inline (potwierdź/odrzuć wizytę)
-5. **MobileMoreMenu.tsx** — mini-raporty (przychód dziś/tydzień), skróty do najczęściej używanych modułów
+**1. `src/components/booking/DateTimeSelection.tsx`** (linie 289-332)
+- Zamienić `flex gap-2 overflow-x-auto` na `grid grid-cols-2 gap-2`
+- Opcja "Dowolny" → `col-span-2`
+- Każdy kafelek: kompaktowy layout z inicjałami, imieniem (truncate), oceną
+- Usunąć `whitespace-nowrap`, `flex-shrink-0`, `overflow-x-auto`
+- Dodać `max-h-[240px] overflow-y-auto` na wypadek >6 specjalistów
 
-### ETAP 3 — Push Notifications (backend + frontend)
+**2. `src/components/booking/StaffSelection.tsx`** (linie 131-226)
+- Zmniejszyć padding kart z `p-5` na `p-3` na mobile
+- Zmniejszyć avatar z `w-14 h-14` na `w-10 h-10`
+- Dodać `max-h-[50vh] overflow-y-auto` do kontenera grid, aby lista była scrollowalna gdy jest wielu specjalistów
 
-1. **Edge Function `send-push-notification`** — wysyłka przez Web Push API (VAPID keys)
-2. **Service Worker** — obsługa `push` event z wyświetleniem natywnego powiadomienia
-3. **Hook `usePushSubscription`** — rejestracja subskrypcji, zapis tokenu do `push_tokens`
-4. **Trigger w DB** — po INSERT do `appointments` → kolejkuj push do klienta (przypomnienie 24h/2h)
-5. **UI opt-in** — przycisk "Włącz powiadomienia" w profilu klienta i w onboardingu
+Obie zmiany zapewniają pełny podgląd wszystkich pracowników zarówno w widgecie jak i w aplikacji mobilnej.
 
-### Kolejność realizacji
-Etap 1 → Etap 2 → Etap 3 (każdy etap w osobnej wiadomości po zatwierdzeniu)
