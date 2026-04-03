@@ -10,8 +10,8 @@ const transformations = [
     after: "Klientki rezerwują same o 23:00",
   },
   {
-    before: "„Ile ja w ogóle zarobiłam w tym miesiącu?"",
-    after: "True Profit na dashboardzie — co do grosza",
+    before: "Ile ja w og\u00F3le zarobi\u0142am w tym miesi\u0105cu?",
+    after: "True Profit na dashboardzie \u2014 co do grosza",
   },
   {
     before: "Klientka nie przyszła. Pusty slot. Strata.",
