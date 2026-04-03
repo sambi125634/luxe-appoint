@@ -63,7 +63,8 @@ export function BookingConfirmation({
   date, 
   time, 
   clientName,
-  bookingRef = "BC" + Date.now().toString().slice(-6)
+  bookingRef = "BC" + Date.now().toString().slice(-6),
+  showAppDownload = false,
 }: BookingConfirmationProps) {
   const [showPreparation, setShowPreparation] = useState(true);
   const [accountCreated, setAccountCreated] = useState(false);
