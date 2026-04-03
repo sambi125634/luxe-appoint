@@ -17,17 +17,23 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
 
   const plans = [
     {
-      name: "FREE",
+      name: "STARTER",
       price: "0 zł",
-      period: "/ miesiąc",
-      description: "Idealny na start",
+      period: "/ miesiąc — na zawsze",
+      description: "Idealny na start. Zacznij bez ryzyka.",
       features: [
-        "1 lokalizacja",
-        "Do 3 pracowników",
-        "Nieograniczone rezerwacje",
-        "Podstawowe raporty",
-        "Przypomnienia SMS/email",
-        "Email support",
+        "1 pracownik (właścicielka)",
+        "Do 50 klientek w bazie",
+        "Do 5 usług w katalogu",
+        "1 widget rezerwacji",
+        "Przypomnienia email",
+        "Podstawowy dashboard",
+        "0% prowizji od rezerwacji",
+      ],
+      limitations: [
+        "Brak SMS",
+        "Brak AI features",
+        "Brak zaawansowanych raportów",
       ],
       cta: "Zacznij za darmo",
       ctaLink: "/auth",
@@ -38,42 +44,52 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
       name: "PRO",
       price: isAnnual ? "79 zł" : "99 zł",
       period: "/ miesiąc",
-      description: "Najczęściej wybierany",
+      description: "Najczęściej wybierany. Pełna moc AI.",
       features: [
-        "Wszystko z FREE plus:",
         "Nieograniczeni pracownicy",
-        "AI Smart Scheduling",
-        "Prognoza przychodów",
-        "Radar Odejść (Client Risk Score)",
-        "Zaawansowane raporty i księgowość",
-        "Dynamiczne ceny AI",
-        "Priority support",
+        "Nieograniczona baza klientek",
+        "Nieograniczone usługi i widgety",
+        "SMS + email (potwierdzenia, przypomnienia)",
+        "AI Autopilot (Smart Gap, Silent Fans, Churn)",
+        "Prognoza przychodów (94% trafność)",
+        "True Profit Dashboard",
+        "Magazyn ze skanerem kodów kreskowych",
+        "Program poleceń + Google Reviews",
+        "Google Calendar sync",
+        "Eksport danych CSV/PDF",
+        "Branding (logo, kolory, custom slug)",
+        "0% prowizji od rezerwacji",
       ],
-      cta: "Rozpocznij 30-dniowy trial",
+      cta: "Rozpocznij za 99 zł/mies",
       ctaLink: "/auth",
       popular: true,
       icon: Sparkles,
+      savings: isAnnual ? "Oszczędzasz 240 zł/rok" : undefined,
     },
     {
-      name: "VIP",
-      price: "497 zł",
+      name: "ELITE",
+      price: isAnnual ? "199 zł" : "249 zł",
       setupFee: true,
-      recurringPrice: isAnnual ? "+ 159 zł/mies." : "+ 199 zł/mies.",
-      period: "",
-      description: "Dla sieci salonów",
+      setupPrice: "497 zł",
+      period: "/ miesiąc",
+      description: "Dla ambitnych salonów i sieci.",
       features: [
         "Wszystko z PRO plus:",
-        "Onboarding done-for-you",
-        "Wiele lokalizacji",
-        "Dedicated account manager",
-        "Ścieżka Klientki",
-        "API access",
-        "Integracja GoHighLevel",
-        "Custom branding",
+        "Prywatny onboarding call (30 min)",
+        "White-label (brak brandingu BC)",
+        "Własna domena (rezerwacje.twojsalon.pl)",
+        "Multi-lokalizacja (kilka salonów)",
+        "Dostęp do API + Webhooks",
+        "CEO Unicat Intelligence™ (AI insights)",
+        "Mood Tracking + Pixel Conditioning",
+        "Własny email i numer SMS (custom sender)",
+        "Priorytetowe wsparcie techniczne",
+        "0% prowizji od rezerwacji",
       ],
       cta: "Umów rozmowę",
       popular: false,
       icon: Crown,
+      savings: isAnnual ? "Oszczędzasz 600 zł/rok" : undefined,
     },
   ];
 
@@ -151,22 +167,25 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
                   <h3 className="text-xl font-bold">{plan.name}</h3>
                   <div className="mt-4">
                     <span className="text-4xl font-bold">{plan.price}</span>
+                    <span className="text-muted-foreground text-sm"> {plan.period}</span>
                     {plan.setupFee && (
                       <span className="text-sm text-muted-foreground block mt-1">
-                        jednorazowy setup {plan.recurringPrice}
+                        + {plan.setupPrice} jednorazowy setup
                       </span>
-                    )}
-                    {!plan.setupFee && (
-                      <span className="text-muted-foreground">{plan.period}</span>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
                     {plan.description}
                   </p>
+                  {plan.savings && (
+                    <Badge className="mt-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
+                      {plan.savings}
+                    </Badge>
+                  )}
                 </CardHeader>
 
                 <CardContent className="pt-6">
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-4">
                     {plan.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
                         <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
@@ -174,6 +193,15 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
                       </li>
                     ))}
                   </ul>
+
+                  {plan.limitations && (
+                    <div className="mb-6 pt-3 border-t border-border/50">
+                      <p className="text-xs text-muted-foreground mb-2 font-medium">Ograniczenia:</p>
+                      {plan.limitations.map((lim, i) => (
+                        <p key={i} className="text-xs text-muted-foreground/70 mb-1">— {lim}</p>
+                      ))}
+                    </div>
+                  )}
 
                   {plan.ctaLink ? (
                     <Button
@@ -205,7 +233,7 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           ))}
         </div>
 
-        {/* Bottom banner */}
+        {/* Anchoring vs Booksy */}
         <motion.div
           className="text-center mt-12 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
@@ -216,10 +244,10 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           <div className="p-6 rounded-2xl bg-primary/5 border border-primary/20">
             <p className="text-xl font-bold mb-1 flex items-center justify-center gap-2">
               <ShieldCheck className="w-5 h-5 text-primary" />
-              0 zł prowizji od rezerwacji.
+              0 zł prowizji od rezerwacji. Zawsze.
             </p>
             <p className="text-muted-foreground">
-              Twoje pieniądze. Twoje klientki. Twoje dane.
+              99 zł/mies vs 3 000–6 000 zł/mies na prowizjach Booksy. To 30–60× taniej.
             </p>
           </div>
         </motion.div>

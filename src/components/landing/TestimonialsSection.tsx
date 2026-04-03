@@ -3,6 +3,9 @@ import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
+/* [PLACEHOLDER] — Wszystkie testimoniale są fikcyjne i służą jako placeholdery.
+   Przed publikacją zastąp je prawdziwymi opiniami klientek. */
+
 const testimonials = [
   {
     id: 1,
@@ -12,6 +15,7 @@ const testimonials = [
     location: "Warszawa",
     avatar: "MK",
     rating: 5,
+    result: "Zaoszczędziła 4 200 zł/mies na prowizjach", /* [PLACEHOLDER] */
   },
   {
     id: 2,
@@ -21,15 +25,17 @@ const testimonials = [
     location: "Kraków",
     avatar: "KW",
     rating: 5,
+    result: "Przychód wzrósł o 18% w 3 miesiące", /* [PLACEHOLDER] */
   },
   {
     id: 3,
-    content: "Mój zespół 4 osób opanował system w jeden dzień. Z Versum szkolenie trwało tydzień. A prowizji zero — oszczędzam 400 zł miesięcznie.",
+    content: "Mój zespół 4 osób opanował system w jeden dzień. Z Versum szkolenie trwało tydzień. A prowizji zero — oszczędzam 2 400 zł miesięcznie.",
     author: "Agnieszka M.",
     role: "Salon Fryzjerski Cięcie",
     location: "Poznań",
     avatar: "AM",
     rating: 5,
+    result: "Oszczędza 2 400 zł/mies", /* [PLACEHOLDER] */
   },
   {
     id: 4,
@@ -39,6 +45,27 @@ const testimonials = [
     location: "Gdańsk",
     avatar: "PL",
     rating: 5,
+    result: "3x wzrost ROI z Instagrama", /* [PLACEHOLDER] */
+  },
+  {
+    id: 5,
+    content: "Skaner kodów kreskowych w telefonie — to coś czego szukałam latami! Inwentaryzacja która trwała 3 godziny teraz zajmuje 20 minut. A receptury automatycznie odliczają produkty po zabiegu.",
+    author: "Dominika S.",
+    role: "SPA & Wellness Harmony",
+    location: "Wrocław",
+    avatar: "DS",
+    rating: 5,
+    result: "Inwentaryzacja 9x szybsza", /* [PLACEHOLDER] */
+  },
+  {
+    id: 6,
+    content: "Bałam się odejść z Booksy — myślałam że klientki mnie nie znajdą. Ale z Beauty Calendar mam WŁASNĄ bazę i link do rezerwacji który wysyłam przez WhatsApp. Ani jedna klientka nie odeszła.",
+    author: "Natalia R.",
+    role: "Salon Kosmetyczny Luxe",
+    location: "Łódź",
+    avatar: "NR",
+    rating: 5,
+    result: "0 utraconych klientek po migracji", /* [PLACEHOLDER] */
   },
 ];
 
@@ -50,9 +77,14 @@ const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] 
         <Star key={i} className="w-4 h-4 fill-accent text-accent" />
       ))}
     </div>
-    <blockquote className="text-base lg:text-lg leading-relaxed mb-6 flex-grow font-serif italic">
-      "{testimonial.content}"
+    <blockquote className="text-base lg:text-lg leading-relaxed mb-4 flex-grow font-serif italic">
+      &ldquo;{testimonial.content}&rdquo;
     </blockquote>
+    {testimonial.result && (
+      <div className="mb-4 px-3 py-1.5 bg-emerald-500/10 rounded-lg inline-block">
+        <span className="text-sm font-bold text-emerald-600">📊 {testimonial.result}</span>
+      </div>
+    )}
     <div className="flex items-center gap-3 mt-auto">
       <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0">
         {testimonial.avatar}
@@ -94,7 +126,7 @@ export const TestimonialsSection = () => {
               <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
             ))}
             <span className="ml-2 font-bold">4.9/5</span>
-            <span className="text-muted-foreground ml-1 text-sm">(127 opinii)</span>
+            <span className="text-muted-foreground ml-1 text-sm">(127 opinii) [PLACEHOLDER]</span>
           </div>
         </motion.div>
 
@@ -112,6 +144,11 @@ export const TestimonialsSection = () => {
         {/* Desktop: 3-column grid */}
         <div className="hidden lg:grid lg:grid-cols-3 gap-6">
           {testimonials.slice(0, 3).map((testimonial) => (
+            <TestimonialCard key={testimonial.id} testimonial={testimonial} />
+          ))}
+        </div>
+        <div className="hidden lg:grid lg:grid-cols-3 gap-6 mt-6">
+          {testimonials.slice(3, 6).map((testimonial) => (
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
         </div>
