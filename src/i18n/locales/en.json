@@ -340,6 +340,31 @@
     "saved": "Saved successfully",
     "error": "An error occurred"
   },
+  "tour": {
+    "step": "Step {{current}} of {{total}}",
+    "skip": "Skip",
+    "start": "Start working",
+    "restartHint": "💡 You can restart the tour by clicking 'Tutorial' in the sidebar",
+    "steps": {
+      "welcome": { "title": "Welcome to Beauty Calendar! 🎉", "description": "We'll walk you through every section. You'll see what you gain in each module and how to start. Takes 2 minutes." },
+      "dashboard": { "title": "Dashboard — Your command center", "description": "See how much you earn, how many clients return, and what needs attention — all at a glance, without opening Excel." },
+      "calendar": { "title": "Calendar — zero phone calls", "description": "Clients book themselves 24/7, you only manage exceptions. See everyone's schedule on one screen." },
+      "widgets": { "title": "Widgets — Your booking link", "description": "Paste the link on Instagram or your website — clients book even at 11 PM. Like an employee who never sleeps." },
+      "staff": { "title": "Team — everyone knows their role", "description": "Each employee has their own calendar, services, and color. The system manages the schedule for you." },
+      "clients": { "title": "Clients — full history", "description": "Full history of every client with tags, notes, and preferences. Know who's VIP, who's disappearing, and who to call." },
+      "conversations": { "title": "Conversations — one view", "description": "SMS, email, WhatsApp — all client conversations in one place. Never lose a thread." },
+      "consultation": { "title": "Consultations — digital documentation", "description": "Consultation cards with GDPR signature, voice notes, and AI — professional documentation without paper bureaucracy." },
+      "services": { "title": "Services — online price list", "description": "Clients see prices and book immediately. Change a price once — the widget updates automatically." },
+      "products": { "title": "Products — inventory under control", "description": "Know how many products are left and when to order. Scan deliveries with your phone — the system calculates margins." },
+      "accounting": { "title": "Reports — export with one click", "description": "Close the salon, check the daily report — everything adds up. Export for your accountant with one click." },
+      "pipeline": { "title": "Client journey — react faster", "description": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off. React before they leave." },
+      "retention": { "title": "Retention — automatic returns", "description": "The system automatically takes care of client returns. 5 message sequences react at the right moment." },
+      "referral": { "title": "Referrals — free clients", "description": "Happy clients recommend you to friends, the system tracks it. Every referral = a new client without ad costs." },
+      "settings": { "title": "Settings — configure once", "description": "Logo, colors, notifications, integrations — configure once, effects last forever." },
+      "support": { "title": "Help — ask, get an answer", "description": "The AI Assistant knows the entire system. Ask in your language, get a specific answer instantly." },
+      "cta": { "title": "Ready to start! 🚀", "description": "You now know all the modules. Start by filling in your data — the dashboard checklist will show what's left." }
+    }
+  },
   "common": {
     "loading": "Loading...",
     "save": "Save",

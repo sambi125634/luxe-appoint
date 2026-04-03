@@ -476,6 +476,31 @@
     "saved": "Zapisano pomyślnie",
     "error": "Wystąpił błąd"
   },
+  "tour": {
+    "step": "Krok {{current}} z {{total}}",
+    "skip": "Pomiń",
+    "start": "Rozpocznij pracę",
+    "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając „Samouczek" w menu bocznym",
+    "steps": {
+      "welcome": { "title": "Witaj w Beauty Calendar! 🎉", "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty." },
+      "dashboard": { "title": "Dashboard — Twoje centrum dowodzenia", "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela." },
+      "calendar": { "title": "Kalendarz — zero telefonów", "description": "Klientki rezerwują same 24/7, Ty zarządzasz tylko wyjątkami. Widzisz grafik wszystkich pracowników na jednym ekranie." },
+      "widgets": { "title": "Widgety — Twój link do rezerwacji", "description": "Wklej link na Instagram lub stronę www — klientki rezerwują nawet o 23:00. Jak pracownik, który nigdy nie śpi." },
+      "staff": { "title": "Zespół — każdy wie co robi", "description": "Każdy pracownik ma swój kalendarz, usługi i kolor. System pilnuje grafiku — Ty nie musisz pamiętać kto co robi." },
+      "clients": { "title": "Klienci — pełna historia", "description": "Pełna historia każdej klientki z tagami, notatkami i preferencjami. Wiesz kto jest VIP, kto znika i do kogo warto zadzwonić." },
+      "conversations": { "title": "Konwersacje — jeden widok", "description": "SMS, email, WhatsApp — wszystkie rozmowy z klientkami w jednym miejscu. Nigdy nie zgubisz wątku." },
+      "consultation": { "title": "Konsultacje — cyfrowa dokumentacja", "description": "Karty konsultacyjne z podpisem RODO, notatki głosowe i AI — profesjonalna dokumentacja bez papierowej biurokracji." },
+      "services": { "title": "Usługi — cennik online", "description": "Klientki widzą ceny i rezerwują od razu. Zmień cenę raz — widget aktualizuje się automatycznie." },
+      "products": { "title": "Produkty — magazyn pod kontrolą", "description": "Wiesz ile produktów zostało i kiedy zamówić. Skanuj dostawy telefonem — system liczy marże za Ciebie." },
+      "accounting": { "title": "Raporty — eksport jednym klikiem", "description": "Zamykasz salon, sprawdzasz raport dzienny — wszystko się zgadza. Eksport dla księgowej jednym kliknięciem." },
+      "pipeline": { "title": "Ścieżka klientki — reaguj szybciej", "description": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają. Reagujesz zanim odejdą do konkurencji." },
+      "retention": { "title": "Retencja — automatyczne powroty", "description": "System automatycznie dba o powroty klientek. 5 sekwencji wiadomości reaguje we właściwym momencie — Ty nie musisz pamiętać." },
+      "referral": { "title": "Polecenia — darmowe klientki", "description": "Zadowolone klientki polecają Cię znajomym, system to trackuje. Każde polecenie = nowa klientka bez kosztu reklamy." },
+      "settings": { "title": "Ustawienia — konfiguracja raz", "description": "Logo, kolory, powiadomienia, integracje — skonfiguruj raz, a efekty działają na zawsze." },
+      "support": { "title": "Pomoc — pytasz, dostajesz odpowiedź", "description": "AI Asystent zna cały system. Pytasz po polsku, dostajesz konkretną odpowiedź natychmiast." },
+      "cta": { "title": "Gotowa do startu! 🚀", "description": "Znasz już wszystkie moduły. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże co jeszcze zostało." }
+    }
+  },
   "common": {
     "loading": "Ładowanie...",
     "save": "Zapisz",
