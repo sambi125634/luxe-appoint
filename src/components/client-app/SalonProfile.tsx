@@ -195,7 +195,7 @@ export function SalonProfile() {
 
       {/* Main booking widget — displayed directly */}
       <div className="mt-2">
-        <BookingWidget salonId={salonId} />
+        <BookingWidget salonId={salonId} skipIntro />
       </div>
     </div>
   );
