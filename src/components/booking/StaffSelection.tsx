@@ -133,7 +133,7 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed, salonId, is
         <button
           onClick={() => handleSelect(null)}
           className={cn(
-            "group w-full text-left p-5 rounded-xl border transition-all duration-300",
+            "group w-full text-left p-3 sm:p-5 rounded-xl border transition-all duration-300",
             isAnySelected
               ? "border-primary bg-primary/5 shadow-glow"
               : "border-border bg-card hover:border-primary/50 hover:shadow-soft"
