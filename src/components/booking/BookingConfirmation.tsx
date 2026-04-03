@@ -25,6 +25,7 @@ interface BookingConfirmationProps {
   time: string | null;
   clientName: string;
   bookingRef?: string;
+  showAppDownload?: boolean;
 }
 
 // Salon info
@@ -62,7 +63,8 @@ export function BookingConfirmation({
   date, 
   time, 
   clientName,
-  bookingRef = "BC" + Date.now().toString().slice(-6)
+  bookingRef = "BC" + Date.now().toString().slice(-6),
+  showAppDownload = false,
 }: BookingConfirmationProps) {
   const [showPreparation, setShowPreparation] = useState(true);
   const [accountCreated, setAccountCreated] = useState(false);
@@ -369,8 +371,31 @@ export function BookingConfirmation({
           )}
         </div>
 
-        {/* Create account CTA */}
-        {!accountCreated ? (
+        {/* Download app CTA - shown only in widget context */}
+        {showAppDownload && (
+          <div className="mt-6 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Phone className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="font-medium text-sm mb-1">Następnym razem zarezerwuj w 10 sekund</p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  Pobierz aplikację Beauty Calendar — Twoje dane będą już zapisane, a rezerwacja zajmie 3 kliknięcia.
+                </p>
+                <Link to="/install">
+                  <Button size="sm" variant="outline" className="gap-2">
+                    <Phone className="w-4 h-4" />
+                    Pobierz aplikację
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Create account CTA - only when no app download shown */}
+        {!showAppDownload && !accountCreated ? (
           <div className="mt-6 p-4 bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20 rounded-xl">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -388,7 +413,7 @@ export function BookingConfirmation({
               </div>
             </div>
           </div>
-        ) : (
+        ) : !showAppDownload && accountCreated ? (
           <div className="mt-6 p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-xl animate-fade-in">
             <div className="flex items-center gap-2 text-green-800 dark:text-green-200">
               <Check className="w-5 h-5" />
@@ -398,7 +423,7 @@ export function BookingConfirmation({
               Przy kolejnej wizycie Twoje dane będą już wypełnione.
             </p>
           </div>
-        )}
+        ) : null}
 
         {/* Beauty Calendar branding */}
         <div className="mt-8 text-center space-y-2">

@@ -33,6 +33,7 @@ interface BookingWidgetProps {
   salonId?: string;
   onStepChange?: (stepId: string) => void;
   skipIntro?: boolean;
+  autoClientData?: ClientData | null;
 }
 
 interface ServiceVariant {
@@ -136,7 +137,7 @@ const demoServiceRecommendations: Record<string, { id: string; name: string; pri
   ],
 };
 
-export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange, skipIntro = false }: BookingWidgetProps) {
+export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange, skipIntro = false, autoClientData }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
@@ -200,13 +201,29 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   };
 
   // Build dynamic steps from widget configuration
+  // Check if auto client data is complete (can skip form step)
+  const isAutoDataComplete = useMemo(() => {
+    if (!autoClientData) return false;
+    return (
+      autoClientData.firstName.trim().length >= 2 &&
+      autoClientData.lastName.trim().length >= 2 &&
+      /^[+]?[0-9]{9,15}$/.test(autoClientData.phone.replace(/[\s\-()]/g, "")) &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(autoClientData.email.trim()) &&
+      autoClientData.acceptRodo
+    );
+  }, [autoClientData]);
+
   const { steps, stepMapping } = useMemo(() => {
     if (!widgetConfig?.steps) {
-      // When skipIntro, don't include intro in the mapping at all
-      const baseMapping = skipIntro ? ["services", "datetime", "form"] : ["intro", "services", "datetime", "form"];
-      const baseSteps = defaultSteps;
+      let baseMapping = skipIntro ? ["services", "datetime", "form"] : ["intro", "services", "datetime", "form"];
       
-      // Add payment step if enabled
+      // Skip form step when auto client data is complete
+      if (isAutoDataComplete) {
+        baseMapping = baseMapping.filter(s => s !== "form");
+      }
+      
+      const baseSteps = baseMapping.filter(s => s !== "intro").map(s => stepIdToName[s] || s);
+      
       if (isPaymentEnabled) {
         return {
           steps: [...baseSteps, "Płatność"],
@@ -221,9 +238,13 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
       .filter(s => s.enabled && s.id !== "summary" && s.id !== "staff")
       .sort((a, b) => a.order - b.order);
     
-    // Remove intro from mapping when skipIntro
     if (skipIntro) {
       enabledSteps = enabledSteps.filter(s => s.id !== "intro");
+    }
+    
+    // Skip form step when auto client data is complete
+    if (isAutoDataComplete) {
+      enabledSteps = enabledSteps.filter(s => s.id !== "form");
     }
     
     const stepNames = enabledSteps
@@ -232,7 +253,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     
     const mapping = enabledSteps.map(s => s.id);
     
-    // Add payment step if enabled and not already in steps
     if (isPaymentEnabled && !mapping.includes("payment")) {
       return {
         steps: [...stepNames, "Płatność"],
@@ -241,7 +261,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     }
     
     return { steps: stepNames, stepMapping: mapping };
-  }, [widgetConfig?.steps, isPaymentEnabled, skipIntro]);
+  }, [widgetConfig?.steps, isPaymentEnabled, skipIntro, isAutoDataComplete]);
 
   const hasIntro = stepMapping.includes("intro") && !skipIntro;
   const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
@@ -266,16 +286,20 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const [selectedStaffName, setSelectedStaffName] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [clientData, setClientData] = useState<ClientData>({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    notes: "",
-    acceptRodo: false,
-    acceptMarketing: false,
-    confirmationMethod: 'sms',
-  });
+  const [clientData, setClientData] = useState<ClientData>(
+    autoClientData && isAutoDataComplete
+      ? autoClientData
+      : {
+          firstName: "",
+          lastName: "",
+          phone: "",
+          email: "",
+          notes: "",
+          acceptRodo: false,
+          acceptMarketing: false,
+          confirmationMethod: 'sms',
+        }
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
@@ -330,7 +354,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   };
 
   // Determine last step based on payment enabled
-  const lastStepId = isPaymentEnabled ? "payment" : "form";
+  const lastStepId = isPaymentEnabled ? "payment" : (isAutoDataComplete ? "datetime" : "form");
   const isLastStep = currentStepId === lastStepId;
   const isFormStep = currentStepId === "form";
   const isPaymentStep = currentStepId === "payment";
@@ -552,6 +576,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
         date={selectedDate}
         time={selectedTime}
         clientName={`${clientData.firstName} ${clientData.lastName}`}
+        showAppDownload={!autoClientData}
       />
     );
   }
@@ -788,7 +813,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
             Wstecz
           </Button>
 
-          {!isFormStep ? (
+          {(!isFormStep && !isLastStep) ? (
             <Button
               variant="luxury"
               size="lg"
@@ -799,7 +824,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               Dalej
               <ArrowRight className="w-4 h-4" />
             </Button>
-          ) : (
+          ) : (isFormStep || (isLastStep && isAutoDataComplete)) ? (
             <Button
               variant="luxury"
               size="lg"
@@ -818,6 +843,17 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                   {isPaymentEnabled ? "Przejdź do płatności" : "Potwierdź rezerwację"}
                 </>
               )}
+            </Button>
+          ) : (
+            <Button
+              variant="luxury"
+              size="lg"
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="gap-2"
+            >
+              Dalej
+              <ArrowRight className="w-4 h-4" />
             </Button>
           )}
         </div>

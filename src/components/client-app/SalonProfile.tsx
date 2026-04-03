@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Phone, Mail, Heart, Info, X } from "lucide-react";
+import { ArrowLeft, MapPin, Phone, Mail, Heart, Info, X, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,12 +10,14 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import type { ClientData } from "@/components/booking/ClientForm";
 
 export function SalonProfile() {
   const { salonId } = useParams<{ salonId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showInfo, setShowInfo] = useState(false);
+  const [overrideAutoData, setOverrideAutoData] = useState(false);
 
   const { data: salon, isLoading } = useQuery({
     queryKey: ["client-salon", salonId],
@@ -31,6 +33,37 @@ export function SalonProfile() {
     },
     enabled: !!salonId,
   });
+
+  // Fetch logged-in user profile for auto-fill
+  const { data: userProfile } = useQuery({
+    queryKey: ["client-profile-for-booking"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("first_name, last_name, phone, email")
+        .eq("id", user.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+
+  const autoClientData: ClientData | null = 
+    userProfile && !overrideAutoData && 
+    userProfile.first_name && userProfile.last_name && 
+    userProfile.phone && userProfile.email
+      ? {
+          firstName: userProfile.first_name,
+          lastName: userProfile.last_name,
+          phone: userProfile.phone,
+          email: userProfile.email,
+          notes: "",
+          acceptRodo: true,
+          acceptMarketing: false,
+          confirmationMethod: "sms" as const,
+        }
+      : null;
 
   const { data: favoriteLink } = useQuery({
     queryKey: ["client-salon-fav", salonId],
@@ -86,6 +119,10 @@ export function SalonProfile() {
   const isFav = favoriteLink?.is_favorite ?? false;
   const primaryColor = salon.theme_primary_color ?? "hsl(var(--primary))";
   const secondaryColor = salon.theme_secondary_color ?? "hsl(var(--primary))";
+
+  const maskedPhone = autoClientData?.phone
+    ? autoClientData.phone.slice(0, 4) + " *** " + autoClientData.phone.slice(-3)
+    : "";
 
   return (
     <div className="pb-24 min-h-screen bg-background">
@@ -193,9 +230,32 @@ export function SalonProfile() {
         )}
       </AnimatePresence>
 
+      {/* Booking-as identity tile */}
+      {autoClientData && (
+        <div className="mx-4 mt-3 p-3 rounded-xl bg-primary/5 border border-primary/15 flex items-center justify-between">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+              <User className="w-4 h-4 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium truncate">
+                {autoClientData.firstName} {autoClientData.lastName.charAt(0)}.
+              </p>
+              <p className="text-[11px] text-muted-foreground">{maskedPhone}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setOverrideAutoData(true)}
+            className="text-xs text-primary font-medium px-2 py-1 rounded-md hover:bg-primary/10 transition-colors shrink-0"
+          >
+            Zmień
+          </button>
+        </div>
+      )}
+
       {/* Main booking widget — displayed directly */}
       <div className="mt-2">
-        <BookingWidget salonId={salonId} skipIntro />
+        <BookingWidget salonId={salonId} skipIntro autoClientData={autoClientData} />
       </div>
     </div>
   );
