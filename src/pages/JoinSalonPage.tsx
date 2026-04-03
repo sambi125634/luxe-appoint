@@ -14,6 +14,7 @@ export default function JoinSalonPage() {
   const navigate = useNavigate();
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const { data: salon, isLoading } = useQuery({
     queryKey: ["join-salon", slug],
