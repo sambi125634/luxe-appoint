@@ -434,6 +434,148 @@ export type Database = {
           },
         ]
       }
+      client_coupons: {
+        Row: {
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean
+          salon_id: string
+          title: string
+          used_at: string | null
+          user_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean
+          salon_id: string
+          title: string
+          used_at?: string | null
+          user_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean
+          salon_id?: string
+          title?: string
+          used_at?: string | null
+          user_id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_coupons_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_notifications: {
+        Row: {
+          action_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_read: boolean
+          salon_id: string
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          action_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_read?: boolean
+          salon_id: string
+          title: string
+          type?: string
+          user_id: string
+        }
+        Update: {
+          action_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_read?: boolean
+          salon_id?: string
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_notifications_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_reviews: {
+        Row: {
+          appointment_id: string | null
+          comment: string | null
+          created_at: string
+          id: string
+          is_public: boolean
+          rating: number
+          salon_id: string
+          user_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          rating: number
+          salon_id: string
+          user_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          comment?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          rating?: number
+          salon_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_reviews_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_reviews_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_risk_scores: {
         Row: {
           calculated_at: string
@@ -1091,6 +1233,61 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      loyalty_stamps: {
+        Row: {
+          appointment_id: string | null
+          client_id: string
+          created_at: string
+          id: string
+          points: number
+          reason: string
+          salon_id: string
+          user_id: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          client_id: string
+          created_at?: string
+          id?: string
+          points?: number
+          reason?: string
+          salon_id: string
+          user_id: string
+        }
+        Update: {
+          appointment_id?: string | null
+          client_id?: string
+          created_at?: string
+          id?: string
+          points?: number
+          reason?: string
+          salon_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_stamps_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_stamps_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_stamps_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pixel_attributions: {
         Row: {
