@@ -170,7 +170,7 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed, salonId, is
             key={staff.id}
             onClick={() => handleSelect(staff)}
             className={cn(
-              "group w-full text-left p-5 rounded-xl border transition-all duration-300",
+              "group w-full text-left p-3 sm:p-5 rounded-xl border transition-all duration-300",
               "animate-fade-in",
               selectedStaff?.id === staff.id
                 ? "border-primary bg-primary/5 shadow-glow"
