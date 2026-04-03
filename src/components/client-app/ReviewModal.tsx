@@ -5,6 +5,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ReviewModalProps {
   open: boolean;
@@ -12,13 +14,15 @@ interface ReviewModalProps {
   bookingId: string;
   serviceName: string;
   salonName: string;
+  salonId: string;
 }
 
-export function ReviewModal({ open, onClose, bookingId, serviceName, salonName }: ReviewModalProps) {
+export function ReviewModal({ open, onClose, bookingId, serviceName, salonName, salonId }: ReviewModalProps) {
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async () => {
     if (rating === 0) {
@@ -26,17 +30,32 @@ export function ReviewModal({ open, onClose, bookingId, serviceName, salonName }
       return;
     }
     setSubmitting(true);
-    // TODO: Save to DB when review table exists
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitting(false);
-    toast.success("Dziękujemy za opinię! ⭐");
-    onClose();
-    setRating(0);
-    setComment("");
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Nie zalogowano");
+
+      const { error } = await supabase.from("client_reviews").insert({
+        salon_id: salonId,
+        user_id: user.id,
+        appointment_id: bookingId,
+        rating,
+        comment: comment.trim() || null,
+      });
+
+      if (error) throw error;
+      toast.success("Dziękujemy za opinię! ⭐");
+      queryClient.invalidateQueries({ queryKey: ["client-reviews"] });
+      onClose();
+      setRating(0);
+      setComment("");
+    } catch (err: any) {
+      toast.error(err.message || "Nie udało się zapisać opinii");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const displayRating = hoveredRating || rating;
-
   const ratingLabels = ["", "Słabo", "Mogło być lepiej", "OK", "Bardzo dobrze", "Doskonale!"];
 
   return (
@@ -51,7 +70,6 @@ export function ReviewModal({ open, onClose, bookingId, serviceName, salonName }
           <p className="text-xs text-muted-foreground">{salonName}</p>
         </div>
 
-        {/* Star rating */}
         <div className="flex justify-center gap-2 py-4">
           {[1, 2, 3, 4, 5].map((star) => (
             <button
@@ -64,9 +82,7 @@ export function ReviewModal({ open, onClose, bookingId, serviceName, salonName }
               <Star
                 className={cn(
                   "h-10 w-10 transition-colors",
-                  star <= displayRating
-                    ? "text-primary fill-primary"
-                    : "text-muted-foreground/30"
+                  star <= displayRating ? "text-primary fill-primary" : "text-muted-foreground/30"
                 )}
               />
             </button>
@@ -79,7 +95,6 @@ export function ReviewModal({ open, onClose, bookingId, serviceName, salonName }
           </p>
         )}
 
-        {/* Comment */}
         <Textarea
           placeholder="Dodaj komentarz (opcjonalnie)..."
           value={comment}

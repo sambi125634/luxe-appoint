@@ -1,55 +1,45 @@
 import { Bell, Calendar, Gift, Star, Clock, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useClientNotifications, useMarkNotificationRead } from "@/hooks/useClientLoyalty";
+import { useQueryClient } from "@tanstack/react-query";
+import { formatDistanceToNow } from "date-fns";
+import { pl } from "date-fns/locale";
 
-type ActivityItem = {
-  id: string;
-  type: "reminder" | "confirmation" | "coupon" | "loyalty" | "review";
-  title: string;
-  description: string;
-  time: string;
-  read: boolean;
+const iconMap: Record<string, { icon: typeof Clock; bg: string; color: string }> = {
+  reminder: { icon: Clock, bg: "bg-blue-500/10", color: "text-blue-600" },
+  confirmation: { icon: CheckCircle2, bg: "bg-green-500/10", color: "text-green-600" },
+  coupon: { icon: Gift, bg: "bg-amber-500/10", color: "text-amber-600" },
+  loyalty: { icon: Star, bg: "bg-purple-500/10", color: "text-purple-600" },
+  review: { icon: Star, bg: "bg-pink-500/10", color: "text-pink-600" },
+  info: { icon: Bell, bg: "bg-muted", color: "text-muted-foreground" },
 };
-
-const iconMap = {
-  reminder: { icon: Clock, bg: "bg-blue-50", color: "text-blue-600" },
-  confirmation: { icon: CheckCircle2, bg: "bg-green-50", color: "text-green-600" },
-  coupon: { icon: Gift, bg: "bg-amber-50", color: "text-amber-600" },
-  loyalty: { icon: Star, bg: "bg-purple-50", color: "text-purple-600" },
-  review: { icon: Star, bg: "bg-pink-50", color: "text-pink-600" },
-};
-
-// Demo data
-const activities: ActivityItem[] = [
-  {
-    id: "1", type: "reminder", title: "Jutro wizyta",
-    description: "Manicure hybrydowy • Glamour Studio • 10:00",
-    time: "2 godz. temu", read: false,
-  },
-  {
-    id: "2", type: "coupon", title: "Nowy kupon!",
-    description: "-20% na koloryzację w Beauty Point",
-    time: "wczoraj", read: false,
-  },
-  {
-    id: "3", type: "confirmation", title: "Wizyta potwierdzona",
-    description: "Stylizacja brwi • 12.04 o 14:30",
-    time: "2 dni temu", read: true,
-  },
-  {
-    id: "4", type: "loyalty", title: "Zdobyłaś 50 pkt!",
-    description: "Za ostatnią wizytę w Glamour Studio",
-    time: "3 dni temu", read: true,
-  },
-  {
-    id: "5", type: "review", title: "Oceń wizytę",
-    description: "Jak oceniasz ostatni zabieg w Beauty Point?",
-    time: "5 dni temu", read: true,
-  },
-];
 
 export function Activity() {
-  const unreadCount = activities.filter((a) => !a.read).length;
+  const { data: notifications = [], isLoading } = useClientNotifications();
+  const markRead = useMarkNotificationRead();
+  const queryClient = useQueryClient();
+
+  const unreadCount = notifications.filter((n: any) => !n.is_read).length;
+
+  const handleTap = async (notification: any) => {
+    if (!notification.is_read) {
+      await markRead(notification.id);
+      queryClient.invalidateQueries({ queryKey: ["client-notifications"] });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="px-4 pt-6 pb-24 space-y-3">
+        <Skeleton className="h-8 w-40" />
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-20 w-full rounded-2xl" />
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 pt-6 pb-24">
@@ -63,7 +53,7 @@ export function Activity() {
         )}
       </div>
 
-      {activities.length === 0 ? (
+      {notifications.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="w-24 h-24 rounded-full bg-muted/50 flex items-center justify-center mb-5">
             <Bell className="h-10 w-10 text-muted-foreground/40" />
@@ -75,30 +65,32 @@ export function Activity() {
         </div>
       ) : (
         <div className="space-y-2">
-          {activities.map((item) => {
-            const { icon: Icon, bg, color } = iconMap[item.type];
+          {notifications.map((item: any) => {
+            const config = iconMap[item.type] || iconMap.info;
+            const Icon = config.icon;
             return (
               <Card
                 key={item.id}
+                onClick={() => handleTap(item)}
                 className={`border-border/40 rounded-2xl overflow-hidden cursor-pointer active:scale-[0.98] transition-all ${
-                  !item.read ? "bg-primary/[0.03] border-primary/20" : ""
+                  !item.is_read ? "bg-primary/[0.03] border-primary/20" : ""
                 }`}
               >
                 <CardContent className="flex items-start gap-3 p-4">
-                  <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <Icon className={`h-5 w-5 ${color}`} />
+                  <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+                    <Icon className={`h-5 w-5 ${config.color}`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className={`text-sm font-semibold text-foreground ${!item.read ? "" : ""}`}>
-                        {item.title}
-                      </h3>
-                      {!item.read && (
+                      <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+                      {!item.is_read && (
                         <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{item.description}</p>
-                    <p className="text-[11px] text-muted-foreground/60 mt-1">{item.time}</p>
+                    <p className="text-[11px] text-muted-foreground/60 mt-1">
+                      {formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: pl })}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
