@@ -338,6 +338,7 @@ export function MyBookings() {
           bookingId={reviewBooking?.id ?? ""}
           serviceName={reviewBooking?.serviceName ?? ""}
           salonName={reviewBooking?.salonName ?? ""}
+          salonId={reviewBooking?.salonId ?? ""}
         />
       </div>
     </div>
