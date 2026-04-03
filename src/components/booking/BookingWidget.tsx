@@ -286,16 +286,20 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   const [selectedStaffName, setSelectedStaffName] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [clientData, setClientData] = useState<ClientData>({
-    firstName: "",
-    lastName: "",
-    phone: "",
-    email: "",
-    notes: "",
-    acceptRodo: false,
-    acceptMarketing: false,
-    confirmationMethod: 'sms',
-  });
+  const [clientData, setClientData] = useState<ClientData>(
+    autoClientData && isAutoDataComplete
+      ? autoClientData
+      : {
+          firstName: "",
+          lastName: "",
+          phone: "",
+          email: "",
+          notes: "",
+          acceptRodo: false,
+          acceptMarketing: false,
+          confirmationMethod: 'sms',
+        }
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
 
