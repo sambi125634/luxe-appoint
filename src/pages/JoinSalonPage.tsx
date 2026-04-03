@@ -57,7 +57,7 @@ export default function JoinSalonPage() {
 
       setJoined(true);
       toast.success(`Dołączono do ${salon.name}!`);
-      setTimeout(() => navigate("/app"), 1500);
+      setShowOnboarding(true);
     } catch (err) {
       toast.error("Nie udało się dołączyć do salonu");
     } finally {
