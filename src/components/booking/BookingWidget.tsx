@@ -32,6 +32,7 @@ interface BookingWidgetProps {
   widgetConfig?: WidgetConfig | null;
   salonId?: string;
   onStepChange?: (stepId: string) => void;
+  skipIntro?: boolean;
 }
 
 interface ServiceVariant {
@@ -135,7 +136,7 @@ const demoServiceRecommendations: Record<string, { id: string; name: string; pri
   ],
 };
 
-export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange }: BookingWidgetProps) {
+export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange, skipIntro = false }: BookingWidgetProps) {
   const [salonSettings, setSalonSettings] = useState<SalonSettings | null>(null);
   const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   
@@ -236,7 +237,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     return { steps: stepNames, stepMapping: mapping };
   }, [widgetConfig?.steps, isPaymentEnabled]);
 
-  const hasIntro = stepMapping.includes("intro");
+  const hasIntro = stepMapping.includes("intro") && !skipIntro;
   const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
   const [previousStep, setPreviousStep] = useState(hasIntro ? 0 : 1);
   const [isTransitioning, setIsTransitioning] = useState(false);
