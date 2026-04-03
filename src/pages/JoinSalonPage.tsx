@@ -86,6 +86,15 @@ export default function JoinSalonPage() {
     );
   }
 
+  if (showOnboarding && salon) {
+    return (
+      <ClientOnboarding
+        salonName={salon.name}
+        onComplete={() => navigate("/app")}
+      />
+    );
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background px-4">
       <Card className="w-full max-w-sm border-border/50">
