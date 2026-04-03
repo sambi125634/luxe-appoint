@@ -843,6 +843,17 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
                 </>
               )}
             </Button>
+          ) : (
+            <Button
+              variant="luxury"
+              size="lg"
+              onClick={handleNext}
+              disabled={!canProceed()}
+              className="gap-2"
+            >
+              Dalej
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           )}
         </div>
       )}
