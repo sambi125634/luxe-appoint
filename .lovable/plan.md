@@ -1,26 +1,67 @@
 
 
-## Plan: Poprawka widoczności listy specjalistów na mobile
+## Plan: Automatyczne uzupełnianie danych klienta w procesie rezerwacji
 
-### Problem
-W `DateTimeSelection.tsx` (linia 290) lista specjalistów jest wyświetlana jako poziomy pasek z `overflow-x-auto`. Na ekranie 390px widać tylko 1-2 chipsy, reszta jest ukryta bez widocznego wskaźnika przewijania.
+### Kontekst
 
-### Rozwiązanie
-Zmienić layout specjalistów z poziomego paska na **siatkę 2 kolumny** (`grid grid-cols-2`) z kompaktowymi kafelkami. Każdy kafelek zawiera inicjały, imię i ocenę. Opcja "Dowolny" zajmuje pełną szerokość na górze.
+Obecnie krok "Dane" (ClientForm) wymaga ręcznego wpisania imienia, nazwiska, telefonu, e-maila i zgód RODO — za każdym razem, niezależnie czy klient jest zalogowany czy nie.
 
-### Zmiany w plikach
+**Dwa scenariusze:**
+1. **Aplikacja mobilna (`/app/*`)** — klient jest ZAWSZE zalogowany → dane z profilu powinny być auto-uzupełnione, a krok "Dane" powinien być pominięty lub zredukowany do podglądu
+2. **Widget online (`/s/slug`)** — klient zazwyczaj niezalogowany → pełny formularz jak dotychczas, ale z zachętą do pobrania aplikacji na ekranie potwierdzenia
 
-**1. `src/components/booking/DateTimeSelection.tsx`** (linie 289-332)
-- Zamienić `flex gap-2 overflow-x-auto` na `grid grid-cols-2 gap-2`
-- Opcja "Dowolny" → `col-span-2`
-- Każdy kafelek: kompaktowy layout z inicjałami, imieniem (truncate), oceną
-- Usunąć `whitespace-nowrap`, `flex-shrink-0`, `overflow-x-auto`
-- Dodać `max-h-[240px] overflow-y-auto` na wypadek >6 specjalistów
+### Strategia biznesowa
 
-**2. `src/components/booking/StaffSelection.tsx`** (linie 131-226)
-- Zmniejszyć padding kart z `p-5` na `p-3` na mobile
-- Zmniejszyć avatar z `w-14 h-14` na `w-10 h-10`
-- Dodać `max-h-[50vh] overflow-y-auto` do kontenera grid, aby lista była scrollowalna gdy jest wielu specjalistów
+Widget = narzędzie akwizycji (pierwsza wizyta). Aplikacja = retencja (kolejne wizyty bez wysiłku). Na potwierdzeniu w widgecie dodajemy baner "Pobierz aplikację — następnym razem zarezerwujesz w 10 sekund".
 
-Obie zmiany zapewniają pełny podgląd wszystkich pracowników zarówno w widgecie jak i w aplikacji mobilnej.
+---
+
+### Zmiany techniczne
+
+**1. Nowy prop `autoClientData` w `BookingWidget`**
+
+```
+interface BookingWidgetProps {
+  ...
+  autoClientData?: ClientData | null;
+}
+```
+
+Gdy przekazany i kompletny — krok `form` jest automatycznie pomijany (filtrowany z `stepMapping` jak `intro` przy `skipIntro`).
+
+**2. `SalonProfile.tsx` — pobranie danych zalogowanego użytkownika**
+
+Przed renderowaniem `BookingWidget`, komponent pobiera dane z `profiles` (imię, nazwisko, telefon, email) i przekazuje je jako `autoClientData`. Klient nie musi nic wpisywać.
+
+Dodatkowy kafelek przed widgetem: "Rezerwujesz jako Anna K. · +48 *** *** 789" z opcją "Zmień dane" (która przywraca pełny formularz).
+
+**3. `BookingWidget.tsx` — logika pomijania kroku**
+
+- Jeśli `autoClientData` jest kompletne (imię, nazwisko, telefon, email, acceptRodo=true):
+  - Ustaw `clientData` na wartości z `autoClientData`
+  - Usuń `"form"` z `stepMapping` (jak przy `skipIntro`)
+  - Przy submicie użyj auto-danych
+- Jeśli niekompletne — pokaż formularz z pre-fillem
+
+**4. `BookingConfirmation.tsx` — baner "Pobierz aplikację"**
+
+Tylko gdy kontekst = widget (brak `autoClientData`):
+- Baner z ikoną smartfona
+- "Następnym razem zarezerwuj w 3 kliknięcia"
+- Link do `/install` lub deep link
+
+**5. `handleFormSubmit` — rozpoznawanie istniejącego klienta**
+
+Obecna logika już szuka klienta po telefonie (linia 388-393). Gdy znajdzie — używa istniejącego `client_id`. To działa poprawnie, nie wymaga zmian.
+
+---
+
+### Pliki do edycji
+
+| Plik | Zmiana |
+|------|--------|
+| `src/components/booking/BookingWidget.tsx` | Nowy prop `autoClientData`, logika pomijania kroku `form` |
+| `src/components/client-app/SalonProfile.tsx` | Fetch profilu użytkownika, przekazanie `autoClientData`, kafelek "Rezerwujesz jako..." |
+| `src/components/booking/BookingConfirmation.tsx` | Baner "Pobierz aplikację" dla widgetu |
+| `src/components/booking/ClientForm.tsx` | Brak zmian (formularz zostaje dla widgetu) |
 
