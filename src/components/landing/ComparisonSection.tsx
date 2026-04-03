@@ -3,13 +3,17 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const comparisonData = [
-  { feature: "AI Smart Scheduling", bc: true, booksy: false, fresha: false, versum: false, highlight: false },
-  { feature: "Scoring ryzyka klientów", bc: true, booksy: false, fresha: false, versum: false, highlight: false },
-  { feature: "Prognoza przychodów", bc: true, booksy: false, fresha: "partial", versum: "partial", highlight: false },
-  { feature: "Prowizja od nowej klientki", bc: "0%", booksy: "35–45% netto", fresha: "0%", versum: "0%", highlight: true },
-  { feature: "Abonament miesięczny", bc: "od 0 zł", booksy: "od 135 zł", fresha: "od 79 zł", versum: "od 149 zł", highlight: false },
-  { feature: "Przedpłaty online (BLIK)", bc: true, booksy: "partial", fresha: true, versum: "partial", highlight: false },
-  { feature: "Support po polsku 24/7", bc: true, booksy: "partial", fresha: "partial", versum: true, highlight: false },
+  { feature: "Prowizja od rezerwacji", bc: "0%", booksy: "25-45%", noSystem: "—", highlight: true },
+  { feature: "Roczny koszt (śr. salon)", bc: "1 788 zł", booksy: "36 000–81 000 zł", noSystem: "0 zł (+ chaos)", highlight: true },
+  { feature: "Własność danych klientów", bc: true, booksy: false, noSystem: true, highlight: false },
+  { feature: "AI (12 funkcji)", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "Skaner magazynowy (aparat)", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "CRM z historią i tagami", bc: true, booksy: "partial", noSystem: false, highlight: false },
+  { feature: "True Profit per zabieg", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "SMS + email automatyzacja", bc: true, booksy: "partial", noSystem: false, highlight: false },
+  { feature: "Własna domena rezerwacji", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "Multi-lokalizacja", bc: true, booksy: true, noSystem: false, highlight: false },
+  { feature: "White-label", bc: true, booksy: false, noSystem: false, highlight: false },
 ];
 
 const StatusIcon = ({ status, isHighlight, isBc }: { status: boolean | string; isHighlight?: boolean; isBc?: boolean }) => {
@@ -52,17 +56,17 @@ export const ComparisonSection = () => {
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Beauty Calendar vs.{" "}
-            <span className="text-gradient-luxury">Konkurencja</span>
+            163 funkcje. 0% prowizji.{" "}
+            <span className="text-gradient-luxury">1 platforma.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Porównaj sam/sama i podejmij świadomą decyzję
+            Porównaj fakty — nie opinie.
           </p>
         </div>
 
         {/* Comparison table */}
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
+          <table className="w-full min-w-[700px]">
             <thead>
               <tr className="border-b border-border">
                 <th className="text-left py-4 px-4 font-semibold">Funkcja</th>
@@ -75,8 +79,7 @@ export const ComparisonSection = () => {
                   </div>
                 </th>
                 <th className="py-4 px-4 text-center font-semibold text-muted-foreground">Booksy</th>
-                <th className="py-4 px-4 text-center font-semibold text-muted-foreground">Fresha</th>
-                <th className="py-4 px-4 text-center font-semibold text-muted-foreground">Versum</th>
+                <th className="py-4 px-4 text-center font-semibold text-muted-foreground">Brak systemu</th>
               </tr>
             </thead>
             <tbody>
@@ -107,12 +110,7 @@ export const ComparisonSection = () => {
                   </td>
                   <td className="py-4 px-4">
                     <div className="flex justify-center">
-                      <StatusIcon status={row.fresha} isHighlight={row.highlight} />
-                    </div>
-                  </td>
-                  <td className="py-4 px-4">
-                    <div className="flex justify-center">
-                      <StatusIcon status={row.versum} isHighlight={row.highlight} />
+                      <StatusIcon status={row.noSystem} isHighlight={row.highlight} />
                     </div>
                   </td>
                 </tr>
@@ -143,12 +141,10 @@ export const ComparisonSection = () => {
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="text-center mt-12 p-6 bg-gradient-to-r from-emerald-500/10 via-primary/10 to-emerald-500/10 rounded-2xl border border-primary/20">
-          <p className="text-xl font-semibold">
-            💡 <span className="text-primary font-bold">Oszczędź nawet 15,000 zł rocznie</span> na prowizjach Booksy Boost (35–45% od każdej nowej klientki)
-          </p>
-        </div>
+        {/* Footer note */}
+        <p className="text-center text-xs text-muted-foreground mt-8">
+          Dane porównawcze oparte na publicznie dostępnych cennikach i regulaminach konkurencji (stan na 2026).
+        </p>
       </div>
     </section>
   );

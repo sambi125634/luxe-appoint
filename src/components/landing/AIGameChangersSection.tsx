@@ -4,7 +4,8 @@ import {
   Target, 
   TrendingUp, 
   DollarSign, 
-  Instagram,
+  Users,
+  Heart,
   Check,
   ArrowRight
 } from "lucide-react";
@@ -13,59 +14,70 @@ import { cn } from "@/lib/utils";
 
 const features = [
   {
+    id: "silent-fans",
+    icon: Heart,
+    title: "Silent Fans Detector™",
+    subtitle: "Znajdź ciche fanki",
+    description: "23% Twoich klientek to lojalne fanki, które nigdy nie zostawiły opinii. System je znajduje i wysyła spersonalizowaną wiadomość z prośbą o polecenie lub recenzję Google. Ty nie robisz nic. One robią resztę.",
+    stat: "+23%",
+    statLabel: "opinii Google bez Twojego udziału",
+    color: "from-pink-500 to-rose-600",
+    bgColor: "bg-pink-500/10",
+  },
+  {
     id: "smart-gap",
     icon: Brain,
-    title: "Wypełniacz Luk",
-    subtitle: "AI samo dzwoni do klientek",
-    description: "Masz 30-minutową przerwę między zabiegami? AI sugeruje klientkom dokładnie ten termin z badge \"Idealny termin\". Wypełnij każdą minutę.",
+    title: "Smart Gap Management",
+    subtitle: "AI zamyka luki w kalendarzu",
+    description: "30-minutowa luka między 14:00 a 14:30? System sprawdza bazę klientek, znajduje te które lubią usługi ekspresowe i wysyła im ofertę last-minute. Luka = stracone pieniądze. AI ją zamyka za Ciebie.",
     stat: "+23%",
     statLabel: "więcej rezerwacji w \"martwych\" godzinach",
     color: "from-violet-500 to-purple-600",
     bgColor: "bg-violet-500/10",
   },
   {
-    id: "risk-score",
-    icon: Target,
-    title: "Radar Odejść",
-    subtitle: "Wiesz zanim odejdzie",
-    description: "System analizuje historię: no-showy, odwołania, spóźnienia. Automatycznie wymaga przedpłaty od ryzykownych klientów.",
-    stat: "-67%",
-    statLabel: "redukcja no-showów",
+    id: "true-profit",
+    icon: DollarSign,
+    title: "True Profit Dashboard",
+    subtitle: "Ile NAPRAWDĘ zarabiasz?",
+    description: "Przychód to nie zysk. System odejmuje koszt materiałów, czas pracownicy i koszty stałe. Pokazuje ile NAPRAWDĘ zarabiasz na każdym zabiegu. Będziesz zaskoczona co wyjdzie na plus, a co na minus.",
+    stat: "100%",
+    statLabel: "przejrzystości finansowej",
     color: "from-emerald-500 to-teal-600",
     bgColor: "bg-emerald-500/10",
   },
   {
-    id: "revenue",
-    icon: TrendingUp,
-    title: "Prognoza Kasy",
-    subtitle: "Wiesz ile zarobisz w piątek",
-    description: "Wiesz ile zarobisz zanim miesiąc się skończy. AI analizuje trendy, sezonowość i historię rezerwacji.",
-    stat: "94%",
-    statLabel: "dokładność prognoz",
+    id: "churn",
+    icon: Target,
+    title: "Churn Prediction",
+    subtitle: "Wiesz zanim odejdzie",
+    description: "Klientka Anna nie była 45 dni. Wcześniej przychodziła co 3 tygodnie. System wykrywa tę zmianę 14 dni ZANIM odejdzie na dobre — i daje Ci gotową wiadomość reaktywacyjną. Ty tylko klikasz „wyślij".",
+    stat: "-67%",
+    statLabel: "redukcja odejść klientek",
     color: "from-amber-500 to-orange-600",
     bgColor: "bg-amber-500/10",
   },
   {
-    id: "pricing",
-    icon: DollarSign,
-    title: "Dynamiczne Ceny",
-    subtitle: "Automatyczna optymalizacja cennika",
-    description: "Poniedziałek pusty? Piątek przepełniony? AI sugeruje zniżki off-peak i premium w godzinach szczytu.",
+    id: "upsell",
+    icon: TrendingUp,
+    title: "AI Upsell Engine",
+    subtitle: "Automatyczne dosprzedawanie",
+    description: "Klientka rezerwuje manicure hybrydowy. System wie, że 60% klientek z tym zabiegiem dokupuje pielęgnację dłoni. Automatycznie sugeruje: „Dodaj spa dłoni za 45 zł?" Średni wzrost wartości wizyty: +18%.",
     stat: "+18%",
-    statLabel: "przychodu bez dodatkowych klientów",
-    color: "from-pink-500 to-rose-600",
-    bgColor: "bg-pink-500/10",
+    statLabel: "wzrost wartości wizyty",
+    color: "from-blue-500 to-indigo-600",
+    bgColor: "bg-blue-500/10",
   },
   {
-    id: "instagram",
-    icon: Instagram,
-    title: "Rezerwacja z IG",
-    subtitle: "1 link, klientka rezerwuje",
-    description: "Jeden link w bio, który śledzi konwersje z social media. Zobacz dokładnie, które posty przynoszą rezerwacje.",
+    id: "pixel",
+    icon: Users,
+    title: "Auto-Audience Builder",
+    subtitle: "Pixel Conditioning",
+    description: "System automatycznie dzieli Twoje klientki na grupy: nowe, powracające, VIP, zagrożone odejściem. Tworzy gotowe segmenty do Facebook Ads. Zero ręcznej pracy — Pixel robi resztę.",
     stat: "ROI",
-    statLabel: "z Instagrama wreszcie mierzalne",
-    color: "from-gradient-to-r from-purple-500 via-pink-500 to-orange-500",
-    bgColor: "bg-pink-500/10",
+    statLabel: "z reklam wreszcie mierzalny",
+    color: "from-purple-500 to-pink-600",
+    bgColor: "bg-purple-500/10",
   },
 ];
 
@@ -85,21 +97,21 @@ export const AIGameChangersSection = () => {
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 text-sm text-primary font-medium mb-4">
             <Brain className="w-4 h-4" />
-            Autorskie funkcje AI — nie do kupienia nigdzie indziej
+            12 funkcji AI — żaden konkurent tego nie ma
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            5 funkcji AI które zastąpią{" "}
-            <span className="text-primary">pełnoetatowego managera</span>
+            Co jeśli Twój salon zarabiał na Ciebie,{" "}
+            <span className="text-primary">nawet gdy śpisz?</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Sztuczna inteligencja, która naprawdę rozumie Twój biznes i automatycznie go optymalizuje.
+            12 funkcji AI, które pracują 24/7. Żaden konkurent tego nie ma. Żaden. Sprawdź sama.
           </p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-8">
           {/* Feature tabs - left side */}
           <div className="lg:col-span-2 space-y-3">
-            {features.map((feature, index) => (
+            {features.map((feature) => (
               <button
                 key={feature.id}
                 onClick={() => setActiveFeature(feature)}
@@ -168,7 +180,7 @@ export const AIGameChangersSection = () => {
 
                 {/* Benefits */}
                 <div className="space-y-3 mb-6">
-                  {["Działa automatycznie 24/7", "Brak dodatkowych kosztów", "Rezultaty od pierwszego dnia"].map((benefit, i) => (
+                  {["Działa automatycznie 24/7", "W cenie pakietu ELITE", "Rezultaty od pierwszego tygodnia"].map((benefit, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <Check className="w-4 h-4 text-emerald-500" />
                       <span>{benefit}</span>

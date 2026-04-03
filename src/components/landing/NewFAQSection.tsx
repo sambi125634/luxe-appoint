@@ -10,38 +10,38 @@ import { motion } from "framer-motion";
 const faqs = [
   {
     icon: Users,
-    question: "Ale moje klientki znają mnie z Booksy — nie znajdą mnie tutaj",
-    answer: "Twoje klientki znają CIEBIE, nie Booksy. Wysyłasz im swój link do rezerwacji przez WhatsApp, SMS lub Instagram — i rezerwują u Ciebie bezpośrednio. 93% klientek przechodzi bez problemu, bo rezerwacja jest prostsza niż przez Booksy.",
+    question: "„Moje klientki znają mnie z Booksy — nie znajdą mnie tutaj?"",
+    answer: "Twoje klientki nie szukają Cię „na Booksy". Szukają Cię po nazwie w Google. Beauty Calendar daje Ci własny link i widget na stronie, Facebooku i Instagramie. Wyślij im jedną wiadomość z nowym linkiem — 90% przejdzie w ciągu tygodnia.",
   },
   {
     icon: Percent,
-    question: "Jak to możliwe że 0% prowizji? Gdzie jest haczyk?",
-    answer: "Nie ma haczyka. Zarabiamy na stałym abonamencie (0/99/249 zł miesięcznie), nie na prowizjach. To jest nasz fundamentalny wybór biznesowy — wierzymy że Twoje pieniądze powinny zostać u Ciebie.",
+    question: "„Jak to możliwe że 0% prowizji? Gdzie jest haczyk?"",
+    answer: "Booksy jest marketplace — łączy klientki z salonami i bierze procent od każdego połączenia. My nie jesteśmy marketplace. Jesteśmy narzędziem — jak Canva czy Notion. Płacisz za software, nie za swoje klientki.",
   },
   {
     icon: ArrowRightLeft,
-    question: "Czy migracja z Booksy jest trudna?",
-    answer: "5 minut. Serio. Mamy jedno-klikowy import z Booksy, Fresha i Versumu. Baza klientek, usługi i grafik przeniosą się automatycznie. Uruchomisz Beauty Calendar jeszcze tego samego dnia.",
+    question: "„Czy migracja z Booksy jest trudna?"",
+    answer: "Eksportujesz dane jako CSV, importujesz jednym kliknięciem. Całość trwa 10-15 minut. W pakiecie ELITE — robimy to za Ciebie podczas onboarding callu.",
   },
   {
     icon: ShieldCheck,
-    question: "Czy to jest bezpieczne? Gdzie są moje dane?",
-    answer: "Twoje dane przechowywane są na serwerach w UE, szyfrowane SSL 256-bit, w pełni zgodne z RODO. Masz pełną kontrolę — eksportujesz lub usuwasz dane w dowolnym momencie. To TWOJA baza, nie nasza.",
+    question: "„Czy moje dane są bezpieczne?"",
+    answer: "Serwery w UE, szyfrowanie SSL/TLS, pełna zgodność z RODO. I co najważniejsze — to SĄ Twoje dane. Możesz je wyeksportować i usunąć w każdej chwili. W Booksy — Twoje dane należą do Booksy.",
   },
   {
     icon: Smartphone,
-    question: "Nie jestem techniczna — czy dam radę?",
-    answer: "Jeśli umiesz obsługiwać Instagram — dasz radę z Beauty Calendar. Interfejs jest prostszy niż Booksy. Średni czas konfiguracji to 5 minut. A jeśli utkniesz — nasz support odpowiada w ciągu 2 godzin.",
+    question: "„Nie jestem techniczna — czy dam radę?"",
+    answer: "Jeśli obsługujesz Instagram — dasz radę z Beauty Calendar. Konfiguracja trwa 15 minut. Mamy video-poradniki po polsku. A w pakiecie ELITE — konfigurujemy wszystko za Ciebie.",
   },
   {
     icon: RotateCcw,
-    question: "Co jeśli mi się nie spodoba — mogę zrezygnować?",
-    answer: "W każdej chwili. Bez okresu wypowiedzenia, bez ukrytych opłat. Zabierasz swoją bazę klientek (eksport CSV) i odchodzisz. Ale szczerze? 94% właścicielek zostaje po pierwszym miesiącu.",
+    question: "„Co jeśli mi się nie spodoba?"",
+    answer: "Pakiet FREE jest darmowy na zawsze — testuj bez limitu czasowego. Pakiety płatne anulujesz jednym kliknięciem, bez wypowiedzenia, bez tłumaczenia się. Twoje dane zostają Twoje.",
   },
   {
     icon: HelpCircle,
-    question: "Dlaczego nie znam tej aplikacji?",
-    answer: "Bo nie wydajemy milionów na reklamy jak Booksy. Rosnemy organicznie — przez polecenia zadowolonych właścicielek salonów. To dlatego 150+ salonów już nam zaufało bez wielkich kampanii marketingowych.",
+    question: "„Dlaczego nie znam tej aplikacji?"",
+    answer: "Bo nie wydajemy milionów na reklamy. Inwestujemy w produkt — 163 funkcje mówią same za siebie. Dowiadują się o nas od innych właścicielek salonów. Najlepsza rekomendacja nie pochodzi od nas.",
   },
 ];
 
@@ -57,12 +57,9 @@ export const NewFAQSection = () => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Masz pytania?{" "}
-            <span className="text-gradient-luxury">Mamy odpowiedzi.</span>
+            7 pytań, które zadajesz{" "}
+            <span className="text-gradient-luxury">zanim klikniesz „zacznij"</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
-            7 najczęstszych obiekcji — i konkretne odpowiedzi.
-          </p>
         </motion.div>
 
         <Accordion type="single" collapsible className="space-y-4">

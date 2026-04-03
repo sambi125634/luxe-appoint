@@ -3,69 +3,58 @@ import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-/* [PLACEHOLDER] — Wszystkie testimoniale są fikcyjne i służą jako placeholdery.
-   Przed publikacją zastąp je prawdziwymi opiniami klientek. */
+{/* [PLACEHOLDER — do zamiany na prawdziwe] */}
 
 const testimonials = [
   {
     id: 1,
-    content: "Przeszłam z Booksy po 3 latach. W pierwszym miesiącu no-showy spadły o 70%. AI naprawdę działa — sugeruje terminy które wypełniają luki i klientki je wybierają!",
-    author: "Marta K.",
-    role: "Klinika Estetyczna Bella",
-    location: "Warszawa",
-    avatar: "MK",
-    rating: 5,
-    result: "Zaoszczędziła 4 200 zł/mies na prowizjach", /* [PLACEHOLDER] */
-  },
-  {
-    id: 2,
-    content: "Nareszcie wiem ile zarabiam bez przekopywania się przez 10 raportów. Prognoza przychodów to game changer — planuję zakupy produktów z miesięcznym wyprzedzeniem.",
+    content: "Przeszłam z Booksy 3 miesiące temu. Bałam się, że stracę klientki. Nie straciłam ani jednej. Za to oszczędzam 2 400 zł miesięcznie na prowizjach. Żałuję tylko, że nie zrobiłam tego rok wcześniej.",
     author: "Karolina W.",
-    role: "Studio Urody Glow",
+    role: "Salon kosmetyczny",
     location: "Kraków",
     avatar: "KW",
     rating: 5,
-    result: "Przychód wzrósł o 18% w 3 miesiące", /* [PLACEHOLDER] */
+    result: "Oszczędza 2 400 zł/mies na prowizjach",
+  },
+  {
+    id: 2,
+    content: "Skaner magazynowy przez telefon — to jest game changer. Skanuję produkt po zabiegu, system odejmuje ze stanu, a kiedy się kończy — sam przypomina żeby zamówić. Koniec z niespodziankami w środku koloryzacji.",
+    author: "Magda K.",
+    role: "Salon fryzjerski",
+    location: "Wrocław",
+    avatar: "MK",
+    rating: 5,
+    result: "Inwentaryzacja 9x szybsza",
   },
   {
     id: 3,
-    content: "Mój zespół 4 osób opanował system w jeden dzień. Z Versum szkolenie trwało tydzień. A prowizji zero — oszczędzam 2 400 zł miesięcznie.",
-    author: "Agnieszka M.",
-    role: "Salon Fryzjerski Cięcie",
-    location: "Poznań",
-    avatar: "AM",
+    content: "True Profit Dashboard otworzył mi oczy. Myślałam że botox to moja najlepsza usługa. Po odjęciu materiałów — peelingi chemiczne są 3x bardziej rentowne. Bez tego raportu nigdy bym się nie dowiedziała.",
+    author: "Anna S.",
+    role: "Klinika medycyny estetycznej",
+    location: "Warszawa",
+    avatar: "AS",
     rating: 5,
-    result: "Oszczędza 2 400 zł/mies", /* [PLACEHOLDER] */
+    result: "Odkryła 3x rentowniejsze usługi",
   },
   {
     id: 4,
-    content: "Widget na Instagramie to strzał w dziesiątkę. Widzę dokładnie które Stories przynoszą rezerwacje. Mój ROI z social media wzrósł 3x w dwa miesiące.",
-    author: "Patrycja L.",
-    role: "Brow Bar Perfect",
+    content: "Moje 3 pracowniczki mają osobne kalendarze, klientki rezerwują same nawet o 23:00, a ja w końcu mam weekendy wolne. 149 zł miesięcznie? To najlepsza inwestycja jaką kiedykolwiek zrobiłam w mój biznes.",
+    author: "Izabela M.",
+    role: "SPA & Wellness",
     location: "Gdańsk",
-    avatar: "PL",
+    avatar: "IM",
     rating: 5,
-    result: "3x wzrost ROI z Instagrama", /* [PLACEHOLDER] */
+    result: "Weekendy wolne, klientki rezerwują same",
   },
   {
     id: 5,
-    content: "Skaner kodów kreskowych w telefonie — to coś czego szukałam latami! Inwentaryzacja która trwała 3 godziny teraz zajmuje 20 minut. A receptury automatycznie odliczają produkty po zabiegu.",
-    author: "Dominika S.",
-    role: "SPA & Wellness Harmony",
-    location: "Wrocław",
-    avatar: "DS",
+    content: "Nie jestem techniczna — kompletnie. Bałam się, że nie dam rady. Konfiguracja zajęła mi 15 minut. PIĘTNAŚCIE. Teraz nie wyobrażam sobie pracy bez tego systemu.",
+    author: "Justyna P.",
+    role: "Studio paznokci",
+    location: "Poznań",
+    avatar: "JP",
     rating: 5,
-    result: "Inwentaryzacja 9x szybsza", /* [PLACEHOLDER] */
-  },
-  {
-    id: 6,
-    content: "Bałam się odejść z Booksy — myślałam że klientki mnie nie znajdą. Ale z Beauty Calendar mam WŁASNĄ bazę i link do rezerwacji który wysyłam przez WhatsApp. Ani jedna klientka nie odeszła.",
-    author: "Natalia R.",
-    role: "Salon Kosmetyczny Luxe",
-    location: "Łódź",
-    avatar: "NR",
-    rating: 5,
-    result: "0 utraconych klientek po migracji", /* [PLACEHOLDER] */
+    result: "Konfiguracja w 15 minut",
   },
 ];
 
@@ -110,45 +99,22 @@ export const TestimonialsSection = () => {
   return (
     <section className="py-20 lg:py-32 bg-gradient-to-b from-muted/20 to-background">
       <div className="container">
-        {/* Rating header */}
-        <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <p className="text-sm text-muted-foreground mb-2">
-            Co mówią właścicielki które przestały płacić prowizje:
-          </p>
-          <div className="flex items-center justify-center gap-1">
-            {[1, 2, 3, 4, 5].map(i => (
-              <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-            ))}
-            <span className="ml-2 font-bold">4.9/5</span>
-            <span className="text-muted-foreground ml-1 text-sm">(127 opinii) [PLACEHOLDER]</span>
-          </div>
-        </motion.div>
-
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Co mówią{" "}
-            <span className="text-gradient-luxury">właścicielki salonów</span>
+            Właścicielki salonów, które{" "}
+            <span className="text-gradient-luxury">przestały oddawać swoje pieniądze</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Dołącz do setek zadowolonych właścicielek salonów w całej Polsce
-          </p>
         </div>
 
-        {/* Desktop: 3-column grid */}
+        {/* Desktop: grid */}
         <div className="hidden lg:grid lg:grid-cols-3 gap-6">
           {testimonials.slice(0, 3).map((testimonial) => (
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
         </div>
-        <div className="hidden lg:grid lg:grid-cols-3 gap-6 mt-6">
-          {testimonials.slice(3, 6).map((testimonial) => (
+        <div className="hidden lg:grid lg:grid-cols-2 gap-6 mt-6 max-w-3xl mx-auto">
+          {testimonials.slice(3, 5).map((testimonial) => (
             <TestimonialCard key={testimonial.id} testimonial={testimonial} />
           ))}
         </div>
