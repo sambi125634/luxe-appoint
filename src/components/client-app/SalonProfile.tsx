@@ -20,9 +20,7 @@ export function SalonProfile() {
   const { salonId } = useParams<{ salonId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [showBooking, setShowBooking] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(["all"]));
-  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+  const [showInfo, setShowInfo] = useState(false);
 
   const { data: salon, isLoading } = useQuery({
     queryKey: ["client-salon", salonId],
