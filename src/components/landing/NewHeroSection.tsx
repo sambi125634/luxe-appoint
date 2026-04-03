@@ -5,7 +5,7 @@ import { Check, Sparkles, ArrowRight, Play } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 
-const Hero3DScene = lazy(() => import("./Hero3DScene"));
+const Hero3DScene = lazy(() => import("./Hero3DScene").catch(() => ({ default: () => null })));
 
 interface NewHeroSectionProps {
   onScrollToForm: () => void;
