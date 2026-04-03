@@ -109,52 +109,26 @@
     "tour": {
       "step": "Step {{current}} of {{total}}",
       "skip": "Skip tour",
-      "start": "Start exploring",
+      "start": "Start working",
+      "restartHint": "💡 You can restart the tour by clicking 'Tutorial' in the sidebar",
       "steps": {
-        "welcome": {
-          "title": "Welcome to Beauty Calendar!",
-          "description": "We'll show you how easy it is to manage a beauty salon. This quick guide will walk you through the main features."
-        },
-        "dashboard": {
-          "title": "Your Dashboard",
-          "description": "This is your command center. See today's appointments, revenue, and what needs attention – all at a glance.",
-          "feature1": "Today's appointments",
-          "feature2": "Estimated revenue",
-          "feature3": "Alerts & notifications"
-        },
-        "calendar": {
-          "title": "Appointment Calendar",
-          "description": "Drag and drop appointments, see free slots for each employee. Manage your schedule stress-free.",
-          "feature1": "Drag & drop",
-          "feature2": "Week view",
-          "feature3": "Quick blocks"
-        },
-        "clients": {
-          "title": "Client Database",
-          "description": "Visit history, preferences, notes – everything in one place. Know your clients better than ever.",
-          "feature1": "Visit history",
-          "feature2": "VIP/problematic tags",
-          "feature3": "Notes & preferences"
-        },
-        "services": {
-          "title": "Service Management",
-          "description": "Add categories, set prices and duration. CSV import – ready in 5 minutes.",
-          "feature1": "Service categories",
-          "feature2": "CSV import",
-          "feature3": "Multimedia"
-        },
-        "staff": {
-          "title": "Your Team",
-          "description": "Assign services, set work schedules, track performance. Everyone knows what to do.",
-          "feature1": "Work schedule",
-          "feature2": "Assigned services",
-          "feature3": "Calendar colors"
-        },
-        "cta": {
-          "title": "All done! Time to explore",
-          "description": "That's it! Now you can freely browse all features. Click the menu on the left to see more.",
-          "highlight": "Want this system for your salon? Leave your contact and we'll reach out within 24h!"
-        }
+        "welcome": { "title": "Welcome to Beauty Calendar! 🎉", "description": "We'll walk you through every section of your panel. You'll see what you gain in each module and how to start. Takes 2 minutes." },
+        "dashboard": { "title": "Dashboard — Your command center", "description": "See how much you earn, how many clients return, and what needs attention — all at a glance, without opening Excel." },
+        "calendar": { "title": "Calendar — zero phone calls", "description": "Clients book themselves 24/7, you only manage exceptions. See everyone's schedule on one screen." },
+        "widgets": { "title": "Widgets — Your booking link", "description": "Paste the link on Instagram or your website — clients book even at 11 PM. Like an employee who never sleeps." },
+        "staff": { "title": "Team — everyone knows their role", "description": "Each employee has their own calendar, services, and color. The system manages the schedule — you don't need to remember who does what." },
+        "clients": { "title": "Clients — full history", "description": "Full history of every client with tags, notes, and preferences. Know who's VIP, who's disappearing, and who to call." },
+        "conversations": { "title": "Conversations — one view", "description": "SMS, email, WhatsApp — all client conversations in one place. Never lose a thread." },
+        "consultation": { "title": "Consultations — digital documentation", "description": "Consultation cards with GDPR signature, voice notes, and AI — professional documentation without paper bureaucracy." },
+        "services": { "title": "Services — online price list", "description": "Clients see prices and book immediately. Change a price once — the widget updates automatically." },
+        "products": { "title": "Products — inventory under control", "description": "Know how many products are left and when to order. Scan deliveries with your phone — the system calculates margins for you." },
+        "accounting": { "title": "Reports — export with one click", "description": "Close the salon, check the daily report — everything adds up. Export for your accountant with one click." },
+        "pipeline": { "title": "Client journey — react faster", "description": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off. React before they go to competitors." },
+        "retention": { "title": "Retention — automatic returns", "description": "The system automatically takes care of client returns. 5 message sequences react at the right moment — you don't have to remember." },
+        "referral": { "title": "Referrals — free clients", "description": "Happy clients recommend you to friends, the system tracks it. Every referral = a new client without advertising costs." },
+        "settings": { "title": "Settings — configure once", "description": "Logo, colors, notifications, integrations — configure once, effects last forever." },
+        "support": { "title": "Help — ask, get an answer", "description": "The AI Assistant knows the entire system. Ask in your language, get a specific answer instantly." },
+        "cta": { "title": "Ready to start! 🚀", "description": "You now know all the modules. Start by filling in your data — the dashboard checklist will show what's left.", "highlight": "Want this system for your salon? Leave your contact and we'll reach out within 24h!" }
       }
     },
     "benefits": {
