@@ -354,7 +354,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   };
 
   // Determine last step based on payment enabled
-  const lastStepId = isPaymentEnabled ? "payment" : "form";
+  const lastStepId = isPaymentEnabled ? "payment" : (isAutoDataComplete ? "datetime" : "form");
   const isLastStep = currentStepId === lastStepId;
   const isFormStep = currentStepId === "form";
   const isPaymentStep = currentStepId === "payment";
