@@ -217,9 +217,14 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
       return { steps: baseSteps, stepMapping: baseMapping };
     }
     
-    const enabledSteps = widgetConfig.steps
+    let enabledSteps = widgetConfig.steps
       .filter(s => s.enabled && s.id !== "summary" && s.id !== "staff")
       .sort((a, b) => a.order - b.order);
+    
+    // Remove intro from mapping when skipIntro
+    if (skipIntro) {
+      enabledSteps = enabledSteps.filter(s => s.id !== "intro");
+    }
     
     const stepNames = enabledSteps
       .filter(s => s.id !== "intro")
@@ -236,7 +241,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     }
     
     return { steps: stepNames, stepMapping: mapping };
-  }, [widgetConfig?.steps, isPaymentEnabled]);
+  }, [widgetConfig?.steps, isPaymentEnabled, skipIntro]);
 
   const hasIntro = stepMapping.includes("intro") && !skipIntro;
   const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
