@@ -812,7 +812,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
             Wstecz
           </Button>
 
-          {!isFormStep ? (
+          {(!isFormStep && !isLastStep) ? (
             <Button
               variant="luxury"
               size="lg"
@@ -823,7 +823,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               Dalej
               <ArrowRight className="w-4 h-4" />
             </Button>
-          ) : (
+          ) : (isFormStep || (isLastStep && isAutoDataComplete)) ? (
             <Button
               variant="luxury"
               size="lg"
