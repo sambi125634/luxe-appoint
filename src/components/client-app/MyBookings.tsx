@@ -213,6 +213,7 @@ export function MyBookings() {
                     id: booking.id,
                     serviceName: service?.name ?? "Usługa",
                     salonName: salon?.name ?? "Salon",
+                    salonId: booking.salon_id,
                   })}
                 >
                   <Star className="h-4 w-4 mr-1" />
