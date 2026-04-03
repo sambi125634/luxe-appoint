@@ -18,7 +18,7 @@ const transformations = [
     after: "SMS przypomina 24h i 2h przed wizytą",
   },
   {
-    before: "„Kiedy zamawiałam ten kolor? Ile go mam?"",
+    before: "Kiedy zamawia\u0142am ten kolor? Ile go mam?",
     after: "Skanujesz telefonem. System wie wszystko.",
   },
   {
