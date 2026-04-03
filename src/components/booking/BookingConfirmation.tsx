@@ -25,6 +25,7 @@ interface BookingConfirmationProps {
   time: string | null;
   clientName: string;
   bookingRef?: string;
+  showAppDownload?: boolean;
 }
 
 // Salon info
