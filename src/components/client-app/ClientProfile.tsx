@@ -237,6 +237,24 @@ export function ClientProfile() {
         </Card>
       </button>
 
+      {/* Referral shortcut */}
+      <button
+        onClick={() => navigate("/app/profile/referrals")}
+        className="w-full mb-4"
+      >
+        <Card className="border-border/40 rounded-2xl overflow-hidden hover:shadow-md transition-all">
+          <CardContent className="flex items-center justify-between px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <Gift className="h-4 w-4 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-foreground">Poleć znajomej</span>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </CardContent>
+        </Card>
+      </button>
+
       {/* Info cards */}
       <Card className="border-border/40 rounded-2xl mb-6 overflow-hidden">
         <CardContent className="divide-y divide-border/30 p-0">
