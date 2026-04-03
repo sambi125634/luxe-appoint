@@ -196,40 +196,57 @@ export function MyBookings() {
             </p>
           </div>
 
-          {/* Price + Cancel */}
+          {/* Price + Actions */}
           <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/30">
             {service?.price != null && (
               <span className="font-bold text-foreground">
                 {Number(service.price).toFixed(0)} zł
               </span>
             )}
-            {isUpcoming && booking.status !== "cancelled" && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 -mr-2">
-                    <XCircle className="h-4 w-4 mr-1" />
-                    Anuluj
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Anulować wizytę?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Czy na pewno chcesz anulować wizytę "{service?.name}" zaplanowaną na {format(parseISO(booking.start_time), "d MMMM o HH:mm", { locale: pl })}?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Nie, zostaw</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => cancelBooking.mutate(booking.id)}
-                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                    >
-                      Tak, anuluj
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
+            <div className="flex items-center gap-1">
+              {!isUpcoming && booking.status === "completed" && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-primary hover:text-primary hover:bg-primary/10 -mr-1"
+                  onClick={() => setReviewBooking({
+                    id: booking.id,
+                    serviceName: service?.name ?? "Usługa",
+                    salonName: salon?.name ?? "Salon",
+                  })}
+                >
+                  <Star className="h-4 w-4 mr-1" />
+                  Oceń
+                </Button>
+              )}
+              {isUpcoming && booking.status !== "cancelled" && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10 -mr-2">
+                      <XCircle className="h-4 w-4 mr-1" />
+                      Anuluj
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Anulować wizytę?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Czy na pewno chcesz anulować wizytę "{service?.name}" zaplanowaną na {format(parseISO(booking.start_time), "d MMMM o HH:mm", { locale: pl })}?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Nie, zostaw</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => cancelBooking.mutate(booking.id)}
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                      >
+                        Tak, anuluj
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>
