@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MapPin, Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
+import { ClientOnboarding } from "@/components/client-app/ClientOnboarding";
 
 export default function JoinSalonPage() {
   const { slug } = useParams<{ slug: string }>();
