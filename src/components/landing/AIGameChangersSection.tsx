@@ -51,7 +51,7 @@ const features = [
     icon: Target,
     title: "Churn Prediction",
     subtitle: "Wiesz zanim odejdzie",
-    description: "Klientka Anna nie była 45 dni. Wcześniej przychodziła co 3 tygodnie. System wykrywa tę zmianę 14 dni ZANIM odejdzie na dobre — i daje Ci gotową wiadomość reaktywacyjną. Ty tylko klikasz „wyślij".",
+    description: "Klientka Anna nie by\u0142a 45 dni. Wcze\u015Bniej przychodzi\u0142a co 3 tygodnie. System wykrywa t\u0119 zmian\u0119 14 dni ZANIM odejdzie na dobre \u2014 i daje Ci gotow\u0105 wiadomo\u015B\u0107 reaktywacyjn\u0105. Ty tylko klikasz \u201Ewy\u015Blij\u201D.",
     stat: "-67%",
     statLabel: "redukcja odejść klientek",
     color: "from-amber-500 to-orange-600",
