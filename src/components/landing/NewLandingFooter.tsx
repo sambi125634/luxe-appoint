@@ -68,13 +68,10 @@ export const NewLandingFooter = () => {
               </span>
             </Link>
             <p className="text-sm text-muted-foreground mb-2">
-              Pierwszy kalendarz rezerwacji z AI dla salonów beauty.
+              System zarządzania salonem beauty.
             </p>
-            <p className="text-xs text-muted-foreground mb-1">
-              Beauty Funnels sp. z o.o.
-            </p>
-            <p className="text-xs text-muted-foreground mb-4">
-              Poznań, Polska
+            <p className="text-sm text-muted-foreground mb-4">
+              163 funkcje · 0% prowizji · Made in Poland 🇵🇱
             </p>
 
             {/* Social links */}
@@ -166,7 +163,7 @@ export const NewLandingFooter = () => {
         {/* Bottom bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Beauty Calendar by Beauty Funnels. Wszystkie prawa zastrzeżone.
+            © {new Date().getFullYear()} Beauty Calendar · beauty-funnels.com · Wszystkie prawa zastrzeżone
           </p>
 
           <div className="flex items-center gap-4">

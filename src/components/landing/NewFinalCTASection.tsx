@@ -13,26 +13,6 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-pink-500/10" />
 
       <div className="relative z-10 container max-w-3xl mx-auto px-4 text-center">
-        {/* Social proof live */}
-        <motion.div
-          className="flex items-center justify-center gap-2 mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <div className="flex -space-x-2">
-            {['AK', 'MW', 'JP', 'KW'].map((i, idx) => (
-              <div key={idx} className="w-8 h-8 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-bold text-primary">
-                {i}
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            <span className="font-bold text-foreground">23 salony</span>{' '}dołączyły w tym tygodniu
-          </p>
-        </motion.div>
-
         <motion.h2
           className="text-3xl md:text-5xl font-serif font-bold mb-6 leading-tight"
           initial={{ opacity: 0, y: 30 }}
@@ -40,61 +20,50 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Każdy dzień z Booksy<br />
+          Każdy dzień z prowizjami to dzień,<br />
           <span className="bg-gradient-to-r from-destructive to-amber-500 bg-clip-text text-transparent">
-            kosztuje Cię pieniądze.
+            w którym oddajesz swoje pieniądze.
           </span>
         </motion.h2>
 
-        <motion.p
-          className="text-lg text-muted-foreground mb-3"
+        <motion.div
+          className="text-lg text-muted-foreground mb-10 space-y-2"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          Właścicielki które czekały "jeszcze miesiąc" straciły przez ten czas średnio
-        </motion.p>
-
-        <motion.p
-          className="text-4xl font-black text-destructive mb-8"
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-        >
-          3 167 zł
-        </motion.p>
-
-        <motion.p
-          className="text-muted-foreground mb-10"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-        >
-          Zacznij za darmo dziś. Skonfiguruj w 5 minut.<br />
-          Zaoszczędź pierwszy tysiąc jeszcze w tym miesiącu.
-        </motion.p>
+          <p>163 funkcje. 0% prowizji. Konfiguracja w 15 minut.</p>
+          <p>Zacznij od FREE — bez karty, bez zobowiązań, bez ryzyka.</p>
+          <p className="font-semibold text-foreground">Jedyne ryzyko to zostawienie rzeczy tak jak są.</p>
+        </motion.div>
 
         <motion.div
           className="flex flex-col sm:flex-row gap-4 justify-center mb-8"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.3 }}
         >
           <Button size="lg" onClick={onScrollToForm} className="h-14 px-10 text-lg gap-2 relative overflow-hidden">
-            <span>Zacznij za darmo — 0 zł</span>
+            <span>Zacznij za darmo — odbierz dostęp</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
-          <Button size="lg" variant="outline" asChild className="h-14 px-8 text-lg gap-2">
-            <Link to="/demo">
-              <Play className="w-4 h-4" />
-              Zobacz demo najpierw
-            </Link>
+          <Button size="lg" variant="outline" onClick={onScrollToForm} className="h-14 px-8 text-lg gap-2">
+            Umów prywatną prezentację
           </Button>
         </motion.div>
+
+        {/* Micro-copy */}
+        <motion.p
+          className="text-sm text-muted-foreground mb-8"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4 }}
+        >
+          Dołącz w 60 sekund · Nie wymagamy karty kredytowej · Rezygnacja jednym kliknięciem
+        </motion.p>
 
         {/* Trust indicators */}
         <motion.div
@@ -102,7 +71,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 0.6 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.5 }}
         >
           <div className="flex items-center gap-1.5 text-sm">
             <Lock className="w-3.5 h-3.5" />

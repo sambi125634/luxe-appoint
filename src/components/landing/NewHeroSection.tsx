@@ -11,32 +11,6 @@ interface NewHeroSectionProps {
   onScrollToForm: () => void;
 }
 
-const AnimatedSalonCount = () => {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true });
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    const target = 150;
-    const duration = 2000;
-    const step = target / (duration / 16);
-    let current = 0;
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) {
-        setCount(target);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, 16);
-    return () => clearInterval(timer);
-  }, [isInView]);
-
-  return <span ref={ref} className="font-bold text-primary">{count}+ salonów</span>;
-};
-
 export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
@@ -65,7 +39,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              🚀 Jedyny kalendarz z AI dla salonów beauty
+              163 funkcje · 0% prowizji · Made in Poland 🇵🇱
             </Badge>
           </motion.div>
 
@@ -77,24 +51,22 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-              Twój salon rezerwuje, przypomina
+              Ile kosztuje Cię Booksy?
               <br />
-              <span className="text-gradient-luxury">i odzyskuje klientki sam.</span>
-              <br />
-              <span className="text-muted-foreground text-3xl md:text-4xl lg:text-5xl">
-                Bez Booksy. Bez prowizji. Bez chaosu.
-              </span>
+              <span className="text-gradient-luxury">Policz sama.</span>
             </h1>
           </motion.div>
 
-          {/* Subheadline with live counter */}
+          {/* Subheadline */}
           <motion.p
             className="text-lg md:text-xl text-muted-foreground max-w-2xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            Dołącz do <AnimatedSalonCount /> które przestały płacić prowizje.
+            Beauty Calendar to 163 funkcje zarządzania salonem — z jedną różnicą.
+            <br />
+            <span className="font-semibold text-foreground">Zero prowizji. Na zawsze.</span> Płacisz stałą kwotę. Reszta zostaje u Ciebie.
           </motion.p>
 
           {/* CTAs */}
@@ -110,7 +82,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Załóż konto za darmo
+                Zacznij za darmo — bez karty kredytowej
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Button>
@@ -118,29 +90,24 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <Button
               variant="outline"
               size="lg"
-              asChild
               className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
+              onClick={() => {
+                document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" });
+              }}
             >
-              <Link to="/demo">
-                <Play className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Zobacz demo na żywo
-              </Link>
+              Policz ile tracisz na prowizjach ↓
             </Button>
           </motion.div>
 
-          {/* Social proof inline */}
-          <motion.div
+          {/* Micro-copy */}
+          <motion.p
+            className="text-sm text-muted-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.0 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20 backdrop-blur-sm">
-              <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-emerald-600 font-bold text-sm">
-                Zaufało nam już ponad 150+ salonów w całej Polsce
-              </span>
-            </div>
-          </motion.div>
+            Konfiguracja w 15 minut · Rezygnacja jednym kliknięciem
+          </motion.p>
 
           {/* Trust indicators */}
           <motion.div
@@ -151,9 +118,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             {[
               "Bez karty kredytowej",
-              "Gotowe w 5 minut",
-              "0% prowizji — zawsze",
-              "📱 Aplikacja mobilna iOS & Android",
+              "Konfiguracja w 15 minut",
+              "0% prowizji — na zawsze",
+              "🇵🇱 Made in Poland",
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
@@ -162,25 +129,6 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
                 <span>{item}</span>
               </div>
             ))}
-          </motion.div>
-
-          {/* Urgency bar */}
-          <motion.div
-            className="mt-6 flex items-center justify-center gap-3"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.3 }}
-          >
-            <div className="flex -space-x-2">
-              {['AK', 'MW', 'JP', 'KW', 'LS'].map((i, idx) => (
-                <div key={idx} className="w-7 h-7 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-bold text-primary">
-                  {i}
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-muted-foreground">
-              <span className="font-bold text-foreground">23 salony</span>{' '}dołączyły w tym tygodniu
-            </p>
           </motion.div>
         </div>
       </div>

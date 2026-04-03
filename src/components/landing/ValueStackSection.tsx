@@ -11,7 +11,7 @@ const items = [
   { name: "Zarządzanie Magazynem + Receptury", desc: "Stany, dostawy, True Profit na zabieg", value: "197 zł/mies" },
   { name: "Program Poleceń + Google Reviews", desc: "Automatyczne prośby o opinie, kody polecające", value: "147 zł/mies" },
   { name: "Raporty Finansowe + Eksport danych", desc: "VAT, prowizje pracowników, True Profit", value: "97 zł/mies" },
-  { name: "BONUS: Import z Booksy jednym kliknięciem", desc: "Przenieś wszystko w 5 minut", value: "997 zł (jednorazowo)", isBonus: true },
+  { name: "BONUS: Import z Booksy jednym kliknięciem", desc: "Przenieś wszystko w 15 minut", value: "997 zł (jednorazowo)", isBonus: true },
 ];
 
 export const ValueStackSection = () => {
@@ -55,7 +55,7 @@ export const ValueStackSection = () => {
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="text-xs line-through text-muted-foreground">{item.value}</p>
-                <p className="text-xs font-bold text-primary">INCLUDED</p>
+                <p className="text-xs font-bold text-primary">W CENIE</p>
               </div>
             </motion.div>
           ))}
@@ -74,7 +74,7 @@ export const ValueStackSection = () => {
           </p>
           <p className="text-4xl font-black line-through text-muted-foreground mb-2">3 272 zł/mies</p>
           <p className="text-sm text-muted-foreground mb-3">Twoja cena z Beauty Calendar PRO:</p>
-          <p className="text-5xl font-black text-primary mb-2">99 zł/mies</p>
+          <p className="text-5xl font-black text-primary mb-2">149 zł/mies</p>
           <p className="text-sm text-muted-foreground">+ 0 zł prowizji od rezerwacji. Zawsze.</p>
         </motion.div>
       </div>

@@ -20,11 +20,11 @@ export const InteractiveDemoSection = () => {
             Interaktywne demo
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Zobacz sam/sama{" "}
-            <span className="text-gradient-luxury">jak to działa</span>
+            Zobaczysz to co widzą{" "}
+            <span className="text-gradient-luxury">najlepsze właścicielki salonów</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Przetestuj Beauty Calendar bez zakładania konta
+            Intuicyjny panel. Zero szkoleń. Konfiguracja w 15 minut — nawet jeśli ostatnio „coś technicznego" to zmiana hasła do Wi-Fi.
           </p>
         </div>
 

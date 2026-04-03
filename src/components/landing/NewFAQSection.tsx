@@ -10,38 +10,38 @@ import { motion } from "framer-motion";
 const faqs = [
   {
     icon: Users,
-    question: "Ale moje klientki znają mnie z Booksy — nie znajdą mnie tutaj",
-    answer: "Twoje klientki znają CIEBIE, nie Booksy. Wysyłasz im swój link do rezerwacji przez WhatsApp, SMS lub Instagram — i rezerwują u Ciebie bezpośrednio. 93% klientek przechodzi bez problemu, bo rezerwacja jest prostsza niż przez Booksy.",
+    question: "Moje klientki znaj\u0105 mnie z Booksy \u2014 nie znajd\u0105 mnie tutaj?",
+    answer: "Twoje klientki nie szukaj\u0105 Ci\u0119 na Booksy. Szukaj\u0105 Ci\u0119 po nazwie w Google. Beauty Calendar daje Ci w\u0142asny link i widget na stronie, Facebooku i Instagramie. Wy\u015Blij im jedn\u0105 wiadomo\u015B\u0107 z nowym linkiem \u2014 90% przejdzie w ci\u0105gu tygodnia.",
   },
   {
     icon: Percent,
-    question: "Jak to możliwe że 0% prowizji? Gdzie jest haczyk?",
-    answer: "Nie ma haczyka. Zarabiamy na stałym abonamencie (0/99/249 zł miesięcznie), nie na prowizjach. To jest nasz fundamentalny wybór biznesowy — wierzymy że Twoje pieniądze powinny zostać u Ciebie.",
+    question: "Jak to mo\u017Cliwe \u017Ce 0% prowizji? Gdzie jest haczyk?",
+    answer: "Booksy jest marketplace \u2014 \u0142\u0105czy klientki z salonami i bierze procent od ka\u017Cdego po\u0142\u0105czenia. My nie jeste\u015Bmy marketplace. Jeste\u015Bmy narz\u0119dziem \u2014 jak Canva czy Notion. P\u0142acisz za software, nie za swoje klientki.",
   },
   {
     icon: ArrowRightLeft,
     question: "Czy migracja z Booksy jest trudna?",
-    answer: "5 minut. Serio. Mamy jedno-klikowy import z Booksy, Fresha i Versumu. Baza klientek, usługi i grafik przeniosą się automatycznie. Uruchomisz Beauty Calendar jeszcze tego samego dnia.",
+    answer: "Eksportujesz dane jako CSV, importujesz jednym klikni\u0119ciem. Ca\u0142o\u015B\u0107 trwa 10-15 minut. W pakiecie ELITE \u2014 robimy to za Ciebie podczas onboarding callu.",
   },
   {
     icon: ShieldCheck,
-    question: "Czy to jest bezpieczne? Gdzie są moje dane?",
-    answer: "Twoje dane przechowywane są na serwerach w UE, szyfrowane SSL 256-bit, w pełni zgodne z RODO. Masz pełną kontrolę — eksportujesz lub usuwasz dane w dowolnym momencie. To TWOJA baza, nie nasza.",
+    question: "Czy moje dane s\u0105 bezpieczne?",
+    answer: "Serwery w UE, szyfrowanie SSL/TLS, pe\u0142na zgodno\u015B\u0107 z RODO. I co najwa\u017Cniejsze \u2014 to S\u0104 Twoje dane. Mo\u017Cesz je wyeksportowa\u0107 i usun\u0105\u0107 w ka\u017Cdej chwili. W Booksy \u2014 Twoje dane nale\u017C\u0105 do Booksy.",
   },
   {
     icon: Smartphone,
-    question: "Nie jestem techniczna — czy dam radę?",
-    answer: "Jeśli umiesz obsługiwać Instagram — dasz radę z Beauty Calendar. Interfejs jest prostszy niż Booksy. Średni czas konfiguracji to 5 minut. A jeśli utkniesz — nasz support odpowiada w ciągu 2 godzin.",
+    question: "Nie jestem techniczna \u2014 czy dam rad\u0119?",
+    answer: "Je\u015Bli obs\u0142ugujesz Instagram \u2014 dasz rad\u0119 z Beauty Calendar. Konfiguracja trwa 15 minut. Mamy video-poradniki po polsku. A w pakiecie ELITE \u2014 konfigurujemy wszystko za Ciebie.",
   },
   {
     icon: RotateCcw,
-    question: "Co jeśli mi się nie spodoba — mogę zrezygnować?",
-    answer: "W każdej chwili. Bez okresu wypowiedzenia, bez ukrytych opłat. Zabierasz swoją bazę klientek (eksport CSV) i odchodzisz. Ale szczerze? 94% właścicielek zostaje po pierwszym miesiącu.",
+    question: "Co je\u015Bli mi si\u0119 nie spodoba?",
+    answer: "Pakiet FREE jest darmowy na zawsze \u2014 testuj bez limitu czasowego. Pakiety p\u0142atne anulujesz jednym klikni\u0119ciem, bez wypowiedzenia, bez t\u0142umaczenia si\u0119. Twoje dane zostaj\u0105 Twoje.",
   },
   {
     icon: HelpCircle,
     question: "Dlaczego nie znam tej aplikacji?",
-    answer: "Bo nie wydajemy milionów na reklamy jak Booksy. Rosnemy organicznie — przez polecenia zadowolonych właścicielek salonów. To dlatego 150+ salonów już nam zaufało bez wielkich kampanii marketingowych.",
+    answer: "Bo nie wydajemy milion\u00F3w na reklamy. Inwestujemy w produkt \u2014 163 funkcje m\u00F3wi\u0105 same za siebie. Dowiaduj\u0105 si\u0119 o nas od innych w\u0142a\u015Bcicielek salon\u00F3w. Najlepsza rekomendacja nie pochodzi od nas.",
   },
 ];
 
@@ -57,12 +57,9 @@ export const NewFAQSection = () => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Masz pytania?{" "}
-            <span className="text-gradient-luxury">Mamy odpowiedzi.</span>
+            7 pytań, które zadajesz{" "}
+            <span className="text-gradient-luxury">zanim klikniesz „zacznij"</span>
           </h2>
-          <p className="text-lg text-muted-foreground">
-            7 najczęstszych obiekcji — i konkretne odpowiedzi.
-          </p>
         </motion.div>
 
         <Accordion type="single" collapsible className="space-y-4">
