@@ -201,13 +201,29 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
   };
 
   // Build dynamic steps from widget configuration
+  // Check if auto client data is complete (can skip form step)
+  const isAutoDataComplete = useMemo(() => {
+    if (!autoClientData) return false;
+    return (
+      autoClientData.firstName.trim().length >= 2 &&
+      autoClientData.lastName.trim().length >= 2 &&
+      /^[+]?[0-9]{9,15}$/.test(autoClientData.phone.replace(/[\s\-()]/g, "")) &&
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(autoClientData.email.trim()) &&
+      autoClientData.acceptRodo
+    );
+  }, [autoClientData]);
+
   const { steps, stepMapping } = useMemo(() => {
     if (!widgetConfig?.steps) {
-      // When skipIntro, don't include intro in the mapping at all
-      const baseMapping = skipIntro ? ["services", "datetime", "form"] : ["intro", "services", "datetime", "form"];
-      const baseSteps = defaultSteps;
+      let baseMapping = skipIntro ? ["services", "datetime", "form"] : ["intro", "services", "datetime", "form"];
       
-      // Add payment step if enabled
+      // Skip form step when auto client data is complete
+      if (isAutoDataComplete) {
+        baseMapping = baseMapping.filter(s => s !== "form");
+      }
+      
+      const baseSteps = baseMapping.filter(s => s !== "intro").map(s => stepIdToName[s] || s);
+      
       if (isPaymentEnabled) {
         return {
           steps: [...baseSteps, "Płatność"],
@@ -222,9 +238,13 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
       .filter(s => s.enabled && s.id !== "summary" && s.id !== "staff")
       .sort((a, b) => a.order - b.order);
     
-    // Remove intro from mapping when skipIntro
     if (skipIntro) {
       enabledSteps = enabledSteps.filter(s => s.id !== "intro");
+    }
+    
+    // Skip form step when auto client data is complete
+    if (isAutoDataComplete) {
+      enabledSteps = enabledSteps.filter(s => s.id !== "form");
     }
     
     const stepNames = enabledSteps
@@ -233,7 +253,6 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     
     const mapping = enabledSteps.map(s => s.id);
     
-    // Add payment step if enabled and not already in steps
     if (isPaymentEnabled && !mapping.includes("payment")) {
       return {
         steps: [...stepNames, "Płatność"],
@@ -242,7 +261,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
     }
     
     return { steps: stepNames, stepMapping: mapping };
-  }, [widgetConfig?.steps, isPaymentEnabled, skipIntro]);
+  }, [widgetConfig?.steps, isPaymentEnabled, skipIntro, isAutoDataComplete]);
 
   const hasIntro = stepMapping.includes("intro") && !skipIntro;
   const [currentStep, setCurrentStep] = useState(hasIntro ? 0 : 1);
