@@ -26,8 +26,8 @@ const transformations = [
     after: "0% prowizji. 149 zł miesięcznie. Kropka.",
   },
   {
-    before: "„Tracę klientki ale nie wiem dlaczego"",
-    after: "AI mówi kto odchodzi — zanim to zrobi",
+    before: "Trac\u0119 klientki ale nie wiem dlaczego",
+    after: "AI m\u00F3wi kto odchodzi \u2014 zanim to zrobi",
   },
 ];
 

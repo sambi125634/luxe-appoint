@@ -2,11 +2,11 @@ import { X } from "lucide-react";
 import { motion } from "framer-motion";
 
 const painBullets = [
-  "„Dlaczego płacę prowizję od klientki, którą sama pozyskałam?"",
-  "„Nie wiem ile naprawdę zarabiam po odjęciu materiałów i czasu"",
-  "„Klientka nie przyszła — straciłam slot, pieniądze i nerwy"",
-  "„Boję się odejść z Booksy, bo klientki mnie nie znajdą"",
-  "„Prowadzę salon z notatnika i głowy — i codziennie coś mi umyka"",
+  "\u201EDlaczego p\u0142ac\u0119 prowizj\u0119 od klientki, kt\u00F3r\u0105 sama pozyska\u0142am?\u201D",
+  "\u201ENie wiem ile naprawd\u0119 zarabiam po odj\u0119ciu materia\u0142\u00F3w i czasu\u201D",
+  "\u201EKlientka nie przysz\u0142a \u2014 straci\u0142am slot, pieni\u0105dze i nerwy\u201D",
+  "\u201EBoj\u0119 si\u0119 odej\u015B\u0107 z Booksy, bo klientki mnie nie znajd\u0105\u201D",
+  "\u201EProwadz\u0119 salon z notatnika i g\u0142owy \u2014 i codziennie co\u015B mi umyka\u201D",
 ];
 
 interface ProblemSectionProps {
