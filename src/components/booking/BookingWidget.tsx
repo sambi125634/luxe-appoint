@@ -33,6 +33,7 @@ interface BookingWidgetProps {
   salonId?: string;
   onStepChange?: (stepId: string) => void;
   skipIntro?: boolean;
+  autoClientData?: ClientData | null;
 }
 
 interface ServiceVariant {
