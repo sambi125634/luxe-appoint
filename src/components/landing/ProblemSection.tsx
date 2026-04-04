@@ -2,11 +2,11 @@ import { X } from "lucide-react";
 import { motion } from "framer-motion";
 
 const painBullets = [
-  "„Płacę abonament, a do tego prowizję od klientek, które i tak są moje"",
-  "„Moja baza klientek jest na cudzej platformie — nie mam do niej pełnego dostępu"",
-  "„Klientka nie przyszła — straciłam slot, pieniądze i nerwy. Nikt mi w tym nie pomaga"",
-  "„Na marketplace biję się ceną jak na targu — kto taniej, ten wygrywa"",
-  "„Nikt nie pomaga mi zatrzymać klientek po pierwszej wizycie — a tam jest prawdziwy zysk"",
+  "\u201EP\u0142ac\u0119 abonament, a do tego prowizj\u0119 od klientek, kt\u00F3re i tak s\u0105 moje\u201D",
+  "\u201EMoja baza klientek jest na cudzej platformie \u2014 nie mam do niej pe\u0142nego dost\u0119pu\u201D",
+  "\u201EKlientka nie przysz\u0142a \u2014 straci\u0142am slot, pieni\u0105dze i nerwy. Nikt mi w tym nie pomaga\u201D",
+  "\u201ENa marketplace bij\u0119 si\u0119 cen\u0105 jak na targu \u2014 kto taniej, ten wygrywa\u201D",
+  "\u201ENikt nie pomaga mi zatrzyma\u0107 klientek po pierwszej wizycie \u2014 a tam jest prawdziwy zysk\u201D",
 ];
 
 interface ProblemSectionProps {
