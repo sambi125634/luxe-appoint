@@ -3,18 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const comparisonData = [
-  { feature: "Prowizja od rezerwacji", bc: "0%", booksy: "0\u201345% (Boost)", noSystem: "\u2014", highlight: true },
-  { feature: "Koszt podstawowy (miesi\u0119cznie)", bc: "od 99 z\u0142 netto", booksy: "~145 z\u0142 netto", noSystem: "0 z\u0142 (+ chaos)", highlight: true },
-  { feature: "W\u0142asno\u015B\u0107 bazy danych klient\u00F3w", bc: true, booksy: false, noSystem: true, highlight: false },
-  { feature: "Narz\u0119dzia retencji klientek", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "Prowizja od rezerwacji", bc: "0%", booksy: "0–45% (Boost)", noSystem: "—", highlight: true },
+  { feature: "Koszt podstawowy (miesięcznie)", bc: "od 99 zł netto", booksy: "~145 zł netto", noSystem: "0 zł (+ chaos)", highlight: true },
+  { feature: "Własność bazy danych klientów", bc: true, booksy: false, noSystem: true, highlight: false },
+  { feature: "Narzędzia retencji klientek", bc: true, booksy: false, noSystem: false, highlight: false },
   { feature: "Prywatna aplikacja mobilna", bc: true, booksy: false, noSystem: false, highlight: false },
   { feature: "AI Autopilot (12 funkcji)", bc: true, booksy: false, noSystem: false, highlight: false },
   { feature: "Skaner magazynowy (aparat)", bc: true, booksy: false, noSystem: false, highlight: false },
-  { feature: "CRM z histori\u0105 i tagami", bc: true, booksy: "partial", noSystem: false, highlight: false },
+  { feature: "CRM z historią i tagami", bc: true, booksy: "partial", noSystem: false, highlight: false },
   { feature: "True Profit per zabieg", bc: true, booksy: false, noSystem: false, highlight: false },
   { feature: "SMS + email automatyzacja", bc: true, booksy: "partial", noSystem: false, highlight: false },
-  { feature: "W\u0142asna domena rezerwacji", bc: true, booksy: false, noSystem: false, highlight: false },
-  { feature: "\u015Acie\u017Cka Klientki (5 wizyt)", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "Własna domena rezerwacji", bc: true, booksy: false, noSystem: false, highlight: false },
+  { feature: "Ścieżka Klientki (5 wizyt)", bc: true, booksy: false, noSystem: false, highlight: false },
   { feature: "Widget per kampania", bc: true, booksy: false, noSystem: false, highlight: false },
 ];
 
@@ -59,10 +59,10 @@ export const ComparisonSection = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             Beauty Calendar vs. platformy marketplace.{" "}
-            <span className="text-gradient-luxury">Uczciwe por\u00F3wnanie.</span>
+            <span className="text-gradient-luxury">Uczciwe porównanie.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Por\u00F3wnaj fakty \u2014 nie opinie. Ceny oparte na publicznie dost\u0119pnych cennikach.
+            Porównaj fakty — nie opinie. Ceny oparte na publicznie dostępnych cennikach.
           </p>
         </div>
 
@@ -75,12 +75,12 @@ export const ComparisonSection = () => {
                 <th className="py-4 px-4 text-center">
                   <div className="flex flex-col items-center">
                     <Badge className="mb-2 bg-primary text-primary-foreground">
-                      Tw\u00F3j salon, Twoje zasady
+                      Twój salon, Twoje zasady
                     </Badge>
                     <span className="font-bold text-lg text-primary">Beauty Calendar</span>
                   </div>
                 </th>
-                <th className="py-4 px-4 text-center font-semibold text-muted-foreground">B{"\uD83E\uDD21"}SY / Marketplace</th>
+                <th className="py-4 px-4 text-center font-semibold text-muted-foreground">B{"🤡"}SY / Marketplace</th>
                 <th className="py-4 px-4 text-center font-semibold text-muted-foreground">Brak systemu</th>
               </tr>
             </thead>
@@ -127,7 +127,7 @@ export const ComparisonSection = () => {
             <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
               <Check className="w-3 h-3 text-emerald-600" />
             </div>
-            <span>Pe\u0142na funkcjonalno\u015B\u0107</span>
+            <span>Pełna funkcjonalność</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center">
@@ -145,8 +145,8 @@ export const ComparisonSection = () => {
 
         {/* Footer note */}
         <p className="text-center text-xs text-muted-foreground mt-8">
-          Dane por\u00F3wnawcze oparte na publicznie dost\u0119pnych cennikach i regulaminach (stan na 2026). 
-          Prowizja 45% dotyczy us\u0142ugi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
+          Dane porównawcze oparte na publicznie dostępnych cennikach i regulaminach (stan na 2026). 
+          Prowizja 45% dotyczy usługi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
         </p>
       </div>
     </section>

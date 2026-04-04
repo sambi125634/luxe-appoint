@@ -24,7 +24,7 @@ const footerLinks = {
   ],
   legal: [
     { label: "Regulamin", href: "#" },
-    { label: "Polityka prywatno\u015bci", href: "#" },
+    { label: "Polityka prywatności", href: "#" },
     { label: "RODO", href: "#" },
     { label: "Cookies", href: "#" },
   ],
@@ -41,7 +41,7 @@ const FooterLink = ({ link }: { link: { label: string; href: string; soon?: bool
   if (link.soon) {
     return (
       <span className="text-sm text-muted-foreground/50 italic cursor-default">
-        {link.label} <span className="text-[10px]">(Wkr\u00f3tce)</span>
+        {link.label} <span className="text-[10px]">(Wkrótce)</span>
       </span>
     );
   }
@@ -62,8 +62,8 @@ export const NewLandingFooter = () => {
             <Link to="/" className="inline-block mb-4">
               <span className="font-serif text-2xl font-bold text-gradient-luxury">Beauty Calendar</span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-2">System zarz\u0105dzania salonem beauty.</p>
-            <p className="text-sm text-muted-foreground mb-4">0% prowizji \u00b7 Made in Poland \ud83c\uddf5\ud83c\uddf1</p>
+            <p className="text-sm text-muted-foreground mb-2">System zarządzania salonem beauty.</p>
+            <p className="text-sm text-muted-foreground mb-4">0% prowizji · Made in Poland 🇵🇱</p>
 
             <div className="flex gap-3 mb-6">
               {socialLinks.map((social) => (
@@ -76,20 +76,20 @@ export const NewLandingFooter = () => {
             <TooltipProvider>
               <div className="space-y-2">
                 <p className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-                  <Smartphone className="w-3 h-3" />Pobierz aplikacj\u0119
+                  <Smartphone className="w-3 h-3" />Pobierz aplikację
                 </p>
                 <div className="flex gap-2">
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="px-3 py-1.5 bg-muted rounded-md text-xs text-muted-foreground/50 cursor-not-allowed">App Store</div>
                     </TooltipTrigger>
-                    <TooltipContent>Wkr\u00f3tce dost\u0119pne</TooltipContent>
+                    <TooltipContent>Wkrótce dostępne</TooltipContent>
                   </Tooltip>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <div className="px-3 py-1.5 bg-muted rounded-md text-xs text-muted-foreground/50 cursor-not-allowed">Google Play</div>
                     </TooltipTrigger>
-                    <TooltipContent>Wkr\u00f3tce dost\u0119pne</TooltipContent>
+                    <TooltipContent>Wkrótce dostępne</TooltipContent>
                   </Tooltip>
                 </div>
               </div>
@@ -116,7 +116,7 @@ export const NewLandingFooter = () => {
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            \u00a9 {new Date().getFullYear()} Beauty Calendar \u00b7 beauty-funnels.com \u00b7 Wszystkie prawa zastrze\u017cone
+            © {new Date().getFullYear()} Beauty Calendar · beauty-funnels.com · Wszystkie prawa zastrzeżone
           </p>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />

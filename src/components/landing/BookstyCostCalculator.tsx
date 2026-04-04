@@ -33,7 +33,7 @@ export const BookstyCostCalculator = ({ onScrollToForm }: BookstyCostCalculatorP
               <span className="text-primary">marketplace</span>
             </h2>
             <p className="text-muted-foreground">
-              Platformy typu B{"\uD83E\uDD21"}SY pobieraj&#261; do 45% prowizji od nowych klientek z ich systemu. Policz ile to kosztuje Tw&#243;j salon.
+              Platformy typu B{"🤡"}SY pobierają do 45% prowizji od nowych klientek z ich systemu. Policz ile to kosztuje Twój salon.
             </p>
           </div>
 

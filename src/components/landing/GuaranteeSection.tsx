@@ -21,9 +21,9 @@ export const GuaranteeSection = () => {
               <span className="bg-green-500/10 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">
                 GWARANCJA 1
               </span>
-              <h3 className="font-bold text-xl mt-2 mb-2">30 dni bez pyta\u0144 \u2014 zwracamy 100%</h3>
+              <h3 className="font-bold text-xl mt-2 mb-2">30 dni bez pytań — zwracamy 100%</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Je\u015bli z jakiegokolwiek powodu nie jeste\u015b zadowolona w pierwszych 30 dniach PRO/ELITE \u2014 jeden email wystarczy. Pe\u0142ny zwrot. Zero formalno\u015bci.
+                Jeśli z jakiegokolwiek powodu nie jesteś zadowolona w pierwszych 30 dniach PRO/ELITE — jeden email wystarczy. Pełny zwrot. Zero formalności.
               </p>
             </div>
           </div>
@@ -43,11 +43,11 @@ export const GuaranteeSection = () => {
             </div>
             <div>
               <span className="bg-amber-500/10 text-amber-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                GWARANCJA 2 \u2014 ELITE
+                GWARANCJA 2 — ELITE
               </span>
-              <h3 className="font-bold text-xl mt-2 mb-2">Oszcz\u0119d\u017a 10\u00a0000 z\u0142 w 90 dni lub oddamy 3 miesi\u0105ce abonamentu</h3>
+              <h3 className="font-bold text-xl mt-2 mb-2">Oszczędź 10 000 zł w 90 dni lub oddamy 3 miesiące abonamentu</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Je\u015bli w ci\u0105gu 90 dni korzystania z ELITE nie odnotujesz oszcz\u0119dno\u015bci minimum 10\u00a0000 z\u0142 (no-showy + odzyskane klientki + czas), oddamy Ci 3 miesi\u0105ce abonamentu.
+                Jeśli w ciągu 90 dni korzystania z ELITE nie odnotujesz oszczędności minimum 10 000 zł (no-showy + odzyskane klientki + czas), oddamy Ci 3 miesiące abonamentu.
               </p>
               <p className="text-xs text-muted-foreground mt-2 italic">
                 Warunek: uruchomiony Autopilot + skonfigurowany Widget.

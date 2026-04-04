@@ -19,10 +19,10 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Ka\u017cdy dzie\u0144 bez Beauty Calendar
+          Każdy dzień bez Beauty Calendar
           <br />
           <span className="bg-gradient-to-r from-destructive to-amber-500 bg-clip-text text-transparent">
-            to pieni\u0105dze kt\u00f3re mog\u0142a\u015b mie\u0107.
+            to pieniądze które mogłaś mieć.
           </span>
         </motion.h2>
 
@@ -33,7 +33,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          <p>Do\u0142\u0105cz do w\u0142a\u015bcicielek salon\u00f3w kt\u00f3re odzyska\u0142y kontrol\u0119 nad swoim biznesem \u2014 i swoimi klientkami.</p>
+          <p>Dołącz do właścicielek salonów które odzyskały kontrolę nad swoim biznesem — i swoimi klientkami.</p>
         </motion.div>
 
         <motion.div
@@ -44,11 +44,11 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           transition={{ delay: 0.3 }}
         >
           <Button size="lg" onClick={onScrollToForm} className="h-14 px-10 text-lg gap-2 relative overflow-hidden">
-            <span>Zacznij za darmo \u2014 bez karty kredytowej</span>
+            <span>Zacznij za darmo — bez karty kredytowej</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
           <Button size="lg" variant="outline" onClick={onScrollToForm} className="h-14 px-8 text-lg gap-2">
-            Porozmawiajmy najpierw \u2192
+            Porozmawiajmy najpierw →
           </Button>
         </motion.div>
 
@@ -68,7 +68,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
             ))}
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="font-bold text-foreground">23 salony</span> do\u0142\u0105czy\u0142y w tym tygodniu
+            <span className="font-bold text-foreground">23 salony</span> dołączyły w tym tygodniu
           </p>
         </motion.div>
 
@@ -85,7 +85,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           <div className="text-sm font-bold">Przelewy24</div>
           <div className="text-sm font-bold">BLIK</div>
           <div className="flex items-center gap-1.5 text-sm"><CreditCard className="w-3.5 h-3.5" />Bez karty</div>
-          <div className="text-sm">Twoje dane \u2014 zawsze Twoje</div>
+          <div className="text-sm">Twoje dane — zawsze Twoje</div>
         </motion.div>
       </div>
     </section>

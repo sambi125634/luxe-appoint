@@ -42,7 +42,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               variant="outline"
               className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
             >
-              Platforma beauty kt\u00f3ra pracuje \u2014 kiedy Ty nie mo\u017cesz
+              Platforma beauty która pracuje — kiedy Ty nie możesz
             </Badge>
           </motion.div>
 
@@ -54,7 +54,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-              Tw\u00f3j salon rezerwuje, przypomina
+              Twój salon rezerwuje, przypomina
               <br />
               <span className="text-gradient-luxury">i odzyskuje klientki sam.</span>
             </h1>
@@ -70,9 +70,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            AI wype\u0142nia grafik, segreguje klientki, prognozuje przychody i wysy\u0142a komunikacj\u0119 \u2014 automatycznie.
+            AI wypełnia grafik, segreguje klientki, prognozuje przychody i wysyła komunikację — automatycznie.
             <br />
-            <span className="font-semibold text-foreground">Ty zajmujesz si\u0119 zabiegami.</span>
+            <span className="font-semibold text-foreground">Ty zajmujesz się zabiegami.</span>
           </motion.p>
 
           {/* CTAs */}
@@ -88,7 +88,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Zacznij za darmo \u2014 bez karty
+                Zacznij za darmo — bez karty
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Button>
@@ -99,7 +99,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
               onClick={scrollToDemo}
             >
-              Zobacz jak to dzia\u0142a \u2192
+              Zobacz jak to działa →
             </Button>
           </motion.div>
 
@@ -114,7 +114,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               "Bez karty kredytowej",
               "Gotowe w 5 minut",
               "0% prowizji od rezerwacji",
-              "Twoje dane \u2014 zawsze Twoje",
+              "Twoje dane — zawsze Twoje",
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
@@ -144,7 +144,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             </div>
             <p className="text-sm text-muted-foreground">
               <span className="font-bold text-foreground">23 salony</span>{" "}
-              do\u0142\u0105czy\u0142y w tym tygodniu
+              dołączyły w tym tygodniu
             </p>
           </motion.div>
         </div>

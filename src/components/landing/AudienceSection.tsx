@@ -3,54 +3,54 @@ import { motion } from "framer-motion";
 
 const categories = [
   {
-    emoji: "\ud83d\udc85",
-    title: "Paznokcie i d\u0142onie",
-    items: ["Salon paznokci", "Manicure hybrydowy", "Przed\u0142u\u017canie paznokci", "Pedicure leczniczy", "Nail art studio"],
+    emoji: "💅",
+    title: "Paznokcie i dłonie",
+    items: ["Salon paznokci", "Manicure hybrydowy", "Przedłużanie paznokci", "Pedicure leczniczy", "Nail art studio"],
   },
   {
-    emoji: "\u2702\ufe0f",
-    title: "Fryzjerstwo i w\u0142osy",
-    items: ["Salon fryzjerski", "Barber shop", "Koloryzacja i balayage", "Przed\u0142u\u017canie w\u0142os\u00f3w", "Studio stylizacji"],
+    emoji: "✂️",
+    title: "Fryzjerstwo i włosy",
+    items: ["Salon fryzjerski", "Barber shop", "Koloryzacja i balayage", "Przedłużanie włosów", "Studio stylizacji"],
   },
   {
-    emoji: "\u2728",
+    emoji: "✨",
     title: "Kosmetyka i twarz",
     items: ["Gabinet kosmetyczny", "Peeling kawitacyjny", "Mikrodermabrazja", "Oczyszczanie wodorowe", "Lifting twarzy"],
   },
   {
-    emoji: "\ud83e\udee7",
-    title: "Rz\u0119sy i brwi",
-    items: ["Stylizacja rz\u0119s", "Lash lifting", "Laminacja brwi", "Microblading", "PMU i makija\u017c permanentny"],
+    emoji: "🫧",
+    title: "Rzęsy i brwi",
+    items: ["Stylizacja rzęs", "Lash lifting", "Laminacja brwi", "Microblading", "PMU i makijaż permanentny"],
   },
   {
-    emoji: "\u26a1",
+    emoji: "⚡",
     title: "Depilacja",
     items: ["Depilacja laserowa", "Depilacja IPL", "Woskowanie i sugaring", "Studio depilacji"],
   },
   {
-    emoji: "\ud83e\ude7a",
+    emoji: "🩺",
     title: "Medycyna estetyczna",
-    items: ["Gabinet medycyny estetycznej", "Klinika anti-aging", "Mezoterapia", "Botoks i wype\u0142niacze", "Osocze bogatop\u0142ytkowe"],
+    items: ["Gabinet medycyny estetycznej", "Klinika anti-aging", "Mezoterapia", "Botoks i wypełniacze", "Osocze bogatopłytkowe"],
   },
   {
-    emoji: "\ud83d\udc86",
-    title: "Masa\u017c i wellness",
-    items: ["Salon masa\u017cu", "Masa\u017c tajski / leczniczy", "Refleksologia", "Studio wellness i relaksu"],
+    emoji: "💆",
+    title: "Masaż i wellness",
+    items: ["Salon masażu", "Masaż tajski / leczniczy", "Refleksologia", "Studio wellness i relaksu"],
   },
   {
-    emoji: "\ud83c\udf3f",
+    emoji: "🌿",
     title: "SPA i kompleksy",
     items: ["Salon SPA", "Hotel SPA", "Centrum odnowy biologicznej", "Strefa relaksu"],
   },
   {
-    emoji: "\ud83d\udcaa",
-    title: "Sylwetka i cia\u0142o",
-    items: ["Studio modelowania sylwetki", "Kriolipoliza", "Endermologia", "Drena\u017c limfatyczny"],
+    emoji: "💪",
+    title: "Sylwetka i ciało",
+    items: ["Studio modelowania sylwetki", "Kriolipoliza", "Endermologia", "Drenaż limfatyczny"],
   },
   {
-    emoji: "\ud83d\udd2c",
+    emoji: "🔬",
     title: "Specjalistyczne",
-    items: ["Gabinet trychologiczny", "Studio bridal (makija\u017c \u015blubny)", "Gabinet podologiczny", "Studio opalania natryskowego", "Solarium"],
+    items: ["Gabinet trychologiczny", "Studio bridal (makijaż ślubny)", "Gabinet podologiczny", "Studio opalania natryskowego", "Solarium"],
   },
 ];
 
@@ -66,9 +66,9 @@ export const AudienceSection = () => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
-            Beauty Calendar jest dla Ciebie \u2014
+            Beauty Calendar jest dla Ciebie —
             <br />
-            <span className="text-gradient-luxury">niezale\u017cnie od tego czym si\u0119 zajmujesz</span>
+            <span className="text-gradient-luxury">niezależnie od tego czym się zajmujesz</span>
           </h2>
         </motion.div>
 
@@ -101,12 +101,12 @@ export const AudienceSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <p className="font-bold text-lg mb-2">Prowadzisz salon kt\u00f3rego tu nie ma?</p>
+          <p className="font-bold text-lg mb-2">Prowadzisz salon którego tu nie ma?</p>
           <p className="text-muted-foreground text-sm mb-4">
-            Je\u015bli masz klient\u00f3w, terminy i us\u0142ugi \u2014 Beauty Calendar jest dla Ciebie. Dzia\u0142a dla ka\u017cdego salonu us\u0142ugowego w Polsce.
+            Jeśli masz klientów, terminy i usługi — Beauty Calendar jest dla Ciebie. Działa dla każdego salonu usługowego w Polsce.
           </p>
           <Button variant="outline" className="gap-2">
-            Porozmawiajmy \u2192
+            Porozmawiajmy →
           </Button>
         </motion.div>
       </div>
