@@ -69,13 +69,13 @@ const LeadFormSection = () => {
     return (
       <section id="lead-form" className="landing-section-dark landing-section-spacing">
         <div className="max-w-xl mx-auto text-center landing-card-dark p-12">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "rgba(34,197,94,0.1)" }}>
-            <CheckCircle className="w-10 h-10 text-emerald-400" />
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6" style={{ background: "rgba(34,197,94,0.08)" }}>
+            <CheckCircle className="w-10 h-10 text-emerald-500" />
           </div>
-          <h3 className="text-2xl font-bold mb-4" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>
+          <h3 className="text-2xl font-bold mb-4" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>
             {t("leadForm.success")}
           </h3>
-          <p style={{ color: "rgba(245,245,247,0.5)" }}>
+          <p style={{ color: "#6e6e73" }}>
             <a href="/demo" className="text-[#8b5cf6] hover:underline">{t("demo.viewSalonPanel")}</a>
           </p>
         </div>
@@ -84,7 +84,7 @@ const LeadFormSection = () => {
   }
 
   return (
-    <section id="lead-form" className="landing-section-dark landing-section-spacing relative overflow-hidden">
+    <section id="lead-form" className="landing-section-dark landing-section-spacing relative overflow-hidden" style={{ background: "linear-gradient(180deg, #faf9f7, #f5f0ff, #faf9f7)" }}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-[#8b5cf6]/5 blur-[150px]" />
 
       <div className="max-w-2xl mx-auto px-[max(24px,5vw)] relative z-10">
@@ -98,12 +98,12 @@ const LeadFormSection = () => {
               transition={{ duration: 0.3, ease: appleEaseArray }}
               className="text-center landing-card-dark p-8 md:p-12"
             >
-              <h2 className="headline-section mb-2" style={{ color: "#f5f5f7" }}>
+              <h2 className="headline-section mb-2" style={{ color: "#1d1d1f" }}>
                 Zacznij za darmo.
                 <br />
                 <span className="apple-accent-gradient">Bez karty kredytowej.</span>
               </h2>
-              <p className="subheadline mb-8" style={{ color: "rgba(245,245,247,0.5)" }}>
+              <p className="subheadline mb-8" style={{ color: "#6e6e73" }}>
                 Gotowe w 5 minut. Import z Booksy jednym kliknięciem.
               </p>
 
@@ -113,7 +113,7 @@ const LeadFormSection = () => {
                   placeholder="twoj@email.pl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/30"
+                  className="flex-1 h-12 bg-white border-black/10 text-[#1d1d1f] placeholder:text-[#c7c7cc]"
                 />
                 <button
                   className="apple-btn-primary h-12 px-6 flex items-center gap-2 whitespace-nowrap text-sm"
@@ -125,10 +125,10 @@ const LeadFormSection = () => {
                 </button>
               </div>
 
-              <div className="flex flex-wrap justify-center gap-4 text-sm" style={{ color: "rgba(245,245,247,0.4)" }}>
+              <div className="flex flex-wrap justify-center gap-4 text-sm" style={{ color: "#86868b" }}>
                 {["Bez karty", "Anuluj kiedy chcesz", "Setup 5 min"].map((item, i) => (
                   <div key={i} className="flex items-center gap-1.5">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <Check className="w-3.5 h-3.5 text-emerald-500" />
                     {item}
                   </div>
                 ))}
@@ -145,11 +145,11 @@ const LeadFormSection = () => {
             >
               <div className="text-center mb-6">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "rgba(139,92,246,0.15)", color: "#8b5cf6" }}>2</div>
-                  <span className="text-sm" style={{ color: "rgba(245,245,247,0.4)" }}>z 2 — jeszcze chwila!</span>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ background: "rgba(139,92,246,0.1)", color: "#8b5cf6" }}>2</div>
+                  <span className="text-sm" style={{ color: "#86868b" }}>z 2 — jeszcze chwila!</span>
                 </div>
-                <p className="text-sm" style={{ color: "rgba(245,245,247,0.4)" }}>
-                  Email: <strong style={{ color: "#f5f5f7" }}>{email}</strong>
+                <p className="text-sm" style={{ color: "#86868b" }}>
+                  Email: <strong style={{ color: "#1d1d1f" }}>{email}</strong>
                   <button onClick={() => setStep(1)} className="ml-2 text-[#8b5cf6] hover:underline text-xs">zmień</button>
                 </p>
               </div>
@@ -159,15 +159,15 @@ const LeadFormSection = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="first_name" render={({ field }) => (
                       <FormItem>
-                        <FormLabel style={{ color: "rgba(245,245,247,0.7)" }}>{t("leadForm.firstName")} *</FormLabel>
-                        <FormControl><Input placeholder="Anna" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-white/30" /></FormControl>
+                        <FormLabel style={{ color: "#6e6e73" }}>{t("leadForm.firstName")} *</FormLabel>
+                        <FormControl><Input placeholder="Anna" {...field} className="bg-white border-black/10 text-[#1d1d1f] placeholder:text-[#c7c7cc]" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="phone" render={({ field }) => (
                       <FormItem>
-                        <FormLabel style={{ color: "rgba(245,245,247,0.7)" }}>{t("leadForm.phone")} *</FormLabel>
-                        <FormControl><Input type="tel" placeholder="500 123 456" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-white/30" /></FormControl>
+                        <FormLabel style={{ color: "#6e6e73" }}>{t("leadForm.phone")} *</FormLabel>
+                        <FormControl><Input type="tel" placeholder="500 123 456" {...field} className="bg-white border-black/10 text-[#1d1d1f] placeholder:text-[#c7c7cc]" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
@@ -175,24 +175,24 @@ const LeadFormSection = () => {
                   <div className="grid md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="salon_name" render={({ field }) => (
                       <FormItem>
-                        <FormLabel style={{ color: "rgba(245,245,247,0.7)" }}>{t("leadForm.salonName")} *</FormLabel>
-                        <FormControl><Input placeholder="Studio Urody Anna" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-white/30" /></FormControl>
+                        <FormLabel style={{ color: "#6e6e73" }}>{t("leadForm.salonName")} *</FormLabel>
+                        <FormControl><Input placeholder="Studio Urody Anna" {...field} className="bg-white border-black/10 text-[#1d1d1f] placeholder:text-[#c7c7cc]" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                     <FormField control={form.control} name="city" render={({ field }) => (
                       <FormItem>
-                        <FormLabel style={{ color: "rgba(245,245,247,0.7)" }}>{t("leadForm.city")} *</FormLabel>
-                        <FormControl><Input placeholder="Warszawa" {...field} className="bg-white/5 border-white/10 text-white placeholder:text-white/30" /></FormControl>
+                        <FormLabel style={{ color: "#6e6e73" }}>{t("leadForm.city")} *</FormLabel>
+                        <FormControl><Input placeholder="Warszawa" {...field} className="bg-white border-black/10 text-[#1d1d1f] placeholder:text-[#c7c7cc]" /></FormControl>
                         <FormMessage />
                       </FormItem>
                     )} />
                   </div>
                   <FormField control={form.control} name="team_size" render={({ field }) => (
                     <FormItem>
-                      <FormLabel style={{ color: "rgba(245,245,247,0.7)" }}>{t("leadForm.teamSize")} *</FormLabel>
+                      <FormLabel style={{ color: "#6e6e73" }}>{t("leadForm.teamSize")} *</FormLabel>
                       <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl><SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="Wybierz wielkość zespołu" /></SelectTrigger></FormControl>
+                        <FormControl><SelectTrigger className="bg-white border-black/10 text-[#1d1d1f]"><SelectValue placeholder="Wybierz wielkość zespołu" /></SelectTrigger></FormControl>
                         <SelectContent>
                           <SelectItem value="1">{t("leadForm.teamSizeOptions.solo")}</SelectItem>
                           <SelectItem value="2-5">{t("leadForm.teamSizeOptions.small")}</SelectItem>
@@ -207,7 +207,7 @@ const LeadFormSection = () => {
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                       <FormControl><Checkbox checked={field.value} onCheckedChange={field.onChange} /></FormControl>
                       <div className="space-y-1 leading-none">
-                        <FormLabel className="text-sm font-normal" style={{ color: "rgba(245,245,247,0.5)" }}>{t("leadForm.consent")} *</FormLabel>
+                        <FormLabel className="text-sm font-normal" style={{ color: "#86868b" }}>{t("leadForm.consent")} *</FormLabel>
                         <FormMessage />
                       </div>
                     </FormItem>

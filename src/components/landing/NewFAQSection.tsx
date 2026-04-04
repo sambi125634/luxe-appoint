@@ -43,7 +43,7 @@ export const NewFAQSection = () => {
               >
                 <AccordionTrigger className="hover:no-underline py-5">
                   <div className="flex items-center gap-4 text-left">
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(139,92,246,0.08)" }}>
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background: "rgba(139,92,246,0.06)" }}>
                       <faq.icon className="w-5 h-5 text-[#8b5cf6]" />
                     </div>
                     <span className="font-semibold text-base" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>{faq.question}</span>
@@ -57,8 +57,6 @@ export const NewFAQSection = () => {
           ))}
         </Accordion>
       </div>
-
-      <div className="h-32 section-fade-to-dark mt-16" />
     </section>
   );
 };

@@ -157,39 +157,45 @@
   }
 }
 
-/* ─── Apple-inspired Landing Page Styles ─── */
+/* ─── Premium Light Landing Page Styles ─── */
 
 .landing-section-dark {
-  background-color: #000000;
-  color: #f5f5f7;
-}
-
-.landing-section-dark-2 {
-  background-color: #0a0a0a;
-  color: #f5f5f7;
-}
-
-.landing-section-dark-3 {
-  background-color: #111111;
-  color: #f5f5f7;
-}
-
-.landing-section-dark-4 {
-  background-color: #1a1a1a;
-  color: #f5f5f7;
-}
-
-.landing-section-light {
-  background-color: #f5f5f7;
+  background-color: #faf9f7;
   color: #1d1d1f;
 }
 
+.landing-section-dark-2 {
+  background-color: #f5f3f0;
+  color: #1d1d1f;
+}
+
+.landing-section-dark-3 {
+  background-color: #f0eeeb;
+  color: #1d1d1f;
+}
+
+.landing-section-dark-4 {
+  background-color: #f5f3f0;
+  color: #1d1d1f;
+}
+
+.landing-section-light {
+  background-color: #ffffff;
+  color: #1d1d1f;
+}
+
+/* Premium violet accent section */
+.landing-section-accent {
+  background: linear-gradient(135deg, #2d1b4e, #1a0a2e);
+  color: #f5f5f7;
+}
+
 .landing-text-muted-dark {
-  color: rgba(245, 245, 247, 0.7);
+  color: #6e6e73;
 }
 
 .landing-text-subtle-dark {
-  color: rgba(245, 245, 247, 0.4);
+  color: #86868b;
 }
 
 .landing-text-muted-light {
@@ -197,9 +203,10 @@
 }
 
 .landing-card-dark {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 20px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
 }
 
 .landing-card-light {
@@ -210,15 +217,16 @@
 }
 
 .landing-card-dark:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  border-color: rgba(139, 92, 246, 0.15);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.08);
 }
 
 .landing-card-light:hover {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Headline typography - Apple-style */
+/* Headline typography */
 .headline-hero {
   font-family: 'Playfair Display', serif;
   font-size: clamp(48px, 8vw, 96px);
@@ -265,7 +273,7 @@
   padding-bottom: clamp(80px, 12vh, 160px);
 }
 
-/* Apple accent gradient */
+/* Accent gradient */
 .apple-accent-gradient {
   background: linear-gradient(135deg, #8b5cf6, #ec4899);
   -webkit-background-clip: text;
@@ -275,24 +283,26 @@
 
 /* Section transition gradients */
 .section-fade-to-light {
-  background: linear-gradient(to bottom, transparent, #f5f5f7);
+  background: linear-gradient(to bottom, transparent, #ffffff);
 }
 
 .section-fade-to-dark {
-  background: linear-gradient(to bottom, transparent, #000000);
+  background: linear-gradient(to bottom, transparent, #faf9f7);
 }
 
-/* Apple-style buttons */
+/* Premium buttons */
 .apple-btn-primary {
   @apply font-semibold rounded-full transition-all duration-200;
-  background: #f5f5f7;
-  color: #1d1d1f;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  color: #ffffff;
   padding: 14px 28px;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
 }
 
 .apple-btn-primary:hover {
-  background: rgba(245, 245, 247, 0.9);
+  background: linear-gradient(135deg, #7c3aed, #6d28d9);
   transform: scale(1.02);
+  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
 }
 
 .apple-btn-primary:active {
@@ -302,14 +312,14 @@
 .apple-btn-secondary-dark {
   @apply font-semibold rounded-full transition-all duration-200;
   background: transparent;
-  color: #f5f5f7;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #1d1d1f;
+  border: 1px solid rgba(0, 0, 0, 0.15);
   padding: 14px 28px;
-  backdrop-filter: blur(8px);
 }
 
 .apple-btn-secondary-dark:hover {
-  border-color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #8b5cf6;
 }
 
 .apple-btn-secondary-light {
@@ -321,7 +331,8 @@
 }
 
 .apple-btn-secondary-light:hover {
-  border-color: rgba(0, 0, 0, 0.4);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #8b5cf6;
 }
 
 @layer components {

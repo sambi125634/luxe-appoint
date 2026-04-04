@@ -55,15 +55,15 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
   ];
 
   return (
-    <section id="pricing" className="landing-section-dark landing-section-spacing">
+    <section id="pricing" className="landing-section-dark landing-section-spacing" style={{ background: "linear-gradient(180deg, #faf9f7 0%, #f5f0ff 50%, #faf9f7 100%)" }}>
       <div className="max-w-[1200px] mx-auto px-[max(24px,5vw)]">
         <AnimatedHeadline className="text-center mb-10">
-          <h2 className="headline-section mb-4" style={{ color: "#f5f5f7" }}>
+          <h2 className="headline-section mb-4" style={{ color: "#1d1d1f" }}>
             Prosta cena. Zero prowizji.
             <br />
             <span className="apple-accent-gradient">Pełna kontrola nad Twoim biznesem.</span>
           </h2>
-          <p className="subheadline max-w-2xl mx-auto" style={{ color: "rgba(245,245,247,0.6)" }}>
+          <p className="subheadline max-w-2xl mx-auto" style={{ color: "#6e6e73" }}>
             Zacznij za darmo. Przejdź na PRO gdy będziesz gotowa. Żadnych ukrytych opłat.
           </p>
         </AnimatedHeadline>
@@ -72,13 +72,13 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
         <div className="flex items-center justify-center gap-4 mb-14">
           <button
             onClick={() => setIsAnnual(false)}
-            className={cn("text-sm font-medium px-4 py-2 rounded-full transition-all", !isAnnual ? "bg-white text-black" : "text-white/50")}
+            className={cn("text-sm font-medium px-4 py-2 rounded-full transition-all", !isAnnual ? "bg-[#8b5cf6] text-white" : "text-[#6e6e73]")}
           >
             Miesięcznie
           </button>
           <button
             onClick={() => setIsAnnual(true)}
-            className={cn("text-sm font-medium px-4 py-2 rounded-full transition-all", isAnnual ? "bg-white text-black" : "text-white/50")}
+            className={cn("text-sm font-medium px-4 py-2 rounded-full transition-all", isAnnual ? "bg-[#8b5cf6] text-white" : "text-[#6e6e73]")}
           >
             Rocznie (-20%)
           </button>
@@ -95,8 +95,8 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           {plans.map((plan, index) => (
             <motion.div key={index} variants={cardVariants}>
               <div className={cn(
-                "landing-card-dark p-8 h-full flex flex-col relative overflow-hidden transition-all duration-300",
-                plan.popular && "ring-2 ring-[#8b5cf6] scale-[1.02]"
+                "bg-white rounded-[20px] p-8 h-full flex flex-col relative overflow-hidden transition-all duration-300 border",
+                plan.popular ? "ring-2 ring-[#8b5cf6] scale-[1.02] border-[#8b5cf6]/20 shadow-lg shadow-[#8b5cf6]/10" : "border-black/6 shadow-sm"
               )}>
                 {plan.popular && (
                   <div className="absolute top-0 left-0 right-0 text-center py-1.5 text-xs font-semibold" style={{ background: "#8b5cf6", color: "#fff" }}>
@@ -111,32 +111,32 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
 
                 <div className={cn("text-center", (plan.popular || plan.badge) && "pt-8")}>
                   <div className="flex justify-center mb-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: plan.popular ? "rgba(139,92,246,0.15)" : "rgba(255,255,255,0.04)" }}>
-                      <plan.icon className="w-6 h-6" style={{ color: plan.popular ? "#8b5cf6" : "rgba(245,245,247,0.4)" }} />
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: plan.popular ? "rgba(139,92,246,0.1)" : "#faf9f7" }}>
+                      <plan.icon className="w-6 h-6" style={{ color: plan.popular ? "#8b5cf6" : "#86868b" }} />
                     </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-4" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>{plan.name}</h3>
+                  <h3 className="text-xl font-bold mb-4" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>{plan.name}</h3>
                   <div className="mb-2">
-                    <span className="text-4xl font-bold" style={{ color: "#f5f5f7", fontFamily: "'Playfair Display', serif" }}>{plan.price}</span>
-                    <span className="text-sm" style={{ color: "rgba(245,245,247,0.4)" }}> {plan.period}</span>
-                    {plan.setupFee && <span className="text-sm block mt-1" style={{ color: "rgba(245,245,247,0.4)" }}>+ {plan.setupPrice} jednorazowy onboarding</span>}
+                    <span className="text-4xl font-bold" style={{ color: "#1d1d1f", fontFamily: "'Playfair Display', serif" }}>{plan.price}</span>
+                    <span className="text-sm" style={{ color: "#86868b" }}> {plan.period}</span>
+                    {plan.setupFee && <span className="text-sm block mt-1" style={{ color: "#86868b" }}>+ {plan.setupPrice} jednorazowy onboarding</span>}
                   </div>
-                  <p className="text-sm mb-2" style={{ color: "rgba(245,245,247,0.5)" }}>{plan.description}</p>
-                  {plan.savings && <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.1)", color: "#34d399" }}>{plan.savings}</span>}
+                  <p className="text-sm mb-2" style={{ color: "#6e6e73" }}>{plan.description}</p>
+                  {plan.savings && <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(34,197,94,0.08)", color: "#16a34a" }}>{plan.savings}</span>}
                 </div>
 
                 <div className="flex-1 mt-6">
                   <ul className="space-y-3 mb-4">
                     {plan.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm" style={{ color: "rgba(245,245,247,0.7)" }}>
-                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" /><span>{f}</span>
+                      <li key={i} className="flex items-start gap-2 text-sm" style={{ color: "#6e6e73" }}>
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /><span>{f}</span>
                       </li>
                     ))}
                   </ul>
                   {plan.limitations && (
-                    <div className="pt-3" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-                      <p className="text-xs font-medium mb-2" style={{ color: "rgba(245,245,247,0.3)" }}>Nie zawiera:</p>
-                      {plan.limitations.map((lim, i) => <p key={i} className="text-xs mb-1" style={{ color: "rgba(245,245,247,0.2)" }}>— {lim}</p>)}
+                    <div className="pt-3" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+                      <p className="text-xs font-medium mb-2" style={{ color: "#86868b" }}>Nie zawiera:</p>
+                      {plan.limitations.map((lim, i) => <p key={i} className="text-xs mb-1" style={{ color: "#c7c7cc" }}>— {lim}</p>)}
                     </div>
                   )}
                 </div>
@@ -173,11 +173,11 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3, ease: appleEaseArray }}
         >
-          <div className="inline-flex items-center gap-3 landing-card-dark px-8 py-4">
+          <div className="inline-flex items-center gap-3 bg-white rounded-[20px] border border-black/6 shadow-sm px-8 py-4">
             <Percent className="w-5 h-5 text-[#8b5cf6]" />
-            <p className="font-bold text-lg" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>0% prowizji od rezerwacji — <span style={{ color: "#8b5cf6" }}>zawsze.</span></p>
+            <p className="font-bold text-lg" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>0% prowizji od rezerwacji — <span style={{ color: "#8b5cf6" }}>zawsze.</span></p>
           </div>
-          <p className="text-sm mt-3" style={{ color: "rgba(245,245,247,0.4)" }}>
+          <p className="text-sm mt-3" style={{ color: "#86868b" }}>
             W żadnym pakiecie nie pobieramy prowizji od wizyt Twoich klientek. Nigdy.
           </p>
         </motion.div>

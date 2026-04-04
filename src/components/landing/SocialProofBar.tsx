@@ -43,10 +43,9 @@ export const SocialProofBar = () => {
   const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   return (
-    <section ref={ref} className="landing-section-dark-2 landing-section-spacing" style={{ paddingTop: "clamp(40px, 6vh, 80px)", paddingBottom: "clamp(40px, 6vh, 80px)" }}>
+    <section ref={ref} className="landing-section-dark landing-section-spacing" style={{ paddingTop: "clamp(40px, 6vh, 80px)", paddingBottom: "clamp(40px, 6vh, 80px)" }}>
       <div className="max-w-[1200px] mx-auto px-[max(24px,5vw)]">
-        {/* Separator */}
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-12" />
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#8b5cf6]/15 to-transparent mb-12" />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
@@ -58,17 +57,17 @@ export const SocialProofBar = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: index * 0.1, ease: appleEaseArray }}
             >
-              <div className="text-4xl md:text-5xl font-bold mb-2" style={{ color: "#f5f5f7", fontFamily: "'Playfair Display', serif" }}>
+              <div className="text-4xl md:text-5xl font-bold mb-2 apple-accent-gradient" style={{ fontFamily: "'Playfair Display', serif" }}>
                 <CountUp target={stat.value} suffix={stat.suffix} isInView={isInView} />
               </div>
-              <div className="text-sm landing-text-subtle-dark">
+              <div className="text-sm" style={{ color: "#86868b" }}>
                 {stat.label}
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mt-12" />
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-[#8b5cf6]/15 to-transparent mt-12" />
       </div>
     </section>
   );
