@@ -6,7 +6,7 @@ const steps = [
   {
     icon: CalendarCheck,
     title: "Klientka rezerwuje",
-    description: "Widget na Twojej stronie, Instagramie lub przez link w bio. Bez telefonu. Bez „sprawdzę i oddzwonię".",
+    description: "Widget na Twojej stronie, Instagramie lub przez link w bio. Bez telefonu. Bez \u201Esprawdzę i oddzwonię\u201D.",
   },
   {
     icon: Bell,
