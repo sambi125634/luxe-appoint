@@ -16,7 +16,7 @@ const steps = [
   {
     icon: RotateCcw,
     title: "Po wizycie — sekwencja powrotu",
-    description: "Nie „dziękuję za wizytę". System wysyła spersonalizowaną ofertę kolejnej wizyty. W optymalnym momencie. Kiedy jest gotowa wrócić.",
+    description: "Nie \u201Edziękuję za wizytę\u201D. System wysyła spersonalizowaną ofertę kolejnej wizyty. W optymalnym momencie. Kiedy jest gotowa wrócić.",
   },
   {
     icon: Heart,
