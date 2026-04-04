@@ -93,7 +93,7 @@ const features = [
     icon: ShieldAlert,
     title: "AI Retencja — strefy zagrożenia",
     description:
-      "System dzieli klientów na strefy: Aktywna, Uwaga, Ryzyko, Krytyczna, Utracona. Dla każdej strefy masz gotowe sekwencje reaktywacyjne. AI wykrywa kto odchodzi i działa zanim będzie za późno.",
+      "Widzisz od razu kto odchodzi — strefy: Aktywna, Uwaga, Ryzyko, Krytyczna, Utracona. Dla każdej strefy masz gotowe sekwencje reaktywacyjne. Działasz zanim będzie za późno.",
     accent: "from-red-500/20 to-red-500/5",
     iconColor: "text-red-500",
   },
