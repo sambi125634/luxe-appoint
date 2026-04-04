@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { LandingNavbar, LeadFormSection } from "@/components/landing";
+import { TopBanner } from "@/components/landing/TopBanner";
 import { NewHeroSection } from "@/components/landing/NewHeroSection";
 import { SocialProofBar } from "@/components/landing/SocialProofBar";
 
@@ -29,6 +30,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <TopBanner />
       <LandingNavbar onScrollToForm={scrollToForm} />
 
       <main>

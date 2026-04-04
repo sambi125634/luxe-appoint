@@ -10,13 +10,13 @@ const steps = [
   },
   {
     icon: Bell,
-    title: "System przypomina",
-    description: "24h przed wizytą — SMS. 2h przed — push. Zero no-showów od tych które dostały przypomnienie. (Nasze dane: -67% no-showów po pierwszym miesiącu)",
+    title: "Twoje klientki dostają przypomnienie",
+    description: "24h przed wizytą — SMS. 2h przed — push. Zero no-showów od tych które dostały przypomnienie. (-67% no-showów po pierwszym miesiącu)",
   },
   {
     icon: RotateCcw,
     title: "Po wizycie — sekwencja powrotu",
-    description: "Nie \u201Edziękuję za wizytę\u201D. System wysyła spersonalizowaną ofertę kolejnej wizyty. W optymalnym momencie. Kiedy jest gotowa wrócić.",
+    description: 'Nie "dziękuję za wizytę". Twoja klientka dostaje spersonalizowaną ofertę kolejnej wizyty. W optymalnym momencie. Kiedy jest gotowa wrócić.',
   },
   {
     icon: Heart,

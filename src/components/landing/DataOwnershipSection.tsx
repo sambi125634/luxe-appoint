@@ -44,8 +44,8 @@ export const DataOwnershipSection = () => {
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         >
           <p className="text-xl md:text-2xl font-serif leading-relaxed">
-            <span className="text-primary font-bold">Beauty Calendar</span> buduje{" "}
-            <span className="text-primary">Twoją</span> bazę.
+            <span className="text-primary font-bold">Twój salon</span> buduje{" "}
+            <span className="text-primary">swoją</span> bazę.
             <br />
             Każda klientka. Każda wizyta. Każdy kontakt.
             <br />

@@ -61,7 +61,7 @@ const features = [
     icon: Users,
     title: "Grupy zakupowe klientów",
     description:
-      "AI automatycznie segreguje klientów wg preferencji: VIP Shopper, Stała, Sezonowa, Odkrywczyni. Wiesz komu zaproponować upsell, a kogo reaktywować — zanim odejdzie.",
+      "Wiesz od razu: kto jest VIP, kto stała, kto sezonowa, kto odkrywczyni. Wiesz komu zaproponować upsell, a kogo reaktywować — zanim odejdzie.",
     accent: "from-indigo-500/20 to-indigo-500/5",
     iconColor: "text-indigo-500",
   },
@@ -93,7 +93,7 @@ const features = [
     icon: ShieldAlert,
     title: "AI Retencja — strefy zagrożenia",
     description:
-      "System dzieli klientów na strefy: Aktywna, Uwaga, Ryzyko, Krytyczna, Utracona. Dla każdej strefy masz gotowe sekwencje reaktywacyjne. AI wykrywa kto odchodzi i działa zanim będzie za późno.",
+      "Widzisz od razu kto odchodzi — strefy: Aktywna, Uwaga, Ryzyko, Krytyczna, Utracona. Dla każdej strefy masz gotowe sekwencje reaktywacyjne. Działasz zanim będzie za późno.",
     accent: "from-red-500/20 to-red-500/5",
     iconColor: "text-red-500",
   },
@@ -101,7 +101,7 @@ const features = [
     icon: CreditCard,
     title: "Auto-zaliczki dla no-showów",
     description:
-      "Klient nie przyszedł 2 razy? Przy trzeciej rezerwacji system automatycznie wymaga zaliczki. Tylko od tych, którzy nie przychodzą — reszta rezerwuje normalnie. Zero ręcznej konfiguracji.",
+      "Klientka nie przyszła 2 razy? Przy trzeciej rezerwacji — zaliczka. Automatycznie. Tylko od tych, które nie przychodzą — reszta rezerwuje normalnie. Zero ręcznej konfiguracji.",
     accent: "from-fuchsia-500/20 to-fuchsia-500/5",
     iconColor: "text-fuchsia-500",
   },
@@ -146,12 +146,12 @@ export const GameChangerFeaturesSection = () => {
             🚀 To zmienia zasady gry
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">
-            14 funkcji, których{" "}
-            <span className="text-primary">nie znajdziesz nigdzie indziej</span>
+            14 sposobów w jakie{" "}
+            <span className="text-primary">Twój salon zarabia więcej</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Każda z tych funkcji sama w sobie jest warta więcej niż cały
-            abonament. Razem tworzą system, który pracuje za Ciebie 24/7.
+            abonament. Razem sprawiają że Twój salon zarabia nawet gdy śpisz.
           </p>
         </motion.div>
 

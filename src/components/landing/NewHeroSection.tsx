@@ -64,7 +64,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground font-normal">
-              Beauty Calendar robi to za Ciebie. Automatycznie. Każdego dnia.
+              Twój salon rezerwuje, przypomina i odzyskuje klientki sam. Każdego dnia.
             </p>
           </motion.div>
 
