@@ -14,7 +14,7 @@ const painCards = [
   {
     icon: "🪑",
     headline: "Pusty fotel. Znowu.",
-    desc: "Klientka nie przyszła bez słowa. Termin przepadł. 200–400 zł wyparowało. Przy 3–4 no-showach tygodniowo to nawet 60\u00a0000 zł straty rocznie.",
+    desc: "Klientka nie przyszła bez słowa. Termin przepadł. 200–400 zł wyparowało. Przy 3–4 no-showach tygodniowo to nawet 60 000 zł straty rocznie.",
   },
   {
     icon: "📊",
@@ -63,7 +63,7 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
           </h2>
 
           <p className="subheadline" style={{ color: "rgba(245,245,247,0.6)" }}>
-            Większość właścicielek salonów traci od <strong style={{ color: "#f5f5f7" }}>15\u00a0000</strong> do <strong style={{ color: "#f5f5f7" }}>60\u00a0000 zł rocznie</strong> — nie dlatego że źle pracują. Tylko dlatego że nie mają odpowiednich narzędzi.
+            Większość właścicielek salonów traci od <strong style={{ color: "#f5f5f7" }}>15 000</strong> do <strong style={{ color: "#f5f5f7" }}>60 000 zł rocznie</strong> — nie dlatego że źle pracują. Tylko dlatego że nie mają odpowiednich narzędzi.
           </p>
         </AnimatedHeadline>
 
