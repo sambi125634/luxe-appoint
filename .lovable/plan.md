@@ -1,46 +1,36 @@
 
 
-## Plan: Quiz-kalkulator zamiast sliderów w ProblemSection
+## Plan: Dodanie nowych sekcji (System Flow + Data Ownership) obok istniejących
 
-### Koncept
-Zastąpienie obecnego kalkulatora sliderowego 3-krokowym quizem z przyciskami wyboru. Pain cards na górze zostają bez zmian. Kalkulator poniżej zmienia się w interaktywny quiz.
+Dodajemy dwa nowe komponenty **obok** istniejących `GameChangerFeaturesSection` i `OwnYourClientsSection` — nic nie zastępujemy ani nie usuwamy.
 
-### Mechanika quizu
+### Nowe pliki
 
-**Krok 1:** "Ile klientek odwiedziło Twój salon w ostatnim roku?"
-- Przyciski: `do 50` (wartość: 40) / `50–150` (100) / `150–300` (225) / `300+` (350)
+| Plik | Opis |
+|------|------|
+| `src/components/landing/SystemFlowSection.tsx` | 4-krokowy flow z pionową connecting line (rezerwacja → przypomnienie → sekwencja → powrót). Eyebrow "Jak to działa", headline, kroki z `framer-motion` stagger, CTA na dole. |
+| `src/components/landing/DataOwnershipSection.tsx` | Czarne tło (`bg-black`), biały tekst serif, przekaz o utracie kontroli na marketplace + odpowiedź Beauty Calendar. Separator `border-white/20`, kluczowe frazy w `text-primary`. |
 
-**Krok 2:** "Ile z nich wróciło więcej niż raz?"
-- Przyciski: `mniej niż 30%` / `30–50%` / `50–70%` / `ponad 70%`
-
-**Krok 3:** "Jak często klientka nie stawiła się bez odwołania?"
-- Przyciski: `rzadko` (1/mies) / `1–2× mies` / `3–5× mies` / `więcej` (7/mies)
-
-**Logika wyniku:**
-- Utracone klientki = total × (1 - retentionRate) × avgVisitValue(200zł) × 12
-- No-show straty = noShowFreq × 280zł × 12
-- Łączna strata roczna = suma
-
-**Porównania kontekstowe** (pod wynikiem):
-- `X` rat kredytowych (rata = 1 500 zł)
-- `Y` wakacyjnych wyjazdów (wyjazd = 4 000 zł)
-- `Z` miesięcy spokoju finansowego
-
-### UI/UX
-
-- Progres: 3 kropki/kreski na górze quizu pokazujące aktualny krok
-- Każdy krok z animacją `framer-motion` (fade + slide)
-- Przyciski: duże, `rounded-xl`, hover z `border-primary`, po kliknięciu `bg-primary text-white`
-- Po wybraniu odpowiedzi — automatyczne przejście do następnego kroku (300ms delay)
-- Wynik: animowany CountUp, duża czerwona kwota, porównania poniżej
-- Przycisk "Wróć" na krokach 2-3
-- CTA na końcu: "Odzyskaj te pieniądze — zacznij za darmo"
-
-### Zmiany techniczne
+### Zmiany w istniejących plikach
 
 | Plik | Co |
 |------|----|
-| `ProblemSection.tsx` | Usunięcie sliderów, dodanie stanu quizu (`step`, `answers`), 3 ekrany pytań z przyciskami, ekran wyniku z obliczeniami i porównaniami. Pain cards zostają. |
+| `src/pages/Index.tsx` | Import obu nowych komponentów. Wstawienie `<SystemFlowSection />` tuż pod `<GameChangerFeaturesSection />` i `<DataOwnershipSection />` tuż pod `<OwnYourClientsSection />`. Istniejące sekcje zostają bez zmian. |
 
-Jeden plik do edycji — cała zmiana w `ProblemSection.tsx`.
+### Detale wizualne
+
+**SystemFlowSection:**
+- Pionowa gradient linia `from-primary to-primary/20` łącząca 4 kroki
+- Każdy krok: numerowana kropka (`bg-primary`) + tytuł bold + opis muted
+- Stagger delay `index * 0.15`
+- CTA: "Chcę taki system — zaczynam za darmo"
+
+**DataOwnershipSection:**
+- `bg-black text-white`, `max-w-3xl`, tekst centrowany
+- Duży serif font, `leading-relaxed`
+- Separator: `border-t border-white/20`
+- Dolna część: "Beauty Calendar buduje Twoją bazę" z `text-primary` na kluczowych frazach
+- Małym: "Eksportujesz kiedy chcesz..."
+
+Trzy pliki do edycji/utworzenia. Zero usunięć.
 
