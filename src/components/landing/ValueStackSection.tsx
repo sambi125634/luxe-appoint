@@ -1,5 +1,6 @@
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
+import { AnimatedHeadline, appleEaseArray } from "@/components/ui/AnimatedSection";
 
 const items = [
   { name: "Inteligentny Asystent Grafiku — AI wypełnia luki za Ciebie", desc: "Rekomenduje klientom terminy korzystne dla Twojego kalendarza", value: "397 zł/mies" },
@@ -22,46 +23,42 @@ export const ValueStackSection = () => {
   const totalValue = "3 910 zł/mies";
 
   return (
-    <section className="py-20 bg-gradient-to-b from-background to-primary/5" id="value">
-      <div className="container max-w-3xl mx-auto px-4">
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <h2 className="text-3xl font-serif font-bold mb-4">Zsumujmy, co dostajesz</h2>
-          <p className="text-muted-foreground">Gdybyś płaciła za każde narzędzie osobno — tyle by Cię to kosztowało</p>
-        </motion.div>
+    <section className="landing-section-light landing-section-spacing" id="value">
+      <div className="max-w-[800px] mx-auto px-[max(24px,5vw)]">
+        <AnimatedHeadline className="text-center mb-12">
+          <h2 className="headline-section mb-4" style={{ color: "#1d1d1f" }}>Zsumujmy, co dostajesz</h2>
+          <p className="subheadline landing-text-muted-light">Gdybyś płaciła za każde narzędzie osobno — tyle by Cię to kosztowało</p>
+        </AnimatedHeadline>
 
-        <div className="space-y-3 mb-8">
+        <div className="space-y-3 mb-10">
           {items.map((item, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className={`flex items-center gap-4 p-4 rounded-xl border ${
-                item.isBonus ? 'bg-amber-500/5 border-amber-500/20' : 'bg-card border-border'
+              transition={{ delay: i * 0.04, ease: appleEaseArray }}
+              className={`flex items-center gap-4 p-4 rounded-2xl ${
+                item.isBonus
+                  ? "bg-amber-50 border border-amber-200"
+                  : "landing-card-light"
               }`}
             >
               <div className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center ${
-                item.isBonus ? 'bg-amber-500/10' : 'bg-primary/10'
+                item.isBonus ? "bg-amber-100" : "bg-[#8b5cf6]/10"
               }`}>
-                <Check className={`w-3.5 h-3.5 ${item.isBonus ? 'text-amber-500' : 'text-primary'}`} />
+                <Check className={`w-3.5 h-3.5 ${item.isBonus ? "text-amber-600" : "text-[#8b5cf6]"}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm">
-                  {item.isBonus && <span className="text-amber-500 font-bold mr-2">🎁 BONUS:</span>}
+                <p className="font-semibold text-sm" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>
+                  {item.isBonus && <span className="text-amber-600 font-bold mr-2">🎁 BONUS:</span>}
                   {item.name}
                 </p>
-                <p className="text-xs text-muted-foreground">{item.desc}</p>
+                <p className="text-xs landing-text-muted-light">{item.desc}</p>
               </div>
               <div className="text-right flex-shrink-0">
-                <p className="text-xs line-through text-muted-foreground">{item.value}</p>
-                <p className="text-xs font-bold text-primary">W CENIE</p>
+                <p className="text-xs line-through landing-text-muted-light">{item.value}</p>
+                <p className="text-xs font-bold text-[#8b5cf6]">W CENIE</p>
               </div>
             </motion.div>
           ))}
@@ -69,21 +66,24 @@ export const ValueStackSection = () => {
 
         {/* Total */}
         <motion.div
-          className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20 rounded-2xl p-6 text-center"
+          className="rounded-3xl p-8 text-center"
+          style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.08), rgba(236,72,153,0.08))", border: "1px solid rgba(139,92,246,0.15)" }}
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.6, ease: appleEaseArray }}
         >
-          <p className="text-sm text-muted-foreground mb-1">
+          <p className="text-sm landing-text-muted-light mb-1">
             Łączna wartość gdybyś płaciła za każde narzędzie osobno:
           </p>
-          <p className="text-4xl font-black line-through text-muted-foreground mb-2">{totalValue}</p>
-          <p className="text-sm text-muted-foreground mb-3">Twoja cena z Beauty Calendar PRO:</p>
-          <p className="text-5xl font-black text-primary mb-2">99 zł netto/mies</p>
-          <p className="text-sm text-muted-foreground">+ 0 zł prowizji od rezerwacji. Zawsze. Twoja baza = Twoja własność.</p>
+          <p className="text-4xl font-black line-through landing-text-muted-light mb-3" style={{ fontFamily: "'Playfair Display', serif" }}>{totalValue}</p>
+          <p className="text-sm landing-text-muted-light mb-3">Twoja cena z Beauty Calendar PRO:</p>
+          <p className="text-5xl font-black mb-3 apple-accent-gradient" style={{ fontFamily: "'Playfair Display', serif" }}>99 zł netto/mies</p>
+          <p className="text-sm landing-text-muted-light">+ 0 zł prowizji od rezerwacji. Zawsze. Twoja baza = Twoja własność.</p>
         </motion.div>
       </div>
+
+      <div className="h-32 section-fade-to-dark mt-16" />
     </section>
   );
 };
