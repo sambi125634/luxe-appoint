@@ -1,7 +1,9 @@
-import { lazy, Suspense, useRef, useState, useEffect } from "react";
+import { lazy, Suspense } from "react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { SplitText, appleEaseArray } from "@/components/ui/AnimatedSection";
 
 const Hero3DScene = lazy(() => import("./Hero3DScene").catch(() => ({ default: () => null })));
 
@@ -15,143 +17,145 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{ background: "linear-gradient(180deg, #faf9f7 0%, #f5f0ff 50%, #faf9f7 100%)" }}>
-      {/* Soft gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-[#8b5cf6]/[0.07] blur-[150px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full bg-[#ec4899]/[0.05] blur-[150px]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#8b5cf6]/[0.04] blur-[200px]" />
+    <section className="relative min-h-screen flex items-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-dark via-background to-muted/30" />
 
       <Suspense fallback={null}>
         <Hero3DScene />
       </Suspense>
 
-      <div className="relative z-10 max-w-[1200px] mx-auto px-[max(24px,5vw)] landing-section-spacing text-center">
-        {/* Eyebrow */}
-        <motion.p
-          className="eyebrow tracking-widest mb-8"
-          style={{ color: "#8b5cf6" }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: appleEaseArray, delay: 0.2 }}
-        >
-          <span className="inline-flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#8b5cf6] animate-pulse" />
-            Platforma beauty z AI
-          </span>
-        </motion.p>
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20 z-[1]" />
+      <div className="absolute inset-0 z-[1]" style={{
+        background: "radial-gradient(ellipse 60% 70% at 50% 50%, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 60%, transparent 100%)"
+      }} />
+      <div className="absolute inset-0 bg-background/50 md:bg-transparent z-[1]" />
 
-        {/* H1 */}
-        <h1 className="headline-hero mb-6" style={{ color: "#1d1d1f" }}>
-          <SplitText text="Twój salon rezerwuje, przypomina" />
-          <br />
-          <span className="apple-accent-gradient">
-            <SplitText text="i odzyskuje klientki sam." />
-          </span>
-        </h1>
-
-        {/* Sub */}
-        <motion.p
-          className="subheadline max-w-2xl mx-auto mb-10"
-          style={{ color: "#6e6e73" }}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: appleEaseArray, delay: 0.8 }}
-        >
-          AI rezerwuje, przypomina i odzyskuje klientki — automatycznie.
-          <br />
-          <span style={{ color: "#1d1d1f", fontWeight: 500 }}>Twoja baza. Twoje dane. Na zawsze.</span>
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          className="flex flex-col sm:flex-row gap-4 justify-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: appleEaseArray, delay: 1.0 }}
-        >
-          <button
-            onClick={onScrollToForm}
-            className="apple-btn-primary text-base font-semibold px-8 py-4 flex items-center justify-center gap-2 group"
+      <div className="container relative z-10 py-20 lg:py-32">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Zacznij za darmo
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
-          <button
-            onClick={scrollToDemo}
-            className="apple-btn-secondary-dark text-base px-8 py-4 flex items-center justify-center gap-2"
+            <Badge
+              variant="outline"
+              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
+            >
+              Platforma beauty kt\u00f3ra pracuje \u2014 kiedy Ty nie mo\u017cesz
+            </Badge>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.div
+            className="space-y-2"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4 }}
           >
-            Zobacz jak działa
-            <span className="text-lg">→</span>
-          </button>
-        </motion.div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
+              Tw\u00f3j salon rezerwuje, przypomina
+              <br />
+              <span className="text-gradient-luxury">i odzyskuje klientki sam.</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground font-normal">
+              Bez prowizji od rezerwacji. Twoja baza. Na zawsze.
+            </p>
+          </motion.div>
 
-        {/* Trust indicators */}
-        <motion.div
-          className="flex flex-wrap gap-6 justify-center text-sm"
-          style={{ color: "#86868b" }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease: appleEaseArray, delay: 1.2 }}
-        >
-          {[
-            "Bez karty kredytowej",
-            "Gotowe w 5 minut",
-            "0% prowizji od rezerwacji",
-            "Twoje dane — zawsze Twoje",
-          ].map((item, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                <Check className="w-3 h-3 text-emerald-500" />
-              </div>
-              <span>{item}</span>
-            </div>
-          ))}
-        </motion.div>
+          {/* Subheadline */}
+          <motion.p
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+          >
+            AI wype\u0142nia grafik, segreguje klientki, prognozuje przychody i wysy\u0142a komunikacj\u0119 \u2014 automatycznie.
+            <br />
+            <span className="font-semibold text-foreground">Ty zajmujesz si\u0119 zabiegami.</span>
+          </motion.p>
 
-        {/* Live social proof */}
-        <motion.div
-          className="flex items-center justify-center gap-3 mt-8"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, ease: appleEaseArray, delay: 1.4 }}
-        >
-          <div className="flex -space-x-2">
-            {["AK", "MW", "JP", "KW", "LS"].map((initials, idx) => (
-              <div
-                key={idx}
-                className="w-7 h-7 rounded-full bg-[#8b5cf6]/10 border-2 border-white flex items-center justify-center text-xs font-bold"
-                style={{ color: "#8b5cf6" }}
-              >
-                {initials}
+          {/* CTAs */}
+          <motion.div
+            className="flex flex-col sm:flex-row gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <Button
+              size="lg"
+              onClick={onScrollToForm}
+              className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
+            >
+              <span className="relative z-10 flex items-center gap-2">
+                Zacznij za darmo \u2014 bez karty
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </span>
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
+              onClick={scrollToDemo}
+            >
+              Zobacz jak to dzia\u0142a \u2192
+            </Button>
+          </motion.div>
+
+          {/* Trust indicators */}
+          <motion.div
+            className="flex flex-wrap gap-6 justify-center text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
+          >
+            {[
+              "Bez karty kredytowej",
+              "Gotowe w 5 minut",
+              "0% prowizji od rezerwacji",
+              "Twoje dane \u2014 zawsze Twoje",
+            ].map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                  <Check className="w-3 h-3 text-emerald-600" />
+                </div>
+                <span>{item}</span>
               </div>
             ))}
-          </div>
-          <p className="text-sm" style={{ color: "#86868b" }}>
-            <span className="font-bold" style={{ color: "#1d1d1f" }}>23 salony</span>{" "}
-            dołączyły w tym tygodniu
-          </p>
-        </motion.div>
+          </motion.div>
+
+          {/* Live social proof */}
+          <motion.div
+            className="flex items-center justify-center gap-3 mt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+          >
+            <div className="flex -space-x-2">
+              {["AK", "MW", "JP", "KW", "LS"].map((initials, idx) => (
+                <div
+                  key={idx}
+                  className="w-7 h-7 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-bold text-primary"
+                >
+                  {initials}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              <span className="font-bold text-foreground">23 salony</span>{" "}
+              do\u0142\u0105czy\u0142y w tym tygodniu
+            </p>
+          </motion.div>
+        </div>
       </div>
 
       {/* Scroll indicator */}
-      <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.4 }}
-        transition={{ delay: 2 }}
-      >
-        <span className="eyebrow text-[10px]" style={{ color: "#86868b" }}>Odkryj</span>
-        <div className="w-6 h-10 rounded-full border border-black/15 flex justify-center pt-2">
-          <motion.div
-            className="w-1.5 h-3 bg-[#8b5cf6]/40 rounded-full"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-          />
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
+        <div className="w-6 h-10 rounded-full border-2 border-primary/30 flex justify-center pt-2">
+          <div className="w-1.5 h-3 bg-primary/50 rounded-full animate-pulse" />
         </div>
-      </motion.div>
-
-      {/* Section transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent to-[#faf9f7] pointer-events-none" />
+      </div>
     </section>
   );
 };

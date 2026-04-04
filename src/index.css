@@ -2,7 +2,6 @@
 @import '@fontsource/playfair-display/500.css';
 @import '@fontsource/playfair-display/600.css';
 @import '@fontsource/playfair-display/700.css';
-@import '@fontsource/inter/300.css';
 @import '@fontsource/inter/400.css';
 @import '@fontsource/inter/500.css';
 @import '@fontsource/inter/600.css';
@@ -157,184 +156,6 @@
   }
 }
 
-/* ─── Premium Light Landing Page Styles ─── */
-
-.landing-section-dark {
-  background-color: #faf9f7;
-  color: #1d1d1f;
-}
-
-.landing-section-dark-2 {
-  background-color: #f5f3f0;
-  color: #1d1d1f;
-}
-
-.landing-section-dark-3 {
-  background-color: #f0eeeb;
-  color: #1d1d1f;
-}
-
-.landing-section-dark-4 {
-  background-color: #f5f3f0;
-  color: #1d1d1f;
-}
-
-.landing-section-light {
-  background-color: #ffffff;
-  color: #1d1d1f;
-}
-
-/* Premium violet accent section */
-.landing-section-accent {
-  background: linear-gradient(135deg, #2d1b4e, #1a0a2e);
-  color: #f5f5f7;
-}
-
-.landing-text-muted-dark {
-  color: #6e6e73;
-}
-
-.landing-text-subtle-dark {
-  color: #86868b;
-}
-
-.landing-text-muted-light {
-  color: #6e6e73;
-}
-
-.landing-card-dark {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 20px;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
-}
-
-.landing-card-light {
-  background: #ffffff;
-  border: none;
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
-  border-radius: 20px;
-}
-
-.landing-card-dark:hover {
-  background: #ffffff;
-  border-color: rgba(139, 92, 246, 0.15);
-  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.08);
-}
-
-.landing-card-light:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-/* Headline typography */
-.headline-hero {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(48px, 8vw, 96px);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-}
-
-.headline-section {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(32px, 5vw, 64px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-}
-
-.subheadline {
-  font-family: 'Inter', sans-serif;
-  font-size: clamp(18px, 2.5vw, 28px);
-  font-weight: 300;
-  line-height: 1.4;
-  letter-spacing: -0.01em;
-}
-
-.body-text {
-  font-family: 'Inter', sans-serif;
-  font-size: 17px;
-  font-weight: 400;
-  line-height: 1.7;
-  letter-spacing: -0.003em;
-}
-
-.eyebrow {
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-/* Landing section spacing */
-.landing-section-spacing {
-  padding-top: clamp(80px, 12vh, 160px);
-  padding-bottom: clamp(80px, 12vh, 160px);
-}
-
-/* Accent gradient */
-.apple-accent-gradient {
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Section transition gradients */
-.section-fade-to-light {
-  background: linear-gradient(to bottom, transparent, #ffffff);
-}
-
-.section-fade-to-dark {
-  background: linear-gradient(to bottom, transparent, #faf9f7);
-}
-
-/* Premium buttons */
-.apple-btn-primary {
-  @apply font-semibold rounded-full transition-all duration-200;
-  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-  color: #ffffff;
-  padding: 14px 28px;
-  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.3);
-}
-
-.apple-btn-primary:hover {
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
-  transform: scale(1.02);
-  box-shadow: 0 8px 30px rgba(139, 92, 246, 0.4);
-}
-
-.apple-btn-primary:active {
-  transform: scale(0.98);
-}
-
-.apple-btn-secondary-dark {
-  @apply font-semibold rounded-full transition-all duration-200;
-  background: transparent;
-  color: #1d1d1f;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  padding: 14px 28px;
-}
-
-.apple-btn-secondary-dark:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  color: #8b5cf6;
-}
-
-.apple-btn-secondary-light {
-  @apply font-semibold rounded-full transition-all duration-200;
-  background: transparent;
-  color: #1d1d1f;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  padding: 14px 28px;
-}
-
-.apple-btn-secondary-light:hover {
-  border-color: rgba(139, 92, 246, 0.4);
-  color: #8b5cf6;
-}
-
 @layer components {
   .glass-card {
     @apply bg-card/70 backdrop-blur-xl border border-border/50 rounded-xl;
@@ -389,23 +210,43 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
 
   @keyframes slideUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   @keyframes progress {
-    from { width: 0%; }
-    to { width: 100%; }
+    from {
+      width: 0%;
+    }
+    to {
+      width: 100%;
+    }
   }
 
   .animate-progress {
