@@ -8,9 +8,9 @@ interface NewFinalCTASectionProps {
 
 export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) => {
   return (
-    <section className="landing-section-dark landing-section-spacing relative overflow-hidden">
+    <section className="landing-section-spacing relative overflow-hidden" style={{ background: "linear-gradient(135deg, #2d1b4e, #1a0a2e)" }}>
       {/* Gradient orbs */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#8b5cf6]/10 blur-[200px]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-[#8b5cf6]/15 blur-[200px]" />
 
       <div className="relative z-10 max-w-[800px] mx-auto px-[max(24px,5vw)] text-center">
         <h2 className="headline-section mb-8" style={{ color: "#f5f5f7" }}>
@@ -23,7 +23,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
 
         <motion.p
           className="subheadline mb-12"
-          style={{ color: "rgba(245,245,247,0.6)" }}
+          style={{ color: "rgba(245,245,247,0.7)" }}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -39,11 +39,11 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.4, ease: appleEaseArray }}
         >
-          <button onClick={onScrollToForm} className="apple-btn-primary text-base px-10 py-4 flex items-center justify-center gap-2 group">
+          <button onClick={onScrollToForm} className="font-semibold rounded-full transition-all duration-200 text-base px-10 py-4 flex items-center justify-center gap-2 group bg-white text-[#1d1d1f] hover:bg-white/90 hover:scale-[1.02] active:scale-[0.98]">
             Zacznij za darmo — bez karty kredytowej
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
-          <button onClick={onScrollToForm} className="apple-btn-secondary-dark text-base px-8 py-4">
+          <button onClick={onScrollToForm} className="font-semibold rounded-full transition-all duration-200 text-base px-8 py-4 bg-transparent text-white border border-white/20 hover:border-white/50 backdrop-blur-sm">
             Porozmawiajmy najpierw →
           </button>
         </motion.div>
@@ -58,7 +58,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
         >
           <div className="flex -space-x-2">
             {["AK", "MW", "JP"].map((i, idx) => (
-              <div key={idx} className="w-6 h-6 rounded-full border-2 border-black flex items-center justify-center text-[10px] font-bold" style={{ background: "rgba(139,92,246,0.2)", color: "#8b5cf6" }}>
+              <div key={idx} className="w-6 h-6 rounded-full border-2 border-[#2d1b4e] flex items-center justify-center text-[10px] font-bold" style={{ background: "rgba(139,92,246,0.3)", color: "#c4b5fd" }}>
                 {i}
               </div>
             ))}
@@ -71,7 +71,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
         {/* Trust */}
         <motion.div
           className="flex items-center justify-center gap-6 flex-wrap"
-          style={{ color: "rgba(245,245,247,0.3)" }}
+          style={{ color: "rgba(245,245,247,0.4)" }}
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}

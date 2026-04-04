@@ -20,10 +20,10 @@ const comparisonData = [
 ];
 
 const StatusIcon = ({ status, isHighlight, isBc }: { status: boolean | string; isHighlight?: boolean; isBc?: boolean }) => {
-  if (status === true) return <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center"><Check className="w-4 h-4 text-emerald-400" /></div>;
-  if (status === false) return <div className="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center"><X className="w-4 h-4 text-red-400" /></div>;
-  if (status === "partial") return <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-amber-400" /></div>;
-  return <span className={cn("text-sm font-medium", isHighlight && isBc && "text-emerald-400 font-bold", isHighlight && !isBc && "text-red-400 font-bold")}>{status}</span>;
+  if (status === true) return <div className="w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center"><Check className="w-4 h-4 text-emerald-500" /></div>;
+  if (status === false) return <div className="w-6 h-6 rounded-full bg-red-500/10 flex items-center justify-center"><X className="w-4 h-4 text-red-500" /></div>;
+  if (status === "partial") return <div className="w-6 h-6 rounded-full bg-amber-500/10 flex items-center justify-center"><AlertTriangle className="w-4 h-4 text-amber-500" /></div>;
+  return <span className={cn("text-sm font-medium", isHighlight && isBc && "text-emerald-600 font-bold", isHighlight && !isBc && "text-red-500 font-bold")}>{status}</span>;
 };
 
 export const ComparisonSection = () => {
@@ -70,7 +70,7 @@ export const ComparisonSection = () => {
                   className="transition-colors"
                   style={{
                     borderBottom: "1px solid rgba(0,0,0,0.04)",
-                    background: row.highlight ? "rgba(239,68,68,0.04)" : index % 2 === 0 ? "rgba(0,0,0,0.02)" : "transparent",
+                    background: row.highlight ? "rgba(239,68,68,0.04)" : index % 2 === 0 ? "rgba(0,0,0,0.015)" : "transparent",
                   }}
                 >
                   <td className="py-4 px-4 font-medium text-sm" style={{ color: row.highlight ? "#ef4444" : "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>{row.feature}</td>
@@ -84,18 +84,16 @@ export const ComparisonSection = () => {
         </motion.div>
 
         <div className="flex flex-wrap justify-center gap-6 mt-8 text-sm landing-text-muted-light">
-          <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center"><Check className="w-3 h-3 text-emerald-500" /></div><span>Pełna funkcjonalność</span></div>
-          <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center"><AlertTriangle className="w-3 h-3 text-amber-500" /></div><span>Ograniczona</span></div>
-          <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-red-500/20 flex items-center justify-center"><X className="w-3 h-3 text-red-500" /></div><span>Brak</span></div>
+          <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center"><Check className="w-3 h-3 text-emerald-500" /></div><span>Pełna funkcjonalność</span></div>
+          <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-amber-500/10 flex items-center justify-center"><AlertTriangle className="w-3 h-3 text-amber-500" /></div><span>Ograniczona</span></div>
+          <div className="flex items-center gap-2"><div className="w-5 h-5 rounded-full bg-red-500/10 flex items-center justify-center"><X className="w-3 h-3 text-red-500" /></div><span>Brak</span></div>
         </div>
 
         <p className="text-center text-xs landing-text-muted-light mt-8">
-          Dane porównawcze oparte na publicznie dostępnych cennikach i regulaminach (stan na 2026). 
+          Dane porównawcze oparte na publicznie dostępnych cennikach i regulaminach (stan na 2026).
           Prowizja 45% dotyczy usługi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
         </p>
       </div>
-
-      <div className="h-32 section-fade-to-dark mt-16" />
     </section>
   );
 };

@@ -12,29 +12,29 @@ const testimonials = [
   { id: 5, content: "Nie jestem techniczna — kompletnie. Bałam się, że nie dam rady. Konfiguracja zajęła mi 15 minut. PIĘTNAŚCIE. Teraz nie wyobrażam sobie pracy bez tego systemu. A to, że klientki widzą w aplikacji tylko mój salon? Bezcenne.", author: "Justyna P.", role: "Studio paznokci", location: "Poznań", avatar: "JP", rating: 5, result: "Konfiguracja w 15 minut" },
 ];
 
-const TestimonialCard = ({ testimonial, isDark }: { testimonial: typeof testimonials[0]; isDark: boolean }) => (
-  <div className={isDark ? "landing-card-dark p-6 lg:p-8 h-full flex flex-col" : "landing-card-light p-6 lg:p-8 h-full flex flex-col"}>
-    <Quote className="w-8 h-8 mb-4 shrink-0" style={{ color: isDark ? "rgba(139,92,246,0.3)" : "rgba(139,92,246,0.2)" }} />
+const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] }) => (
+  <div className="landing-card-dark p-6 lg:p-8 h-full flex flex-col">
+    <Quote className="w-8 h-8 mb-4 shrink-0" style={{ color: "rgba(139,92,246,0.2)" }} />
     <div className="flex gap-1 mb-4">
       {[...Array(testimonial.rating)].map((_, i) => (
         <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
       ))}
     </div>
-    <blockquote className="text-base lg:text-lg leading-relaxed mb-4 flex-grow italic" style={{ color: isDark ? "rgba(245,245,247,0.8)" : "#1d1d1f", fontFamily: "'Playfair Display', serif" }}>
+    <blockquote className="text-base lg:text-lg leading-relaxed mb-4 flex-grow italic" style={{ color: "#1d1d1f", fontFamily: "'Playfair Display', serif" }}>
       &ldquo;{testimonial.content}&rdquo;
     </blockquote>
     {testimonial.result && (
-      <div className="mb-4 px-3 py-1.5 rounded-lg inline-block" style={{ background: isDark ? "rgba(34,197,94,0.1)" : "rgba(34,197,94,0.08)" }}>
-        <span className="text-sm font-bold text-emerald-400">📊 {testimonial.result}</span>
+      <div className="mb-4 px-3 py-1.5 rounded-lg inline-block" style={{ background: "rgba(34,197,94,0.06)" }}>
+        <span className="text-sm font-bold text-emerald-600">📊 {testimonial.result}</span>
       </div>
     )}
     <div className="flex items-center gap-3 mt-auto">
-      <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "rgba(139,92,246,0.15)", color: "#8b5cf6" }}>
+      <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold shrink-0" style={{ background: "rgba(139,92,246,0.1)", color: "#8b5cf6" }}>
         {testimonial.avatar}
       </div>
       <div>
-        <div className="font-semibold" style={{ color: isDark ? "#f5f5f7" : "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>{testimonial.author}</div>
-        <div className="text-sm" style={{ color: isDark ? "rgba(245,245,247,0.5)" : "#6e6e73" }}>{testimonial.role}, {testimonial.location}</div>
+        <div className="font-semibold" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>{testimonial.author}</div>
+        <div className="text-sm" style={{ color: "#86868b" }}>{testimonial.role}, {testimonial.location}</div>
       </div>
     </div>
   </div>
@@ -49,10 +49,10 @@ export const TestimonialsSection = () => {
   }, []);
 
   return (
-    <section className="landing-section-dark landing-section-spacing">
+    <section className="landing-section-light landing-section-spacing">
       <div className="max-w-[1200px] mx-auto px-[max(24px,5vw)]">
         <AnimatedHeadline className="text-center mb-16">
-          <h2 className="headline-section mb-4" style={{ color: "#f5f5f7" }}>
+          <h2 className="headline-section mb-4" style={{ color: "#1d1d1f" }}>
             Właścicielki, które{" "}
             <span className="apple-accent-gradient">odzyskały kontrolę nad swoim biznesem</span>
           </h2>
@@ -66,7 +66,7 @@ export const TestimonialsSection = () => {
           viewport={{ once: true }}
         >
           {testimonials.slice(0, 3).map((t) => (
-            <motion.div key={t.id} variants={cardVariants}><TestimonialCard testimonial={t} isDark={true} /></motion.div>
+            <motion.div key={t.id} variants={cardVariants}><TestimonialCard testimonial={t} /></motion.div>
           ))}
         </motion.div>
         <motion.div
@@ -77,12 +77,12 @@ export const TestimonialsSection = () => {
           viewport={{ once: true }}
         >
           {testimonials.slice(3, 5).map((t) => (
-            <motion.div key={t.id} variants={cardVariants}><TestimonialCard testimonial={t} isDark={true} /></motion.div>
+            <motion.div key={t.id} variants={cardVariants}><TestimonialCard testimonial={t} /></motion.div>
           ))}
         </motion.div>
 
         <div className="lg:hidden max-w-xl mx-auto">
-          <TestimonialCard testimonial={testimonials[activeIndex]} isDark={true} />
+          <TestimonialCard testimonial={testimonials[activeIndex]} />
           <div className="flex justify-center gap-2 mt-6">
             {testimonials.map((_, index) => (
               <button
@@ -90,7 +90,7 @@ export const TestimonialsSection = () => {
                 onClick={() => setActiveIndex(index)}
                 className={cn(
                   "h-2 rounded-full transition-all",
-                  activeIndex === index ? "w-8 bg-[#8b5cf6]" : "w-2 bg-white/20 hover:bg-white/40"
+                  activeIndex === index ? "w-8 bg-[#8b5cf6]" : "w-2 bg-black/10 hover:bg-black/20"
                 )}
               />
             ))}

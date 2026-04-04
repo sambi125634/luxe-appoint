@@ -40,13 +40,13 @@ const socialLinks = [
 const FooterLink = ({ link }: { link: { label: string; href: string; soon?: boolean } }) => {
   if (link.soon) {
     return (
-      <span className="text-[13px] italic cursor-default" style={{ color: "rgba(245,245,247,0.2)" }}>
+      <span className="text-[13px] italic cursor-default" style={{ color: "rgba(0,0,0,0.2)" }}>
         {link.label} <span className="text-[10px]">(Wkrótce)</span>
       </span>
     );
   }
   return (
-    <Link to={link.href} className="text-[13px] transition-colors" style={{ color: "rgba(245,245,247,0.4)" }} onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(245,245,247,0.8)")} onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(245,245,247,0.4)")}>
+    <Link to={link.href} className="text-[13px] transition-colors" style={{ color: "#86868b" }} onMouseEnter={(e) => (e.currentTarget.style.color = "#1d1d1f")} onMouseLeave={(e) => (e.currentTarget.style.color = "#86868b")}>
       {link.label}
     </Link>
   );
@@ -54,19 +54,19 @@ const FooterLink = ({ link }: { link: { label: string; href: string; soon?: bool
 
 export const NewLandingFooter = () => {
   return (
-    <footer style={{ background: "#000", borderTop: "1px solid rgba(255,255,255,0.08)" }}>
+    <footer style={{ background: "#faf9f7", borderTop: "1px solid rgba(0,0,0,0.06)" }}>
       <div className="max-w-[1200px] mx-auto px-[max(24px,5vw)] py-12">
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
           <div className="col-span-2">
             <Link to="/" className="inline-block mb-4">
               <span className="text-2xl font-bold apple-accent-gradient" style={{ fontFamily: "'Playfair Display', serif" }}>Beauty Calendar</span>
             </Link>
-            <p className="text-[13px] mb-2" style={{ color: "rgba(245,245,247,0.4)" }}>System zarządzania salonem beauty.</p>
-            <p className="text-[13px] mb-4" style={{ color: "rgba(245,245,247,0.3)" }}>0% prowizji · Made in Poland 🇵🇱</p>
+            <p className="text-[13px] mb-2" style={{ color: "#86868b" }}>System zarządzania salonem beauty.</p>
+            <p className="text-[13px] mb-4" style={{ color: "#c7c7cc" }}>0% prowizji · Made in Poland 🇵🇱</p>
 
             <div className="flex gap-3 mb-6">
               {socialLinks.map((social) => (
-                <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(245,245,247,0.4)" }} aria-label={social.label}>
+                <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: "rgba(0,0,0,0.04)", color: "#86868b" }} aria-label={social.label}>
                   <social.icon className="w-4 h-4" />
                 </a>
               ))}
@@ -74,14 +74,14 @@ export const NewLandingFooter = () => {
 
             <TooltipProvider>
               <div className="space-y-2">
-                <p className="text-xs font-medium flex items-center gap-1" style={{ color: "rgba(245,245,247,0.3)" }}>
+                <p className="text-xs font-medium flex items-center gap-1" style={{ color: "#86868b" }}>
                   <Smartphone className="w-3 h-3" />Pobierz aplikację
                 </p>
                 <div className="flex gap-2">
                   {["App Store", "Google Play"].map((store) => (
                     <Tooltip key={store}>
                       <TooltipTrigger asChild>
-                        <div className="px-3 py-1.5 rounded-md text-xs cursor-not-allowed" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(245,245,247,0.2)" }}>{store}</div>
+                        <div className="px-3 py-1.5 rounded-md text-xs cursor-not-allowed" style={{ background: "rgba(0,0,0,0.03)", color: "#c7c7cc" }}>{store}</div>
                       </TooltipTrigger>
                       <TooltipContent>Wkrótce dostępne</TooltipContent>
                     </Tooltip>
@@ -92,30 +92,30 @@ export const NewLandingFooter = () => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "rgba(245,245,247,0.7)", fontFamily: "'Inter', sans-serif" }}>Produkt</h4>
+            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>Produkt</h4>
             <ul className="space-y-2">{footerLinks.product.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "rgba(245,245,247,0.7)", fontFamily: "'Inter', sans-serif" }}>Firma</h4>
+            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>Firma</h4>
             <ul className="space-y-2">{footerLinks.company.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "rgba(245,245,247,0.7)", fontFamily: "'Inter', sans-serif" }}>Zasoby</h4>
+            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>Zasoby</h4>
             <ul className="space-y-2">{footerLinks.resources.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "rgba(245,245,247,0.7)", fontFamily: "'Inter', sans-serif" }}>Legal</h4>
+            <h4 className="font-semibold mb-4 text-[13px]" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>Legal</h4>
             <ul className="space-y-2">{footerLinks.legal.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <p className="text-[13px]" style={{ color: "rgba(245,245,247,0.2)" }}>
+        <div className="mt-12 pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+          <p className="text-[13px]" style={{ color: "#c7c7cc" }}>
             © {new Date().getFullYear()} Beauty Calendar · beauty-funnels.com · Wszystkie prawa zastrzeżone
           </p>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <span className="text-[13px] flex items-center gap-1" style={{ color: "rgba(245,245,247,0.3)" }}>
+            <span className="text-[13px] flex items-center gap-1" style={{ color: "#86868b" }}>
               Made with <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> in Poland
             </span>
           </div>

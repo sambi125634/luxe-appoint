@@ -14,30 +14,30 @@ export const OwnYourClientsSection = () => {
           transition={{ duration: 0.8, ease: appleEaseArray }}
         >
           <div>
-            <p className="eyebrow tracking-widest mb-6 text-red-400 flex items-center gap-2">
+            <p className="eyebrow tracking-widest mb-6 text-red-500 flex items-center gap-2">
               <AlertTriangle className="w-3.5 h-3.5" />
               Wiedziałaś o tym?
             </p>
 
-            <h2 className="headline-section mb-8" style={{ color: "#f5f5f7" }}>
+            <h2 className="headline-section mb-8" style={{ color: "#1d1d1f" }}>
               Pracujesz na budowę
-              <span className="text-red-400"> cudzej bazy klientek.</span>
+              <span className="text-red-500"> cudzej bazy klientek.</span>
             </h2>
 
-            <div className="space-y-5 body-text" style={{ color: "rgba(245,245,247,0.7)" }}>
+            <div className="space-y-5 body-text" style={{ color: "#6e6e73" }}>
               <p>
                 Platformy marketplace działają jak
-                <strong style={{ color: "#f5f5f7" }}> Allegro dla usług beauty.</strong>
+                <strong style={{ color: "#1d1d1f" }}> Allegro dla usług beauty.</strong>
                 {" "}Wchodzisz, wystawiasz usługi, bijesz się ceną z innymi salonami obok Ciebie. Klientka wybiera najtańszego.
               </p>
               <p>
                 Co gorsza — ta klientka
-                <strong style={{ color: "#f5f5f7" }}> należy do platformy, nie do Ciebie.</strong>
+                <strong style={{ color: "#1d1d1f" }}> należy do platformy, nie do Ciebie.</strong>
                 {" "}Jej dane, jej historia, jej preferencje — to ich własność. Gdy odejdziesz, nie zabierzesz ich ze sobą.
               </p>
               <p>
                 Przez lata budujesz ich biznes.
-                <strong style={{ color: "#f5f5f7" }}> Nie swój.</strong>
+                <strong style={{ color: "#1d1d1f" }}> Nie swój.</strong>
               </p>
             </div>
           </div>
@@ -47,9 +47,9 @@ export const OwnYourClientsSection = () => {
             <div className="landing-card-dark p-6" style={{ borderColor: "rgba(239,68,68,0.2)" }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-sm">🏪</div>
-                <span className="font-bold text-sm" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>Platforma marketplace</span>
+                <span className="font-bold text-sm" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>Platforma marketplace</span>
               </div>
-              <ul className="space-y-2.5 text-sm" style={{ color: "rgba(245,245,247,0.6)" }}>
+              <ul className="space-y-2.5 text-sm" style={{ color: "#6e6e73" }}>
                 {[
                   "Klientki należą do platformy",
                   "Odejście = utrata całej historii",
@@ -58,7 +58,7 @@ export const OwnYourClientsSection = () => {
                   "Prowizja od każdej nowej wizyty",
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-2">
-                    <X className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />
+                    <X className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -66,12 +66,12 @@ export const OwnYourClientsSection = () => {
             </div>
 
             {/* Beauty Calendar card */}
-            <div className="landing-card-dark p-6" style={{ borderColor: "rgba(139,92,246,0.3)", background: "rgba(139,92,246,0.05)" }}>
+            <div className="landing-card-dark p-6" style={{ borderColor: "rgba(139,92,246,0.2)", background: "rgba(139,92,246,0.03)" }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-lg bg-[#8b5cf6]/10 flex items-center justify-center text-sm">✨</div>
-                <span className="font-bold text-sm" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>Beauty Calendar</span>
+                <span className="font-bold text-sm" style={{ color: "#1d1d1f", fontFamily: "'Inter', sans-serif" }}>Beauty Calendar</span>
               </div>
-              <ul className="space-y-2.5 text-sm" style={{ color: "rgba(245,245,247,0.7)" }}>
+              <ul className="space-y-2.5 text-sm" style={{ color: "#6e6e73" }}>
                 {[
                   { text: "Twoje klientki. Na zawsze.", bold: true, extra: " Eksport jednym kliknięciem" },
                   { text: "Prywatna aplikacja — tylko Twój salon" },
@@ -80,9 +80,9 @@ export const OwnYourClientsSection = () => {
                   { text: "0% prowizji od rezerwacji. Zawsze." },
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                    <Check className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
                     <span>
-                      {item.bold ? <strong style={{ color: "#f5f5f7" }}>{item.text}</strong> : item.text}
+                      {item.bold ? <strong style={{ color: "#1d1d1f" }}>{item.text}</strong> : item.text}
                       {item.extra}
                     </span>
                   </li>
@@ -91,8 +91,8 @@ export const OwnYourClientsSection = () => {
             </div>
 
             <div className="text-center">
-              <p className="text-xs italic" style={{ color: "rgba(245,245,247,0.3)" }}>
-                {"„"}Nie budujesz na cudzej ziemi. Budujesz własny dom.{"”"}
+              <p className="text-xs italic" style={{ color: "#86868b" }}>
+                {"„"}Nie budujesz na cudzej ziemi. Budujesz własny dom.{"""}
               </p>
             </div>
           </div>
