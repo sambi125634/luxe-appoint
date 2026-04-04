@@ -6,7 +6,7 @@ import AuroraBackground from "./AuroraBackground";
 
 const transformations = [
   {
-    before: "Odbierasz telefony w \u015Brodku zabiegu",
+    before: "Odbierasz telefony w środku zabiegu",
     after: "Klientki rezerwują same o 23:00 przez Twój widget",
   },
   {
@@ -19,7 +19,7 @@ const transformations = [
   },
   {
     before: "Klientka przyszła raz i zniknęła",
-    after: "\u015Acie\u017Cka Klientki prowadzi ją przez 5 wizyt automatycznie",
+    after: "Ścieżka Klientki prowadzi ją przez 5 wizyt automatycznie",
   },
   {
     before: "Marketplace bierze prowizję od Twoich nowych klientek",
@@ -47,8 +47,8 @@ export const TransformationSection = () => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Zanim Beauty Calendar {"\u2192"}{" "}
-            <span className="text-primary">3 miesiące pó\u017Aniej</span>
+            Zanim Beauty Calendar {"→"}{" "}
+            <span className="text-primary">3 miesiące później</span>
           </h2>
         </motion.div>
 
@@ -64,11 +64,11 @@ export const TransformationSection = () => {
               transition={{ delay: index * 0.08, duration: 0.5 }}
             >
               <div className="flex items-center gap-3 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
-                <span className="text-destructive font-bold text-lg">{"\u274C"}</span>
+                <span className="text-destructive font-bold text-lg">{"❌"}</span>
                 <span className="text-sm">{item.before}</span>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                <span className="text-emerald-600 font-bold text-lg">{"\u2705"}</span>
+                <span className="text-emerald-600 font-bold text-lg">{"✅"}</span>
                 <span className="text-sm font-medium">{item.after}</span>
               </div>
             </motion.div>
