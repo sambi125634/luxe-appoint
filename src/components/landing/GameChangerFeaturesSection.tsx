@@ -77,7 +77,7 @@ const features = [
     icon: Mail,
     title: "Raporty dla księgowej — 1 klik",
     description:
-      "Sprzedaż ze stawkami VAT, prowizje pracowników, podsumowanie kasowe. Wpisujesz email księgowej, klikasz „Wyślij" — koniec. Zero eksportowania, zero załączników.",
+      'Sprzedaż ze stawkami VAT, prowizje pracowników, podsumowanie kasowe. Wpisujesz email księgowej, klikasz \u201EWyślij\u201D \u2014 koniec. Zero eksportowania, zero załączników.',
     accent: "from-rose-500/20 to-rose-500/5",
     iconColor: "text-rose-500",
   },

@@ -110,14 +110,14 @@ export default function DemoPage() {
       )}
 
       {/* Demo banner */}
-      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2 px-4 text-center text-sm flex items-center justify-center gap-3 flex-wrap">
+      <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2.5 px-4 text-center text-sm flex items-center justify-center gap-3 flex-wrap">
         <span className="flex items-center gap-2">
           <Sparkles className="w-4 h-4" />
-          <strong>{t("demo.banner.title")}</strong> • {t("demo.banner.subtitle")}
+          <strong>Chcesz to u siebie?</strong> • Zacznij za darmo — 14 dni pełnego dostępu
         </span>
         <a href="/#lead-form">
-          <Button variant="secondary" size="sm" className="h-7 text-xs">
-            {t("demo.banner.cta")}
+          <Button variant="secondary" size="sm" className="h-7 text-xs font-semibold">
+            Zapisz się za darmo
           </Button>
         </a>
       </div>

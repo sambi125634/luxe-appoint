@@ -36,10 +36,11 @@ const Index = () => {
         <ProblemSection onScrollToForm={scrollToForm} />
         <BookstyCostCalculator onScrollToForm={scrollToForm} />
         <TransformationSection />
-        <AIGameChangersSection />
+        <GameChangerFeaturesSection />
         <ComparisonSection />
         <FeaturesSection />
         <ValueStackSection />
+        <DemoPreviewSection />
         <TestimonialsSection />
         <MobileAppSection />
         <AudienceSection />
