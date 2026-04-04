@@ -1,20 +1,22 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Brain,
   Calculator,
   Scan,
   TrendingUp,
   Users,
-  FileText,
   Shield,
-  Gift,
   Layout,
   Target,
   Sparkles,
   Heart,
   Package,
+  Gift,
   Check,
   ArrowRight,
+  ChevronDown,
+  AlertTriangle,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,77 +26,95 @@ const uniqueFeatures = [
     icon: Brain,
     title: "AI Autopilot (12 funkcji)",
     description:
-      "Automatyczne wypełnianie luk w grafiku, predykcja odejść, inteligentne urodziny, upsell w rezerwacji — 12 funkcji AI które pracują za Ciebie 24/7.",
+      "Nie musisz ręcznie szukać wolnych terminów, dzwonić w urodziny ani zgadywać kto odejdzie. 12 funkcji AI robi to za Ciebie — codziennie, bez przerwy.",
   },
   {
     icon: Calculator,
     title: "True Profit per zabieg",
     description:
-      "Dodajesz składniki receptury do zabiegu. System automatycznie oblicza realny zysk po odliczeniu materiałów — nie przychód, a prawdziwy profit.",
+      "Wiesz ile naprawdę zarabiasz na każdym zabiegu — po odliczeniu materiałów. Koniec zgadywania, które usługi Ci się opłacają.",
   },
   {
     icon: Heart,
     title: "Retencja — strefy zagrożenia",
     description:
-      "Radar odejść pokazuje klientki w strefie żółtej i czerwonej. Automatyczne SMS/email zanim klientka odejdzie na dobre.",
+      "Widzisz które klientki zaraz odejdą — zanim to się stanie. System sam wysyła SMS lub email, żeby je zatrzymać.",
   },
   {
     icon: TrendingUp,
     title: "Prognoza przychodów AI",
     description:
-      "AI analizuje trendy rezerwacji i przewiduje Twoje przychody na 30/60/90 dni. Trafność: 94%.",
+      "Wiesz ile zarobisz za 30, 60 i 90 dni. Planujesz zakupy, urlopy i inwestycje na twardych danych, nie przeczuciu.",
   },
   {
     icon: Shield,
     title: "Własność bazy danych",
     description:
-      "Twoja baza klientek jest Twoja. Eksport jednym kliknięciem. Żadna platforma nie może Ci jej zabrać.",
+      "Twoja baza klientek należy do Ciebie. Eksportujesz jednym kliknięciem. Żadna platforma nie może Ci jej zabrać ani zablokować.",
   },
   {
     icon: Layout,
     title: "Prywatna aplikacja mobilna",
     description:
-      "Twoje klientki widzą tylko Twój salon — nie konkurencję obok. Bez reklam innych salonów.",
+      "Twoje klientki widzą tylko Twój salon — nie konkurencję obok. Zero reklam innych salonów w Twojej aplikacji.",
   },
   {
     icon: Users,
     title: "Automatyczna segmentacja",
     description:
-      "System sam przypisuje tagi: VIP, zagrożona, nowa, no-show. AI taguje za Ciebie.",
+      "System sam oznacza klientki: VIP, zagrożona odejściem, nowa, no-show. Nie musisz ręcznie tagować setek osób.",
   },
   {
     icon: Package,
     title: "Receptury zabiegowe",
     description:
-      "Każdy zabieg ma przypisaną recepturę. Magazyn aktualizuje się automatycznie po każdej wizycie.",
+      "Przypisujesz składniki do zabiegu raz — magazyn aktualizuje się sam po każdej wizycie. Koniec ręcznego liczenia zużycia.",
   },
   {
     icon: Scan,
     title: "Skaner kodów kamerą",
     description:
-      "Skanuj kody kreskowe aparatem telefonu — przyjmuj dostawy, sprawdzaj stany. Bez dodatkowego sprzętu.",
+      "Przyjmujesz dostawę aparatem telefonu. Skanujesz kod — produkt trafia do magazynu. Bez czytnika, bez ręcznego wpisywania.",
   },
   {
     icon: Target,
     title: "Ścieżka Klientki™ + Auto-zaliczki",
     description:
-      "Wizualna ścieżka od pierwszej wizyty do stałej klientki. Automatyczne zaliczki dla no-showów.",
+      "Widzisz dokładnie na jakim etapie jest każda klientka — od pierwszej wizyty do stałej. Automatyczne zaliczki chronią Cię przed no-showami.",
   },
   {
     icon: Gift,
     title: "Program poleceń z ROI",
     description:
-      "Każda klientka dostaje unikalny link. Widzisz ile klientek przyprowadziła i ile zarobiłaś dzięki niej.",
+      "Każda klientka ma unikalny link polecający. Widzisz ile nowych osób przyprowadziła i ile na tym zarobiłaś.",
   },
   {
     icon: Sparkles,
     title: "Widget per kampania",
     description:
-      "Osobny widget rezerwacji dla każdej kampanii — Instagram, strona, Google Ads. Mierzysz konwersję każdego źródła.",
+      "Osobny widget rezerwacji dla Instagrama, strony i Google Ads. Wiesz która kampania przynosi rezerwacje.",
   },
 ];
 
+const sharedFeatures = [
+  { name: "Kalendarz online z rezerwacjami", bc: true, market: true },
+  { name: "CRM z kartami klientów i tagami", bc: true, market: true },
+  { name: "Automatyczne SMS/email przypomnienia", bc: true, market: true },
+  { name: "Kampanie marketingowe SMS/email", bc: true, market: true },
+  { name: "Zarządzanie magazynem", bc: true, market: true },
+  { name: "Raporty sprzedaży i statystyki", bc: true, market: true },
+  { name: "Karty lojalnościowe / pieczątki", bc: true, market: true },
+  { name: "Płatności online", bc: true, market: true },
+  { name: "Kaucje / zaliczki", bc: true, market: true, bcNote: "automatyczne reguły", marketNote: "ręczne" },
+  { name: "Wideoprezentacja usług", bc: true, market: false, marketNote: "tylko zdjęcia" },
+  { name: "Grupy usług / kategorie", bc: true, market: true },
+  { name: "Wielostanowiskowość", bc: true, market: true },
+  { name: "Formularze / zgody klientek", bc: true, market: true, bcNote: "builder", marketNote: "prostsze" },
+];
+
 export const ComparisonSection = () => {
+  const [showShared, setShowShared] = useState(false);
+
   const scrollToForm = () => {
     document.getElementById("lead-form")?.scrollIntoView({ behavior: "smooth" });
   };
@@ -127,7 +147,6 @@ export const ComparisonSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
         >
-          {/* BC card */}
           <div className="relative rounded-2xl border-2 border-primary bg-card p-6 md:p-8 shadow-lg">
             <Badge className="absolute -top-3 left-6 bg-primary text-primary-foreground text-xs px-3">
               Beauty Calendar
@@ -151,7 +170,6 @@ export const ComparisonSection = () => {
             </div>
           </div>
 
-          {/* Marketplace card */}
           <div className="rounded-2xl border border-border bg-muted/30 p-6 md:p-8 opacity-80">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-4">
               Typowy marketplace
@@ -179,7 +197,7 @@ export const ComparisonSection = () => {
           transition={{ duration: 0.5 }}
         >
           <h3 className="text-xl md:text-2xl font-bold text-center">
-            <span className="text-primary">{uniqueFeatures.length} funkcji</span> których marketplace nie oferuje
+            <span className="text-primary">{uniqueFeatures.length} funkcji</span>, które znajdziesz tylko u nas
           </h3>
         </motion.div>
 
@@ -218,24 +236,90 @@ export const ComparisonSection = () => {
           })}
         </div>
 
-        {/* Shared features disclaimer */}
+        {/* Shared features disclaimer + collapsible */}
         <motion.div
-          className="mt-12 text-center max-w-2xl mx-auto"
+          className="mt-12 max-w-3xl mx-auto"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground leading-relaxed text-center">
             CRM, SMS, magazyn, raporty, karty lojalnościowe — tak, to mają obie platformy.{" "}
             <span className="text-foreground font-medium">
               Różnica? W tym co dzieje się potem — gdy klientka nie wraca.
             </span>
           </p>
-          <p className="text-xs text-muted-foreground/60 mt-4">
-            Dane porównawcze oparte na publicznie dostępnych cennikach (stan na 2026).
-            Prowizja 45% dotyczy usługi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
-          </p>
+
+          {/* Collapsible shared features */}
+          <div className="mt-6">
+            <button
+              onClick={() => setShowShared(!showShared)}
+              className="mx-auto flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+            >
+              Porównaj standardowe funkcje
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-300 ${showShared ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            <AnimatePresence>
+              {showShared && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-6 rounded-xl border border-border bg-card overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border bg-muted/50">
+                            <th className="text-left py-3 px-4 font-medium text-muted-foreground">Funkcja</th>
+                            <th className="text-center py-3 px-4 font-medium text-primary w-32">Beauty Calendar</th>
+                            <th className="text-center py-3 px-4 font-medium text-muted-foreground w-32">Marketplace</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {sharedFeatures.map((f, i) => (
+                            <tr key={i} className="border-b border-border/50 last:border-0">
+                              <td className="py-2.5 px-4 text-foreground">{f.name}</td>
+                              <td className="py-2.5 px-4 text-center">
+                                <div className="flex flex-col items-center gap-0.5">
+                                  <Check className="w-4 h-4 text-emerald-600" />
+                                  {f.bcNote && (
+                                    <span className="text-[10px] text-primary">{f.bcNote}</span>
+                                  )}
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-4 text-center">
+                                <div className="flex flex-col items-center gap-0.5">
+                                  {f.market ? (
+                                    <Check className="w-4 h-4 text-muted-foreground" />
+                                  ) : (
+                                    <AlertTriangle className="w-4 h-4 text-amber-500" />
+                                  )}
+                                  {f.marketNote && (
+                                    <span className="text-[10px] text-muted-foreground">{f.marketNote}</span>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground/60 px-4 py-2 border-t border-border/50">
+                      Dane porównawcze oparte na publicznie dostępnych cennikach (stan na 2026).
+                      Prowizja 45% dotyczy usługi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </motion.div>
 
         {/* CTA */}
