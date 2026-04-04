@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { Calculator, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { Calculator, ArrowRight, ArrowLeft, RotateCcw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 
 const painCards = [
   {
@@ -14,7 +12,7 @@ const painCards = [
   {
     icon: "🪑",
     headline: "Pusty fotel. Znowu.",
-    desc: "Klientka nie przyszła bez słowa. Termin przepadł. 200–400 zł wyparowało. Przy 3–4 no-showach tygodniowo to nawet 60 000 zł straty rocznie.",
+    desc: "Klientka nie przyszła bez słowa. Termin przepadł. 200–400 zł wyparowało. Przy 3–4 no-showach tygodniowo to nawet 60 000 zł straty rocznie.",
   },
   {
     icon: "📊",
@@ -33,17 +31,113 @@ const painCards = [
   },
 ];
 
+interface QuizStep {
+  question: string;
+  options: { label: string; value: number }[];
+}
+
+const quizSteps: QuizStep[] = [
+  {
+    question: "Ile klientek odwiedziło Twój salon w ostatnim roku?",
+    options: [
+      { label: "do 50", value: 40 },
+      { label: "50–150", value: 100 },
+      { label: "150–300", value: 225 },
+      { label: "300+", value: 350 },
+    ],
+  },
+  {
+    question: "Ile z nich wróciło więcej niż raz?",
+    options: [
+      { label: "mniej niż 30%", value: 0.2 },
+      { label: "30–50%", value: 0.4 },
+      { label: "50–70%", value: 0.6 },
+      { label: "ponad 70%", value: 0.8 },
+    ],
+  },
+  {
+    question: "Jak często klientka nie stawiła się bez odwołania?",
+    options: [
+      { label: "rzadko", value: 1 },
+      { label: "1–2× mies", value: 1.5 },
+      { label: "3–5× mies", value: 4 },
+      { label: "więcej", value: 7 },
+    ],
+  },
+];
+
+const AVG_VISIT = 200;
+const NOSHOW_COST = 280;
+const CAR_PAYMENT = 1500;
+const HOLIDAY = 4000;
+
+function CountUp({ target, duration = 1.5 }: { target: number; duration?: number }) {
+  const [value, setValue] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    let start = 0;
+    const startTime = performance.now();
+    const animate = (now: number) => {
+      const elapsed = (now - startTime) / 1000;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      start = Math.round(eased * target);
+      setValue(start);
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [target, duration]);
+
+  return <span ref={ref}>{value.toLocaleString("pl-PL")}</span>;
+}
+
 interface ProblemSectionProps {
   onScrollToForm?: () => void;
 }
 
 export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
-  const [monthlyRevenue, setMonthlyRevenue] = useState(15000);
-  const [noShows, setNoShows] = useState(4);
-  const [avgVisit, setAvgVisit] = useState(200);
+  const [step, setStep] = useState(0); // 0-2 = questions, 3 = result
+  const [answers, setAnswers] = useState<(number | null)[]>([null, null, null]);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
-  const noShowLoss = Math.round(noShows * avgVisit * 52);
-  const totalLoss = noShowLoss;
+  const handleSelect = (value: number, optIndex: number) => {
+    setSelectedIndex(optIndex);
+    const newAnswers = [...answers];
+    newAnswers[step] = value;
+    setAnswers(newAnswers);
+
+    setTimeout(() => {
+      setSelectedIndex(null);
+      setStep((s) => s + 1);
+    }, 350);
+  };
+
+  const handleBack = () => {
+    setSelectedIndex(null);
+    setStep((s) => Math.max(0, s - 1));
+  };
+
+  const handleReset = () => {
+    setStep(0);
+    setAnswers([null, null, null]);
+    setSelectedIndex(null);
+  };
+
+  // Calculate result
+  const totalClients = answers[0] ?? 100;
+  const retentionRate = answers[1] ?? 0.4;
+  const noShowFreq = answers[2] ?? 1.5;
+
+  const lostClientRevenue = Math.round(totalClients * (1 - retentionRate) * AVG_VISIT * 12);
+  const noShowLoss = Math.round(noShowFreq * NOSHOW_COST * 12);
+  const totalLoss = lostClientRevenue + noShowLoss;
+
+  const carPayments = Math.floor(totalLoss / CAR_PAYMENT);
+  const holidays = Math.floor(totalLoss / HOLIDAY);
+  const calmMonths = Math.floor(totalLoss / 5000);
+
+  const isResult = step === 3;
 
   return (
     <section className="py-20 lg:py-32 relative overflow-hidden bg-gradient-to-b from-background to-muted/20">
@@ -71,7 +165,7 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
           </h2>
 
           <p className="text-lg text-muted-foreground leading-relaxed">
-            Większość właścicielek salonów traci od <strong>15 000</strong> do <strong>60 000 zł rocznie</strong> — nie dlatego że źle pracują. Tylko dlatego że nie mają odpowiednich narzędzi.
+            Większość właścicielek salonów traci od <strong>15 000</strong> do <strong>60 000 zł rocznie</strong> — nie dlatego że źle pracują. Tylko dlatego że nie mają odpowiednich narzędzi.
           </p>
         </motion.div>
 
@@ -97,7 +191,7 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
           ))}
         </div>
 
-        {/* Calculator */}
+        {/* Quiz Calculator */}
         <motion.div
           className="mt-12 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 40 }}
@@ -111,75 +205,134 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
             <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-gradient-to-tr from-destructive/8 to-transparent rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-8">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm">
                   <Calculator className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-bold text-lg tracking-tight">Kalkulator strat</h3>
-                  <p className="text-sm text-muted-foreground">Ile tracisz na no-showach?</p>
+                  <p className="text-sm text-muted-foreground">3 pytania — Twój wynik w 30 sekund</p>
                 </div>
               </div>
 
-              <div className="space-y-7 mb-8">
-                <div>
-                  <div className="flex justify-between mb-3">
-                    <Label className="text-sm font-medium text-muted-foreground">Miesięczny przychód salonu</Label>
-                    <span className="font-bold text-sm bg-primary/5 px-3 py-1 rounded-full">{monthlyRevenue.toLocaleString("pl-PL")} zł</span>
-                  </div>
-                  <Slider value={[monthlyRevenue]} min={2000} max={60000} step={500} onValueChange={([v]) => setMonthlyRevenue(v)} className="[&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:shadow-md" />
+              {/* Progress dots */}
+              {!isResult && (
+                <div className="flex items-center gap-2 mb-8">
+                  {[0, 1, 2].map((i) => (
+                    <div
+                      key={i}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i === step
+                          ? "w-10 bg-primary"
+                          : i < step
+                          ? "w-6 bg-primary/40"
+                          : "w-6 bg-border"
+                      }`}
+                    />
+                  ))}
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    {step + 1} / 3
+                  </span>
                 </div>
-                <div>
-                  <div className="flex justify-between mb-3">
-                    <Label className="text-sm font-medium text-muted-foreground">No-showy tygodniowo</Label>
-                    <span className="font-bold text-sm bg-destructive/5 text-destructive px-3 py-1 rounded-full">{noShows}</span>
-                  </div>
-                  <Slider value={[noShows]} min={0} max={15} step={1} onValueChange={([v]) => setNoShows(v)} className="[&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:shadow-md" />
-                </div>
-                <div>
-                  <div className="flex justify-between mb-3">
-                    <Label className="text-sm font-medium text-muted-foreground">Średnia wartość wizyty</Label>
-                    <span className="font-bold text-sm bg-primary/5 px-3 py-1 rounded-full">{avgVisit} zł</span>
-                  </div>
-                  <Slider value={[avgVisit]} min={50} max={600} step={10} onValueChange={([v]) => setAvgVisit(v)} className="[&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:shadow-md" />
-                </div>
-              </div>
+              )}
 
-              {/* Results card */}
-              <div className="bg-gradient-to-br from-muted/40 to-muted/20 dark:from-muted/20 dark:to-muted/10 rounded-2xl p-6 space-y-4 mb-6 border border-border/20">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-muted-foreground">Straty na no-showach rocznie</span>
-                  <span className="font-bold text-destructive">-{noShowLoss.toLocaleString("pl-PL")} zł</span>
-                </div>
-                <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                <div className="flex justify-between items-center">
-                  <span className="font-bold">Tracisz łącznie</span>
-                  <motion.span
-                    key={totalLoss}
-                    initial={{ scale: 0.9, opacity: 0.5 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                    className="font-black text-3xl text-destructive tracking-tight"
-                  >
-                    -{totalLoss.toLocaleString("pl-PL")} zł
-                    <span className="text-base font-medium text-muted-foreground ml-1">/rok</span>
-                  </motion.span>
-                </div>
-                <div className="bg-emerald-50 dark:bg-emerald-500/10 rounded-xl p-4 border border-emerald-200/50 dark:border-emerald-500/20">
-                  <div className="flex justify-between items-center">
-                    <span className="text-emerald-700 dark:text-emerald-400 text-sm font-medium">Z Beauty Calendar odzyskasz:</span>
-                    <span className="font-bold text-emerald-700 dark:text-emerald-400 text-lg">+{totalLoss.toLocaleString("pl-PL")} zł/rok</span>
-                  </div>
-                </div>
-              </div>
+              {/* Quiz content */}
+              <div className="min-h-[280px] flex flex-col">
+                <AnimatePresence mode="wait">
+                  {!isResult ? (
+                    <motion.div
+                      key={`step-${step}`}
+                      initial={{ opacity: 0, x: 30 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -30 }}
+                      transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="flex-1 flex flex-col"
+                    >
+                      <h4 className="text-xl font-semibold mb-6 leading-snug">
+                        {quizSteps[step].question}
+                      </h4>
 
-              <Button
-                className="w-full h-14 gap-2 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
-                onClick={onScrollToForm}
-              >
-                Zacznij odzyskiwać te pieniądze — za darmo
-                <ArrowRight className="w-4 h-4" />
-              </Button>
+                      <div className="grid grid-cols-2 gap-3 mb-6">
+                        {quizSteps[step].options.map((opt, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleSelect(opt.value, i)}
+                            className={`p-4 rounded-xl border-2 text-center font-medium transition-all duration-200 cursor-pointer ${
+                              selectedIndex === i
+                                ? "border-primary bg-primary text-primary-foreground scale-[0.97]"
+                                : "border-border/60 bg-muted/20 hover:border-primary/50 hover:bg-primary/5"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {step > 0 && (
+                        <button
+                          onClick={handleBack}
+                          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-auto self-start"
+                        >
+                          <ArrowLeft className="w-3.5 h-3.5" />
+                          Wróć
+                        </button>
+                      )}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="result"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="flex-1 flex flex-col"
+                    >
+                      <p className="text-sm text-muted-foreground mb-2 font-medium">
+                        Szacujemy że tracisz rocznie:
+                      </p>
+
+                      <div className="text-5xl md:text-6xl font-black text-destructive tracking-tight mb-6">
+                        −<CountUp target={totalLoss} /> zł
+                      </div>
+
+                      {/* Contextual comparisons */}
+                      <div className="bg-muted/30 rounded-2xl p-5 space-y-3 mb-6 border border-border/20">
+                        <p className="text-sm font-medium text-muted-foreground mb-3">To jest tyle co:</p>
+                        <div className="grid gap-2.5">
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-lg">🚗</span>
+                            <span><strong>{carPayments}</strong> rat kredytowych za samochód</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-lg">✈️</span>
+                            <span><strong>{holidays}</strong> wakacyjnych wyjazdów</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <span className="text-lg">🧘</span>
+                            <span><strong>{calmMonths}</strong> miesięcy spokoju finansowego</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <Button
+                        className="w-full h-14 gap-2 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+                        onClick={onScrollToForm}
+                      >
+                        Odzyskaj te pieniądze — zacznij za darmo
+                        <ArrowRight className="w-4 h-4" />
+                      </Button>
+
+                      <button
+                        onClick={handleReset}
+                        className="flex items-center justify-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-4"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Przelicz ponownie
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </motion.div>
