@@ -1,62 +1,56 @@
-import { Sparkles, Scissors, Heart, Flower, Footprints, Stethoscope, Dumbbell, Eye } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
 
-const audiences = [
+const categories = [
   {
-    icon: Heart,
-    title: "\uD83D\uDC85 Salony kosmetyczne",
-    description: "Manicure, pedicure, stylizacja brwi i rz\u0119s. Zarz\u0105dzaj stanowiskami, materia\u0142ami i grafikiem pracownic.",
-    color: "from-pink-500 to-rose-600",
-    features: ["Magazyn produkt\u00F3w", "Widgety kampanii", "Cross-selling"],
+    emoji: "\ud83d\udc85",
+    title: "Paznokcie i d\u0142onie",
+    items: ["Salon paznokci", "Manicure hybrydowy", "Przed\u0142u\u017canie paznokci", "Pedicure leczniczy", "Nail art studio"],
   },
   {
-    icon: Scissors,
-    title: "\uD83D\uDC87\u200D\u2640\uFE0F Salony fryzjerskie",
-    description: "Warianty us\u0142ug, produkty w magazynie, prowizje dla pracownic. Bo fryzjerstwo to nie tylko no\u017Cyczki.",
-    color: "from-amber-500 to-orange-600",
-    features: ["Multi-stanowiskowy", "Prowizje", "Szybkie rezerwacje"],
+    emoji: "\u2702\ufe0f",
+    title: "Fryzjerstwo i w\u0142osy",
+    items: ["Salon fryzjerski", "Barber shop", "Koloryzacja i balayage", "Przed\u0142u\u017canie w\u0142os\u00f3w", "Studio stylizacji"],
   },
   {
-    icon: Sparkles,
-    title: "\uD83D\uDC69\u200D\u2695\uFE0F Medycyna estetyczna",
-    description: "Karty konsultacyjne, zgody RODO, historia zabieg\u00F3w, True Profit per zabieg. Dla klinik, kt\u00F3re my\u015Bl\u0105 jak biznes.",
-    color: "from-violet-500 to-purple-600",
-    features: ["Historia zabieg\u00F3w", "Dokumentacja", "True Profit"],
+    emoji: "\u2728",
+    title: "Kosmetyka i twarz",
+    items: ["Gabinet kosmetyczny", "Peeling kawitacyjny", "Mikrodermabrazja", "Oczyszczanie wodorowe", "Lifting twarzy"],
   },
   {
-    icon: Flower,
-    title: "\uD83E\uDDD6\u200D\u2640\uFE0F SPA & Wellness",
-    description: "Pakiety us\u0142ug, karnety, rezerwacje grupowe, multi-lokalizacja. Bo SPA to do\u015Bwiadczenie.",
-    color: "from-emerald-500 to-teal-600",
-    features: ["Pakiety us\u0142ug", "Vouchery", "Przedp\u0142aty"],
+    emoji: "\ud83e\udee7",
+    title: "Rz\u0119sy i brwi",
+    items: ["Stylizacja rz\u0119s", "Lash lifting", "Laminacja brwi", "Microblading", "PMU i makija\u017c permanentny"],
   },
   {
-    icon: Scissors,
-    title: "\uD83D\uDC88 Barbershopy",
-    description: "Szybkie rezerwacje, kolejka klient\u00F3w, prowizje dla barber\u00F3w. Prosty kalendarz, zero zb\u0119dnych funkcji.",
-    color: "from-slate-500 to-zinc-600",
-    features: ["Szybki kalendarz", "Prowizje", "SMS"],
+    emoji: "\u26a1",
+    title: "Depilacja",
+    items: ["Depilacja laserowa", "Depilacja IPL", "Woskowanie i sugaring", "Studio depilacji"],
   },
   {
-    icon: Footprints,
-    title: "\uD83E\uDDB6 Podologia",
-    description: "Karty pacjenta, dokumentacja medyczna, przypomnienia o kontrolach. Zgodne z wymogami bran\u017Cy.",
-    color: "from-sky-500 to-blue-600",
-    features: ["Karty pacjenta", "Kontrole", "RODO"],
+    emoji: "\ud83e\ude7a",
+    title: "Medycyna estetyczna",
+    items: ["Gabinet medycyny estetycznej", "Klinika anti-aging", "Mezoterapia", "Botoks i wype\u0142niacze", "Osocze bogatop\u0142ytkowe"],
   },
   {
-    icon: Stethoscope,
-    title: "\uD83E\uDE7A Fizjoterapia",
-    description: "Opis zabieg\u00F3w, post\u0119py pacjenta, cykle wizyt. Idealny dla gabinet\u00F3w rehabilitacyjnych.",
-    color: "from-cyan-500 to-sky-600",
-    features: ["Cykle wizyt", "Notatki", "Eksporty"],
+    emoji: "\ud83d\udc86",
+    title: "Masa\u017c i wellness",
+    items: ["Salon masa\u017cu", "Masa\u017c tajski / leczniczy", "Refleksologia", "Studio wellness i relaksu"],
   },
   {
-    icon: Dumbbell,
-    title: "\uD83E\uDDD8\u200D\u2640\uFE0F Masa\u017C & Joga",
-    description: "Rezerwacje grupowe, pakiety sesji, karnety. Dla studio\u00F3w, kt\u00F3re chc\u0105 rosn\u0105\u0107.",
-    color: "from-orange-500 to-red-600",
-    features: ["Pakiety sesji", "Karnety", "Rezerwacje grupowe"],
+    emoji: "\ud83c\udf3f",
+    title: "SPA i kompleksy",
+    items: ["Salon SPA", "Hotel SPA", "Centrum odnowy biologicznej", "Strefa relaksu"],
+  },
+  {
+    emoji: "\ud83d\udcaa",
+    title: "Sylwetka i cia\u0142o",
+    items: ["Studio modelowania sylwetki", "Kriolipoliza", "Endermologia", "Drena\u017c limfatyczny"],
+  },
+  {
+    emoji: "\ud83d\udd2c",
+    title: "Specjalistyczne",
+    items: ["Gabinet trychologiczny", "Studio bridal (makija\u017c \u015blubny)", "Gabinet podologiczny", "Studio opalania natryskowego", "Solarium"],
   },
 ];
 
@@ -64,46 +58,57 @@ export const AudienceSection = () => {
   return (
     <section className="py-20 lg:py-32">
       <div className="container">
-        {/* Section header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Dla ka\u017Cdego salonu beauty i wellness.{" "}
-            <span className="text-gradient-luxury">R\u00F3wnie\u017C dla Twojego.</span>
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7 }}
+        >
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
+            Beauty Calendar jest dla Ciebie \u2014
+            <br />
+            <span className="text-gradient-luxury">niezale\u017cnie od tego czym si\u0119 zajmujesz</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Niezale\u017Cnie od bran\u017Cy \u2014 je\u015Bli przyjmujesz klient\u00F3w na wizyty, Beauty Calendar jest dla Ciebie.
-          </p>
-        </div>
+        </motion.div>
 
-        {/* Audience cards */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {audiences.map((audience, index) => (
-            <Card 
-              key={index}
-              className="group relative overflow-hidden border-border/50 hover:border-border transition-all duration-500 hover:-translate-y-2 hover:shadow-xl"
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-6xl mx-auto">
+          {categories.map((cat, i) => (
+            <motion.div
+              key={i}
+              className="p-4 rounded-xl bg-card border border-border/50 hover:border-primary/20 transition-all duration-300"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05, duration: 0.4 }}
             >
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold mb-2">{audience.title}</h3>
-                <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
-                  {audience.description}
-                </p>
-
-                <div className="flex flex-wrap gap-2">
-                  {audience.features.map((feature, i) => (
-                    <span 
-                      key={i}
-                      className="text-xs px-2 py-1 bg-muted rounded-full"
-                    >
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-
-                <div className={`absolute inset-0 bg-gradient-to-br ${audience.color} opacity-0 group-hover:opacity-5 transition-opacity`} />
-              </CardContent>
-            </Card>
+              <div className="text-2xl mb-2">{cat.emoji}</div>
+              <h3 className="font-bold text-sm mb-2">{cat.title}</h3>
+              <ul className="space-y-1">
+                {cat.items.map((item, j) => (
+                  <li key={j} className="text-xs text-muted-foreground">{item}</li>
+                ))}
+              </ul>
+            </motion.div>
           ))}
         </div>
+
+        {/* Bottom CTA */}
+        <motion.div
+          className="text-center mt-10 p-6 bg-primary/5 border border-primary/10 rounded-2xl max-w-2xl mx-auto"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <p className="font-bold text-lg mb-2">Prowadzisz salon kt\u00f3rego tu nie ma?</p>
+          <p className="text-muted-foreground text-sm mb-4">
+            Je\u015bli masz klient\u00f3w, terminy i us\u0142ugi \u2014 Beauty Calendar jest dla Ciebie. Dzia\u0142a dla ka\u017cdego salonu us\u0142ugowego w Polsce.
+          </p>
+          <Button variant="outline" className="gap-2">
+            Porozmawiajmy \u2192
+          </Button>
+        </motion.div>
       </div>
     </section>
   );

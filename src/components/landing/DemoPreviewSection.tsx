@@ -12,22 +12,22 @@ const DemoPreviewSection = () => {
           className="max-w-3xl mx-auto text-center mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-sm text-primary mb-4 font-medium">
             <Play className="w-4 h-4" />
-            Interaktywny podgląd
+            Interaktywny podgl\u0105d
           </div>
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
-            Przeklikaj sam — zobacz jak to działa
+            Przeklikaj sam \u2014 zobacz jak to dzia\u0142a
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Pełny panel administracyjny z przykładowymi danymi. Bez rejestracji, bez zobowiązań — po prostu klikaj.
+            Pe\u0142ny panel administracyjny z przyk\u0142adowymi danymi. Bez rejestracji, bez zobowi\u0105za\u0144.
           </p>
         </motion.div>
 
-        {/* Preview mockup frame */}
+        {/* Preview mockup */}
         <motion.div
           className="max-w-4xl mx-auto mb-10 rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
           initial={{ opacity: 0, y: 40 }}
@@ -35,6 +35,13 @@ const DemoPreviewSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.2 }}
         >
+          {/* Demo banner */}
+          <div className="bg-primary/95 text-white px-4 py-2.5 flex items-center justify-between text-sm">
+            <span>\ud83d\udc40 Przegl\u0105dasz wersj\u0119 demo Beauty Calendar</span>
+            <Button size="sm" variant="secondary" className="text-xs h-7" onClick={() => (window.location.href = "/auth")}>
+              Za\u0142\u00f3\u017c swoje konto \u2014 0 z\u0142 \u2192
+            </Button>
+          </div>
           {/* Browser bar */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border bg-muted/30">
             <div className="flex gap-1.5">
@@ -48,11 +55,10 @@ const DemoPreviewSection = () => {
               </div>
             </div>
           </div>
-          {/* Screenshot-like content */}
+          {/* Content */}
           <div className="p-6 grid grid-cols-3 gap-4">
-            {/* Sidebar preview */}
             <div className="space-y-2">
-              {["Dashboard", "Kalendarz", "Klienci", "Usługi", "Retencja", "Polecenia"].map((item, i) => (
+              {["Dashboard", "Kalendarz", "Klienci", "Us\u0142ugi", "Retencja", "Polecenia"].map((item, i) => (
                 <div
                   key={item}
                   className={`px-3 py-2 rounded-lg text-sm ${
@@ -63,13 +69,12 @@ const DemoPreviewSection = () => {
                 </div>
               ))}
             </div>
-            {/* Main content preview */}
             <div className="col-span-2 space-y-4">
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: "Dzisiaj", value: "2 450 zł", color: "text-emerald-600" },
-                  { label: "Ten tydzień", value: "12 800 zł", color: "text-primary" },
-                  { label: "Obłożenie", value: "78%", color: "text-amber-600" },
+                  { label: "Dzisiaj", value: "2 450 z\u0142", color: "text-emerald-600" },
+                  { label: "Ten tydzie\u0144", value: "12 800 z\u0142", color: "text-primary" },
+                  { label: "Ob\u0142o\u017cenie", value: "78%", color: "text-amber-600" },
                 ].map((stat) => (
                   <div key={stat.label} className="p-3 rounded-xl bg-muted/30 border border-border/50">
                     <div className="text-xs text-muted-foreground">{stat.label}</div>
@@ -78,7 +83,7 @@ const DemoPreviewSection = () => {
                 ))}
               </div>
               <div className="h-24 bg-muted/20 rounded-xl border border-border/50 flex items-center justify-center">
-                <span className="text-xs text-muted-foreground">📊 Wykres przychodów</span>
+                <span className="text-xs text-muted-foreground">\ud83d\udcca Wykres przychod\u00f3w</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-muted/20 border border-border/50">
@@ -104,15 +109,15 @@ const DemoPreviewSection = () => {
             onClick={() => (window.location.href = "/demo")}
           >
             <Settings className="mr-2 w-4 h-4" />
-            Otwórz pełne demo
+            Otw\u00f3rz pe\u0142ne demo
           </Button>
           <Button
             size="lg"
             variant="outline"
             className="px-8"
-            onClick={() => (window.location.href = "/book/demo-salon")}
+            onClick={() => (window.location.href = "/auth")}
           >
-            Wypróbuj rezerwację
+            Za\u0142\u00f3\u017c swoje konto za darmo
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>

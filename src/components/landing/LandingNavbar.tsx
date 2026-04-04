@@ -36,7 +36,6 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
           <a href="/" className="flex items-center gap-2 group">
             <Calendar className="h-7 w-7 text-gold group-hover:rotate-12 transition-transform duration-300" />
             <span className="text-xl font-bold text-foreground">
@@ -44,38 +43,24 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             </span>
           </a>
 
-          {/* Desktop navigation */}
           <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => scrollToSection("features")}
-              className="relative text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={() => scrollToSection("features")} className="relative text-muted-foreground hover:text-foreground transition-colors">
               {t("nav.features")}
               <span className="absolute -top-2 -right-8 text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full leading-none">
                 Nowe
               </span>
             </button>
-            <button
-              onClick={() => scrollToSection("pricing")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={() => scrollToSection("pricing")} className="text-muted-foreground hover:text-foreground transition-colors">
               Cennik
             </button>
-            <button
-              onClick={() => scrollToSection("demo-preview")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {t("nav.demo")}
+            <button onClick={() => scrollToSection("demo-preview")} className="text-muted-foreground hover:text-foreground transition-colors">
+              Zobacz demo
             </button>
-            <button
-              onClick={() => scrollToSection("faq")}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={() => scrollToSection("faq")} className="text-muted-foreground hover:text-foreground transition-colors">
               {t("nav.faq")}
             </button>
           </div>
 
-          {/* CTA + Language Switcher */}
           <div className="hidden md:flex items-center gap-4">
             <LanguageSwitcher />
             <a
@@ -83,17 +68,16 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               <LogIn className="w-4 h-4" />
-              Zaloguj się
+              Zaloguj si\u0119
             </a>
             <Button
               onClick={onScrollToForm}
               className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
-              Zacznij za darmo — 0 zł
+              Zacznij za darmo
             </Button>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-2">
             <LanguageSwitcher variant="compact" />
             <a
@@ -105,16 +89,12 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             >
               <MessageCircle className="h-5 w-5" />
             </a>
-            <button
-              className="text-foreground p-2"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
+            <button className="text-foreground p-2" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border/50 animate-fade-in bg-background/80 backdrop-blur-xl rounded-b-xl">
             <div className="flex flex-col gap-4">
@@ -125,20 +105,20 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
                 Cennik
               </button>
               <button onClick={() => scrollToSection("demo-preview")} className="text-left text-muted-foreground hover:text-foreground py-2">
-                {t("nav.demo")}
+                Zobacz demo
               </button>
               <button onClick={() => scrollToSection("faq")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.faq")}
               </button>
               <a href="https://admin.beauty-funnels.com/auth" className="flex items-center gap-1.5 text-left text-muted-foreground hover:text-foreground py-2 font-medium">
                 <LogIn className="w-4 h-4" />
-                Zaloguj się
+                Zaloguj si\u0119
               </a>
               <Button
                 onClick={() => { onScrollToForm(); setIsMobileMenuOpen(false); }}
                 className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
               >
-                Zacznij za darmo — 0 zł
+                Zacznij za darmo
               </Button>
             </div>
           </div>

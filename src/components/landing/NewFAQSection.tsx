@@ -4,49 +4,54 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Users, Percent, ArrowRightLeft, ShieldCheck, Smartphone, RotateCcw, HelpCircle, Heart } from "lucide-react";
+import { Users, Percent, ArrowRightLeft, ShieldCheck, Smartphone, RotateCcw, HelpCircle, Calendar, Crown } from "lucide-react";
 import { motion } from "framer-motion";
 
 const faqs = [
   {
-    icon: Users,
-    question: "Moje klientki znaj\u0105 mnie z innej platformy \u2014 nie znajd\u0105 mnie tutaj?",
-    answer: "Twoje klientki nie szukaj\u0105 Ci\u0119 na marketplace. Szukaj\u0105 Ci\u0119 po nazwie w Google lub na Instagramie. Beauty Calendar daje Ci w\u0142asny link i widget na stronie, Facebooku i Instagramie. Wy\u015Blij im jedn\u0105 wiadomo\u015B\u0107 z nowym linkiem \u2014 90% przejdzie w ci\u0105gu tygodnia.",
+    icon: HelpCircle,
+    question: "Czym r\u00f3\u017cnicie si\u0119 od platform marketplace?",
+    answer: "Platformy marketplace dzia\u0142aj\u0105 jak Allegro dla us\u0142ug \u2014 bijesz si\u0119 cen\u0105 z konkurencj\u0105, a klientki nale\u017c\u0105 do platformy. My dzia\u0142amy odwrotnie: dostarczamy Ci narz\u0119dzia do budowania W\u0141ASNEJ bazy klientek, w\u0142asnego brandu i w\u0142asnych relacji. Twoje dane \u2014 zawsze Twoje.",
   },
   {
     icon: Percent,
-    question: "Jak to mo\u017Cliwe \u017Ce 0% prowizji? Gdzie jest haczyk?",
-    answer: "Platformy marketplace \u0142\u0105cz\u0105 klientki z salonami i bior\u0105 procent od ka\u017Cdego po\u0142\u0105czenia. My nie jeste\u015Bmy marketplace. Jeste\u015Bmy narz\u0119dziem \u2014 jak Canva czy Notion. P\u0142acisz sta\u0142\u0105 kwot\u0119 za software, nie za swoje klientki.",
-  },
-  {
-    icon: ArrowRightLeft,
-    question: "Czy migracja z innej platformy jest trudna?",
-    answer: "Eksportujesz dane jako CSV, importujesz jednym klikni\u0119ciem. Ca\u0142o\u015B\u0107 trwa 10-15 minut. W pakiecie ELITE \u2014 robimy to za Ciebie podczas onboarding callu.",
-  },
-  {
-    icon: Heart,
-    question: "Czym jest \u015Acie\u017Cka Klientki i jak pomaga w retencji?",
-    answer: "\u015Acie\u017Cka Klientki to automatyczny system, kt\u00F3ry prowadzi ka\u017Cd\u0105 klientk\u0119 przez 5 wizyt \u2014 od pierwszej rezerwacji do sta\u0142ej bywalczyni. Mi\u0119dzy wizytami system wysy\u0142a spersonalizowane sekwencje (SMS, email), upselluje pakiety i buduje relacj\u0119. Bo prawdziwy zysk nie jest w pierwszej wizycie \u2014 jest w powrotach.",
+    question: "Czy naprawd\u0119 0% prowizji?",
+    answer: "Tak. W \u017cadnym pakiecie nie pobieramy prowizji od rezerwacji Twoich klientek. P\u0142acisz tylko sta\u0142y abonament. \u017badnych niespodzianek, \u017cadnych ukrytych op\u0142at.",
   },
   {
     icon: ShieldCheck,
-    question: "Czy moje dane s\u0105 bezpieczne?",
-    answer: "Serwery w UE, szyfrowanie SSL/TLS, pe\u0142na zgodno\u015B\u0107 z RODO. I co najwa\u017Cniejsze \u2014 to S\u0104 Twoje dane. Mo\u017Cesz je wyeksportowa\u0107 i usun\u0105\u0107 w ka\u017Cdej chwili. Na marketplace \u2014 Twoje dane nale\u017C\u0105 do platformy.",
+    question: "Co si\u0119 stanie z moimi danymi je\u015bli zrezygnuj\u0119?",
+    answer: "Zabierasz je ze sob\u0105. W dowolnym momencie eksportujesz pe\u0142n\u0105 baz\u0119 klientek, histori\u0119 wizyt i dane finansowe do CSV/Excel. Twoje dane s\u0105 zawsze Twoje.",
+  },
+  {
+    icon: ArrowRightLeft,
+    question: "Jak szybko mog\u0119 zacz\u0105\u0107?",
+    answer: "Konto zak\u0142ada si\u0119 w 5 minut. Je\u015bli korzysta\u0142a\u015b z innej platformy \u2014 import danych zajmuje kolejne 5 minut. Tego samego dnia masz dzia\u0142aj\u0105cy system.",
   },
   {
     icon: Smartphone,
-    question: "Nie jestem techniczna \u2014 czy dam rad\u0119?",
-    answer: "Je\u015Bli obs\u0142ugujesz Instagram \u2014 dasz rad\u0119 z Beauty Calendar. Konfiguracja trwa 15 minut. Mamy video-poradniki po polsku. A w pakiecie ELITE \u2014 konfigurujemy wszystko za Ciebie.",
+    question: "Czy trudno obs\u0142ugiwa\u0107 Beauty Calendar?",
+    answer: "Interfejs by\u0142 projektowany specjalnie dla w\u0142a\u015bcicielek salon\u00f3w \u2014 nie dla programist\u00f3w. Wi\u0119kszo\u015b\u0107 funkcji uruchomisz bez \u017cadnej instrukcji. W pakiecie ELITE mamy prywatny onboarding call \u2014 konfigurujemy system za Ciebie.",
+  },
+  {
+    icon: Users,
+    question: "Czy dzia\u0142a na telefonie?",
+    answer: "Tak. Masz aplikacj\u0119 mobiln\u0105 dla w\u0142a\u015bciciela salonu (zarz\u0105dzanie, kalendarz, powiadomienia) oraz aplikacj\u0119 dla klientek (rezerwacje, historia wizyt, komunikacja). Dost\u0119pne na iOS i Android.",
+  },
+  {
+    icon: Calendar,
+    question: "Czy integruje si\u0119 z Google Calendar?",
+    answer: "Tak, w pakietach PRO i ELITE masz dwukierunkow\u0105 synchronizacj\u0119 z Google Calendar. Wizyty pojawiaj\u0105 si\u0119 automatycznie po obu stronach.",
+  },
+  {
+    icon: Crown,
+    question: "Czym jest pakiet ELITE?",
+    answer: "ELITE to Beauty Calendar z w\u0142\u0105czonym AI Autopilotem \u2014 system sam wykrywa zagro\u017cone klientki, wysy\u0142a sekwencje, wymaga zaliczek od no-show\u00f3w i prognozuje przychody. Do tego prywatny onboarding call gdzie konfigurujemy wszystko za Ciebie.",
   },
   {
     icon: RotateCcw,
-    question: "Co je\u015Bli mi si\u0119 nie spodoba?",
+    question: "Co je\u015bli mi si\u0119 nie spodoba?",
     answer: "Pakiet FREE jest darmowy na zawsze \u2014 testuj bez limitu czasowego. Pakiety p\u0142atne anulujesz jednym klikni\u0119ciem, bez wypowiedzenia. Gwarancja zwrotu 30 dni bez pyta\u0144. Twoje dane zostaj\u0105 Twoje.",
-  },
-  {
-    icon: HelpCircle,
-    question: "Czym si\u0119 r\u00F3\u017Cni od marketplace typu B\uD83E\uDD21SY?",
-    answer: "Marketplace to targ \u2014 Twoje klientki widz\u0105 konkurencj\u0119 i porównuj\u0105 ceny. My jeste\u015Bmy Twoim narz\u0119dziem \u2014 klientki widz\u0105 TYLKO Tw\u00F3j salon. Nie bierzemy prowizji, nie jeste\u015Bmy w\u0142a\u015Bcicielem Twojej bazy, a zamiast tego dajemy Ci narz\u0119dzia retencji, kt\u00F3rych \u017Cadna inna platforma nie oferuje.",
   },
 ];
 
@@ -62,8 +67,8 @@ export const NewFAQSection = () => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            8 pyta\u0144, kt\u00F3re zadajesz{" "}
-            <span className="text-gradient-luxury">zanim klikniesz \u201Ezacznij\u201D</span>
+            Pytania kt\u00f3re zadajesz{" "}
+            <span className="text-gradient-luxury">zanim klikniesz \u201ezacznij\u201d</span>
           </h2>
         </motion.div>
 

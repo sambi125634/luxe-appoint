@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Lock, CreditCard } from "lucide-react";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
 interface NewFinalCTASectionProps {
@@ -20,9 +19,10 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Ka\u017Cdy dzie\u0144 bez systemu retencji<br />
+          Ka\u017cdy dzie\u0144 bez Beauty Calendar
+          <br />
           <span className="bg-gradient-to-r from-destructive to-amber-500 bg-clip-text text-transparent">
-            to klientka, kt\u00F3ra nie wr\u00F3ci.
+            to pieni\u0105dze kt\u00f3re mog\u0142a\u015b mie\u0107.
           </span>
         </motion.h2>
 
@@ -33,9 +33,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          <p>Twoja baza. Twoje dane. Twoje narz\u0119dzia retencji. Od 99 z\u0142 netto/mies.</p>
-          <p>Zacznij od FREE \u2014 14 dni pe\u0142nego dost\u0119pu, bez karty, bez zobowi\u0105za\u0144.</p>
-          <p className="font-semibold text-foreground">Jedyne ryzyko to zostawienie rzeczy tak jak s\u0105.</p>
+          <p>Do\u0142\u0105cz do w\u0142a\u015bcicielek salon\u00f3w kt\u00f3re odzyska\u0142y kontrol\u0119 nad swoim biznesem \u2014 i swoimi klientkami.</p>
         </motion.div>
 
         <motion.div
@@ -46,26 +44,35 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           transition={{ delay: 0.3 }}
         >
           <Button size="lg" onClick={onScrollToForm} className="h-14 px-10 text-lg gap-2 relative overflow-hidden">
-            <span>Zacznij za darmo \u2014 odbierz dost\u0119p</span>
+            <span>Zacznij za darmo \u2014 bez karty kredytowej</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
           <Button size="lg" variant="outline" onClick={onScrollToForm} className="h-14 px-8 text-lg gap-2">
-            Um\u00F3w prywatn\u0105 prezentacj\u0119
+            Porozmawiajmy najpierw \u2192
           </Button>
         </motion.div>
 
-        {/* Micro-copy */}
-        <motion.p
-          className="text-sm text-muted-foreground mb-8"
+        {/* Social proof */}
+        <motion.div
+          className="flex items-center justify-center gap-3 mb-8"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
         >
-          Do\u0142\u0105cz w 60 sekund \u00B7 Nie wymagamy karty kredytowej \u00B7 Rezygnacja jednym klikni\u0119ciem
-        </motion.p>
+          <div className="flex -space-x-2">
+            {["AK", "MW", "JP"].map((i, idx) => (
+              <div key={idx} className="w-6 h-6 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-[10px] font-bold text-primary">
+                {i}
+              </div>
+            ))}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-bold text-foreground">23 salony</span> do\u0142\u0105czy\u0142y w tym tygodniu
+          </p>
+        </motion.div>
 
-        {/* Trust indicators */}
+        {/* Trust */}
         <motion.div
           className="flex items-center justify-center gap-6 opacity-60 flex-wrap"
           initial={{ opacity: 0 }}
@@ -73,20 +80,12 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <div className="flex items-center gap-1.5 text-sm">
-            <Lock className="w-3.5 h-3.5" />
-            SSL 256-bit
-          </div>
-          <div className="flex items-center gap-1.5 text-sm">
-            <Shield className="w-3.5 h-3.5" />
-            RODO compliant
-          </div>
+          <div className="flex items-center gap-1.5 text-sm"><Lock className="w-3.5 h-3.5" />SSL 256-bit</div>
+          <div className="flex items-center gap-1.5 text-sm"><Shield className="w-3.5 h-3.5" />RODO</div>
           <div className="text-sm font-bold">Przelewy24</div>
           <div className="text-sm font-bold">BLIK</div>
-          <div className="flex items-center gap-1.5 text-sm">
-            <CreditCard className="w-3.5 h-3.5" />
-            Bez karty kredytowej
-          </div>
+          <div className="flex items-center gap-1.5 text-sm"><CreditCard className="w-3.5 h-3.5" />Bez karty</div>
+          <div className="text-sm">Twoje dane \u2014 zawsze Twoje</div>
         </motion.div>
       </div>
     </section>

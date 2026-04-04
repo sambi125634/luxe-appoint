@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, ArrowRight } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -12,6 +12,10 @@ interface NewHeroSectionProps {
 }
 
 export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
+  const scrollToDemo = () => {
+    document.getElementById("demo-preview")?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-violet-dark via-background to-muted/30" />
@@ -28,7 +32,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-          {/* Animated Badge */}
+          {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -38,23 +42,25 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               variant="outline"
               className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
-              0% prowizji · Własna baza klientów · Made in Poland 🇵🇱
+              Platforma beauty kt\u00f3ra pracuje \u2014 kiedy Ty nie mo\u017cesz
             </Badge>
           </motion.div>
 
           {/* Headline */}
           <motion.div
-            className="space-y-4"
+            className="space-y-2"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-              Twoje klientki. Twoja baza.
+              Tw\u00f3j salon rezerwuje, przypomina
               <br />
-              <span className="text-gradient-luxury">Twój zysk.</span>
+              <span className="text-gradient-luxury">i odzyskuje klientki sam.</span>
             </h1>
+            <p className="text-xl md:text-2xl text-muted-foreground font-normal">
+              Bez prowizji od rezerwacji. Twoja baza. Na zawsze.
+            </p>
           </motion.div>
 
           {/* Subheadline */}
@@ -64,9 +70,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            Beauty Calendar to system, który pomaga Ci zatrzymać klientki — nie oddawać je platformie marketplace.
+            AI wype\u0142nia grafik, segreguje klientki, prognozuje przychody i wysy\u0142a komunikacj\u0119 \u2014 automatycznie.
             <br />
-            <span className="font-semibold text-foreground">Stała cena od 99 zł/mies. Zero prowizji. Pełna własność danych.</span>
+            <span className="font-semibold text-foreground">Ty zajmujesz si\u0119 zabiegami.</span>
           </motion.p>
 
           {/* CTAs */}
@@ -82,7 +88,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Zacznij za darmo — 14 dni pełnego dostępu
+                Zacznij za darmo \u2014 bez karty
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Button>
@@ -91,11 +97,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               variant="outline"
               size="lg"
               className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
-              asChild
+              onClick={scrollToDemo}
             >
-              <Link to="/demo">
-                Zobacz jak działa ↓
-              </Link>
+              Zobacz jak to dzia\u0142a \u2192
             </Button>
           </motion.div>
 
@@ -108,9 +112,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             {[
               "Bez karty kredytowej",
-              "Konfiguracja w 15 minut",
-              "Twoje dane = Twoja własność",
-              "🇵🇱 Made in Poland",
+              "Gotowe w 5 minut",
+              "0% prowizji od rezerwacji",
+              "Twoje dane \u2014 zawsze Twoje",
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
@@ -119,6 +123,29 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
                 <span>{item}</span>
               </div>
             ))}
+          </motion.div>
+
+          {/* Live social proof */}
+          <motion.div
+            className="flex items-center justify-center gap-3 mt-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
+          >
+            <div className="flex -space-x-2">
+              {["AK", "MW", "JP", "KW", "LS"].map((initials, idx) => (
+                <div
+                  key={idx}
+                  className="w-7 h-7 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-bold text-primary"
+                >
+                  {initials}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              <span className="font-bold text-foreground">23 salony</span>{" "}
+              do\u0142\u0105czy\u0142y w tym tygodniu
+            </p>
           </motion.div>
         </div>
       </div>
