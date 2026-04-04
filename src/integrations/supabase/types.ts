@@ -3490,6 +3490,39 @@ export type Database = {
       }
     }
     Views: {
+      staff_google_calendar_safe: {
+        Row: {
+          block_from_google: boolean | null
+          calendar_id: string | null
+          created_at: string | null
+          google_email: string | null
+          is_active: boolean | null
+          staff_id: string | null
+          sync_to_google: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          block_from_google?: boolean | null
+          calendar_id?: string | null
+          created_at?: string | null
+          google_email?: string | null
+          is_active?: boolean | null
+          staff_id?: string | null
+          sync_to_google?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          block_from_google?: boolean | null
+          calendar_id?: string | null
+          created_at?: string | null
+          google_email?: string | null
+          is_active?: boolean | null
+          staff_id?: string | null
+          sync_to_google?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       staff_public_view: {
         Row: {
           avatar_url: string | null
