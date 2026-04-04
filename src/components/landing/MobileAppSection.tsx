@@ -1,38 +1,27 @@
 import { useState } from "react";
-import { Smartphone, Check, Bell, ArrowRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import { Smartphone, Check, Bell } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { AnimatedHeadline, containerVariants, cardVariants, appleEaseArray } from "@/components/ui/AnimatedSection";
 
 const ownerFeatures = [
-  "Zarz\u0105dzaj kalendarzem jednym palcem",
+  "Zarządzaj kalendarzem jednym palcem",
   "Powiadomienia o nowych rezerwacjach",
   "Dashboard z wynikami w czasie real",
-  "Szybkie blokowanie termin\u00F3w",
+  "Szybkie blokowanie terminów",
   "Chat z klientkami",
-  "Stany magazynowe i alerty brak\u00F3w",
+  "Stany magazynowe i alerty braków",
 ];
 
 const clientFeatures = [
-  "Rezerwuj wizyt\u0119 w 30 sekund",
-  "Widzi TYLKO Tw\u00F3j salon \u2014 nie marketplace z konkurencj\u0105",
-  "Przypomnienia przed wizyt\u0105",
-  "Wirtualna karta lojalno\u015Bciowa",
+  "Rezerwuj wizytę w 30 sekund",
+  "Widzi TYLKO Twój salon — nie marketplace z konkurencją",
+  "Przypomnienia przed wizytą",
+  "Wirtualna karta lojalnościowa",
   "Oceniaj i polecaj salon znajomym",
-  "P\u0142atno\u015Bci BLIK jednym klikni\u0119ciem",
+  "Płatności BLIK jednym kliknięciem",
 ];
-
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" as const },
-  }),
-};
 
 export const MobileAppSection = () => {
   const [waitlistEmail, setWaitlistEmail] = useState("");
@@ -42,156 +31,91 @@ export const MobileAppSection = () => {
       toast.error("Podaj poprawny adres email");
       return;
     }
-    toast.success("Dzi\u0119kujemy! Powiadomimy Ci\u0119 o premierze \uD83C\uDF89");
+    toast.success("Dziękujemy! Powiadomimy Cię o premierze 🎉");
     setWaitlistEmail("");
   };
 
   return (
-    <section className="py-20 lg:py-32 relative overflow-hidden bg-gradient-to-b from-muted/20 to-background">
-      <div className="container relative z-10">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.7 }}
-        >
-          <Badge variant="outline" className="mb-6 px-4 py-2 border-primary/30 bg-primary/5 text-primary">
-            <Smartphone className="w-4 h-4 mr-2" />
-            Wkr\u00F3tce dost\u0119pne
-          </Badge>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+    <section className="landing-section-dark landing-section-spacing relative overflow-hidden">
+      <div className="max-w-[1200px] mx-auto px-[max(24px,5vw)] relative z-10">
+        <AnimatedHeadline className="text-center mb-16">
+          <p className="eyebrow tracking-widest mb-4 landing-text-subtle-dark flex items-center justify-center gap-2">
+            <Smartphone className="w-4 h-4" />
+            Wkrótce dostępne
+          </p>
+          <h2 className="headline-section mb-4" style={{ color: "#f5f5f7" }}>
             Prywatna aplikacja w kieszeni Twojej klientki.
             <br />
-            <span className="text-gradient-luxury">Tylko Ty. Bez konkurencji.</span>
+            <span className="apple-accent-gradient">Tylko Ty. Bez konkurencji.</span>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Twoja klientka pobiera aplikacj\u0119 Beauty Calendar i przypisuje si\u0119 do Twojego salonu. 
-            Widzi tylko Ciebie \u2014 nie marketplace, nie konkurencj\u0119. To Twoja prywatna przestrze\u0144 w jej telefonie.
+          <p className="subheadline max-w-2xl mx-auto" style={{ color: "rgba(245,245,247,0.6)" }}>
+            Twoja klientka pobiera aplikację Beauty Calendar i przypisuje się do Twojego salonu. 
+            Widzi tylko Ciebie — nie marketplace, nie konkurencję. To Twoja prywatna przestrzeń w jej telefonie.
           </p>
+        </AnimatedHeadline>
+
+        <motion.div
+          className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+        >
+          {[
+            { title: "Beauty Calendar Business", subtitle: "Dla właścicielek i managera salonu", features: ownerFeatures, date: "Q3 2026" },
+            { title: "Beauty Calendar Client", subtitle: "Prywatna aplikacja dla klientek Twojego salonu", features: clientFeatures, date: "Q4 2026" },
+          ].map((app, idx) => (
+            <motion.div key={idx} variants={cardVariants}>
+              <div className="landing-card-dark p-6 lg:p-8 h-full relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl" style={{ background: idx === 0 ? "rgba(139,92,246,0.08)" : "rgba(236,72,153,0.08)" }} />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ background: idx === 0 ? "rgba(139,92,246,0.1)" : "rgba(236,72,153,0.1)" }}>
+                      <Smartphone className="w-6 h-6" style={{ color: idx === 0 ? "#8b5cf6" : "#ec4899" }} />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>{app.title}</h3>
+                      <p className="text-sm" style={{ color: "rgba(245,245,247,0.5)" }}>{app.subtitle}</p>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 mb-6">
+                    {app.features.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm" style={{ color: "rgba(245,245,247,0.7)" }}>
+                        <Check className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="flex gap-3 mb-4">
+                    {["App Store", "Google Play"].map((store) => (
+                      <div key={store} className="px-3 py-2 rounded-lg text-xs cursor-not-allowed" style={{ background: "rgba(255,255,255,0.04)", color: "rgba(245,245,247,0.3)" }}>
+                        <div className="text-[10px]">Pobierz w</div>
+                        <div className="font-semibold">{store}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-2 text-xs" style={{ color: "rgba(245,245,247,0.3)" }}>
+                    <Bell className="w-3 h-3" />
+                    Dostępna {app.date} — zapisz się na listę
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </motion.div>
 
-        {/* Two app cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-16">
-          {/* Owner app */}
-          <motion.div
-            custom={0}
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <Card className="relative overflow-hidden border-primary/20 h-full">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 blur-3xl rounded-full" />
-              <CardContent className="p-6 lg:p-8 relative">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Smartphone className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">Beauty Calendar Business</h3>
-                    <p className="text-sm text-muted-foreground">Dla w\u0142a\u015Bcicielek i managera salonu</p>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-6">
-                  {ownerFeatures.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex gap-3 mb-4">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg opacity-60 cursor-not-allowed">
-                    <div className="text-left">
-                      <div className="text-[10px] text-muted-foreground">Pobierz w</div>
-                      <div className="text-xs font-semibold">App Store</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg opacity-60 cursor-not-allowed">
-                    <div className="text-left">
-                      <div className="text-[10px] text-muted-foreground">Pobierz w</div>
-                      <div className="text-xs font-semibold">Google Play</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Bell className="w-3 h-3" />
-                  Dost\u0119pna Q3 2026 \u2014 zapisz si\u0119 na list\u0119
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Client app */}
-          <motion.div
-            custom={1}
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <Card className="relative overflow-hidden border-secondary/20 h-full">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-secondary/10 blur-3xl rounded-full" />
-              <CardContent className="p-6 lg:p-8 relative">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
-                    <Smartphone className="w-6 h-6 text-secondary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg">Beauty Calendar Client</h3>
-                    <p className="text-sm text-muted-foreground">Prywatna aplikacja dla klientek Twojego salonu</p>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-6">
-                  {clientFeatures.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="flex gap-3 mb-4">
-                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg opacity-60 cursor-not-allowed">
-                    <div className="text-left">
-                      <div className="text-[10px] text-muted-foreground">Pobierz w</div>
-                      <div className="text-xs font-semibold">App Store</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 px-3 py-2 bg-muted rounded-lg opacity-60 cursor-not-allowed">
-                    <div className="text-left">
-                      <div className="text-[10px] text-muted-foreground">Pobierz w</div>
-                      <div className="text-xs font-semibold">Google Play</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Bell className="w-3 h-3" />
-                  Dost\u0119pna Q4 2026 \u2014 do\u0142\u0105cz do waitlisty
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Waitlist form */}
         <motion.div
           className="max-w-xl mx-auto text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.6, ease: appleEaseArray }}
         >
-          <p className="text-muted-foreground mb-4">
-            B\u0105d\u017A pierwsza \u2014 do\u0142\u0105cz do listy oczekuj\u0105cych
-            i dostań aplikacj\u0119 w dniu premiery za darmo.
+          <p className="mb-4" style={{ color: "rgba(245,245,247,0.6)" }}>
+            Bądź pierwsza — dołącz do listy oczekujących i dostań aplikację w dniu premiery za darmo.
           </p>
           <div className="flex gap-2">
             <Input
@@ -199,15 +123,15 @@ export const MobileAppSection = () => {
               placeholder="twoj@email.pl"
               value={waitlistEmail}
               onChange={(e) => setWaitlistEmail(e.target.value)}
-              className="flex-1"
+              className="flex-1 bg-white/5 border-white/10 text-white placeholder:text-white/30"
             />
-            <Button onClick={handleWaitlist} className="gap-2">
+            <button onClick={handleWaitlist} className="apple-btn-primary flex items-center gap-2 text-sm whitespace-nowrap">
               <Bell className="w-4 h-4" />
               Powiadom mnie
-            </Button>
+            </button>
           </div>
-          <p className="text-xs text-muted-foreground mt-3">
-            Do\u0142\u0105czy\u0142o ju\u017C <span className="font-bold text-primary">247</span> w\u0142a\u015Bcicielek salon\u00F3w
+          <p className="text-xs mt-3" style={{ color: "rgba(245,245,247,0.3)" }}>
+            Dołączyło już <span className="font-bold" style={{ color: "#8b5cf6" }}>247</span> właścicielek salonów
           </p>
         </motion.div>
       </div>
