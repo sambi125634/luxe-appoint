@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { LandingNavbar, LeadFormSection } from "@/components/landing";
 import { NewHeroSection } from "@/components/landing/NewHeroSection";
 import { SocialProofBar } from "@/components/landing/SocialProofBar";
-import { LossNumbersSection } from "@/components/landing/LossNumbersSection";
+
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { GameChangerFeaturesSection } from "@/components/landing/GameChangerFeaturesSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
@@ -32,7 +32,7 @@ const Index = () => {
       <main>
         <NewHeroSection onScrollToForm={scrollToForm} />
         <SocialProofBar />
-        <LossNumbersSection />
+        
         <ProblemSection onScrollToForm={scrollToForm} />
         <GameChangerFeaturesSection />
         <OwnYourClientsSection />
