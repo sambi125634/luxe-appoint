@@ -5,7 +5,7 @@ import { NewHeroSection } from "@/components/landing/NewHeroSection";
 import { SocialProofBar } from "@/components/landing/SocialProofBar";
 
 import { ProblemSection } from "@/components/landing/ProblemSection";
-import { GameChangerFeaturesSection } from "@/components/landing/GameChangerFeaturesSection";
+
 import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
 import { DataOwnershipSection } from "@/components/landing/DataOwnershipSection";
@@ -38,7 +38,7 @@ const Index = () => {
         <SocialProofBar />
         
         <ProblemSection onScrollToForm={scrollToForm} />
-        <GameChangerFeaturesSection />
+        
         <SystemFlowSection onScrollToForm={scrollToForm} />
         <OwnYourClientsSection />
         <DataOwnershipSection />
