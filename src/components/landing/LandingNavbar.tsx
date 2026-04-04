@@ -68,7 +68,7 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               <LogIn className="w-4 h-4" />
-              Zaloguj si\u0119
+              Zaloguj się
             </a>
             <Button
               onClick={onScrollToForm}
@@ -112,7 +112,7 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               </button>
               <a href="https://admin.beauty-funnels.com/auth" className="flex items-center gap-1.5 text-left text-muted-foreground hover:text-foreground py-2 font-medium">
                 <LogIn className="w-4 h-4" />
-                Zaloguj si\u0119
+                Zaloguj się
               </a>
               <Button
                 onClick={() => { onScrollToForm(); setIsMobileMenuOpen(false); }}

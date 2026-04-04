@@ -3,10 +3,10 @@ import { Building2, Calendar, PiggyBank, Star } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 
 const stats = [
-  { value: 150, suffix: "+", label: "aktywnych salon\u00f3w", icon: Building2 },
-  { value: 25000, suffix: "+", label: "rezerwacji miesi\u0119cznie", icon: Calendar },
-  { value: 38000, suffix: " z\u0142", label: "\u015brednia oszcz\u0119dno\u015b\u0107 / rok", icon: PiggyBank },
-  { value: 4.9, suffix: "\u2605", label: "\u015brednia ocena", icon: Star },
+  { value: 150, suffix: "+", label: "aktywnych salonów", icon: Building2 },
+  { value: 25000, suffix: "+", label: "rezerwacji miesięcznie", icon: Calendar },
+  { value: 38000, suffix: " zł", label: "średnia oszczędność / rok", icon: PiggyBank },
+  { value: 4.9, suffix: "★", label: "średnia ocena", icon: Star },
 ];
 
 const CountUp = ({ target, suffix, isInView }: { target: number; suffix: string; isInView: boolean }) => {
