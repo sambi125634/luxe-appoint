@@ -61,7 +61,7 @@ const features = [
     icon: Users,
     title: "Grupy zakupowe klientów",
     description:
-      "AI automatycznie segreguje klientów wg preferencji: VIP Shopper, Stała, Sezonowa, Odkrywczyni. Wiesz komu zaproponować upsell, a kogo reaktywować — zanim odejdzie.",
+      "Wiesz od razu: kto jest VIP, kto stała, kto sezonowa, kto odkrywczyni. Wiesz komu zaproponować upsell, a kogo reaktywować — zanim odejdzie.",
     accent: "from-indigo-500/20 to-indigo-500/5",
     iconColor: "text-indigo-500",
   },
