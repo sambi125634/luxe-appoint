@@ -63,7 +63,7 @@ export const NewLandingFooter = () => {
               <span className="font-serif text-2xl font-bold text-gradient-luxury">Beauty Calendar</span>
             </Link>
             <p className="text-sm text-muted-foreground mb-2">System zarządzania salonem beauty.</p>
-            <p className="text-sm text-muted-foreground mb-4">0% prowizji · Made in Poland \ud83c\uddf5\ud83c\uddf1</p>
+            <p className="text-sm text-muted-foreground mb-4">0% prowizji · Made in Poland 🇵🇱</p>
 
             <div className="flex gap-3 mb-6">
               {socialLinks.map((social) => (

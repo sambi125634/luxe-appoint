@@ -45,7 +45,7 @@ export const OwnYourClientsSection = () => {
             {/* Marketplace card */}
             <div className="bg-destructive/5 border border-destructive/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center text-sm">\ud83c\udfea</div>
+                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center text-sm">🏪</div>
                 <span className="font-bold text-sm">Platforma marketplace</span>
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">

@@ -7,27 +7,27 @@ import { Slider } from "@/components/ui/slider";
 
 const painCards = [
   {
-    icon: "\ud83d\udcf5",
+    icon: "📵",
     headline: "Telefon dzwoni podczas zabiegu",
     desc: "Przerywasz klientce. Gubisz skupienie. Inna klientka nie dodzwoniła się i zapisała gdzieś indziej. To nie jest standard. To jest codzienność.",
   },
   {
-    icon: "\ud83e\ude91",
+    icon: "🪑",
     headline: "Pusty fotel. Znowu.",
     desc: "Klientka nie przyszła bez słowa. Termin przepadł. 200–400 zł wyparowało. Przy 3–4 no-showach tygodniowo to nawet 60 000 zł straty rocznie.",
   },
   {
-    icon: "\ud83d\udcca",
+    icon: "📊",
     headline: "Nie wiesz ile naprawdę zarabiasz",
     desc: "Masz przychód — ale ile zostaje po kosztach materiałów, pracowników, produktów? Większość właścicielek zgaduje. My to liczymy automatycznie.",
   },
   {
-    icon: "\ud83d\udcbe",
+    icon: "💾",
     headline: "Twoje klientki nie są Twoje",
     desc: "Korzystasz z platformy marketplace? Jej baza klientek należy do platformy. Nie do Ciebie. Gdy odejdziesz — tracisz wszystko co budowałaś latami.",
   },
   {
-    icon: "\ud83d\udd04",
+    icon: "🔄",
     headline: "Klientki przychodzą raz i znikają",
     desc: "Pierwsza wizyta. Świetna. Potem cisza. Żadna platforma nie pomaga Ci ich zatrzymać. Nie wysyła sekwencji. Nie buduje powracalności. Ty musisz to robić ręcznie — albo nie robisz wcale.",
   },

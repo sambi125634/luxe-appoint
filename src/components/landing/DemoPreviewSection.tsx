@@ -37,7 +37,7 @@ const DemoPreviewSection = () => {
         >
           {/* Demo banner */}
           <div className="bg-primary/95 text-white px-4 py-2.5 flex items-center justify-between text-sm">
-            <span>\ud83d\udc40 Przeglądasz wersję demo Beauty Calendar</span>
+            <span>👀 Przeglądasz wersję demo Beauty Calendar</span>
             <Button size="sm" variant="secondary" className="text-xs h-7" onClick={() => (window.location.href = "/auth")}>
               Załóż swoje konto — 0 zł →
             </Button>
@@ -83,7 +83,7 @@ const DemoPreviewSection = () => {
                 ))}
               </div>
               <div className="h-24 bg-muted/20 rounded-xl border border-border/50 flex items-center justify-center">
-                <span className="text-xs text-muted-foreground">\ud83d\udcca Wykres przychodów</span>
+                <span className="text-xs text-muted-foreground">📊 Wykres przychodów</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-muted/20 border border-border/50">

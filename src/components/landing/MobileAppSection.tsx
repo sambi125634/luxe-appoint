@@ -42,7 +42,7 @@ export const MobileAppSection = () => {
       toast.error("Podaj poprawny adres email");
       return;
     }
-    toast.success("Dziękujemy! Powiadomimy Cię o premierze \uD83C\uDF89");
+    toast.success("Dziękujemy! Powiadomimy Cię o premierze 🎉");
     setWaitlistEmail("");
   };
 

@@ -83,7 +83,7 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
       description: "Dla salonów które chcą system który pracuje za nich 24/7",
       features: [
         "Wszystko z PRO +",
-        "\ud83e\udd16 AI Autopilot (wykrywa, wysyła, reaguje)",
+        "🤖 AI Autopilot (wykrywa, wysyła, reaguje)",
         "AI Segmentacja klientek automatyczna",
         "AI Prognoza przychodów (30 dni, 94%)",
         "Radar Odejść (wykrywa zagrożone klientki)",

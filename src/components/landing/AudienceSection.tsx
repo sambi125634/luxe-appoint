@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const categories = [
   {
-    emoji: "\ud83d\udc85",
+    emoji: "💅",
     title: "Paznokcie i dłonie",
     items: ["Salon paznokci", "Manicure hybrydowy", "Przedłużanie paznokci", "Pedicure leczniczy", "Nail art studio"],
   },
@@ -18,7 +18,7 @@ const categories = [
     items: ["Gabinet kosmetyczny", "Peeling kawitacyjny", "Mikrodermabrazja", "Oczyszczanie wodorowe", "Lifting twarzy"],
   },
   {
-    emoji: "\ud83e\udee7",
+    emoji: "🫧",
     title: "Rzęsy i brwi",
     items: ["Stylizacja rzęs", "Lash lifting", "Laminacja brwi", "Microblading", "PMU i makijaż permanentny"],
   },
@@ -28,27 +28,27 @@ const categories = [
     items: ["Depilacja laserowa", "Depilacja IPL", "Woskowanie i sugaring", "Studio depilacji"],
   },
   {
-    emoji: "\ud83e\ude7a",
+    emoji: "🩺",
     title: "Medycyna estetyczna",
     items: ["Gabinet medycyny estetycznej", "Klinika anti-aging", "Mezoterapia", "Botoks i wypełniacze", "Osocze bogatopłytkowe"],
   },
   {
-    emoji: "\ud83d\udc86",
+    emoji: "💆",
     title: "Masaż i wellness",
     items: ["Salon masażu", "Masaż tajski / leczniczy", "Refleksologia", "Studio wellness i relaksu"],
   },
   {
-    emoji: "\ud83c\udf3f",
+    emoji: "🌿",
     title: "SPA i kompleksy",
     items: ["Salon SPA", "Hotel SPA", "Centrum odnowy biologicznej", "Strefa relaksu"],
   },
   {
-    emoji: "\ud83d\udcaa",
+    emoji: "💪",
     title: "Sylwetka i ciało",
     items: ["Studio modelowania sylwetki", "Kriolipoliza", "Endermologia", "Drenaż limfatyczny"],
   },
   {
-    emoji: "\ud83d\udd2c",
+    emoji: "🔬",
     title: "Specjalistyczne",
     items: ["Gabinet trychologiczny", "Studio bridal (makijaż ślubny)", "Gabinet podologiczny", "Studio opalania natryskowego", "Solarium"],
   },
