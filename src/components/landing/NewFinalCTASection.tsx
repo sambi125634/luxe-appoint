@@ -19,7 +19,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Każdy dzień bez Beauty Calendar
+          Każdy dzień bez systemu
           <br />
           <span className="bg-gradient-to-r from-destructive to-amber-500 bg-clip-text text-transparent">
             to pieniądze które mogłaś mieć.

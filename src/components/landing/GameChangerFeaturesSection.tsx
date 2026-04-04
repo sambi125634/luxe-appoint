@@ -101,7 +101,7 @@ const features = [
     icon: CreditCard,
     title: "Auto-zaliczki dla no-showów",
     description:
-      "Klient nie przyszedł 2 razy? Przy trzeciej rezerwacji system automatycznie wymaga zaliczki. Tylko od tych, którzy nie przychodzą — reszta rezerwuje normalnie. Zero ręcznej konfiguracji.",
+      "Klientka nie przyszła 2 razy? Przy trzeciej rezerwacji — zaliczka. Automatycznie. Tylko od tych, które nie przychodzą — reszta rezerwuje normalnie. Zero ręcznej konfiguracji.",
     accent: "from-fuchsia-500/20 to-fuchsia-500/5",
     iconColor: "text-fuchsia-500",
   },
