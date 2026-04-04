@@ -5,7 +5,9 @@ import { SocialProofBar } from "@/components/landing/SocialProofBar";
 
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { GameChangerFeaturesSection } from "@/components/landing/GameChangerFeaturesSection";
+import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
+import { DataOwnershipSection } from "@/components/landing/DataOwnershipSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
 import { ValueStackSection } from "@/components/landing/ValueStackSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
