@@ -1,55 +1,61 @@
 
 
-## Plan: Banner na górze strony + Rewrite copy na "o niej, nie o produkcie"
+## Plan: Laptop mockup dla panelu admin + Phone mockup dla aplikacji klienckiej
 
-### Dwa zadania
+### Koncept
 
-**1. Czarny banner nad nawigacją**
+Dwa osobne podglądy na landing page:
+1. **Panel admin** → w ramce laptopa (iframe `/demo`) — więcej miejsca, naturalne środowisko pracy
+2. **Aplikacja klientki** → w ramce telefonu (iframe `/app`) — tak jak klientka widzi salon
 
-Nowy komponent `TopBanner.tsx` — pełna szerokość, `bg-black text-white`, wycentrowany tekst, link "Sprawdź →" scrollujący do sekcji kalkulatora (`#calculator`).
+### Zmiana 1: `DemoPreviewSection.tsx` — przebudowa na laptop mockup z iframe
+
+Zamiast obecnego statycznego mockupu z placeholder danymi — prawdziwy laptop frame z live iframe do `/demo`.
 
 ```text
-┌─────────────── bg-black ────────────────┐
-│ Przeciętna właścicielka salonu traci     │
-│ 38 000 zł rocznie na klientkach które   │
-│ nie wróciły. Ile Ty tracisz? [Sprawdź →]│
-└─────────────────────────────────────────┘
-← nawigacja poniżej (top offset +40px) →
+┌─────────────────────────────────────────────┐
+│  [eyebrow] Interaktywny podgląd             │
+│  Przeklikaj panel — zobacz jak zarządzasz    │
+│  salonem                                    │
+│                                             │
+│  ┌─── Laptop bezel (rounded, dark) ───────┐ │
+│  │  ● ● ●  [calendar.beauty-funnels.com]  │ │
+│  │  ┌──────────────────────────────────┐   │ │
+│  │  │                                  │   │ │
+│  │  │   <iframe src="/demo" />         │   │ │
+│  │  │   aspect-ratio 16/10            │   │ │
+│  │  │                                  │   │ │
+│  │  └──────────────────────────────────┘   │ │
+│  └─────── base/hinge ────────────────────┘ │
+│                                             │
+│  [CTA: Otwórz pełne demo] [Załóż konto]    │
+└─────────────────────────────────────────────┘
 ```
 
-- Tekst: `text-sm`, `py-2.5`, centered
-- "Sprawdź →" jako `text-primary underline` link
-- Nawigacja: zmiana `top-0` na `top-10` (40px offset dla bannera), banner sam jest `fixed top-0 z-[60]`
-- Na mobile: tekst w jednej linii lub delikatny wrap, `text-xs`
+- Laptop frame wzorowany na istniejącym `AnimatedMockup` (bezel, browser chrome, base)
+- Iframe do `/demo` zamiast statycznych komponentów
+- Aspect ratio `16/10`, max-w-5xl
+- Fallback jeśli iframe się nie załaduje
 
-**2. Copy rewrite — z "produkt" na "o niej"**
+### Zmiana 2: `InteractivePhoneMockup.tsx` — zmiana na aplikację klientki
 
-Zmiana perspektywy we wszystkich sekcjach. Główne zamiany:
+Zachowujemy obecny phone frame i layout (tekst + telefon). Zmieniamy:
+- iframe src: `/demo` → `/app` (aplikacja klientki)
+- Copy: dostosowanie tekstów — teraz pokazujemy aplikację mobilną klientki, nie widget rezerwacji
+- Headline: "Tak wygląda Twoja aplikacja dla klientek"
+- Punkty: "Rezerwuje wizytę w 3 kliknięcia", "Widzi historię wizyt i ulubione", "Dostaje powiadomienia i kupony lojalnościowe"
+- Floating badges: dostosowane do kontekstu klientki
 
-| Przed | Po |
-|-------|-----|
-| "Beauty Calendar robi to za Ciebie" | "Twój salon rezerwuje, przypomina i odzyskuje klientki sam" |
-| "System przypomina" → opis | "Twoje klientki dostają przypomnienie..." |
-| "System wysyła spersonalizowaną ofertę" | "Twoja klientka dostaje ofertę kolejnej wizyty..." |
-| "System dzieli klientów na strefy" | "Widzisz od razu kto odchodzi..." |
-| "System automatycznie wymaga zaliczki" | "Klientka która nie przyszła 2 razy? Przy trzeciej rezerwacji — zaliczka. Automatycznie." |
-| "AI automatycznie segreguje" | "Wiesz od razu: kto jest VIP, kto sezonowa, kto odkrywczyni" |
-| "Każdy dzień bez Beauty Calendar" | "Każdy dzień bez systemu" |
-| "14 funkcji których nie znajdziesz..." | "14 sposobów w jakie Twój salon zarabia więcej" |
-| "Razem tworzą system który pracuje za Ciebie" | "Razem sprawiają że Twój salon zarabia nawet gdy śpisz" |
+### Zmiana 3: Fix runtime error
+
+Usunięcie referencji do `MobileAppSection` w `Index.tsx` (jeśli jeszcze istnieje).
 
 ### Pliki do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/TopBanner.tsx` | **Nowy** — czarny banner z copy i linkiem do kalkulatora |
-| `src/pages/Index.tsx` | Import TopBanner, render przed LandingNavbar |
-| `src/components/landing/LandingNavbar.tsx` | Offset `top-10` zamiast `top-0` gdy banner widoczny |
-| `src/components/landing/NewHeroSection.tsx` | Rewrite subheadline |
-| `src/components/landing/SystemFlowSection.tsx` | Rewrite opisy kroków na perspektywę "Ty/Twój salon" |
-| `src/components/landing/GameChangerFeaturesSection.tsx` | Rewrite headline + opisy features |
-| `src/components/landing/NewFinalCTASection.tsx` | "Każdy dzień bez systemu" zamiast "bez Beauty Calendar" |
-| `src/components/landing/DataOwnershipSection.tsx` | Drobne rewrite jeśli mówi o produkcie |
+| `src/components/landing/DemoPreviewSection.tsx` | Przebudowa na laptop mockup z iframe `/demo` |
+| `src/components/landing/InteractivePhoneMockup.tsx` | Zmiana iframe na `/app`, rewrite copy na aplikację klientki |
 
-Osiem plików. Zero zmian w logice, animacjach czy strukturze — wyłącznie copy i nowy banner.
+Dwa pliki. Kolejność w `Index.tsx` bez zmian — DemoPreviewSection (laptop) pojawia się przed InteractivePhoneMockup (telefon).
 
