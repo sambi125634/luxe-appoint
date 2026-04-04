@@ -11,7 +11,7 @@ const proofItems = [
 const losses = [
   { label: "Klientka która była raz i nie wróciła", value: 4800, detail: "12 wizyt rocznie których nie było" },
   { label: "No-show bez zaliczki", value: 280, detail: "każdy. jeden. raz." },
-  { label: "Klientka na liście która „gdzieś znikła"", value: 3600, detail: "18 miesięcy × średnia wizyta 200 zł" },
+  { label: 'Klientka na liście która "gdzieś znikła"', value: 3600, detail: "18 miesięcy × średnia wizyta 200 zł" },
 ];
 
 const CountUp = ({ target, suffix = "", isInView, formatFn }: { target: number; suffix?: string; isInView: boolean; formatFn?: (n: number) => string }) => {
