@@ -18,14 +18,14 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
   const plans = [
     {
       name: "FREE",
-      price: "0 z\u0142",
+      price: "0 zł",
       period: "/ na zawsze",
-      description: "Dla jednoosobowych dzia\u0142alno\u015bci kt\u00f3re stawiaj\u0105 pierwsze kroki",
+      description: "Dla jednoosobowych działalności które stawiają pierwsze kroki",
       features: [
         "Max 1 pracownik",
         "Max 50 klientek w bazie",
-        "Max 10 us\u0142ug",
-        "Max 20 produkt\u00f3w w magazynie",
+        "Max 10 usług",
+        "Max 20 produktów w magazynie",
         "Tylko potwierdzenia email (bez SMS)",
         "Kalendarz + Widget rezerwacji",
         "Podstawowe statystyki",
@@ -43,23 +43,23 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
     },
     {
       name: "PRO",
-      price: isAnnual ? "79 z\u0142 netto" : "99 z\u0142 netto",
-      period: "/ miesi\u0105c",
-      description: "Dla salon\u00f3w kt\u00f3re chc\u0105 rosn\u0105\u0107 i odzyska\u0107 kontrol\u0119",
+      price: isAnnual ? "79 zł netto" : "99 zł netto",
+      period: "/ miesiąc",
+      description: "Dla salonów które chcą rosnąć i odzyskać kontrolę",
       features: [
         "Wszystko z FREE +",
         "Nieograniczeni pracownicy",
-        "Nieograniczone us\u0142ugi i klientki",
+        "Nieograniczone usługi i klientki",
         "Nieograniczony magazyn",
         "SMS + email powiadomienia",
-        "Aplikacja mobilna (w\u0142a\u015bciciel + klientka)",
-        "\u015acie\u017cka Klientki\u2122 (r\u0119czna konfiguracja)",
-        "Program polece\u0144",
+        "Aplikacja mobilna (właściciel + klientka)",
+        "Ścieżka Klientki™ (ręczna konfiguracja)",
+        "Program poleceń",
         "Karty konsultacyjne",
         "Eksport danych",
-        "Raporty finansowe + wysy\u0142ka do ksi\u0119gowej",
+        "Raporty finansowe + wysyłka do księgowej",
         "Receptury i True Profit",
-        "Skanowanie kod\u00f3w kamer\u0105",
+        "Skanowanie kodów kamerą",
       ],
       limitations: [
         "AI Autopilot",
@@ -71,32 +71,32 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
       ctaLink: "/auth",
       popular: true,
       icon: Sparkles,
-      savings: isAnnual ? "Oszcz\u0119dzasz 240 z\u0142/rok" : undefined,
+      savings: isAnnual ? "Oszczędzasz 240 zł/rok" : undefined,
     },
     {
       name: "ELITE",
-      price: isAnnual ? "279 z\u0142" : "349 z\u0142",
+      price: isAnnual ? "279 zł" : "349 zł",
       setupFee: true,
-      setupPrice: "497 z\u0142",
-      period: "/ miesi\u0105c",
-      badge: "Pe\u0142na moc",
-      description: "Dla salon\u00f3w kt\u00f3re chc\u0105 system kt\u00f3ry pracuje za nich 24/7",
+      setupPrice: "497 zł",
+      period: "/ miesiąc",
+      badge: "Pełna moc",
+      description: "Dla salonów które chcą system który pracuje za nich 24/7",
       features: [
         "Wszystko z PRO +",
-        "\ud83e\udd16 AI Autopilot (wykrywa, wysy\u0142a, reaguje)",
+        "\ud83e\udd16 AI Autopilot (wykrywa, wysyła, reaguje)",
         "AI Segmentacja klientek automatyczna",
-        "AI Prognoza przychod\u00f3w (30 dni, 94%)",
-        "Radar Odej\u015b\u0107 (wykrywa zagro\u017cone klientki)",
+        "AI Prognoza przychodów (30 dni, 94%)",
+        "Radar Odejść (wykrywa zagrożone klientki)",
         "Auto-zaliczki dla no-show przez AI",
         "Prywatny Onboarding Call 1:1",
         "Konfiguracja sekwencji za Ciebie",
         "Konsultacja strategiczna salonu",
-        "Priorytetowy support \u2014 odpowied\u017a w 2h",
+        "Priorytetowy support — odpowiedź w 2h",
       ],
-      cta: "Um\u00f3w prywatny onboarding",
+      cta: "Umów prywatny onboarding",
       popular: false,
       icon: Crown,
-      savings: isAnnual ? "Oszcz\u0119dzasz 840 z\u0142/rok" : undefined,
+      savings: isAnnual ? "Oszczędzasz 840 zł/rok" : undefined,
     },
   ];
 
@@ -113,18 +113,18 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             Prosta cena. Zero prowizji.
             <br />
-            <span className="text-gradient-luxury">Pe\u0142na kontrola nad Twoim biznesem.</span>
+            <span className="text-gradient-luxury">Pełna kontrola nad Twoim biznesem.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Zacznij za darmo. Przejd\u017a na PRO gdy b\u0119dziesz gotowa. \u017badnych ukrytych op\u0142at.
+            Zacznij za darmo. Przejdź na PRO gdy będziesz gotowa. Żadnych ukrytych opłat.
           </p>
         </motion.div>
 
         {/* Toggle */}
         <div className="flex items-center justify-center gap-3 mb-12">
-          <span className={cn("text-sm font-medium", !isAnnual ? "text-foreground" : "text-muted-foreground")}>Miesi\u0119cznie</span>
+          <span className={cn("text-sm font-medium", !isAnnual ? "text-foreground" : "text-muted-foreground")}>Miesięcznie</span>
           <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
-          <span className={cn("text-sm font-medium", isAnnual ? "text-foreground" : "text-muted-foreground")}>Rocznie (oszcz\u0119dzasz 20%)</span>
+          <span className={cn("text-sm font-medium", isAnnual ? "text-foreground" : "text-muted-foreground")}>Rocznie (oszczędzasz 20%)</span>
           {isAnnual && <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">-20%</Badge>}
         </div>
 
@@ -178,7 +178,7 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
                   {plan.limitations && (
                     <div className="mb-6 pt-3 border-t border-border/50">
                       <p className="text-xs text-muted-foreground mb-2 font-medium">Nie zawiera:</p>
-                      {plan.limitations.map((lim, i) => <p key={i} className="text-xs text-muted-foreground/70 mb-1">\u2014 {lim}</p>)}
+                      {plan.limitations.map((lim, i) => <p key={i} className="text-xs text-muted-foreground/70 mb-1">— {lim}</p>)}
                     </div>
                   )}
                   {plan.ctaLink ? (
@@ -206,10 +206,10 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
         >
           <div className="inline-flex items-center gap-3 bg-card border border-border rounded-2xl px-8 py-4">
             <Percent className="w-5 h-5 text-primary" />
-            <p className="font-bold text-lg">0% prowizji od rezerwacji \u2014 <span className="text-primary">zawsze.</span></p>
+            <p className="font-bold text-lg">0% prowizji od rezerwacji — <span className="text-primary">zawsze.</span></p>
           </div>
           <p className="text-sm text-muted-foreground mt-3">
-            W \u017cadnym pakiecie nie pobieramy prowizji od wizyt Twoich klientek. Nigdy.
+            W żadnym pakiecie nie pobieramy prowizji od wizyt Twoich klientek. Nigdy.
           </p>
         </motion.div>
       </div>

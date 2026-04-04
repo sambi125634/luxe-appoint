@@ -17,13 +17,13 @@ const DemoPreviewSection = () => {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-sm text-primary mb-4 font-medium">
             <Play className="w-4 h-4" />
-            Interaktywny podgl\u0105d
+            Interaktywny podgląd
           </div>
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
-            Przeklikaj sam \u2014 zobacz jak to dzia\u0142a
+            Przeklikaj sam — zobacz jak to działa
           </h2>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Pe\u0142ny panel administracyjny z przyk\u0142adowymi danymi. Bez rejestracji, bez zobowi\u0105za\u0144.
+            Pełny panel administracyjny z przykładowymi danymi. Bez rejestracji, bez zobowiązań.
           </p>
         </motion.div>
 
@@ -37,9 +37,9 @@ const DemoPreviewSection = () => {
         >
           {/* Demo banner */}
           <div className="bg-primary/95 text-white px-4 py-2.5 flex items-center justify-between text-sm">
-            <span>\ud83d\udc40 Przegl\u0105dasz wersj\u0119 demo Beauty Calendar</span>
+            <span>\ud83d\udc40 Przeglądasz wersję demo Beauty Calendar</span>
             <Button size="sm" variant="secondary" className="text-xs h-7" onClick={() => (window.location.href = "/auth")}>
-              Za\u0142\u00f3\u017c swoje konto \u2014 0 z\u0142 \u2192
+              Załóż swoje konto — 0 zł →
             </Button>
           </div>
           {/* Browser bar */}
@@ -58,7 +58,7 @@ const DemoPreviewSection = () => {
           {/* Content */}
           <div className="p-6 grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              {["Dashboard", "Kalendarz", "Klienci", "Us\u0142ugi", "Retencja", "Polecenia"].map((item, i) => (
+              {["Dashboard", "Kalendarz", "Klienci", "Usługi", "Retencja", "Polecenia"].map((item, i) => (
                 <div
                   key={item}
                   className={`px-3 py-2 rounded-lg text-sm ${
@@ -72,9 +72,9 @@ const DemoPreviewSection = () => {
             <div className="col-span-2 space-y-4">
               <div className="grid grid-cols-3 gap-3">
                 {[
-                  { label: "Dzisiaj", value: "2 450 z\u0142", color: "text-emerald-600" },
-                  { label: "Ten tydzie\u0144", value: "12 800 z\u0142", color: "text-primary" },
-                  { label: "Ob\u0142o\u017cenie", value: "78%", color: "text-amber-600" },
+                  { label: "Dzisiaj", value: "2 450 zł", color: "text-emerald-600" },
+                  { label: "Ten tydzień", value: "12 800 zł", color: "text-primary" },
+                  { label: "Obłożenie", value: "78%", color: "text-amber-600" },
                 ].map((stat) => (
                   <div key={stat.label} className="p-3 rounded-xl bg-muted/30 border border-border/50">
                     <div className="text-xs text-muted-foreground">{stat.label}</div>
@@ -83,7 +83,7 @@ const DemoPreviewSection = () => {
                 ))}
               </div>
               <div className="h-24 bg-muted/20 rounded-xl border border-border/50 flex items-center justify-center">
-                <span className="text-xs text-muted-foreground">\ud83d\udcca Wykres przychod\u00f3w</span>
+                <span className="text-xs text-muted-foreground">\ud83d\udcca Wykres przychodów</span>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3 rounded-xl bg-muted/20 border border-border/50">
@@ -109,7 +109,7 @@ const DemoPreviewSection = () => {
             onClick={() => (window.location.href = "/demo")}
           >
             <Settings className="mr-2 w-4 h-4" />
-            Otw\u00f3rz pe\u0142ne demo
+            Otwórz pełne demo
           </Button>
           <Button
             size="lg"
@@ -117,7 +117,7 @@ const DemoPreviewSection = () => {
             className="px-8"
             onClick={() => (window.location.href = "/auth")}
           >
-            Za\u0142\u00f3\u017c swoje konto za darmo
+            Załóż swoje konto za darmo
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </div>

@@ -8,21 +8,21 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 const ownerFeatures = [
-  "Zarz\u0105dzaj kalendarzem jednym palcem",
+  "Zarządzaj kalendarzem jednym palcem",
   "Powiadomienia o nowych rezerwacjach",
   "Dashboard z wynikami w czasie real",
-  "Szybkie blokowanie termin\u00F3w",
+  "Szybkie blokowanie terminów",
   "Chat z klientkami",
-  "Stany magazynowe i alerty brak\u00F3w",
+  "Stany magazynowe i alerty braków",
 ];
 
 const clientFeatures = [
-  "Rezerwuj wizyt\u0119 w 30 sekund",
-  "Widzi TYLKO Tw\u00F3j salon \u2014 nie marketplace z konkurencj\u0105",
-  "Przypomnienia przed wizyt\u0105",
-  "Wirtualna karta lojalno\u015Bciowa",
+  "Rezerwuj wizytę w 30 sekund",
+  "Widzi TYLKO Twój salon — nie marketplace z konkurencją",
+  "Przypomnienia przed wizytą",
+  "Wirtualna karta lojalnościowa",
   "Oceniaj i polecaj salon znajomym",
-  "P\u0142atno\u015Bci BLIK jednym klikni\u0119ciem",
+  "Płatności BLIK jednym kliknięciem",
 ];
 
 const cardVariants = {
@@ -42,7 +42,7 @@ export const MobileAppSection = () => {
       toast.error("Podaj poprawny adres email");
       return;
     }
-    toast.success("Dzi\u0119kujemy! Powiadomimy Ci\u0119 o premierze \uD83C\uDF89");
+    toast.success("Dziękujemy! Powiadomimy Cię o premierze \uD83C\uDF89");
     setWaitlistEmail("");
   };
 
@@ -59,7 +59,7 @@ export const MobileAppSection = () => {
         >
           <Badge variant="outline" className="mb-6 px-4 py-2 border-primary/30 bg-primary/5 text-primary">
             <Smartphone className="w-4 h-4 mr-2" />
-            Wkr\u00F3tce dost\u0119pne
+            Wkrótce dostępne
           </Badge>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
             Prywatna aplikacja w kieszeni Twojej klientki.
@@ -67,8 +67,8 @@ export const MobileAppSection = () => {
             <span className="text-gradient-luxury">Tylko Ty. Bez konkurencji.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Twoja klientka pobiera aplikacj\u0119 Beauty Calendar i przypisuje si\u0119 do Twojego salonu. 
-            Widzi tylko Ciebie \u2014 nie marketplace, nie konkurencj\u0119. To Twoja prywatna przestrze\u0144 w jej telefonie.
+            Twoja klientka pobiera aplikację Beauty Calendar i przypisuje się do Twojego salonu. 
+            Widzi tylko Ciebie — nie marketplace, nie konkurencję. To Twoja prywatna przestrzeń w jej telefonie.
           </p>
         </motion.div>
 
@@ -91,7 +91,7 @@ export const MobileAppSection = () => {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Beauty Calendar Business</h3>
-                    <p className="text-sm text-muted-foreground">Dla w\u0142a\u015Bcicielek i managera salonu</p>
+                    <p className="text-sm text-muted-foreground">Dla właścicielek i managera salonu</p>
                   </div>
                 </div>
 
@@ -121,7 +121,7 @@ export const MobileAppSection = () => {
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Bell className="w-3 h-3" />
-                  Dost\u0119pna Q3 2026 \u2014 zapisz si\u0119 na list\u0119
+                  Dostępna Q3 2026 — zapisz się na listę
                 </div>
               </CardContent>
             </Card>
@@ -174,7 +174,7 @@ export const MobileAppSection = () => {
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Bell className="w-3 h-3" />
-                  Dost\u0119pna Q4 2026 \u2014 do\u0142\u0105cz do waitlisty
+                  Dostępna Q4 2026 — dołącz do waitlisty
                 </div>
               </CardContent>
             </Card>
@@ -190,8 +190,8 @@ export const MobileAppSection = () => {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           <p className="text-muted-foreground mb-4">
-            B\u0105d\u017A pierwsza \u2014 do\u0142\u0105cz do listy oczekuj\u0105cych
-            i dostań aplikacj\u0119 w dniu premiery za darmo.
+            Bądź pierwsza — dołącz do listy oczekujących
+            i dostań aplikację w dniu premiery za darmo.
           </p>
           <div className="flex gap-2">
             <Input
@@ -207,7 +207,7 @@ export const MobileAppSection = () => {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground mt-3">
-            Do\u0142\u0105czy\u0142o ju\u017C <span className="font-bold text-primary">247</span> w\u0142a\u015Bcicielek salon\u00F3w
+            Dołączyło już <span className="font-bold text-primary">247</span> właścicielek salonów
           </p>
         </motion.div>
       </div>
