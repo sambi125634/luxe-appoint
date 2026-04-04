@@ -42,10 +42,9 @@ export function StaffSelection({ onSelect, selectedStaff, onProceed, salonId, is
     queryKey: ["booking-staff", salonId],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("staff_members")
+        .from("staff_public_view")
         .select("id, name, role, avatar_url")
-        .eq("salon_id", salonId!)
-        .eq("is_active", true);
+        .eq("salon_id", salonId!);
       if (error) throw error;
       return data ?? [];
     },
