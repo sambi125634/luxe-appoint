@@ -92,7 +92,7 @@ export const OwnYourClientsSection = () => {
 
             <div className="text-center">
               <p className="text-xs italic" style={{ color: "rgba(245,245,247,0.3)" }}>
-                {"\u201e"}Nie budujesz na cudzej ziemi. Budujesz własny dom.{"\u201d"}
+                {"„"}Nie budujesz na cudzej ziemi. Budujesz własny dom.{"”"}
               </p>
             </div>
           </div>

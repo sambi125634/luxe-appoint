@@ -51,7 +51,7 @@ const features = [
     icon: Target,
     title: "Churn Prediction",
     subtitle: "Wiesz zanim odejdzie",
-    description: "Klientka Anna nie by\u0142a 45 dni. Wcze\u015Bniej przychodzi\u0142a co 3 tygodnie. System wykrywa t\u0119 zmian\u0119 14 dni ZANIM odejdzie na dobre \u2014 i daje Ci gotow\u0105 wiadomo\u015B\u0107 reaktywacyjn\u0105. Ty tylko klikasz \u201Ewy\u015Blij\u201D.",
+    description: "Klientka Anna nie była 45 dni. Wcześniej przychodziła co 3 tygodnie. System wykrywa tę zmianę 14 dni ZANIM odejdzie na dobre — i daje Ci gotową wiadomość reaktywacyjną. Ty tylko klikasz „wyślij”.",
     stat: "-67%",
     statLabel: "redukcja odejść klientek",
     color: "from-amber-500 to-orange-600",
@@ -62,7 +62,7 @@ const features = [
     icon: TrendingUp,
     title: "AI Upsell Engine",
     subtitle: "Automatyczne dosprzedawanie",
-    description: "Klientka rezerwuje manicure hybrydowy. System wie, \u017Ce 60% klientek z tym zabiegiem dokupuje piel\u0119gnacj\u0119 d\u0142oni. Automatycznie sugeruje: \u201EDodaj spa d\u0142oni za 45 z\u0142?\u201D \u015Aredni wzrost warto\u015Bci wizyty: +18%.",
+    description: "Klientka rezerwuje manicure hybrydowy. System wie, że 60% klientek z tym zabiegiem dokupuje pielęgnację dłoni. Automatycznie sugeruje: „Dodaj spa dłoni za 45 zł?” Średni wzrost wartości wizyty: +18%.",
     stat: "+18%",
     statLabel: "wzrost wartości wizyty",
     color: "from-blue-500 to-indigo-600",
@@ -180,7 +180,7 @@ export const AIGameChangersSection = () => {
 
                 {/* Benefits */}
                 <div className="space-y-3 mb-6">
-                  {["Dzia\u0142a automatycznie 24/7", "Dost\u0119pne w pakiecie ELITE (349 z\u0142/mies)", "Rezultaty od pierwszego tygodnia"].map((benefit, i) => (
+                  {["Działa automatycznie 24/7", "Dostępne w pakiecie ELITE (349 zł/mies)", "Rezultaty od pierwszego tygodnia"].map((benefit, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <Check className="w-4 h-4 text-emerald-500" />
                       <span>{benefit}</span>

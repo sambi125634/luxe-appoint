@@ -46,9 +46,9 @@ export const GuaranteeSection = () => {
               <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ background: "rgba(245,158,11,0.1)", color: "#fbbf24" }}>
                 GWARANCJA 2 — ELITE
               </span>
-              <h3 className="font-bold text-xl mt-3 mb-2" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>Oszczędź 10\u00a0000 zł w 90 dni lub oddamy 3 miesiące abonamentu</h3>
+              <h3 className="font-bold text-xl mt-3 mb-2" style={{ color: "#f5f5f7", fontFamily: "'Inter', sans-serif" }}>Oszczędź 10 000 zł w 90 dni lub oddamy 3 miesiące abonamentu</h3>
               <p className="text-sm leading-relaxed" style={{ color: "rgba(245,245,247,0.6)" }}>
-                Jeśli w ciągu 90 dni korzystania z ELITE nie odnotujesz oszczędności minimum 10\u00a0000 zł (no-showy + odzyskane klientki + czas), oddamy Ci 3 miesiące abonamentu.
+                Jeśli w ciągu 90 dni korzystania z ELITE nie odnotujesz oszczędności minimum 10 000 zł (no-showy + odzyskane klientki + czas), oddamy Ci 3 miesiące abonamentu.
               </p>
               <p className="text-xs mt-2 italic" style={{ color: "rgba(245,245,247,0.3)" }}>
                 Warunek: uruchomiony Autopilot + skonfigurowany Widget.
