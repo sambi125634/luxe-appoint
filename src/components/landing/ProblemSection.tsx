@@ -105,69 +105,82 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <div className="bg-gradient-to-br from-destructive/5 to-destructive/10 border-2 border-destructive/20 rounded-2xl p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Calculator className="w-6 h-6 text-destructive" />
-              <div>
-                <h3 className="font-bold text-lg">Kalkulator strat</h3>
-                <p className="text-sm text-muted-foreground">Ile tracisz na no-showach?</p>
-              </div>
-            </div>
+          <div className="relative bg-white dark:bg-card rounded-3xl shadow-[0_8px_60px_-12px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_60px_-12px_rgba(0,0,0,0.3)] border border-border/30 p-8 md:p-10 overflow-hidden">
+            {/* Decorative gradient orbs */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-16 -left-16 w-32 h-32 bg-gradient-to-tr from-destructive/8 to-transparent rounded-full blur-3xl pointer-events-none" />
 
-            <div className="space-y-5 mb-6">
-              <div>
-                <div className="flex justify-between mb-2">
-                  <Label>Miesięczny przychód salonu (zł)</Label>
-                  <span className="font-bold">{monthlyRevenue.toLocaleString("pl-PL")} zł</span>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm">
+                  <Calculator className="w-5 h-5 text-primary" />
                 </div>
-                <Slider value={[monthlyRevenue]} min={2000} max={60000} step={500} onValueChange={([v]) => setMonthlyRevenue(v)} />
-              </div>
-              <div>
-                <div className="flex justify-between mb-2">
-                  <Label>No-showy tygodniowo</Label>
-                  <span className="font-bold">{noShows}</span>
+                <div>
+                  <h3 className="font-bold text-lg tracking-tight">Kalkulator strat</h3>
+                  <p className="text-sm text-muted-foreground">Ile tracisz na no-showach?</p>
                 </div>
-                <Slider value={[noShows]} min={0} max={15} step={1} onValueChange={([v]) => setNoShows(v)} />
               </div>
-              <div>
-                <div className="flex justify-between mb-2">
-                  <Label>Średnia wartość wizyty (zł)</Label>
-                  <span className="font-bold">{avgVisit} zł</span>
-                </div>
-                <Slider value={[avgVisit]} min={50} max={600} step={10} onValueChange={([v]) => setAvgVisit(v)} />
-              </div>
-            </div>
 
-            <div className="bg-white/10 dark:bg-black/20 rounded-xl p-5 space-y-3 mb-5">
-              <div className="flex justify-between text-sm">
-                <span>Straty na no-showach rocznie:</span>
-                <span className="font-bold text-destructive">-{noShowLoss.toLocaleString("pl-PL")} zł</span>
+              <div className="space-y-7 mb-8">
+                <div>
+                  <div className="flex justify-between mb-3">
+                    <Label className="text-sm font-medium text-muted-foreground">Miesięczny przychód salonu</Label>
+                    <span className="font-bold text-sm bg-primary/5 px-3 py-1 rounded-full">{monthlyRevenue.toLocaleString("pl-PL")} zł</span>
+                  </div>
+                  <Slider value={[monthlyRevenue]} min={2000} max={60000} step={500} onValueChange={([v]) => setMonthlyRevenue(v)} className="[&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:shadow-md" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-3">
+                    <Label className="text-sm font-medium text-muted-foreground">No-showy tygodniowo</Label>
+                    <span className="font-bold text-sm bg-destructive/5 text-destructive px-3 py-1 rounded-full">{noShows}</span>
+                  </div>
+                  <Slider value={[noShows]} min={0} max={15} step={1} onValueChange={([v]) => setNoShows(v)} className="[&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:shadow-md" />
+                </div>
+                <div>
+                  <div className="flex justify-between mb-3">
+                    <Label className="text-sm font-medium text-muted-foreground">Średnia wartość wizyty</Label>
+                    <span className="font-bold text-sm bg-primary/5 px-3 py-1 rounded-full">{avgVisit} zł</span>
+                  </div>
+                  <Slider value={[avgVisit]} min={50} max={600} step={10} onValueChange={([v]) => setAvgVisit(v)} className="[&_[role=slider]]:w-5 [&_[role=slider]]:h-5 [&_[role=slider]]:border-2 [&_[role=slider]]:border-primary [&_[role=slider]]:shadow-md" />
+                </div>
               </div>
-              <div className="border-t border-destructive/20 pt-3">
-                <div className="flex justify-between">
-                  <span className="font-bold">Tracisz łącznie:</span>
+
+              {/* Results card */}
+              <div className="bg-gradient-to-br from-muted/40 to-muted/20 dark:from-muted/20 dark:to-muted/10 rounded-2xl p-6 space-y-4 mb-6 border border-border/20">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-muted-foreground">Straty na no-showach rocznie</span>
+                  <span className="font-bold text-destructive">-{noShowLoss.toLocaleString("pl-PL")} zł</span>
+                </div>
+                <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                <div className="flex justify-between items-center">
+                  <span className="font-bold">Tracisz łącznie</span>
                   <motion.span
                     key={totalLoss}
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    className="font-black text-2xl text-destructive"
+                    initial={{ scale: 0.9, opacity: 0.5 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="font-black text-3xl text-destructive tracking-tight"
                   >
-                    -{totalLoss.toLocaleString("pl-PL")} zł/rok
+                    -{totalLoss.toLocaleString("pl-PL")} zł
+                    <span className="text-base font-medium text-muted-foreground ml-1">/rok</span>
                   </motion.span>
                 </div>
-              </div>
-              <div className="bg-green-500/10 rounded-lg p-3">
-                <div className="flex justify-between">
-                  <span className="text-green-600 text-sm font-medium">Z Beauty Calendar odzyskasz:</span>
-                  <span className="font-bold text-green-600">+{totalLoss.toLocaleString("pl-PL")} zł/rok</span>
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 rounded-xl p-4 border border-emerald-200/50 dark:border-emerald-500/20">
+                  <div className="flex justify-between items-center">
+                    <span className="text-emerald-700 dark:text-emerald-400 text-sm font-medium">Z Beauty Calendar odzyskasz:</span>
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400 text-lg">+{totalLoss.toLocaleString("pl-PL")} zł/rok</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <Button className="w-full h-12 gap-2" onClick={onScrollToForm}>
-              Zacznij odzyskiwać te pieniądze — za darmo
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+              <Button
+                className="w-full h-14 gap-2 text-base font-semibold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300"
+                onClick={onScrollToForm}
+              >
+                Zacznij odzyskiwać te pieniądze — za darmo
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </motion.div>
       </div>
