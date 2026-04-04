@@ -37,7 +37,9 @@ const Index = () => {
         
         <ProblemSection onScrollToForm={scrollToForm} />
         <GameChangerFeaturesSection />
+        <SystemFlowSection onScrollToForm={scrollToForm} />
         <OwnYourClientsSection />
+        <DataOwnershipSection />
         <ComparisonSection />
         <ValueStackSection />
         <TestimonialsSection />
