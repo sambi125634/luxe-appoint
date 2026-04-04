@@ -38,7 +38,7 @@ const Index = () => {
         <SocialProofBar />
         
         <ProblemSection onScrollToForm={scrollToForm} />
-        <GameChangerFeaturesSection />
+        
         <SystemFlowSection onScrollToForm={scrollToForm} />
         <OwnYourClientsSection />
         <DataOwnershipSection />
