@@ -21,7 +21,7 @@ const features = [
     icon: Brain,
     title: "Inteligentny Asystent Grafiku",
     description:
-      'Masz lukę między 13:00 a 15:00? AI automatycznie sugeruje ten termin klientkom jako \u201Erekomendowany\u201D. Twój kalendarz wypełnia się sam \u2014 bez pustych godzin, bez strat.',
+      'Masz lukę między 13:00 a 15:00? AI automatycznie sugeruje ten termin klientkom jako „rekomendowany". Twój kalendarz wypełnia się sam — bez pustych godzin, bez strat.',
     accent: "from-violet-500/20 to-violet-500/5",
     iconColor: "text-violet-500",
   },
