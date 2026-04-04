@@ -5,7 +5,7 @@ import { SocialProofBar } from "@/components/landing/SocialProofBar";
 import { ProblemSection } from "@/components/landing/ProblemSection";
 import { BookstyCostCalculator } from "@/components/landing/BookstyCostCalculator";
 import { TransformationSection } from "@/components/landing/TransformationSection";
-import { AIGameChangersSection } from "@/components/landing/AIGameChangersSection";
+import { GameChangerFeaturesSection } from "@/components/landing/GameChangerFeaturesSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
 import { FeaturesSection } from "@/components/landing/FeaturesSection";
 import { ValueStackSection } from "@/components/landing/ValueStackSection";
@@ -17,6 +17,7 @@ import { GuaranteeSection } from "@/components/landing/GuaranteeSection";
 import { NewFAQSection } from "@/components/landing/NewFAQSection";
 import { NewFinalCTASection } from "@/components/landing/NewFinalCTASection";
 import { NewLandingFooter } from "@/components/landing/NewLandingFooter";
+import DemoPreviewSection from "@/components/landing/DemoPreviewSection";
 
 const Index = () => {
   const formRef = useRef<HTMLDivElement>(null);
