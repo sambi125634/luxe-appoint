@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
-const DEMO_WIDGET_URL = "/demo";
-
 export const InteractivePhoneMockup = () => {
   const [iframeError, setIframeError] = useState(false);
 
@@ -25,27 +23,26 @@ export const InteractivePhoneMockup = () => {
             transition={{ duration: 0.8 }}
           >
             <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-4">
-              Wypróbuj teraz — bez rejestracji
+              Aplikacja dla Twoich klientek
             </p>
 
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">
-              Tak widzi Twój salon
+              Tak wygląda Twoja
               <br />
               <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                Twoja klientka.
+                aplikacja dla klientek.
               </span>
             </h2>
 
             <p className="text-white/60 text-lg leading-relaxed mb-8 max-w-md">
-              To nie jest animacja. To prawdziwy widget rezerwacji Beauty Calendar.
-              Kliknij i zarezerwuj wizytę — tak jak robi to klientka Twojego salonu.
+              Prawdziwa aplikacja mobilna Twojego salonu. Klientka rezerwuje, sprawdza wizyty i zbiera punkty lojalnościowe — wszystko w jednym miejscu.
             </p>
 
             <div className="space-y-4 mb-10">
               {[
-                "Wybiera usługę z opisem i ceną",
-                "Wybiera termin z dostępnych slotów",
-                "Rezerwuje w 30 sekund — bez telefonu",
+                "Rezerwuje wizytę w 3 kliknięcia",
+                "Widzi historię wizyt i ulubione",
+                "Dostaje powiadomienia i kupony lojalnościowe",
               ].map((text, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <span className="text-primary font-mono font-bold">→</span>
@@ -92,22 +89,22 @@ export const InteractivePhoneMockup = () => {
                   {iframeError ? (
                     <div className="w-full h-full bg-muted flex flex-col items-center justify-center p-6 text-center">
                       <span className="text-4xl mb-4">📱</span>
-                      <p className="font-bold text-foreground mb-2">Demo ładuje się...</p>
+                      <p className="font-bold text-foreground mb-2">Aplikacja ładuje się...</p>
                       <p className="text-sm text-muted-foreground">
-                        Kliknij &quot;Zobacz demo&quot; aby zobaczyć pełną wersję
+                        Kliknij aby zobaczyć aplikację klientki
                       </p>
                       <a
-                        href="/demo"
+                        href="/app"
                         className="mt-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm"
                       >
-                        Otwórz demo →
+                        Otwórz aplikację →
                       </a>
                     </div>
                   ) : (
                     <iframe
-                      src={DEMO_WIDGET_URL}
+                      src="/app"
                       className="w-full h-full border-0"
-                      title="Beauty Calendar — demo rezerwacji"
+                      title="Beauty Calendar — aplikacja klientki"
                       onError={() => setIframeError(true)}
                       style={{
                         transform: "scale(0.85)",
@@ -123,25 +120,25 @@ export const InteractivePhoneMockup = () => {
                 <div className="w-24 h-1 bg-white/20 rounded-full mx-auto mt-3" />
               </div>
 
-              {/* Floating badge — booking */}
+              {/* Floating badge — loyalty */}
               <motion.div
                 animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -right-12 top-20 bg-white rounded-2xl p-3 shadow-xl min-w-[140px] hidden md:block"
               >
-                <p className="text-xs text-muted-foreground mb-1">Nowa rezerwacja ✓</p>
-                <p className="font-bold text-sm text-foreground">Manicure hybrydowy</p>
-                <p className="text-xs text-muted-foreground">jutro · 10:30 · 120 zł</p>
+                <p className="text-xs text-muted-foreground mb-1">Nowa pieczątka ✓</p>
+                <p className="font-bold text-sm text-foreground">7 / 10 wizyt</p>
+                <p className="text-xs text-muted-foreground">jeszcze 3 do nagrody!</p>
               </motion.div>
 
-              {/* Floating badge — no-show */}
+              {/* Floating badge — booking */}
               <motion.div
                 animate={{ y: [0, -6, 0], rotate: [2, -2, 2] }}
                 transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
                 className="absolute -left-14 bottom-32 bg-primary rounded-2xl p-3 shadow-xl min-w-[130px] hidden md:block"
               >
-                <p className="text-xs text-primary-foreground/70 mb-1">Przypomnienie wysłane</p>
-                <p className="font-bold text-sm text-primary-foreground">-67% no-showów</p>
+                <p className="text-xs text-primary-foreground/70 mb-1">Rezerwacja potwierdzona</p>
+                <p className="font-bold text-sm text-primary-foreground">Manicure · jutro 10:30</p>
               </motion.div>
             </div>
           </motion.div>
