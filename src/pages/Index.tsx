@@ -32,7 +32,7 @@ const Index = () => {
       <main>
         <NewHeroSection onScrollToForm={scrollToForm} />
         <SocialProofBar />
-        <LossNumbersSection />
+        
         <ProblemSection onScrollToForm={scrollToForm} />
         <GameChangerFeaturesSection />
         <OwnYourClientsSection />
