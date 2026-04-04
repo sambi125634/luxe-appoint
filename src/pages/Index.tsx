@@ -13,7 +13,7 @@ import { ComparisonSection } from "@/components/landing/ComparisonSection";
 import { ValueStackSection } from "@/components/landing/ValueStackSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import DemoPreviewSection from "@/components/landing/DemoPreviewSection";
-import { MobileAppSection } from "@/components/landing/MobileAppSection";
+import { InteractivePhoneMockup } from "@/components/landing/InteractivePhoneMockup";
 import { AudienceSection } from "@/components/landing/AudienceSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { GuaranteeSection } from "@/components/landing/GuaranteeSection";
@@ -46,7 +46,7 @@ const Index = () => {
         <ValueStackSection />
         <TestimonialsSection />
         <DemoPreviewSection />
-        <MobileAppSection />
+        <InteractivePhoneMockup />
         <AudienceSection />
         <PricingSection onScrollToForm={scrollToForm} />
         <GuaranteeSection />
