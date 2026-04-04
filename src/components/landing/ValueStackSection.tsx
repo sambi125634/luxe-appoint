@@ -2,20 +2,25 @@ import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 const items = [
-  { name: "System Rezerwacji Online 24/7", desc: "Widget na stron\u0119, Instagram, QR kod", value: "197 z\u0142/mies" },
-  { name: "\u015Acie\u017Cka Klientki \u2014 automatyczne sekwencje retencyjne", desc: "Lejek od 1. do 5. wizyty, upsell pakiet\u00F3w, maksymalizacja LTV", value: "497 z\u0142/mies" },
-  { name: "AI Autopilot \u2014 potwierdzenia + przypomnienia", desc: "Automatyczne SMS i email, zero r\u0119cznej pracy", value: "297 z\u0142/mies" },
-  { name: "AI Prognoza przychod\u00F3w (30 dni)", desc: "Wiesz z wyprzedzeniem ile zarobisz", value: "397 z\u0142/mies" },
-  { name: "CRM Klientek + Historia wizyt", desc: "Pe\u0142na baza z segmentacj\u0105 i tagami", value: "147 z\u0142/mies" },
-  { name: "Radar Odej\u015B\u0107 \u2014 AI churn detection", desc: "Wykrywa klientki zagro\u017Cone odej\u015Bciem", value: "297 z\u0142/mies" },
-  { name: "Zarz\u0105dzanie Magazynem + Receptury", desc: "Stany, dostawy, True Profit na zabieg", value: "197 z\u0142/mies" },
-  { name: "Program Polece\u0144 + Google Reviews", desc: "Automatyczne pro\u015Bby o opinie, kody polecaj\u0105ce", value: "147 z\u0142/mies" },
-  { name: "Raporty Finansowe + Eksport danych", desc: "VAT, prowizje pracownik\u00F3w, True Profit", value: "97 z\u0142/mies" },
-  { name: "Aplikacja mobilna (w\u0142a\u015Bciciel + klientka)", desc: "Prywatna przestrze\u0144 \u2014 klientka widzi TYLKO Tw\u00F3j salon", value: "297 z\u0142/mies" },
-  { name: "BONUS: Import z marketplace jednym klikni\u0119ciem", desc: "Przenie\u015B baz\u0119 klientek w 15 minut", value: "997 z\u0142 (jednorazowo)", isBonus: true },
+  { name: "Inteligentny Asystent Grafiku — AI wypełnia luki za Ciebie", desc: "Rekomenduje klientom terminy korzystne dla Twojego kalendarza", value: "397 zł/mies" },
+  { name: "Wideo-prezentacje usług w kalendarzu", desc: "Klient widzi efekt zabiegu zanim zarezerwuje", value: "197 zł/mies" },
+  { name: "Receptury zabiegowe + True Profit", desc: "Realny koszt usługi, automatyczna aktualizacja magazynu", value: "297 zł/mies" },
+  { name: "Skan kodów → aktualizacja magazynu", desc: "Aparat w telefonie lub kamera w komputerze — 3 minuty i gotowe", value: "147 zł/mies" },
+  { name: "Prognoza przychodów AI (30 dni)", desc: "Wiesz z wyprzedzeniem ile zarobisz i co zrobić, żeby zarobić więcej", value: "397 zł/mies" },
+  { name: "Grupy zakupowe + segregacja klientów AI", desc: "VIP, Stała, Sezonowa, Odkrywczyni — wiesz komu co zaproponować", value: "297 zł/mies" },
+  { name: "Karty konsultacyjne z auto-wysyłką", desc: "Ankiety po rezerwacji, dane w profilu klienta, gotowe szablony", value: "197 zł/mies" },
+  { name: "Raporty dla księgowej — 1 kliknięcie", desc: "VAT, prowizje, podsumowanie kasowe — email i gotowe", value: "97 zł/mies" },
+  { name: "Ścieżka Klienta — pipeline 5 wizyt", desc: "Automatyczne sekwencje między wizytami, upsell pakietów", value: "497 zł/mies" },
+  { name: "AI Retencja — strefy zagrożenia + sekwencje", desc: "Wykrywa kto odchodzi i reaguje zanim będzie za późno", value: "397 zł/mies" },
+  { name: "Auto-zaliczki dla no-showów", desc: "Wymusza zaliczki tylko od klientów, którzy nie przychodzą", value: "197 zł/mies" },
+  { name: "Program poleceń + współpraca z influencerami", desc: "Linki afiliacyjne ze statystykami ROI", value: "197 zł/mies" },
+  { name: "Aplikacja mobilna (właściciel + klient)", desc: "Klient widzi TYLKO Twój salon — prywatna przestrzeń w telefonie", value: "297 zł/mies" },
+  { name: "BONUS: Import bazy klientów jednym kliknięciem", desc: "Przenieś bazę z marketplace w 15 minut", value: "997 zł (jednorazowo)", isBonus: true },
 ];
 
 export const ValueStackSection = () => {
+  const totalValue = "3 910 zł/mies";
+
   return (
     <section className="py-20 bg-gradient-to-b from-background to-primary/5" id="value">
       <div className="container max-w-3xl mx-auto px-4">
@@ -26,8 +31,8 @@ export const ValueStackSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <h2 className="text-3xl font-serif font-bold mb-4">Co dostajesz w Beauty Calendar PRO</h2>
-          <p className="text-muted-foreground">Zsumujmy warto\u015B\u0107 tego co otrzymujesz</p>
+          <h2 className="text-3xl font-serif font-bold mb-4">Zsumujmy, co dostajesz</h2>
+          <p className="text-muted-foreground">Gdybyś płaciła za każde narzędzie osobno — tyle by Cię to kosztowało</p>
         </motion.div>
 
         <div className="space-y-3 mb-8">
@@ -37,7 +42,7 @@ export const ValueStackSection = () => {
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.06 }}
+              transition={{ delay: i * 0.05 }}
               className={`flex items-center gap-4 p-4 rounded-xl border ${
                 item.isBonus ? 'bg-amber-500/5 border-amber-500/20' : 'bg-card border-border'
               }`}
@@ -49,7 +54,7 @@ export const ValueStackSection = () => {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">
-                  {item.isBonus && <span className="text-amber-500 font-bold mr-2">{"\uD83C\uDF81"} BONUS:</span>}
+                  {item.isBonus && <span className="text-amber-500 font-bold mr-2">🎁 BONUS:</span>}
                   {item.name}
                 </p>
                 <p className="text-xs text-muted-foreground">{item.desc}</p>
@@ -71,12 +76,12 @@ export const ValueStackSection = () => {
           transition={{ duration: 0.5 }}
         >
           <p className="text-sm text-muted-foreground mb-1">
-            \u0141\u0105czna warto\u015B\u0107 gdyby\u015B p\u0142aci\u0142a za ka\u017Cde narz\u0119dzie osobno:
+            Łączna wartość gdybyś płaciła za każde narzędzie osobno:
           </p>
-          <p className="text-4xl font-black line-through text-muted-foreground mb-2">3 570 z\u0142/mies</p>
+          <p className="text-4xl font-black line-through text-muted-foreground mb-2">{totalValue}</p>
           <p className="text-sm text-muted-foreground mb-3">Twoja cena z Beauty Calendar PRO:</p>
-          <p className="text-5xl font-black text-primary mb-2">99 z\u0142 netto/mies</p>
-          <p className="text-sm text-muted-foreground">+ 0 z\u0142 prowizji od rezerwacji. Zawsze. Twoja baza = Twoja w\u0142asno\u015B\u0107.</p>
+          <p className="text-5xl font-black text-primary mb-2">99 zł netto/mies</p>
+          <p className="text-sm text-muted-foreground">+ 0 zł prowizji od rezerwacji. Zawsze. Twoja baza = Twoja własność.</p>
         </motion.div>
       </div>
     </section>
