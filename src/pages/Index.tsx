@@ -6,7 +6,7 @@ import { SocialProofBar } from "@/components/landing/SocialProofBar";
 
 import { ProblemSection } from "@/components/landing/ProblemSection";
 
-import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
+import { ClientJourneySection } from "@/components/landing/ClientJourneySection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
 import { DataOwnershipSection } from "@/components/landing/DataOwnershipSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
