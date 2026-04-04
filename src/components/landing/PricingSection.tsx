@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, Sparkles, ArrowRight, Crown, Zap, ShieldCheck, X } from "lucide-react";
+import { Check, Sparkles, ArrowRight, Crown, Zap, Percent } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,23 +20,21 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
       name: "FREE",
       price: "0 z\u0142",
       period: "/ na zawsze",
-      description: "Dla jednoosobowych dzia\u0142alno\u015Bci. Zacznij w 60 sekund, bez karty, bez ryzyka.",
+      description: "Dla jednoosobowych dzia\u0142alno\u015bci kt\u00f3re stawiaj\u0105 pierwsze kroki",
       features: [
-        "1 pracownik",
-        "Do 50 klientek w bazie",
-        "Do 10 us\u0142ug w katalogu",
-        "Do 20 produkt\u00F3w w magazynie",
-        "1 widget rezerwacji + link",
-        "Potwierdzenia email",
-        "Profil salonu + godziny otwarcia",
+        "Max 1 pracownik",
+        "Max 50 klientek w bazie",
+        "Max 10 us\u0142ug",
+        "Max 20 produkt\u00f3w w magazynie",
+        "Tylko potwierdzenia email (bez SMS)",
+        "Kalendarz + Widget rezerwacji",
+        "Podstawowe statystyki",
       ],
       limitations: [
-        "Aplikacje mobilne",
+        "Aplikacja mobilna",
         "SMS i przypomnienia automatyczne",
-        "Raporty i statystyki",
         "AI Autopilot",
-        "CRM zaawansowany",
-        "Programy polece\u0144",
+        "Retencja i sekwencje",
       ],
       cta: "Zacznij za darmo",
       ctaLink: "/auth",
@@ -47,27 +45,29 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
       name: "PRO",
       price: isAnnual ? "79 z\u0142 netto" : "99 z\u0142 netto",
       period: "/ miesi\u0105c",
-      description: "Pe\u0142ne zarz\u0105dzanie salonem. Jedna wizyta manicure \u2014 i ca\u0142y system si\u0119 zwraca.",
+      description: "Dla salon\u00f3w kt\u00f3re chc\u0105 rosn\u0105\u0107 i odzyska\u0107 kontrol\u0119",
       features: [
         "Wszystko z FREE +",
         "Nieograniczeni pracownicy",
         "Nieograniczone us\u0142ugi i klientki",
-        "Aplikacja mobilna (w\u0142a\u015Bciciel + klientka)",
-        "SMS + email \u2014 potwierdzenia, przypomnienia, follow-up",
-        "CRM \u2014 tagi, segmentacja, voice notes, pe\u0142na historia",
-        "\uD83D\uDCF7 Skaner magazynowy przez aparat telefonu",
-        "Raporty przychod\u00F3w, no-show, retencji",
-        "R\u0119czne sekwencje retencyjne (\u015Acie\u017Cka Klientki)",
-        "Programy polece\u0144 + Google Reviews",
-        "Eksport danych i raporty finansowe",
         "Nieograniczony magazyn",
+        "SMS + email powiadomienia",
+        "Aplikacja mobilna (w\u0142a\u015bciciel + klientka)",
+        "\u015acie\u017cka Klientki\u2122 (r\u0119czna konfiguracja)",
+        "Program polece\u0144",
+        "Karty konsultacyjne",
+        "Eksport danych",
+        "Raporty finansowe + wysy\u0142ka do ksi\u0119gowej",
+        "Receptury i True Profit",
+        "Skanowanie kod\u00f3w kamer\u0105",
       ],
       limitations: [
-        "AI Autopilot Engine (12 funkcji)",
-        "Prywatny onboarding 1:1",
-        "Konsultacja strategiczna",
+        "AI Autopilot",
+        "AI Segmentacja",
+        "Prognoza AI",
+        "Onboarding 1:1",
       ],
-      cta: "Wybierz PRO",
+      cta: "Zacznij 14 dni bez karty",
       ctaLink: "/auth",
       popular: true,
       icon: Sparkles,
@@ -79,22 +79,21 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
       setupFee: true,
       setupPrice: "497 z\u0142",
       period: "/ miesi\u0105c",
-      badge: "CEO LEVEL",
-      description: "AI pracuje na Tw\u00F3j salon 24/7. My konfigurujemy sekwencje za Ciebie.",
+      badge: "Pe\u0142na moc",
+      description: "Dla salon\u00f3w kt\u00f3re chc\u0105 system kt\u00f3ry pracuje za nich 24/7",
       features: [
         "Wszystko z PRO +",
-        "\uD83E\uDD16 AI Autopilot Engine \u2014 12 funkcji sztucznej inteligencji",
-        "Silent Fans Detector\u2122 \u2014 reaktywacja cichych fan\u00F3w",
-        "Smart Gap Management \u2014 AI wype\u0142nia luki w kalendarzu",
-        "AI Upsell Engine \u2014 automatyczne dosprzedawanie us\u0142ug",
-        "True Profit Dashboard \u2014 zysk netto per zabieg",
-        "Churn Prediction \u2014 kto odchodzi i dlaczego",
-        "Prywatny onboarding 1:1 z ekspertem (wideo)",
-        "Konfiguracja sekwencji retencyjnych za Ciebie",
-        "Konsultacja strategiczna \u2014 plan wzrostu salonu",
-        "Priorytetowe wsparcie \u2014 odpowied\u017A w 2h",
+        "\ud83e\udd16 AI Autopilot (wykrywa, wysy\u0142a, reaguje)",
+        "AI Segmentacja klientek automatyczna",
+        "AI Prognoza przychod\u00f3w (30 dni, 94%)",
+        "Radar Odej\u015b\u0107 (wykrywa zagro\u017cone klientki)",
+        "Auto-zaliczki dla no-show przez AI",
+        "Prywatny Onboarding Call 1:1",
+        "Konfiguracja sekwencji za Ciebie",
+        "Konsultacja strategiczna salonu",
+        "Priorytetowy support \u2014 odpowied\u017a w 2h",
       ],
-      cta: "Um\u00F3w prywatny onboarding",
+      cta: "Um\u00f3w prywatny onboarding",
       popular: false,
       icon: Crown,
       savings: isAnnual ? "Oszcz\u0119dzasz 840 z\u0142/rok" : undefined,
@@ -104,7 +103,6 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
   return (
     <section id="pricing" className="py-20 lg:py-32 bg-gradient-to-b from-background to-muted/20">
       <div className="container">
-        {/* Section header */}
         <motion.div
           className="text-center mb-10"
           initial={{ opacity: 0, y: 30 }}
@@ -118,65 +116,45 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
             <span className="text-gradient-luxury">Pe\u0142na kontrola nad Twoim biznesem.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Zacznij za darmo. Przejd\u017A na PRO gdy b\u0119dziesz gotowa. \u017Badnych ukrytych op\u0142at.
+            Zacznij za darmo. Przejd\u017a na PRO gdy b\u0119dziesz gotowa. \u017badnych ukrytych op\u0142at.
           </p>
         </motion.div>
 
-        {/* Annual/Monthly toggle */}
+        {/* Toggle */}
         <div className="flex items-center justify-center gap-3 mb-12">
-          <span className={cn("text-sm font-medium", !isAnnual ? "text-foreground" : "text-muted-foreground")}>
-            Miesi\u0119cznie
-          </span>
+          <span className={cn("text-sm font-medium", !isAnnual ? "text-foreground" : "text-muted-foreground")}>Miesi\u0119cznie</span>
           <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
-          <span className={cn("text-sm font-medium", isAnnual ? "text-foreground" : "text-muted-foreground")}>
-            Rocznie (oszcz\u0119dzasz 20%)
-          </span>
-          {isAnnual && (
-            <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-              -20%
-            </Badge>
-          )}
+          <span className={cn("text-sm font-medium", isAnnual ? "text-foreground" : "text-muted-foreground")}>Rocznie (oszcz\u0119dzasz 20%)</span>
+          {isAnnual && <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">-20%</Badge>}
         </div>
 
-        {/* Pricing cards */}
+        {/* Cards */}
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={index}
-              custom={index}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
             >
-              <Card
-                className={cn(
-                  "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 h-full",
-                  plan.popular
-                    ? "border-primary shadow-xl scale-105 z-10"
-                    : "border-border/50 hover:border-border hover:shadow-lg"
-                )}
-              >
+              <Card className={cn(
+                "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 h-full",
+                plan.popular ? "border-primary shadow-xl scale-105 z-10" : "border-border/50 hover:border-border hover:shadow-lg"
+              )}>
                 {plan.popular && (
                   <div className="absolute top-0 left-0 right-0 bg-primary text-primary-foreground text-center py-1 text-sm font-medium">
-                    <Sparkles className="w-4 h-4 inline mr-1" />
-                    Najpopularniejszy
+                    <Sparkles className="w-4 h-4 inline mr-1" />Najpopularniejszy
                   </div>
                 )}
-
                 {plan.badge && !plan.popular && (
                   <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-center py-1 text-sm font-medium">
-                    <Crown className="w-4 h-4 inline mr-1" />
-                    {plan.badge}
+                    <Crown className="w-4 h-4 inline mr-1" />{plan.badge}
                   </div>
                 )}
-
                 <CardHeader className={cn("text-center pb-0", (plan.popular || plan.badge) && "pt-10")}>
                   <div className="flex justify-center mb-3">
-                    <div className={cn(
-                      "w-12 h-12 rounded-xl flex items-center justify-center",
-                      plan.popular ? "bg-primary/20" : "bg-muted"
-                    )}>
+                    <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", plan.popular ? "bg-primary/20" : "bg-muted")}>
                       <plan.icon className={cn("w-6 h-6", plan.popular ? "text-primary" : "text-muted-foreground")} />
                     </div>
                   </div>
@@ -184,63 +162,32 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
                   <div className="mt-4">
                     <span className="text-4xl font-bold">{plan.price}</span>
                     <span className="text-muted-foreground text-sm"> {plan.period}</span>
-                    {plan.setupFee && (
-                      <span className="text-sm text-muted-foreground block mt-1">
-                        + {plan.setupPrice} jednorazowy onboarding
-                      </span>
-                    )}
+                    {plan.setupFee && <span className="text-sm text-muted-foreground block mt-1">+ {plan.setupPrice} jednorazowy onboarding</span>}
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    {plan.description}
-                  </p>
-                  {plan.savings && (
-                    <Badge className="mt-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                      {plan.savings}
-                    </Badge>
-                  )}
+                  <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
+                  {plan.savings && <Badge className="mt-2 bg-emerald-500/10 text-emerald-600 border-emerald-500/20">{plan.savings}</Badge>}
                 </CardHeader>
-
                 <CardContent className="pt-6">
                   <ul className="space-y-3 mb-4">
-                    {plan.features.map((feature, i) => (
+                    {plan.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
-                        <span>{feature}</span>
+                        <Check className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" /><span>{f}</span>
                       </li>
                     ))}
                   </ul>
-
                   {plan.limitations && (
                     <div className="mb-6 pt-3 border-t border-border/50">
                       <p className="text-xs text-muted-foreground mb-2 font-medium">Nie zawiera:</p>
-                      {plan.limitations.map((lim, i) => (
-                        <p key={i} className="text-xs text-muted-foreground/70 mb-1">\u2014 {lim}</p>
-                      ))}
+                      {plan.limitations.map((lim, i) => <p key={i} className="text-xs text-muted-foreground/70 mb-1">\u2014 {lim}</p>)}
                     </div>
                   )}
-
                   {plan.ctaLink ? (
-                    <Button
-                      asChild
-                      className={cn(
-                        "w-full",
-                        !plan.popular && "bg-muted hover:bg-muted/80 text-foreground"
-                      )}
-                      variant={plan.popular ? "default" : "secondary"}
-                    >
-                      <Link to={plan.ctaLink}>
-                        {plan.cta}
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </Link>
+                    <Button asChild className={cn("w-full", !plan.popular && "bg-muted hover:bg-muted/80 text-foreground")} variant={plan.popular ? "default" : "secondary"}>
+                      <Link to={plan.ctaLink}>{plan.cta}<ArrowRight className="w-4 h-4 ml-2" /></Link>
                     </Button>
                   ) : (
-                    <Button
-                      onClick={onScrollToForm}
-                      className="w-full bg-muted hover:bg-muted/80 text-foreground"
-                      variant="secondary"
-                    >
-                      {plan.cta}
-                      <ArrowRight className="w-4 h-4 ml-2" />
+                    <Button onClick={onScrollToForm} className="w-full bg-muted hover:bg-muted/80 text-foreground" variant="secondary">
+                      {plan.cta}<ArrowRight className="w-4 h-4 ml-2" />
                     </Button>
                   )}
                 </CardContent>
@@ -249,17 +196,20 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           ))}
         </div>
 
-        {/* Bottom info */}
+        {/* Zero commission */}
         <motion.div
-          className="text-center mt-12 max-w-2xl mx-auto"
+          className="mt-10 text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <p className="text-sm text-muted-foreground">
-            Wszystkie ceny netto. P\u0142atno\u015Bci: Przelewy24 (BLIK, przelew bankowy, karta)<br />
-            Rezygnacja jednym klikni\u0119ciem \u00B7 Bez okresu wypowiedzenia \u00B7 Bez ukrytych op\u0142at
+          <div className="inline-flex items-center gap-3 bg-card border border-border rounded-2xl px-8 py-4">
+            <Percent className="w-5 h-5 text-primary" />
+            <p className="font-bold text-lg">0% prowizji od rezerwacji \u2014 <span className="text-primary">zawsze.</span></p>
+          </div>
+          <p className="text-sm text-muted-foreground mt-3">
+            W \u017cadnym pakiecie nie pobieramy prowizji od wizyt Twoich klientek. Nigdy.
           </p>
         </motion.div>
       </div>

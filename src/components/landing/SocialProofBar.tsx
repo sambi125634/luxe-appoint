@@ -1,13 +1,43 @@
-import { useRef } from "react";
-import { Percent, Layers, Clock, Database } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { Building2, Calendar, PiggyBank, Star } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 
 const stats = [
-  { value: "0%", label: "prowizji — na zawsze", icon: Percent },
-  { value: "163", label: "funkcje w jednym systemie", icon: Layers },
-  { value: "15 min", label: "i Twój salon jest online", icon: Clock },
-  { value: "100%", label: "własność danych — zawsze Twoja", icon: Database },
+  { value: 150, suffix: "+", label: "aktywnych salon\u00f3w", icon: Building2 },
+  { value: 25000, suffix: "+", label: "rezerwacji miesi\u0119cznie", icon: Calendar },
+  { value: 38000, suffix: " z\u0142", label: "\u015brednia oszcz\u0119dno\u015b\u0107 / rok", icon: PiggyBank },
+  { value: 4.9, suffix: "\u2605", label: "\u015brednia ocena", icon: Star },
 ];
+
+const CountUp = ({ target, suffix, isInView }: { target: number; suffix: string; isInView: boolean }) => {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    if (!isInView) return;
+    const duration = 1500;
+    const steps = 40;
+    const increment = target / steps;
+    let step = 0;
+    const timer = setInterval(() => {
+      step++;
+      if (step >= steps) {
+        setCurrent(target);
+        clearInterval(timer);
+      } else {
+        setCurrent(Math.round(increment * step * 10) / 10);
+      }
+    }, duration / steps);
+    return () => clearInterval(timer);
+  }, [isInView, target]);
+
+  const display = target >= 1000
+    ? Math.round(current).toLocaleString("pl-PL")
+    : Number.isInteger(target)
+      ? Math.round(current).toString()
+      : current.toFixed(1);
+
+  return <>{display}{suffix}</>;
+};
 
 export const SocialProofBar = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -27,7 +57,7 @@ export const SocialProofBar = () => {
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <div className="text-3xl md:text-4xl font-bold text-foreground mb-1">
-                {stat.value}
+                <CountUp target={stat.value} suffix={stat.suffix} isInView={isInView} />
               </div>
               <div className="text-sm text-muted-foreground">
                 {stat.label}
