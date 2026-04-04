@@ -146,12 +146,12 @@ export const GameChangerFeaturesSection = () => {
             🚀 To zmienia zasady gry
           </div>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold mb-4">
-            14 funkcji, których{" "}
-            <span className="text-primary">nie znajdziesz nigdzie indziej</span>
+            14 sposobów w jakie{" "}
+            <span className="text-primary">Twój salon zarabia więcej</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Każda z tych funkcji sama w sobie jest warta więcej niż cały
-            abonament. Razem tworzą system, który pracuje za Ciebie 24/7.
+            abonament. Razem sprawiają że Twój salon zarabia nawet gdy śpisz.
           </p>
         </motion.div>
 
