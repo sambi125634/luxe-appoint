@@ -180,7 +180,7 @@ export const AIGameChangersSection = () => {
 
                 {/* Benefits */}
                 <div className="space-y-3 mb-6">
-                  {["Działa automatycznie 24/7", "W cenie pakietu ELITE", "Rezultaty od pierwszego tygodnia"].map((benefit, i) => (
+                  {["Dzia\u0142a automatycznie 24/7", "Dost\u0119pne w pakiecie ELITE (349 z\u0142/mies)", "Rezultaty od pierwszego tygodnia"].map((benefit, i) => (
                     <div key={i} className="flex items-center gap-2 text-sm">
                       <Check className="w-4 h-4 text-emerald-500" />
                       <span>{benefit}</span>
