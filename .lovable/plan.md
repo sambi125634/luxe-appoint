@@ -1,44 +1,46 @@
 
 
-## Plan: Połączenie SocialProofBar i LossNumbers w jedną kompaktową sekcję
+## Plan: Quiz-kalkulator zamiast sliderów w ProblemSection
 
-### Problem
-Teraz mamy dwie osobne sekcje jedna pod drugą: SocialProofBar (4 statystyki) + LossNumbersSection (3 duże liczby). Zajmuje to za dużo miejsca i wygląda rozwlekle.
+### Koncept
+Zastąpienie obecnego kalkulatora sliderowego 3-krokowym quizem z przyciskami wyboru. Pain cards na górze zostają bez zmian. Kalkulator poniżej zmienia się w interaktywny quiz.
 
-### Propozycja: Jedna sekcja z dwoma warstwami
+### Mechanika quizu
 
-Zamiast dwóch sekcji — jedna elegancka sekcja z podziałem na dwie "warstwy":
+**Krok 1:** "Ile klientek odwiedziło Twój salon w ostatnim roku?"
+- Przyciski: `do 50` (wartość: 40) / `50–150` (100) / `150–300` (225) / `300+` (350)
 
-```text
-┌─────────────────────────────────────────────────┐
-│  GÓRNA WARSTWA — social proof (kompaktowy pas)  │
-│  150+ salonów  ·  25 000+ rezerwacji  ·  4.9★   │
-│─────────────────────────────────────────────────│
-│                                                 │
-│  "Ile Twój salon stracił w tym roku?"           │
-│                                                 │
-│  −4 800 zł    −280 zł     −3 600 zł            │
-│  (label)      (label)      (label)              │
-│                                                 │
-│  mały tekst podsumowania                        │
-└─────────────────────────────────────────────────┘
-```
+**Krok 2:** "Ile z nich wróciło więcej niż raz?"
+- Przyciski: `mniej niż 30%` / `30–50%` / `50–70%` / `ponad 70%`
 
-**Górna warstwa** — social proof jako jednoliniowy, horyzontalny pasek z separatorami (kropkami/kreskami), drobna czcionka, bez ikon. Pełni rolę "trust badge" — nie dominuje.
+**Krok 3:** "Jak często klientka nie stawiła się bez odwołania?"
+- Przyciski: `rzadko` (1/mies) / `1–2× mies` / `3–5× mies` / `więcej` (7/mies)
 
-**Dolna warstwa** — trzy liczby strat z animowanym CountUp (nie statyczny tekst). Kiedy sekcja wjeżdża w viewport, liczby odliczają od 0 do docelowej wartości. Efekt: oko natychmiast łapie ruch i czerwone kwoty.
+**Logika wyniku:**
+- Utracone klientki = total × (1 - retentionRate) × avgVisitValue(200zł) × 12
+- No-show straty = noShowFreq × 280zł × 12
+- Łączna strata roczna = suma
+
+**Porównania kontekstowe** (pod wynikiem):
+- `X` rat kredytowych (rata = 1 500 zł)
+- `Y` wakacyjnych wyjazdów (wyjazd = 4 000 zł)
+- `Z` miesięcy spokoju finansowego
+
+### UI/UX
+
+- Progres: 3 kropki/kreski na górze quizu pokazujące aktualny krok
+- Każdy krok z animacją `framer-motion` (fade + slide)
+- Przyciski: duże, `rounded-xl`, hover z `border-primary`, po kliknięciu `bg-primary text-white`
+- Po wybraniu odpowiedzi — automatyczne przejście do następnego kroku (300ms delay)
+- Wynik: animowany CountUp, duża czerwona kwota, porównania poniżej
+- Przycisk "Wróć" na krokach 2-3
+- CTA na końcu: "Odzyskaj te pieniądze — zacznij za darmo"
 
 ### Zmiany techniczne
 
 | Plik | Co |
 |------|----|
-| `SocialProofBar.tsx` | Przebudowa na jednokomponentową sekcję: górny pas social proof (inline, mały) + dolna część z 3 animowanymi liczbami strat. CountUp zastosowany też do kwot strat. |
-| `LossNumbersSection.tsx` | Usunięcie — zawartość przeniesiona do SocialProofBar |
-| `Index.tsx` | Usunięcie importu i użycia `<LossNumbersSection />` |
+| `ProblemSection.tsx` | Usunięcie sliderów, dodanie stanu quizu (`step`, `answers`), 3 ekrany pytań z przyciskami, ekran wyniku z obliczeniami i porównaniami. Pain cards zostają. |
 
-### Detale wizualne
-- Social proof: `text-sm`, inline-flex z dividerami `·`, bez grid/kart
-- Liczby strat: `text-5xl md:text-6xl font-black text-destructive` z CountUp animacją
-- Tło sekcji: delikatne `bg-muted/20` z `border-y`
-- Całość zajmuje ~60% obecnej wysokości dwóch sekcji
+Jeden plik do edycji — cała zmiana w `ProblemSection.tsx`.
 
