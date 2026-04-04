@@ -1,36 +1,55 @@
 
 
-## Plan: Dodanie nowych sekcji (System Flow + Data Ownership) obok istniejących
+## Plan: Banner na górze strony + Rewrite copy na "o niej, nie o produkcie"
 
-Dodajemy dwa nowe komponenty **obok** istniejących `GameChangerFeaturesSection` i `OwnYourClientsSection` — nic nie zastępujemy ani nie usuwamy.
+### Dwa zadania
 
-### Nowe pliki
+**1. Czarny banner nad nawigacją**
 
-| Plik | Opis |
-|------|------|
-| `src/components/landing/SystemFlowSection.tsx` | 4-krokowy flow z pionową connecting line (rezerwacja → przypomnienie → sekwencja → powrót). Eyebrow "Jak to działa", headline, kroki z `framer-motion` stagger, CTA na dole. |
-| `src/components/landing/DataOwnershipSection.tsx` | Czarne tło (`bg-black`), biały tekst serif, przekaz o utracie kontroli na marketplace + odpowiedź Beauty Calendar. Separator `border-white/20`, kluczowe frazy w `text-primary`. |
+Nowy komponent `TopBanner.tsx` — pełna szerokość, `bg-black text-white`, wycentrowany tekst, link "Sprawdź →" scrollujący do sekcji kalkulatora (`#calculator`).
 
-### Zmiany w istniejących plikach
+```text
+┌─────────────── bg-black ────────────────┐
+│ Przeciętna właścicielka salonu traci     │
+│ 38 000 zł rocznie na klientkach które   │
+│ nie wróciły. Ile Ty tracisz? [Sprawdź →]│
+└─────────────────────────────────────────┘
+← nawigacja poniżej (top offset +40px) →
+```
+
+- Tekst: `text-sm`, `py-2.5`, centered
+- "Sprawdź →" jako `text-primary underline` link
+- Nawigacja: zmiana `top-0` na `top-10` (40px offset dla bannera), banner sam jest `fixed top-0 z-[60]`
+- Na mobile: tekst w jednej linii lub delikatny wrap, `text-xs`
+
+**2. Copy rewrite — z "produkt" na "o niej"**
+
+Zmiana perspektywy we wszystkich sekcjach. Główne zamiany:
+
+| Przed | Po |
+|-------|-----|
+| "Beauty Calendar robi to za Ciebie" | "Twój salon rezerwuje, przypomina i odzyskuje klientki sam" |
+| "System przypomina" → opis | "Twoje klientki dostają przypomnienie..." |
+| "System wysyła spersonalizowaną ofertę" | "Twoja klientka dostaje ofertę kolejnej wizyty..." |
+| "System dzieli klientów na strefy" | "Widzisz od razu kto odchodzi..." |
+| "System automatycznie wymaga zaliczki" | "Klientka która nie przyszła 2 razy? Przy trzeciej rezerwacji — zaliczka. Automatycznie." |
+| "AI automatycznie segreguje" | "Wiesz od razu: kto jest VIP, kto sezonowa, kto odkrywczyni" |
+| "Każdy dzień bez Beauty Calendar" | "Każdy dzień bez systemu" |
+| "14 funkcji których nie znajdziesz..." | "14 sposobów w jakie Twój salon zarabia więcej" |
+| "Razem tworzą system który pracuje za Ciebie" | "Razem sprawiają że Twój salon zarabia nawet gdy śpisz" |
+
+### Pliki do edycji
 
 | Plik | Co |
 |------|----|
-| `src/pages/Index.tsx` | Import obu nowych komponentów. Wstawienie `<SystemFlowSection />` tuż pod `<GameChangerFeaturesSection />` i `<DataOwnershipSection />` tuż pod `<OwnYourClientsSection />`. Istniejące sekcje zostają bez zmian. |
+| `src/components/landing/TopBanner.tsx` | **Nowy** — czarny banner z copy i linkiem do kalkulatora |
+| `src/pages/Index.tsx` | Import TopBanner, render przed LandingNavbar |
+| `src/components/landing/LandingNavbar.tsx` | Offset `top-10` zamiast `top-0` gdy banner widoczny |
+| `src/components/landing/NewHeroSection.tsx` | Rewrite subheadline |
+| `src/components/landing/SystemFlowSection.tsx` | Rewrite opisy kroków na perspektywę "Ty/Twój salon" |
+| `src/components/landing/GameChangerFeaturesSection.tsx` | Rewrite headline + opisy features |
+| `src/components/landing/NewFinalCTASection.tsx` | "Każdy dzień bez systemu" zamiast "bez Beauty Calendar" |
+| `src/components/landing/DataOwnershipSection.tsx` | Drobne rewrite jeśli mówi o produkcie |
 
-### Detale wizualne
-
-**SystemFlowSection:**
-- Pionowa gradient linia `from-primary to-primary/20` łącząca 4 kroki
-- Każdy krok: numerowana kropka (`bg-primary`) + tytuł bold + opis muted
-- Stagger delay `index * 0.15`
-- CTA: "Chcę taki system — zaczynam za darmo"
-
-**DataOwnershipSection:**
-- `bg-black text-white`, `max-w-3xl`, tekst centrowany
-- Duży serif font, `leading-relaxed`
-- Separator: `border-t border-white/20`
-- Dolna część: "Beauty Calendar buduje Twoją bazę" z `text-primary` na kluczowych frazach
-- Małym: "Eksportujesz kiedy chcesz..."
-
-Trzy pliki do edycji/utworzenia. Zero usunięć.
+Osiem plików. Zero zmian w logice, animacjach czy strukturze — wyłącznie copy i nowy banner.
 
