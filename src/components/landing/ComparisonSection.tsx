@@ -1,305 +1,115 @@
-import { useState } from "react";
-import { Check, X, AlertTriangle, ChevronDown, Brain, Calculator, Scan, TrendingUp, Users, FileText, Shield, Gift, Layout, Target, Sparkles, BarChart3, Heart, Package } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  Brain,
+  Calculator,
+  Scan,
+  TrendingUp,
+  Users,
+  FileText,
+  Shield,
+  Gift,
+  Layout,
+  Target,
+  Sparkles,
+  Heart,
+  Package,
+  Check,
+  ArrowRight,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
 
-type FeatureStatus = boolean | "partial" | string;
-
-interface ComparisonRow {
-  feature: string;
-  icon?: React.ElementType;
-  bc: FeatureStatus;
-  marketplace: FeatureStatus;
-  highlight?: boolean;
-  description?: string;
-  group: "pricing" | "unique" | "shared";
-}
-
-const comparisonData: ComparisonRow[] = [
-  // Pricing rows
+const uniqueFeatures = [
   {
-    feature: "Prowizja od rezerwacji",
-    bc: "0%",
-    marketplace: "0–45% (Boost)",
-    highlight: true,
-    group: "pricing",
-    description: "Marketplace pobiera do 45% prowizji od nowych klientek pozyskanych przez funkcję Boost. Beauty Calendar — zero prowizji. Zawsze."
-  },
-  {
-    feature: "Koszt podstawowy (miesięcznie)",
-    bc: "od 99 zł netto",
-    marketplace: "145 zł + 35 zł/os",
-    highlight: true,
-    group: "pricing",
-    description: "Marketplace liczy 145 zł netto za pakiet podstawowy + 35 zł za każdego dodatkowego pracownika. U nas — stała cena, bez opłat per-head."
-  },
-  // Unique BC features
-  {
-    feature: "Własność bazy danych",
-    icon: Shield,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Twoja baza klientek jest Twoja. Eksportujesz ją jednym kliknięciem. Żadna platforma nie może Ci jej zabrać ani ograniczyć dostępu."
-  },
-  {
-    feature: "Prywatna aplikacja mobilna",
-    icon: Layout,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Twoje klientki widzą tylko Twój salon — nie konkurencję obok. Aplikacja z Twoim brandem, bez reklam innych salonów."
-  },
-  {
-    feature: "AI Autopilot (12 funkcji)",
     icon: Brain,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Automatyczne wypełnianie luk w grafiku, wykrywanie cichych fanek, predykcja odejść, inteligentne urodziny, upsell w rezerwacji — 12 funkcji AI które pracują za Ciebie 24/7."
+    title: "AI Autopilot (12 funkcji)",
+    description:
+      "Automatyczne wypełnianie luk w grafiku, predykcja odejść, inteligentne urodziny, upsell w rezerwacji — 12 funkcji AI które pracują za Ciebie 24/7.",
   },
   {
-    feature: "True Profit per zabieg",
     icon: Calculator,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Dodajesz składniki receptury do zabiegu. System automatycznie oblicza realny zysk po odliczeniu materiałów — nie przychód, a prawdziwy profit."
+    title: "True Profit per zabieg",
+    description:
+      "Dodajesz składniki receptury do zabiegu. System automatycznie oblicza realny zysk po odliczeniu materiałów — nie przychód, a prawdziwy profit.",
   },
   {
-    feature: "Receptury zabiegowe",
-    icon: Package,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Każdy zabieg ma przypisaną recepturę — ile ml farby, ile g rozjaśniacza. Magazyn aktualizuje się automatycznie po każdej wizycie."
-  },
-  {
-    feature: "Skaner kodów kamerą",
-    icon: Scan,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Skanuj kody kreskowe aparatem telefonu — przyjmuj dostawy, sprawdzaj stany, koryguj magazyn. Bez dodatkowego sprzętu."
-  },
-  {
-    feature: "Prognoza przychodów AI",
-    icon: TrendingUp,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "AI analizuje trendy rezerwacji i przewiduje Twoje przychody na następne 30/60/90 dni. Trafność: 94% na podstawie danych historycznych."
-  },
-  {
-    feature: "Automatyczna segmentacja",
-    icon: Users,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "System sam przypisuje tagi: VIP, zagrożona odejściem, nowa klientka, no-show. Nie musisz ręcznie tagować — AI robi to za Ciebie."
-  },
-  {
-    feature: "Ścieżka Klientki™ + Auto-zaliczki",
-    icon: Target,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Wizualna ścieżka od pierwszej wizyty do stałej klientki (5 etapów). Automatyczne wymaganie zaliczki dla klientek z historią no-showów."
-  },
-  {
-    feature: "Retencja — strefy zagrożenia",
     icon: Heart,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Radar odejść pokazuje klientki w strefie żółtej (dawno nie było) i czerwonej (zaraz odejdą). Automatyczne SMS/email zanim będzie za późno."
+    title: "Retencja — strefy zagrożenia",
+    description:
+      "Radar odejść pokazuje klientki w strefie żółtej i czerwonej. Automatyczne SMS/email zanim klientka odejdzie na dobre.",
   },
   {
-    feature: "Program poleceń z ROI",
-    icon: Gift,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Każda klientka dostaje unikalny link polecający. Widzisz ile klientek przyprowadziła, ile zarobiłaś dzięki niej. Mierzalny ROI, nie życzeniowe 'poleć nas'."
+    icon: TrendingUp,
+    title: "Prognoza przychodów AI",
+    description:
+      "AI analizuje trendy rezerwacji i przewiduje Twoje przychody na 30/60/90 dni. Trafność: 94%.",
   },
   {
-    feature: "Widget per kampania",
-    icon: Sparkles,
-    bc: true,
-    marketplace: false,
-    group: "unique",
-    description: "Tworzysz osobny widget rezerwacji dla każdej kampanii — inny na Instagram, inny na stronę, inny na Google Ads. Mierzysz konwersję każdego źródła."
-  },
-  // Shared features
-  {
-    feature: "Karty konsultacyjne",
-    icon: FileText,
-    bc: true,
-    marketplace: "partial",
-    group: "shared",
-    description: "U nas: pełny builder z własnymi polami, red-flags, podpisem elektronicznym. Marketplace ma prostsze formularze zgody."
-  },
-  {
-    feature: "Auto-zaliczki (no-show)",
     icon: Shield,
-    bc: true,
-    marketplace: "partial",
-    group: "shared",
-    description: "U nas: automatyczne reguły (np. po 2. no-show wymagaj zaliczki). Marketplace: ręczne kaucje/przedpłaty."
+    title: "Własność bazy danych",
+    description:
+      "Twoja baza klientek jest Twoja. Eksport jednym kliknięciem. Żadna platforma nie może Ci jej zabrać.",
   },
   {
-    feature: "CRM z tagami i historią",
-    bc: true,
-    marketplace: true,
-    group: "shared",
-    description: "Obie platformy oferują CRM z tagami klientów, kartami, notatkami i historią wizyt."
+    icon: Layout,
+    title: "Prywatna aplikacja mobilna",
+    description:
+      "Twoje klientki widzą tylko Twój salon — nie konkurencję obok. Bez reklam innych salonów.",
   },
   {
-    feature: "SMS + email automatyzacja",
-    bc: true,
-    marketplace: true,
-    group: "shared",
-    description: "Obie platformy oferują kampanie SMS/email i zautomatyzowany marketing."
+    icon: Users,
+    title: "Automatyczna segmentacja",
+    description:
+      "System sam przypisuje tagi: VIP, zagrożona, nowa, no-show. AI taguje za Ciebie.",
   },
   {
-    feature: "Zarządzanie magazynem",
-    bc: true,
-    marketplace: true,
-    group: "shared",
-    description: "Obie platformy oferują podstawowe zarządzanie stanami magazynowymi produktów."
+    icon: Package,
+    title: "Receptury zabiegowe",
+    description:
+      "Każdy zabieg ma przypisaną recepturę. Magazyn aktualizuje się automatycznie po każdej wizycie.",
   },
   {
-    feature: "Raporty sprzedaży",
-    icon: BarChart3,
-    bc: true,
-    marketplace: true,
-    group: "shared",
-    description: "Obie platformy generują raporty sprzedażowe i finansowe."
+    icon: Scan,
+    title: "Skaner kodów kamerą",
+    description:
+      "Skanuj kody kreskowe aparatem telefonu — przyjmuj dostawy, sprawdzaj stany. Bez dodatkowego sprzętu.",
   },
   {
-    feature: "Karty lojalnościowe",
-    bc: true,
-    marketplace: true,
-    group: "shared",
-    description: "Obie platformy oferują program lojalnościowy / karty stałego klienta."
+    icon: Target,
+    title: "Ścieżka Klientki™ + Auto-zaliczki",
+    description:
+      "Wizualna ścieżka od pierwszej wizyty do stałej klientki. Automatyczne zaliczki dla no-showów.",
+  },
+  {
+    icon: Gift,
+    title: "Program poleceń z ROI",
+    description:
+      "Każda klientka dostaje unikalny link. Widzisz ile klientek przyprowadziła i ile zarobiłaś dzięki niej.",
+  },
+  {
+    icon: Sparkles,
+    title: "Widget per kampania",
+    description:
+      "Osobny widget rezerwacji dla każdej kampanii — Instagram, strona, Google Ads. Mierzysz konwersję każdego źródła.",
   },
 ];
 
-const StatusIcon = ({ status, isHighlight, isBc }: { status: FeatureStatus; isHighlight?: boolean; isBc?: boolean }) => {
-  if (status === true) {
-    return (
-      <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-        <Check className="w-4 h-4 text-emerald-600" />
-      </div>
-    );
-  }
-  if (status === false) {
-    return (
-      <div className="w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center">
-        <X className="w-4 h-4 text-rose-600" />
-      </div>
-    );
-  }
-  if (status === "partial") {
-    return (
-      <div className="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center">
-        <AlertTriangle className="w-4 h-4 text-amber-600" />
-      </div>
-    );
-  }
-  return (
-    <span className={cn(
-      "text-sm font-medium",
-      isHighlight && isBc && "text-emerald-600 font-bold",
-      isHighlight && !isBc && "text-rose-600 font-bold"
-    )}>
-      {status}
-    </span>
-  );
-};
-
-const FeatureRow = ({ row, index }: { row: ComparisonRow; index: number }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const hasDescription = !!row.description;
-  const Icon = row.icon;
-
-  return (
-    <>
-      <tr
-        onClick={() => hasDescription && setIsOpen(!isOpen)}
-        className={cn(
-          "border-b border-border/50 transition-colors",
-          hasDescription && "cursor-pointer hover:bg-muted/30",
-          index % 2 === 0 && "bg-muted/10",
-          row.highlight && "bg-rose-500/5 hover:bg-rose-500/10 border-rose-500/20",
-          isOpen && "bg-primary/5"
-        )}
-      >
-        <td className={cn(
-          "py-3.5 px-4 font-medium text-sm",
-          row.highlight && "text-rose-600 font-bold"
-        )}>
-          <div className="flex items-center gap-2">
-            {hasDescription && (
-              <ChevronDown className={cn(
-                "w-4 h-4 text-muted-foreground transition-transform duration-200 shrink-0",
-                isOpen && "rotate-180"
-              )} />
-            )}
-            {Icon && <Icon className="w-4 h-4 text-primary shrink-0" />}
-            <span>{row.feature}</span>
-          </div>
-        </td>
-        <td className="py-3.5 px-4">
-          <div className="flex justify-center">
-            <StatusIcon status={row.bc} isHighlight={row.highlight} isBc={true} />
-          </div>
-        </td>
-        <td className="py-3.5 px-4">
-          <div className="flex justify-center">
-            <StatusIcon status={row.marketplace} isHighlight={row.highlight} />
-          </div>
-        </td>
-      </tr>
-      <AnimatePresence>
-        {isOpen && row.description && (
-          <tr>
-            <td colSpan={3} className="p-0">
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="overflow-hidden"
-              >
-                <div className="px-6 py-3 text-sm text-muted-foreground bg-muted/20 border-b border-border/30">
-                  {row.description}
-                </div>
-              </motion.div>
-            </td>
-          </tr>
-        )}
-      </AnimatePresence>
-    </>
-  );
-};
-
 export const ComparisonSection = () => {
-  const pricingRows = comparisonData.filter(r => r.group === "pricing");
-  const uniqueRows = comparisonData.filter(r => r.group === "unique");
-  const sharedRows = comparisonData.filter(r => r.group === "shared");
-
   const scrollToForm = () => {
     document.getElementById("lead-form")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section className="py-20 lg:py-32 bg-muted/20">
-      <div className="container max-w-4xl">
+    <section className="py-20 lg:py-32 bg-muted/20" id="comparison">
+      <div className="container max-w-5xl">
         {/* Header */}
-        <div className="text-center mb-12">
+        <motion.div
+          className="text-center mb-14"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
             Uczciwe porównanie
           </p>
@@ -307,96 +117,136 @@ export const ComparisonSection = () => {
             Co dostajesz u nas,{" "}
             <span className="text-gradient-luxury">czego nie ma nigdzie indziej.</span>
           </h2>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Ceny i funkcje oparte na publicznie dostępnych cennikach. Kliknij wiersz po szczegóły.
+        </motion.div>
+
+        {/* Pricing knockout — two cards */}
+        <motion.div
+          className="grid md:grid-cols-2 gap-4 mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+        >
+          {/* BC card */}
+          <div className="relative rounded-2xl border-2 border-primary bg-card p-6 md:p-8 shadow-lg">
+            <Badge className="absolute -top-3 left-6 bg-primary text-primary-foreground text-xs px-3">
+              Beauty Calendar
+            </Badge>
+            <div className="mt-2">
+              <div className="text-4xl md:text-5xl font-black text-foreground">
+                99 <span className="text-lg font-medium text-muted-foreground">zł netto/mies</span>
+              </div>
+              <div className="flex items-center gap-2 mt-3 text-emerald-600 font-semibold">
+                <Check className="w-5 h-5" />
+                <span>0% prowizji — zawsze</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1.5 text-emerald-600 font-semibold">
+                <Check className="w-5 h-5" />
+                <span>Stała cena, bez opłat per-head</span>
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground border-t border-border pt-4">
+                Twoje dane. Twoja baza. Twój brand.<br />
+                Zabierasz kiedy chcesz.
+              </p>
+            </div>
+          </div>
+
+          {/* Marketplace card */}
+          <div className="rounded-2xl border border-border bg-muted/30 p-6 md:p-8 opacity-80">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-4">
+              Typowy marketplace
+            </p>
+            <div className="text-4xl md:text-5xl font-black text-muted-foreground">
+              145+ <span className="text-lg font-medium">zł netto/mies</span>
+            </div>
+            <div className="mt-3 text-sm text-muted-foreground space-y-1.5">
+              <p>+ 35 zł za każdego dodatkowego pracownika</p>
+              <p>+ do 45% prowizji od nowych klientek (Boost)</p>
+            </div>
+            <p className="mt-4 text-sm text-muted-foreground/70 border-t border-border/50 pt-4">
+              Ich platforma. Ich zasady.<br />
+              Jutro mogą zmienić cennik.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Unique features header */}
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <h3 className="text-xl md:text-2xl font-bold text-center">
+            <span className="text-primary">{uniqueFeatures.length} funkcji</span> których marketplace nie oferuje
+          </h3>
+        </motion.div>
+
+        {/* Feature cards grid */}
+        <div className="grid md:grid-cols-2 gap-4">
+          {uniqueFeatures.map((feature, i) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.04, duration: 0.4 }}
+                className="group relative rounded-xl border border-border bg-card p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
+              >
+                <Badge
+                  variant="outline"
+                  className="absolute top-4 right-4 text-[10px] text-primary border-primary/30 bg-primary/5"
+                >
+                  Tylko u nas
+                </Badge>
+                <div className="flex gap-3.5">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
+                    <Icon className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="pr-16">
+                    <h4 className="font-bold text-sm mb-1">{feature.title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {feature.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Shared features disclaimer */}
+        <motion.div
+          className="mt-12 text-center max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            CRM, SMS, magazyn, raporty, karty lojalnościowe — tak, to mają obie platformy.{" "}
+            <span className="text-foreground font-medium">
+              Różnica? W tym co dzieje się potem — gdy klientka nie wraca.
+            </span>
           </p>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-          <table className="w-full min-w-[500px]">
-            <thead>
-              <tr className="border-b-2 border-border">
-                <th className="text-left py-4 px-4 font-semibold text-sm">Funkcja</th>
-                <th className="py-4 px-4 text-center w-32">
-                  <Badge className="bg-primary text-primary-foreground text-xs">
-                    Beauty Calendar
-                  </Badge>
-                </th>
-                <th className="py-4 px-4 text-center w-32 font-semibold text-sm text-muted-foreground">
-                  Marketplace
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Pricing */}
-              {pricingRows.map((row, i) => (
-                <FeatureRow key={row.feature} row={row} index={i} />
-              ))}
-
-              {/* Unique header */}
-              <tr>
-                <td colSpan={3} className="px-4 pt-6 pb-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-primary">
-                    Tylko w Beauty Calendar ({uniqueRows.length})
-                  </p>
-                </td>
-              </tr>
-              {uniqueRows.map((row, i) => (
-                <FeatureRow key={row.feature} row={row} index={i} />
-              ))}
-
-              {/* Shared header */}
-              <tr>
-                <td colSpan={3} className="px-4 pt-6 pb-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Wspólne funkcje
-                  </p>
-                </td>
-              </tr>
-              {sharedRows.map((row, i) => (
-                <FeatureRow key={row.feature} row={row} index={i} />
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Legend */}
-        <div className="flex flex-wrap justify-center gap-6 mt-6 text-xs text-muted-foreground">
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <Check className="w-2.5 h-2.5 text-emerald-600" />
-            </div>
-            <span>Pełna funkcjonalność</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-amber-500/20 flex items-center justify-center">
-              <AlertTriangle className="w-2.5 h-2.5 text-amber-600" />
-            </div>
-            <span>Ograniczona</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full bg-rose-500/20 flex items-center justify-center">
-              <X className="w-2.5 h-2.5 text-rose-600" />
-            </div>
-            <span>Brak</span>
-          </div>
-        </div>
-
-        {/* Footer note */}
-        <p className="text-center text-xs text-muted-foreground mt-4">
-          Dane porównawcze oparte na publicznie dostępnych cennikach i stronach funkcji (stan na 2026).
-          Prowizja 45% dotyczy usługi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
-        </p>
+          <p className="text-xs text-muted-foreground/60 mt-4">
+            Dane porównawcze oparte na publicznie dostępnych cennikach (stan na 2026).
+            Prowizja 45% dotyczy usługi Boost (nowe klientki z marketplace), nie wszystkich wizyt.
+          </p>
+        </motion.div>
 
         {/* CTA */}
         <div className="text-center mt-10">
           <Button
             onClick={scrollToForm}
             size="lg"
-            className="rounded-full px-8 text-base"
+            className="rounded-full px-8 text-base group"
           >
             Zacznij za darmo — przekonaj się sama
+            <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </div>
