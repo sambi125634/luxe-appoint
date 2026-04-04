@@ -1,9 +1,9 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, Sparkles, ArrowRight, Play } from "lucide-react";
+import { Check, Sparkles, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion, useInView } from "framer-motion";
+import { motion } from "framer-motion";
 
 const Hero3DScene = lazy(() => import("./Hero3DScene").catch(() => ({ default: () => null })));
 
@@ -39,7 +39,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              163 funkcje · 0% prowizji · Made in Poland 🇵🇱
+              0% prowizji · Własna baza klientów · Made in Poland 🇵🇱
             </Badge>
           </motion.div>
 
@@ -51,9 +51,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             transition={{ duration: 0.7, delay: 0.4 }}
           >
             <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-              Ile kosztuje Cię Booksy?
+              Twoje klientki. Twoja baza.
               <br />
-              <span className="text-gradient-luxury">Policz sama.</span>
+              <span className="text-gradient-luxury">Twój zysk.</span>
             </h1>
           </motion.div>
 
@@ -64,9 +64,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            Beauty Calendar to 163 funkcje zarządzania salonem — z jedną różnicą.
+            Beauty Calendar to system, który pomaga Ci zatrzymać klientki — nie oddawać je platformie marketplace.
             <br />
-            <span className="font-semibold text-foreground">Zero prowizji. Na zawsze.</span> Płacisz stałą kwotę. Reszta zostaje u Ciebie.
+            <span className="font-semibold text-foreground">Stała cena od 99 zł/mies. Zero prowizji. Pełna własność danych.</span>
           </motion.p>
 
           {/* CTAs */}
@@ -82,7 +82,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               <span className="relative z-10 flex items-center gap-2">
-                Zacznij za darmo — bez karty kredytowej
+                Zacznij za darmo — 14 dni pełnego dostępu
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Button>
@@ -91,35 +91,25 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               variant="outline"
               size="lg"
               className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
-              onClick={() => {
-                document.getElementById("calculator")?.scrollIntoView({ behavior: "smooth" });
-              }}
+              asChild
             >
-              Policz ile tracisz na prowizjach ↓
+              <Link to="/demo">
+                Zobacz jak działa ↓
+              </Link>
             </Button>
           </motion.div>
-
-          {/* Micro-copy */}
-          <motion.p
-            className="text-sm text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.0 }}
-          >
-            Konfiguracja w 15 minut · Rezygnacja jednym kliknięciem
-          </motion.p>
 
           {/* Trust indicators */}
           <motion.div
             className="flex flex-wrap gap-6 justify-center text-sm text-muted-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 1.1 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
           >
             {[
               "Bez karty kredytowej",
               "Konfiguracja w 15 minut",
-              "0% prowizji — na zawsze",
+              "Twoje dane = Twoja własność",
               "🇵🇱 Made in Poland",
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-2">

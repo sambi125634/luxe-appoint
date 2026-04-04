@@ -2,11 +2,11 @@ import { X } from "lucide-react";
 import { motion } from "framer-motion";
 
 const painBullets = [
-  "\u201EDlaczego p\u0142ac\u0119 prowizj\u0119 od klientki, kt\u00F3r\u0105 sama pozyska\u0142am?\u201D",
-  "\u201ENie wiem ile naprawd\u0119 zarabiam po odj\u0119ciu materia\u0142\u00F3w i czasu\u201D",
-  "\u201EKlientka nie przysz\u0142a \u2014 straci\u0142am slot, pieni\u0105dze i nerwy\u201D",
-  "\u201EBoj\u0119 si\u0119 odej\u015B\u0107 z Booksy, bo klientki mnie nie znajd\u0105\u201D",
-  "\u201EProwadz\u0119 salon z notatnika i g\u0142owy \u2014 i codziennie co\u015B mi umyka\u201D",
+  "„Płacę abonament, a do tego prowizję od klientek, które i tak są moje"",
+  "„Moja baza klientek jest na cudzej platformie — nie mam do niej pełnego dostępu"",
+  "„Klientka nie przyszła — straciłam slot, pieniądze i nerwy. Nikt mi w tym nie pomaga"",
+  "„Na marketplace biję się ceną jak na targu — kto taniej, ten wygrywa"",
+  "„Nikt nie pomaga mi zatrzymać klientek po pierwszej wizycie — a tam jest prawdziwy zysk"",
 ];
 
 interface ProblemSectionProps {
@@ -26,9 +26,9 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl md:text-4xl font-serif font-bold mb-6 leading-tight">
-            Pracujesz na swój salon 10 godzin dziennie.
+            Budujesz bazę klientek…
             <br />
-            <span className="text-destructive">A potem oddajesz do 45% zysku komuś, kto nie zrobił ani jednego zabiegu.</span>
+            <span className="text-destructive">ale to nie jest Twoja baza.</span>
           </h2>
         </motion.div>
 
@@ -42,18 +42,19 @@ export const ProblemSection = ({ onScrollToForm }: ProblemSectionProps) => {
         >
           <div className="prose prose-lg text-muted-foreground leading-relaxed space-y-4">
             <p>
-              Znasz to uczucie? Wstajesz o 7:00. Ostatnia klientka wychodzi o 20:00. 
-              Między nimi — telefony, potwierdzenia, przełożone wizyty, klientka 
-              która nie przyszła, zamówienia produktów, grafik pracownic.
+              Platformy marketplace działają jak Allegro dla beauty. Zrzeszają miliony 
+              użytkowników, wyświetlają Twój salon obok konkurencji — i pobierają do 45% 
+              prowizji od każdej nowej klientki pozyskanej przez ich system.
             </p>
             <p>
-              A na koniec miesiąca logujesz się do Booksy i widzisz, że z Twojego 
-              przychodu zniknęło kilka tysięcy złotych. Prowizja. Za klientki, 
-              które i tak są Twoje. Za klientki, które przyszły z polecenia koleżanki. 
-              Za klientki, które chodzą do Ciebie od lat.
+              Plan podstawowy? Kosztuje podobnie jak u nas. Ale prawdziwy koszt pojawia się, 
+              kiedy chcesz pozyskać nowe klientki — wtedy oddajesz niemal połowę wartości 
+              pierwszej wizyty. A potem? Zero pomocy w utrzymaniu tej klientki. 
+              Zero narzędzi retencyjnych. Zero strategii powracalności.
             </p>
             <p className="font-semibold text-foreground">
-              Oddajesz pieniądze za coś, co powinno być Twoje.
+              Płacisz za pozyskanie, ale nikt nie pomaga Ci zarabiać na powrotach. 
+              A tam jest prawdziwy zysk.
             </p>
           </div>
         </motion.div>
