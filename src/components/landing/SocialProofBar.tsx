@@ -1,12 +1,12 @@
 import { useRef } from "react";
-import { Percent, Layers, Clock, Flag } from "lucide-react";
+import { Percent, Layers, Clock, Database } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 
 const stats = [
   { value: "0%", label: "prowizji — na zawsze", icon: Percent },
   { value: "163", label: "funkcje w jednym systemie", icon: Layers },
   { value: "15 min", label: "i Twój salon jest online", icon: Clock },
-  { value: "🇵🇱", label: "Made in Poland, dla polskich salonów", icon: Flag },
+  { value: "100%", label: "własność danych — zawsze Twoja", icon: Database },
 ];
 
 export const SocialProofBar = () => {

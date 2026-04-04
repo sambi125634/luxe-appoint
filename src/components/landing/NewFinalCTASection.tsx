@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Shield, Lock, CreditCard, Play } from "lucide-react";
+import { ArrowRight, Shield, Lock, CreditCard } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -20,9 +20,9 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Każdy dzień z prowizjami to dzień,<br />
+          Ka\u017Cdy dzie\u0144 bez systemu retencji<br />
           <span className="bg-gradient-to-r from-destructive to-amber-500 bg-clip-text text-transparent">
-            w którym oddajesz swoje pieniądze.
+            to klientka, kt\u00F3ra nie wr\u00F3ci.
           </span>
         </motion.h2>
 
@@ -33,9 +33,9 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          <p>163 funkcje. 0% prowizji. Konfiguracja w 15 minut.</p>
-          <p>Zacznij od FREE — bez karty, bez zobowiązań, bez ryzyka.</p>
-          <p className="font-semibold text-foreground">Jedyne ryzyko to zostawienie rzeczy tak jak są.</p>
+          <p>Twoja baza. Twoje dane. Twoje narz\u0119dzia retencji. Od 99 z\u0142 netto/mies.</p>
+          <p>Zacznij od FREE \u2014 14 dni pe\u0142nego dost\u0119pu, bez karty, bez zobowi\u0105za\u0144.</p>
+          <p className="font-semibold text-foreground">Jedyne ryzyko to zostawienie rzeczy tak jak s\u0105.</p>
         </motion.div>
 
         <motion.div
@@ -46,11 +46,11 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           transition={{ delay: 0.3 }}
         >
           <Button size="lg" onClick={onScrollToForm} className="h-14 px-10 text-lg gap-2 relative overflow-hidden">
-            <span>Zacznij za darmo — odbierz dostęp</span>
+            <span>Zacznij za darmo \u2014 odbierz dost\u0119p</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
           <Button size="lg" variant="outline" onClick={onScrollToForm} className="h-14 px-8 text-lg gap-2">
-            Umów prywatną prezentację
+            Um\u00F3w prywatn\u0105 prezentacj\u0119
           </Button>
         </motion.div>
 
@@ -62,7 +62,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.4 }}
         >
-          Dołącz w 60 sekund · Nie wymagamy karty kredytowej · Rezygnacja jednym kliknięciem
+          Do\u0142\u0105cz w 60 sekund \u00B7 Nie wymagamy karty kredytowej \u00B7 Rezygnacja jednym klikni\u0119ciem
         </motion.p>
 
         {/* Trust indicators */}

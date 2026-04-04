@@ -3,55 +3,55 @@ import { Star, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-{/* [PLACEHOLDER — do zamiany na prawdziwe] */}
+{/* [PLACEHOLDER \u2014 do zamiany na prawdziwe] */}
 
 const testimonials = [
   {
     id: 1,
-    content: "Przeszłam z Booksy 3 miesiące temu. Bałam się, że stracę klientki. Nie straciłam ani jednej. Za to oszczędzam 2 400 zł miesięcznie na prowizjach. Żałuję tylko, że nie zrobiłam tego rok wcześniej.",
+    content: "Przesz\u0142am z marketplace 3 miesi\u0105ce temu. Ba\u0142am si\u0119, \u017Ce strac\u0119 klientki. Nie straci\u0142am ani jednej. Wys\u0142a\u0142am im nowy link do rezerwacji \u2014 90% przesz\u0142o w ci\u0105gu tygodnia. Teraz mam pe\u0142n\u0105 kontrol\u0119 nad swoj\u0105 baz\u0105.",
     author: "Karolina W.",
     role: "Salon kosmetyczny",
-    location: "Kraków",
+    location: "Krak\u00F3w",
     avatar: "KW",
     rating: 5,
-    result: "Oszczędza 2 400 zł/mies na prowizjach",
+    result: "Pe\u0142na kontrola nad baz\u0105 klientek",
   },
   {
     id: 2,
-    content: "Skaner magazynowy przez telefon — to jest game changer. Skanuję produkt po zabiegu, system odejmuje ze stanu, a kiedy się kończy — sam przypomina żeby zamówić. Koniec z niespodziankami w środku koloryzacji.",
+    content: "Skaner magazynowy przez telefon \u2014 to jest game changer. Skanuj\u0119 produkt po zabiegu, system odejmuje ze stanu, a kiedy si\u0119 ko\u0144czy \u2014 sam przypomina \u017Ceby zam\u00F3wi\u0107. Koniec z niespodziankami w \u015Brodku koloryzacji.",
     author: "Magda K.",
     role: "Salon fryzjerski",
-    location: "Wrocław",
+    location: "Wroc\u0142aw",
     avatar: "MK",
     rating: 5,
     result: "Inwentaryzacja 9x szybsza",
   },
   {
     id: 3,
-    content: "True Profit Dashboard otworzył mi oczy. Myślałam że botox to moja najlepsza usługa. Po odjęciu materiałów — peelingi chemiczne są 3x bardziej rentowne. Bez tego raportu nigdy bym się nie dowiedziała.",
+    content: "True Profit Dashboard otworzy\u0142 mi oczy. My\u015Bla\u0142am \u017Ce botox to moja najlepsza us\u0142uga. Po odj\u0119ciu materia\u0142\u00F3w \u2014 peelingi chemiczne s\u0105 3x bardziej rentowne. Bez tego raportu nigdy bym si\u0119 nie dowiedzia\u0142a.",
     author: "Anna S.",
     role: "Klinika medycyny estetycznej",
     location: "Warszawa",
     avatar: "AS",
     rating: 5,
-    result: "Odkryła 3x rentowniejsze usługi",
+    result: "Odkry\u0142a 3x rentowniejsze us\u0142ugi",
   },
   {
     id: 4,
-    content: "Moje 3 pracowniczki mają osobne kalendarze, klientki rezerwują same nawet o 23:00, a ja w końcu mam weekendy wolne. 149 zł miesięcznie? To najlepsza inwestycja jaką kiedykolwiek zrobiłam w mój biznes.",
+    content: "\u015Acie\u017Cka Klientki to co\u015B, czego nie daje \u017Cadna inna platforma. Widz\u0119 dok\u0142adnie, kt\u00F3ra klientka jest po 1. wizycie, a kt\u00F3ra po 4. System sam wysy\u0142a sekwencje mi\u0119dzy wizytami. Moje klientki wracaj\u0105 \u2014 bo system o to dba.",
     author: "Izabela M.",
     role: "SPA & Wellness",
-    location: "Gdańsk",
+    location: "Gda\u0144sk",
     avatar: "IM",
     rating: 5,
-    result: "Weekendy wolne, klientki rezerwują same",
+    result: "Retencja klientek wzros\u0142a o 40%",
   },
   {
     id: 5,
-    content: "Nie jestem techniczna — kompletnie. Bałam się, że nie dam rady. Konfiguracja zajęła mi 15 minut. PIĘTNAŚCIE. Teraz nie wyobrażam sobie pracy bez tego systemu.",
+    content: "Nie jestem techniczna \u2014 kompletnie. Ba\u0142am si\u0119, \u017Ce nie dam rady. Konfiguracja zaj\u0119\u0142a mi 15 minut. PI\u0118TNA\u015ACIE. Teraz nie wyobra\u017Cam sobie pracy bez tego systemu. A to, \u017Ce klientki widz\u0105 w aplikacji tylko m\u00F3j salon? Bezcenne.",
     author: "Justyna P.",
     role: "Studio paznokci",
-    location: "Poznań",
+    location: "Pozna\u0144",
     avatar: "JP",
     rating: 5,
     result: "Konfiguracja w 15 minut",
@@ -71,7 +71,7 @@ const TestimonialCard = ({ testimonial }: { testimonial: typeof testimonials[0] 
     </blockquote>
     {testimonial.result && (
       <div className="mb-4 px-3 py-1.5 bg-emerald-500/10 rounded-lg inline-block">
-        <span className="text-sm font-bold text-emerald-600">📊 {testimonial.result}</span>
+        <span className="text-sm font-bold text-emerald-600">{"\uD83D\uDCCA"} {testimonial.result}</span>
       </div>
     )}
     <div className="flex items-center gap-3 mt-auto">
@@ -102,8 +102,8 @@ export const TestimonialsSection = () => {
         {/* Section header */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Właścicielki salonów, które{" "}
-            <span className="text-gradient-luxury">przestały oddawać swoje pieniądze</span>
+            W\u0142a\u015Bcicielki, kt\u00F3re{" "}
+            <span className="text-gradient-luxury">odzyska\u0142y kontrol\u0119 nad swoim biznesem</span>
           </h2>
         </div>
 
