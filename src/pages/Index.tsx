@@ -41,7 +41,7 @@ const Index = () => {
         
         <SystemFlowSection onScrollToForm={scrollToForm} />
         <OwnYourClientsSection />
-        <DataOwnershipSection />
+        
         <ComparisonSection />
         <ValueStackSection />
         <TestimonialsSection />
