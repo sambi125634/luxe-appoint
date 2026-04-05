@@ -1,36 +1,24 @@
 
 
-## Plan: Usunięcie ValueStackSection i wchłonięcie "value stack" do ComparisonSection
+## Plan: Usunięcie DemoPreviewSection + poprawki InteractivePhoneMockup (bez zmian w ServiceSelection)
 
-### Problem
-`ComparisonSection` — 12 unikalnych funkcji z opisami korzyści.
-`ValueStackSection` — te same 13-14 funkcji, ale z przekreślonymi cenami i sumą "3 910 zł/mies → 99 zł".
+### Trzy zmiany
 
-To mówi to samo dwa razy. Użytkownik scrolluje i widzi te same nazwy ponownie.
+**1. Usunięcie DemoPreviewSection z Index.tsx**
+Usuwamy import i `<DemoPreviewSection />` — laptop admin znika ze strony.
 
-### Rozwiązanie
+**2. InteractivePhoneMockup — usunięcie floating badges**
+Usuwamy oba pływające widżety ("Nowa pieczątka" linia 123-132 i "Rezerwacja potwierdzona" linia 134-142) — czystszy wygląd, łatwiejsze scrollowanie.
 
-**Usuwamy `ValueStackSection`** z `Index.tsx` — komponent zostaje w repo, ale nie jest renderowany.
+**3. Iframe startuje na `/s/demo-salon`**
+Zmiana `src="/app"` na `src="/s/demo-salon"` — widget rezerwacyjny demo salonu, od razu widok wyboru usług.
 
-**Przenosimy "punchline cenowy"** do `ComparisonSection` — pod gridem 12 funkcji i rozwijaną tabelą wspólnych funkcji dodajemy kompaktowy blok:
-
-```text
-┌─────────────────────────────────────────────┐
-│ Gdybyś płaciła za każde narzędzie osobno:   │
-│ ̶3̶ ̶9̶1̶0̶ ̶z̶ł̶/̶m̶i̶e̶s̶                               │
-│ Twoja cena: 99 zł netto/mies               │
-│ + 0 zł prowizji. Zawsze.                   │
-└─────────────────────────────────────────────┘
-```
-
-Bez powtarzania listy — sam knockout cenowy. Karty cenowe BC vs Marketplace na górze ComparisonSection już pokazują cenę, więc ten blok to zamknięcie argumentu po zobaczeniu 12 funkcji.
-
-### Zmiany w plikach
+### Pliki do edycji
 
 | Plik | Co |
 |------|----|
-| `src/pages/Index.tsx` | Usunięcie `<ValueStackSection />` i importu |
-| `src/components/landing/ComparisonSection.tsx` | Dodanie kompaktowego bloku "value knockout" (przekreślona suma + cena 99 zł) między rozwijaną tabelą a CTA |
+| `src/pages/Index.tsx` | Usunięcie `<DemoPreviewSection />` i importu (linie 15, 48) |
+| `src/components/landing/InteractivePhoneMockup.tsx` | Usunięcie floating badges (linie 123-142), zmiana iframe src na `/s/demo-salon` (linia 105) |
 
-Dwa pliki. Lista funkcji pojawia się raz — w ComparisonSection. Argument cenowy zostaje, ale bez duplikacji.
+Dwa pliki. Bez zmian w logice rezerwacji (ServiceSelection).
 
