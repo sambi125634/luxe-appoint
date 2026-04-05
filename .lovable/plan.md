@@ -1,24 +1,46 @@
 
 
-## Plan: Usunięcie DemoPreviewSection + poprawki InteractivePhoneMockup (bez zmian w ServiceSelection)
+## Plan: Zamiana emoji na wygenerowane zdjęcia nisz w AudienceSection
 
-### Trzy zmiany
+### Koncept
+Zamiast emoji (💅, ✂️, ✨...) — każda z 10 kart nisz dostaje profesjonalne, wygenerowane zdjęcie przedstawiające daną niszę beauty. Zdjęcia w formacie rounded, na górze karty, pozwalają odwiedzającym od razu utożsamić się ze swoją branżą.
 
-**1. Usunięcie DemoPreviewSection z Index.tsx**
-Usuwamy import i `<DemoPreviewSection />` — laptop admin znika ze strony.
+### Realizacja
 
-**2. InteractivePhoneMockup — usunięcie floating badges**
-Usuwamy oba pływające widżety ("Nowa pieczątka" linia 123-132 i "Rezerwacja potwierdzona" linia 134-142) — czystszy wygląd, łatwiejsze scrollowanie.
+**1. Generowanie 10 zdjęć (edge function + Nano banana pro)**
 
-**3. Iframe startuje na `/s/demo-salon`**
-Zmiana `src="/app"` na `src="/s/demo-salon"` — widget rezerwacyjny demo salonu, od razu widok wyboru usług.
+Skrypt generuje 10 obrazków przez `google/gemini-3-pro-image-preview` z promptami dopasowanymi do każdej niszy:
 
-### Pliki do edycji
+| Kategoria | Prompt (skrót) |
+|-----------|----------------|
+| Paznokcie i dłonie | Elegant close-up of manicured nails, soft lighting, premium salon |
+| Fryzjerstwo i włosy | Stylist working on client's hair, modern salon interior |
+| Kosmetyka i twarz | Facial treatment in aesthetic clinic, clean minimal |
+| Rzęsy i brwi | Lash extension procedure, close-up, professional |
+| Depilacja | Laser hair removal device, clinical setting |
+| Medycyna estetyczna | Aesthetic medicine procedure, modern clinic |
+| Masaż i wellness | Relaxing massage, warm spa ambiance |
+| SPA i kompleksy | Luxury spa interior, candles, warm tones |
+| Sylwetka i ciało | Body contouring treatment, modern equipment |
+| Specjalistyczne | Trichology/bridal makeup, specialized tools |
+
+Zdjęcia zapisane do `src/assets/audience/` jako PNG (np. `nails.png`, `hair.png`...).
+
+**2. Zmiana AudienceSection.tsx**
+
+- Zamiast `emoji: "💅"` → `image: import` z `src/assets/audience/`
+- Zamiast `<div className="text-2xl mb-2">{cat.emoji}</div>` → `<img src={cat.image} className="w-full h-32 object-cover rounded-lg mb-3" />`
+- Karty nieco wyższe, zdjęcie zajmuje górną część karty
+- Overflow hidden na karcie dla czystego wyglądu
+
+**3. Fix runtime error**
+Usunięcie ewentualnej referencji do `DemoPreviewSection` w Index.tsx (jeśli istnieje w wersji buildowej).
+
+### Pliki do edycji/utworzenia
 
 | Plik | Co |
 |------|----|
-| `src/pages/Index.tsx` | Usunięcie `<DemoPreviewSection />` i importu (linie 15, 48) |
-| `src/components/landing/InteractivePhoneMockup.tsx` | Usunięcie floating badges (linie 123-142), zmiana iframe src na `/s/demo-salon` (linia 105) |
-
-Dwa pliki. Bez zmian w logice rezerwacji (ServiceSelection).
+| Skrypt generujący | Generacja 10 zdjęć przez AI, zapis do `src/assets/audience/` |
+| `src/components/landing/AudienceSection.tsx` | Import zdjęć zamiast emoji, img tag zamiast text div |
+| `src/pages/Index.tsx` | Fix runtime error (jeśli referencja DemoPreviewSection wciąż istnieje) |
 
