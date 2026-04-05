@@ -322,6 +322,25 @@ export const ComparisonSection = () => {
           </div>
         </motion.div>
 
+        {/* Value knockout */}
+        <motion.div
+          className="mt-14 max-w-2xl mx-auto"
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20 rounded-2xl p-8 text-center">
+            <p className="text-sm text-muted-foreground mb-1">
+              Gdybyś płaciła za każde z tych narzędzi osobno:
+            </p>
+            <p className="text-4xl font-black line-through text-muted-foreground mb-3">3 910 zł/mies</p>
+            <p className="text-sm text-muted-foreground mb-2">Twoja cena z Beauty Calendar PRO:</p>
+            <p className="text-5xl font-black text-primary mb-1">99 zł netto/mies</p>
+            <p className="text-sm font-semibold text-muted-foreground">+ 0 zł prowizji od rezerwacji. Zawsze.</p>
+          </div>
+        </motion.div>
+
         {/* CTA */}
         <div className="text-center mt-10">
           <Button

@@ -43,7 +43,7 @@ const Index = () => {
         <OwnYourClientsSection />
         
         <ComparisonSection />
-        <ValueStackSection />
+        
         <TestimonialsSection />
         <DemoPreviewSection />
         <InteractivePhoneMockup />
