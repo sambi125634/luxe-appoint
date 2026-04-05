@@ -45,7 +45,7 @@ const Index = () => {
         <ComparisonSection />
         
         <TestimonialsSection />
-        <DemoPreviewSection />
+        
         <InteractivePhoneMockup />
         <AudienceSection />
         <PricingSection onScrollToForm={scrollToForm} />
