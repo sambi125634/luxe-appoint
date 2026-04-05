@@ -33,6 +33,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
           {/* Badge */}
+          {/* Eyebrow badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -40,44 +41,56 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             <Badge
               variant="outline"
-              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm animate-pulse"
+              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
             >
-              dla właścicielek salonów w Polsce
+              Większość właścicielek salonów nie wie że...
             </Badge>
           </motion.div>
 
-          {/* Headline */}
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-          >
-            <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight">
-              Twoje klientki odchodzą.
-              <br />
-              <span className="text-muted-foreground font-normal text-2xl md:text-3xl lg:text-4xl block mt-2">
-                Nie dlatego że jesteś zła.
-              </span>
-              <span className="text-gradient-luxury">
-                Dlatego że nikt im nie przypomniał.
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground font-normal">
-              Twój salon rezerwuje, przypomina i odzyskuje klientki sam. Każdego dnia.
-            </p>
-          </motion.div>
+          {/* H1 — sequential reveal */}
+          <div className="space-y-1">
+            {[
+              { text: "Pracujesz.", delay: 0.3 },
+              { text: "Zarabiasz.", delay: 0.45 },
+              { text: "I budujesz", delay: 0.6 },
+              { text: "czyjś biznes.", delay: 0.75 },
+            ].map(({ text, delay }) => (
+              <motion.span
+                key={text}
+                className="block text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay, ease: "easeOut" }}
+              >
+                {text}
+              </motion.span>
+            ))}
+          </div>
 
-          {/* Subheadline */}
+          {/* H2 — "Nie swój." */}
+          <motion.h2
+            className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gradient-luxury"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
+          >
+            Nie swój.
+          </motion.h2>
+
+          {/* Sub */}
           <motion.p
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl"
+            className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
+            transition={{ duration: 0.6, delay: 1.3 }}
           >
-            Nawet kiedy śpisz.
+            Każda klientka którą pozyskałaś przez platformę
             <br />
-            <span className="font-semibold text-foreground">Ty zajmujesz się zabiegami.</span>
+            marketplace — należy do platformy.
+            <br />
+            Jej dane. Jej historia. Jej kontakt.
+            <br />
+            <span className="font-semibold text-foreground mt-2 inline-block">Beauty Calendar to zmienia.</span>
           </motion.p>
 
           {/* CTAs */}
