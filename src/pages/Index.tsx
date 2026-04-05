@@ -1,62 +1,45 @@
 import { useRef } from "react";
-import { LandingNavbar, LeadFormSection } from "@/components/landing";
+import { LandingNavbar } from "@/components/landing";
 import { TopBanner } from "@/components/landing/TopBanner";
 import { NewHeroSection } from "@/components/landing/NewHeroSection";
-import { SocialProofBar } from "@/components/landing/SocialProofBar";
-
-import { ProblemSection } from "@/components/landing/ProblemSection";
-
-import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
-
+import { ProblemSection } from "@/components/landing/ProblemSection";
+import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
-
-import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
-
 import { InteractivePhoneMockup } from "@/components/landing/InteractivePhoneMockup";
+import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import { AudienceSection } from "@/components/landing/AudienceSection";
 import { PricingSection } from "@/components/landing/PricingSection";
 import { GuaranteeSection } from "@/components/landing/GuaranteeSection";
 import { NewFAQSection } from "@/components/landing/NewFAQSection";
-import { NewFinalCTASection } from "@/components/landing/NewFinalCTASection";
 import { NewLandingFooter } from "@/components/landing/NewLandingFooter";
 
 const Index = () => {
-  const formRef = useRef<HTMLDivElement>(null);
+  const pricingRef = useRef<HTMLDivElement>(null);
 
-  const scrollToForm = () => {
-    formRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToPricing = () => {
+    pricingRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
     <div className="min-h-screen bg-background">
       <TopBanner />
-      <LandingNavbar onScrollToForm={scrollToForm} />
+      <LandingNavbar onScrollToForm={scrollToPricing} />
 
       <main>
-        <NewHeroSection onScrollToForm={scrollToForm} />
-        <SocialProofBar />
-        
-        <ProblemSection onScrollToForm={scrollToForm} />
-        
-        <SystemFlowSection onScrollToForm={scrollToForm} />
+        <NewHeroSection onScrollToForm={scrollToPricing} />
         <OwnYourClientsSection />
-        
+        <ProblemSection onScrollToForm={scrollToPricing} />
+        <SystemFlowSection onScrollToForm={scrollToPricing} />
         <ComparisonSection />
-        
-        <TestimonialsSection />
-        
         <InteractivePhoneMockup />
+        <TestimonialsSection />
         <AudienceSection />
-        <PricingSection onScrollToForm={scrollToForm} />
-        <GuaranteeSection />
-
-        <div ref={formRef}>
-          <LeadFormSection />
+        <div ref={pricingRef}>
+          <PricingSection onScrollToForm={scrollToPricing} />
         </div>
-
+        <GuaranteeSection />
         <NewFAQSection />
-        <NewFinalCTASection onScrollToForm={scrollToForm} />
       </main>
 
       <NewLandingFooter />
