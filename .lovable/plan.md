@@ -1,56 +1,36 @@
 
 
-## Plan: Zmiana głównego komunikatu Hero na narrację o własności danych
+## Plan: Naprawienie kontrastu w sekcji Hero
 
-### Nowy copy
+### Problem
+Tekst H1 ma kolor `#f5f5f7` (biały), a tło strony to jasny motyw (warm white `hsl(40 33% 97%)`). Overlaye (`bg-background/50`, radial-gradient z `--background`) dodatkowo rozjaśniają sekcję. Efekt: biały tekst na białym tle — niewidoczny.
 
-**Eyebrow badge:** "Większość właścicielek salonów nie wie że..."
+### Rozwiązanie: Wymuszone ciemne tło Hero
 
-**H1 (bold, sekwencyjnie):**
-```
-Pracujesz.
-Zarabiasz.
-I budujesz
-czyjś biznes.
-```
+Zamiast polegać na CSS variables (które są jasne), hero dostaje **własne ciemne tło** inline — niezależne od motywu strony. Tekst `#f5f5f7` zostaje (dobrze wygląda na ciemnym). Reszta strony bez zmian.
 
-**H2 (gradient muted, pod H1):**
-```
-Nie swój.
-```
+### Zmiany w `NewHeroSection.tsx`
 
-**Sub (muted-foreground):**
-```
-Każda klientka którą pozyskałaś przez platformę
-marketplace — należy do platformy.
-Jej dane. Jej historia. Jej kontakt.
+1. **Sekcja `<section>`** — dodanie ciemnego tła:
+   ```
+   background: linear-gradient(160deg, #0d0520 0%, #1a0838 40%, #120c2e 70%, #0a0a14 100%)
+   ```
 
-Beauty Calendar to zmienia.
-```
+2. **Usunięcie overlayów** które rozjaśniały tło (linie 27-31) — trzy `<div>` z `bg-background/50`, `bg-gradient-to-t from-background`, i `radial-gradient(... --background ...)`. Te warstwy nadpisywały ciemny gradient na jasny. Zamiast nich — jeden subtelny vignette dla głębi.
 
-### Zmiana w `NewHeroSection.tsx`
+3. **Gradient pod H1** (`from-violet-dark via-background`) na linia 21 → zmiana na ciemne kolory inline (`from-[#0d0520] via-[#1a0838] to-[#0a0a14]`), żeby nie ciągnął jasnego `--background`.
 
-- Badge text: zmiana z "dla właścicielek salonów w Polsce" → "Większość właścicielek salonów nie wie że..."
-- Usunięcie `animate-pulse` z badge (pulse nie pasuje do poważnego tonu)
-- H1: 4 linie tekstu, każda jako osobny `<span className="block">` z sekwencyjnym fade-in (stagger 150ms) — efekt "uderzenia" linia po linii
-- H2 "Nie swój." — `text-gradient-luxury` (lub `text-muted-foreground` gradient), większy font, osobny motion.div z delay
-- Sub: 4 linie tekstu z `text-muted-foreground`, ostatnia linia "Beauty Calendar to zmienia." w `text-foreground font-semibold`
-- CTAs i trust indicators — bez zmian (zostają)
+4. **Social proof tekst** (linia 200-201): `text-muted-foreground` i `text-foreground` → hardcoded jasne kolory, bo te CSS variables wskazują na ciemne kolory (jasny motyw).
 
-### Animacja sekwencyjna
+5. **Outline button** (linia 144-151): dodanie `text-white border-white/30` — bo domyślny outline button dziedziczy ciemny foreground.
 
-Każda linia H1 wchodzi osobno:
-- "Pracujesz." → delay 0.3s
-- "Zarabiasz." → delay 0.45s
-- "I budujesz" → delay 0.6s
-- "czyjś biznes." → delay 0.75s
-- "Nie swój." → delay 1.0s (osobny motion.div, większy efekt)
+6. **Avatar kółka** (linia 192-195): `border-background` → `border-[#0a0a14]` i `text-primary` z dostosowaniem do ciemnego tła.
 
-### Plik do edycji
+### Jeden plik
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/NewHeroSection.tsx` | Zmiana copy: badge, H1, H2, sub — nowa narracja o własności danych |
+| `src/components/landing/NewHeroSection.tsx` | Ciemne tło inline, usunięcie jasnych overlayów, hardcoded jasne kolory tekstu |
 
-Jeden plik. Struktura, CTAs, trust badges, social proof — bez zmian.
+Zero zmian w treści, układzie, animacjach ani innych sekcjach.
 
