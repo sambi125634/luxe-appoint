@@ -1,57 +1,33 @@
 
 
-## Plan: Lepsze opisy funkcji + rozwijana sekcja wspólnych funkcji
+## Plan: Usunięcie DataOwnershipSection + rozbudowa OwnYourClientsSection
 
-### Zmiany w `ComparisonSection.tsx`
+### Co robimy
 
-**1. Header update**
-- Zmiana "12 funkcji których marketplace nie oferuje" → "12 funkcji, które znajdziesz tylko u nas"
+1. **Usuwamy `<DataOwnershipSection />`** z `Index.tsx` — czarna sekcja znika, zero duplikacji.
 
-**2. Rewrite opisów 12 unikalnych funkcji — język korzyści**
-Zamiast technicznego opisu — co to daje właścicielce salonu:
+2. **Rozbudowujemy `OwnYourClientsSection.tsx`** — jedyna sekcja o własności danych, ale mocniejsza:
 
-| Funkcja | Nowy opis (korzyść) |
-|---------|---------------------|
-| AI Autopilot | Nie musisz ręcznie szukać wolnych terminów, dzwonić w urodziny ani zgadywać kto odejdzie. 12 funkcji AI robi to za Ciebie — codziennie, bez przerwy. |
-| True Profit | Wiesz ile naprawdę zarabiasz na każdym zabiegu — po odliczeniu materiałów. Koniec zgadywania, które usługi Ci się opłacają. |
-| Retencja | Widzisz które klientki zaraz odejdą — zanim to się stanie. System sam wysyła SMS lub email, żeby je zatrzymać. |
-| Prognoza AI | Wiesz ile zarobisz za 30, 60 i 90 dni. Planujesz zakupy, urlopy i inwestycje na twardych danych, nie przeczuciu. |
-| Własność bazy | Twoja baza klientek należy do Ciebie. Eksportujesz jednym kliknięciem. Żadna platforma nie może Ci jej zabrać ani zablokować. |
-| Prywatna aplikacja | Twoje klientki widzą tylko Twój salon — nie konkurencję obok. Zero reklam innych salonów w Twojej aplikacji. |
-| Auto-segmentacja | System sam oznacza klientki: VIP, zagrożona odejściem, nowa, no-show. Nie musisz ręcznie tagować setek osób. |
-| Receptury | Przypisujesz składniki do zabiegu raz — magazyn aktualizuje się sam po każdej wizycie. Koniec ręcznego liczenia zużycia. |
-| Skaner kodów | Przyjmujesz dostawę aparatem telefonu. Skanujesz kod — produkt trafia do magazynu. Bez czytnika, bez ręcznego wpisywania. |
-| Ścieżka Klientki | Widzisz dokładnie na jakim etapie jest każda klientka — od pierwszej wizyty do stałej. Automatyczne zaliczki chronią Cię przed no-showami. |
-| Program poleceń | Każda klientka ma unikalny link polecający. Widzisz ile nowych osób przyprowadziła i ile na tym zarobiłaś. |
-| Widget per kampania | Osobny widget rezerwacji dla Instagrama, strony i Google Ads. Wiesz która kampania przynosi rezerwacje. |
+### Nowy layout OwnYourClientsSection
 
-**3. Rozwijana sekcja "Wspólne funkcje" na dole**
-Zamiast jednozdaniowego disclaimera — collapsible accordion z tabelą porównawczą standardowych funkcji (obie platformy mają):
+**Lewa kolumna — copy (rozbudowany):**
+- Badge "Wiedziałaś o tym?" zostaje
+- Headline: "Pracujesz na budowę cudzej bazy klientek." — zostaje, mocny
+- Dodajemy konkretniejszy, bardziej emocjonalny copy:
+  - Analogia Allegro zostaje, ale dodajemy punchline o konsekwencjach: "Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję tej samej klientce za 10 zł taniej. A Ty nie możesz nic zrobić." (przeniesione z DataOwnership — najlepsze zdania)
+  - Zamknięcie: "Przez lata budujesz ich biznes. Nie swój." → wzmocnione o "Bo to ich baza. Nie Twoja."
 
-Przycisk: "Porównaj standardowe funkcje →" (klik rozwija/zwija)
+**Prawa kolumna — karty porównawcze:**
+- Marketplace card: wzmocniony copy (dodajemy "Jutro mogą zmienić zasady" i "Konkurencja wyświetlana obok Ciebie")
+- Beauty Calendar card: wzmocniony copy (dodajemy "Twoje dane — eksport jednym kliknięciem, zawsze" i "Żadna platforma nie może Ci ich zabrać")
+- Cytat na dole: "Nie budujesz na cudzej ziemi. Budujesz własny dom." — zostaje
 
-Wewnątrz — kompaktowa tabela:
-- Kalendarz online z rezerwacjami ✅ / ✅
-- CRM z kartami klientów i tagami ✅ / ✅
-- Automatyczne SMS/email przypomnienia ✅ / ✅
-- Kampanie marketingowe SMS/email ✅ / ✅
-- Zarządzanie magazynem ✅ / ✅
-- Raporty sprzedaży i statystyki ✅ / ✅
-- Karty lojalnościowe / pieczątki ✅ / ✅
-- Płatności online ✅ / ✅
-- Kaucje / zaliczki ✅ / ✅ (BC: automatyczne reguły, Marketplace: ręczne)
-- Wideoprezentacja usług ✅ / ⚠️ zdjęcia (Booksy nie ma wideo w kalendarzu)
-- Grupy usług / kategorie ✅ / ✅
-- Wielostanowiskowość ✅ / ✅
-- Formularze/zgody klientek ✅ (builder) / ✅ (prostsze)
-
-Na dole tabeli nota: "Dane na podstawie publicznych cenników (2026)."
-
-### Plik do edycji
+### Zmiany w plikach
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/ComparisonSection.tsx` | Rewrite opisów 12 funkcji na język korzyści, zmiana headera, dodanie collapsible sekcji wspólnych funkcji z mini-tabelą porównawczą |
+| `src/components/landing/OwnYourClientsSection.tsx` | Rozbudowa copy: wchłonięcie najlepszych zdań z DataOwnership, mocniejsze bullet points w kartach |
+| `src/pages/Index.tsx` | Usunięcie `<DataOwnershipSection />` (linia 44) i importu (linia 11) |
 
-Jeden plik. Struktura (karty cenowe + grid + CTA) bez zmian.
+Dwa pliki. Treść DataOwnership nie ginie — najlepsze fragmenty trafiają do OwnYourClientsSection.
 
