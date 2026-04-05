@@ -1,36 +1,42 @@
 
 
-## Plan: Naprawienie kontrastu w sekcji Hero
+## Plan: Zmiana kolejności sekcji landing page + usunięcie zbędnych
 
-### Problem
-Tekst H1 ma kolor `#f5f5f7` (biały), a tło strony to jasny motyw (warm white `hsl(40 33% 97%)`). Overlaye (`bg-background/50`, radial-gradient z `--background`) dodatkowo rozjaśniają sekcję. Efekt: biały tekst na białym tle — niewidoczny.
+### Nowa kolejność (Index.tsx)
 
-### Rozwiązanie: Wymuszone ciemne tło Hero
+1. **TopBanner** + **LandingNavbar** (nawigacja — bez zmian)
+2. **NewHeroSection** — hero
+3. **OwnYourClientsSection** — "Czy wiedziałaś o marketplace'ach?"
+4. **ProblemSection** — kalkulator strat / quiz
+5. **SystemFlowSection** — jak to działa
+6. **ComparisonSection** — co dostajesz u nas
+7. **InteractivePhoneMockup** — prezentacja client app
+8. **TestimonialsSection** — opinie
+9. **AudienceSection** — dla kogo
+10. **PricingSection** — cennik
+11. **GuaranteeSection** — gwarancja
+12. **NewFAQSection** — FAQ
+13. **NewLandingFooter** — stopka
 
-Zamiast polegać na CSS variables (które są jasne), hero dostaje **własne ciemne tło** inline — niezależne od motywu strony. Tekst `#f5f5f7` zostaje (dobrze wygląda na ciemnym). Reszta strony bez zmian.
+### Sekcje usuwane (z Index.tsx)
 
-### Zmiany w `NewHeroSection.tsx`
+- `SocialProofBar` — pasek "0% prowizji / 163 funkcje"
+- `LeadFormSection` — formularz kontaktowy (+ `formRef` / `scrollToForm` logika)
+- `NewFinalCTASection` — ostatnie CTA przed stopką
 
-1. **Sekcja `<section>`** — dodanie ciemnego tła:
-   ```
-   background: linear-gradient(160deg, #0d0520 0%, #1a0838 40%, #120c2e 70%, #0a0a14 100%)
-   ```
+### Konsekwencje usunięcia `scrollToForm`
 
-2. **Usunięcie overlayów** które rozjaśniały tło (linie 27-31) — trzy `<div>` z `bg-background/50`, `bg-gradient-to-t from-background`, i `radial-gradient(... --background ...)`. Te warstwy nadpisywały ciemny gradient na jasny. Zamiast nich — jeden subtelny vignette dla głębi.
+Kilka sekcji przyjmuje `onScrollToForm` jako prop (Hero, ProblemSection, SystemFlowSection, PricingSection). Po usunięciu formularza te CTA nie mają dokąd scrollować. Opcje:
+- Zamienić na link do `/auth` (rejestracja) lub zewnętrzny URL
+- Albo scrollować do PricingSection
 
-3. **Gradient pod H1** (`from-violet-dark via-background`) na linia 21 → zmiana na ciemne kolory inline (`from-[#0d0520] via-[#1a0838] to-[#0a0a14]`), żeby nie ciągnął jasnego `--background`.
+Proponuję: scrollToForm → scrollToPricing (scroll do sekcji cennika).
 
-4. **Social proof tekst** (linia 200-201): `text-muted-foreground` i `text-foreground` → hardcoded jasne kolory, bo te CSS variables wskazują na ciemne kolory (jasny motyw).
-
-5. **Outline button** (linia 144-151): dodanie `text-white border-white/30` — bo domyślny outline button dziedziczy ciemny foreground.
-
-6. **Avatar kółka** (linia 192-195): `border-background` → `border-[#0a0a14]` i `text-primary` z dostosowaniem do ciemnego tła.
-
-### Jeden plik
+### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/NewHeroSection.tsx` | Ciemne tło inline, usunięcie jasnych overlayów, hardcoded jasne kolory tekstu |
+| `src/pages/Index.tsx` | Nowa kolejność sekcji, usunięcie 3 komponentów, zmiana `formRef` → `pricingRef` |
 
-Zero zmian w treści, układzie, animacjach ani innych sekcjach.
+Jeden plik.
 
