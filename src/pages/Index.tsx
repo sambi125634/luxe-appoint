@@ -8,7 +8,7 @@ import { ProblemSection } from "@/components/landing/ProblemSection";
 
 import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
-import { DataOwnershipSection } from "@/components/landing/DataOwnershipSection";
+
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
 import { ValueStackSection } from "@/components/landing/ValueStackSection";
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
@@ -41,7 +41,7 @@ const Index = () => {
         
         <SystemFlowSection onScrollToForm={scrollToForm} />
         <OwnYourClientsSection />
-        <DataOwnershipSection />
+        
         <ComparisonSection />
         <ValueStackSection />
         <TestimonialsSection />

@@ -1,4 +1,4 @@
-import { AlertTriangle, X, Check } from "lucide-react";
+import { AlertTriangle, X, Check, ShieldAlert } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const OwnYourClientsSection = () => {
@@ -35,8 +35,14 @@ export const OwnYourClientsSection = () => {
                 {" "}Jej dane, jej historia, jej preferencje — to ich własność. Gdy odejdziesz, nie zabierzesz ich ze sobą.
               </p>
               <p>
+                <strong className="text-foreground">Jutro mogą podnieść prowizję.</strong>
+                {" "}Pojutrze mogą wyświetlić Twoją konkurencję tej samej klientce za 10 zł taniej.
+                {" "}<strong className="text-foreground">A Ty nie możesz nic zrobić.</strong>
+              </p>
+              <p>
                 Przez lata budujesz ich biznes.
                 <strong className="text-foreground"> Nie swój.</strong>
+                {" "}Bo to ich baza. <span className="text-muted-foreground/60">Nie Twoja.</span>
               </p>
             </div>
           </div>
@@ -50,14 +56,15 @@ export const OwnYourClientsSection = () => {
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
-                  "Klientki należą do platformy",
-                  "Odejście = utrata całej historii",
-                  "Walczysz ceną z konkurencją obok",
-                  "Brak narzędzi do retencji klientek",
-                  "Prowizja od każdej nowej wizyty",
+                  "Klientki należą do platformy — nie do Ciebie",
+                  "Odejście = utrata całej historii i danych",
+                  "Walczysz ceną z konkurencją wyświetlaną obok",
+                  "Jutro mogą zmienić zasady — i nic na to nie poradzisz",
+                  "Prowizja od każdej nowej wizyty przez Boost",
+                  "Brak narzędzi do retencji — klientka wraca do marketplace, nie do Ciebie",
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <X className="w-3.5 h-3.5 text-destructive flex-shrink-0" />
+                  <li key={i} className="flex items-start gap-2">
+                    <X className="w-3.5 h-3.5 text-destructive flex-shrink-0 mt-0.5" />
                     {item}
                   </li>
                 ))}
@@ -72,25 +79,25 @@ export const OwnYourClientsSection = () => {
               </div>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 {[
-                  { text: "Twoje klientki. Na zawsze.", bold: true, extra: " Eksport jednym kliknięciem" },
-                  { text: "Prywatna aplikacja — tylko Twój salon" },
-                  { text: "Budujesz własny brand, nie cudzy" },
-                  { text: "Automatyczne sekwencje retencyjne" },
-                  { text: "0% prowizji od rezerwacji. Zawsze." },
+                  { text: "Twoje klientki. Twoje dane. Na zawsze.", bold: true },
+                  { text: "Eksport jednym kliknięciem — żadna platforma nie może Ci ich zabrać" },
+                  { text: "Prywatna aplikacja — klientka widzi tylko Twój salon" },
+                  { text: "Budujesz własny brand, nie cudzą platformę" },
+                  { text: "Automatyczne sekwencje retencyjne — klientki wracają same" },
+                  { text: "0% prowizji od rezerwacji. Zawsze. Bez wyjątków." },
                 ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                  <li key={i} className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-primary flex-shrink-0 mt-0.5" />
                     <span>
                       {item.bold ? <strong className="text-foreground">{item.text}</strong> : item.text}
-                      {item.extra}
                     </span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="text-center">
-              <p className="text-xs text-muted-foreground italic">
+            <div className="text-center pt-2">
+              <p className="text-sm text-muted-foreground italic font-serif">
                 {'"'}Nie budujesz na cudzej ziemi. Budujesz własny dom.{'"'}
               </p>
             </div>
