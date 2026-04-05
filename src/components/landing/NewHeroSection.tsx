@@ -17,18 +17,17 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-dark via-background to-muted/30" />
-
+    <section
+      className="relative min-h-screen flex items-center overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #0d0520 0%, #1a0838 50%, #0a0a14 100%)' }}
+    >
       <Suspense fallback={null}>
         <Hero3DScene />
       </Suspense>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20 z-[1]" />
       <div className="absolute inset-0 z-[1]" style={{
-        background: "radial-gradient(ellipse 60% 70% at 50% 50%, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 60%, transparent 100%)"
+        background: "radial-gradient(ellipse 60% 70% at 50% 50%, rgba(10,5,32,0.7) 0%, transparent 70%)"
       }} />
-      <div className="absolute inset-0 bg-background/50 md:bg-transparent z-[1]" />
 
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
@@ -56,19 +55,20 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           {/* H1 — sequential reveal */}
           <div className="space-y-1">
             {[
-              { text: "Pracujesz.", delay: 0.3, weight: 300 },
-              { text: "Zarabiasz.", delay: 0.45, weight: 400 },
-              { text: "I budujesz", delay: 0.6, weight: 500 },
-              { text: "czyjś biznes.", delay: 0.75, weight: 700 },
-            ].map(({ text, delay, weight }) => (
+              { text: "Pracujesz.", delay: 0.3, weight: 300, color: 'rgba(255,255,255,0.75)' },
+              { text: "Zarabiasz.", delay: 0.45, weight: 400, color: 'rgba(255,255,255,0.85)' },
+              { text: "I budujesz", delay: 0.6, weight: 500, color: 'rgba(255,255,255,0.92)' },
+              { text: "czyjś biznes.", delay: 0.75, weight: 700, color: '#ffffff' },
+            ].map(({ text, delay, weight, color }) => (
               <motion.span
                 key={text}
-                className="block leading-[1.0] tracking-[-0.02em]"
+                className="block tracking-[-0.02em]"
                 style={{
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  fontSize: 'clamp(56px, 9vw, 120px)',
+                  fontSize: 'clamp(40px, 6.5vw, 88px)',
+                  lineHeight: 1.05,
                   fontWeight: weight,
-                  color: '#f5f5f7',
+                  color,
                 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -81,10 +81,11 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
           {/* H2 — "Nie swój." */}
           <motion.h2
-            className="leading-[1.0] tracking-[-0.02em]"
+            className="tracking-[-0.02em]"
             style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: 'clamp(64px, 10vw, 130px)',
+              fontSize: 'clamp(48px, 7.5vw, 100px)',
+              lineHeight: 1.05,
               fontWeight: 600,
               fontStyle: 'italic',
               background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
@@ -106,7 +107,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '18px',
               fontWeight: 400,
-              color: 'rgba(245, 245, 247, 0.6)',
+              color: 'rgba(255,255,255,0.60)',
             }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -118,7 +119,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <br />
             Jej dane. Jej historia. Jej kontakt.
             <br />
-            <span style={{ fontWeight: 600, color: '#f5f5f7', marginTop: '8px', display: 'inline-block' }}>
+            <span style={{ fontWeight: 600, color: '#ffffff', marginTop: '8px', display: 'inline-block' }}>
               Beauty Calendar to zmienia.
             </span>
           </motion.p>
@@ -133,7 +134,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <Button
               size="lg"
               onClick={onScrollToForm}
-              className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg shadow-glow hover:shadow-[0_0_60px_hsl(var(--primary)/0.4)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
+              className="group relative overflow-hidden bg-white hover:bg-white/90 text-black px-8 py-6 text-lg shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.25)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Zacznij za darmo — bez karty kredytowej
@@ -144,7 +145,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <Button
               variant="outline"
               size="lg"
-              className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
+              className="group px-8 py-6 text-lg border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
               onClick={scrollToDemo}
             >
               Zobacz jak to działa →
@@ -158,8 +159,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '13px',
               fontWeight: 400,
-              opacity: 0.55,
-              color: '#f5f5f7',
+              color: 'rgba(255,255,255,0.50)',
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
