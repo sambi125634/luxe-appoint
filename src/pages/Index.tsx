@@ -12,7 +12,7 @@ import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSectio
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
 
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
-import DemoPreviewSection from "@/components/landing/DemoPreviewSection";
+
 import { InteractivePhoneMockup } from "@/components/landing/InteractivePhoneMockup";
 import { AudienceSection } from "@/components/landing/AudienceSection";
 import { PricingSection } from "@/components/landing/PricingSection";
