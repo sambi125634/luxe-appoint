@@ -1,67 +1,59 @@
 
 
-## Plan: Redesign Hero na jasne tło + mockupy produktowe w stylu Calendly/Notion
+## Plan: Hero w stylu Notion — wycentrowany, animowany, z pływającymi elementami
 
-### Zakres zmian
+### Inspiracja Notion
+Notion ma: (1) wycentrowany układ, (2) duży, gruby sans-serif headline, (3) pływające animowane ikonki/elementy wokół, (4) mockup produktu pod tekstem, (5) subtelne ciemne tło z akcentami.
 
-Trzy główne zmiany: (1) Hero → jasne tło z split layout (tekst + mockup), (2) SystemFlowSection → layout Calendly z screenshotami, (3) screenshoty z panelu demo jako statyczne obrazki.
+### Zmiany w NewHeroSection.tsx
 
----
+**1. Layout: split → centered**
+- Zamiast `grid lg:grid-cols-2` → `text-center max-w-4xl mx-auto`
+- Headline, sub, CTAs wycentrowane
+- Mockup produktu pod tekstem (pełna szerokość, z perspektywą)
 
-### 1. Generowanie screenshotów z panelu demo
+**2. Typografia — grubsza, bardziej bold**
+- H1: zmiana z Cormorant Garamond (serif) → Inter/Plus Jakarta Sans (sans-serif, jak Notion)
+- Rozmiar: `clamp(40px, 6vw, 72px)`, font-weight 700
+- Kolor: `#1A1A2E` (ciemny na jasnym tle)
+- "Nie swój." — zostaje gradient italic, ale też sans-serif bold
 
-Użyję przeglądarki do zrobienia 5 screenshotów z panelu demo (`/demo`):
-- **Hero mockup**: Widok kalendarza tygodniowego z rezerwacjami (główny screenshot)
-- **Krok 1**: Widget rezerwacyjny `/s/demo-salon` (widok wyboru usług)
-- **Krok 2**: Panel powiadomień / SMS
-- **Krok 3**: Dashboard z retention stats
-- **Krok 4**: Profil klientki z historią
+**3. Pływające animowane elementy (Notion-style)**
+- 6-8 małych ikon beauty (nożyczki, kalendarz, serce, gwiazdka, wiadomość, pieczątka) w postaci emoji lub Lucide icons
+- Rozmieszczone absolutnie wokół sekcji
+- Każda ma animację `float` — powolne unoszenie się w górę/dół (CSS keyframes lub framer-motion `animate` z `repeat: Infinity`)
+- Reagują subtelnie na scroll (parallax via `useTransform`)
 
-Screenshoty zostaną opakowane w macOS-style window frame (skill product-shot) i zapisane do `src/assets/screenshots/`.
+**4. Mockup produktu — pod tekstem, Notion-style**
+- Screenshot kalendarza poniżej CTAs
+- Perspektywa: `perspective(1200px) rotateX(2deg)` — lekkie pochylenie jak u Notion
+- Cień: `shadow-2xl` + glow za mockupem
+- Animacja: wjeżdża od dołu z `opacity: 0, y: 60` → `opacity: 1, y: 0`
 
----
+**5. Badge, CTAs, trust indicators**
+- Przeniesione na środek (text-center)
+- CTAs obok siebie, wycentrowane
+- Trust indicators pod CTAs, wycentrowane
 
-### 2. NewHeroSection.tsx — kompletny redesign
+### Animacje sekwencyjne (zachowane, ulepszone)
 
-**Tło**: Jasne (`#FAFAF8` / warm white) zamiast ciemnego fioletu. Usunięcie `Hero3DScene` (3D kalendarz).
+```text
+0.0s  — Badge fade-in
+0.2s  — "Pracujesz. Zarabiasz." slide-up
+0.4s  — "I budujesz czyjś biznes." slide-up  
+0.7s  — "Nie swój." scale-in z gradient
+0.9s  — Sub text fade-in
+1.1s  — CTAs fade-in
+1.3s  — Trust indicators fade-in
+1.5s  — Mockup slide-up z perspektywą
+1.7s  — Floating icons pojawiają się (stagger)
+```
 
-**Layout**: Split layout jak Calendly:
-- **Lewa strona** (50%): headline + sub + CTAs
-- **Prawa strona** (50%): duży screenshot kalendarza w ramce z cieniem
-
-**Typografia** (zachowujemy Cormorant Garamond):
-- Headline bardziej "rozległy w szerz" — mniejszy font-size ale na 2-3 szerokie linie zamiast 4 wąskich
-- Kolor tekstu: `#1A1A2E` (ciemny) na jasnym tle
-- "Nie swój." — gradient violet→pink zostaje
-- Sub text: `#4A4A5A`
-
-**Rozmiar headline**: `clamp(40px, 6vw, 72px)` zamiast `clamp(56px, 9vw, 120px)` — mniej pionowo, bardziej horyzontalnie
-
-**Trust indicators, social proof, CTAs**: Kolory dostosowane do jasnego tła (ciemny tekst, emerald checkmarki, primary buttons)
-
-**Badge**: `border-primary/20 bg-primary/5 text-primary` zamiast białych/przezroczystych
-
----
-
-### 3. SystemFlowSection.tsx — layout Calendly
-
-Zamiana z pionowej listy na **Calendly-style interactive steps**:
-- Lewa kolumna: lista 4 kroków (klik zmienia aktywny)
-- Prawa kolumna: screenshot odpowiadający aktywnemu krokowi
-- Aktywny krok jest wyróżniony (bold, ikona primary, opis widoczny)
-- Nieaktywne kroki mają tylko tytuł (muted)
-- Automatyczne przełączanie co 4s (jak Calendly)
-- Container `max-w-6xl` zamiast `max-w-3xl` (potrzeba miejsca na 2 kolumny)
-
----
-
-### Pliki do edycji/utworzenia
+### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| Skrypt screenshotów | Zrzuty ekranu z demo → product-shot frames → `src/assets/screenshots/` |
-| `src/components/landing/NewHeroSection.tsx` | Jasne tło, split layout (tekst + mockup), mniejszy headline, usunięcie Hero3DScene |
-| `src/components/landing/SystemFlowSection.tsx` | Layout Calendly: interactive steps z screenshotami po prawej |
+| `src/components/landing/NewHeroSection.tsx` | Centered layout, sans-serif bold typography, floating animated icons, mockup pod tekstem z perspektywą |
 
-Trzy pliki + generacja 5 screenshotów. Treść, kolejność sekcji i inne sekcje bez zmian.
+Jeden plik. Treść bez zmian. Tylko layout, typografia, animacje.
 
