@@ -102,7 +102,7 @@ export const InteractivePhoneMockup = () => {
                     </div>
                   ) : (
                     <iframe
-                      src="/app"
+                      src="/s/demo-salon"
                       className="w-full h-full border-0"
                       title="Beauty Calendar — aplikacja klientki"
                       onError={() => setIframeError(true)}
