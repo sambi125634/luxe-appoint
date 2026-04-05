@@ -10,7 +10,7 @@ import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
 
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
-import { ValueStackSection } from "@/components/landing/ValueStackSection";
+
 import { TestimonialsSection } from "@/components/landing/TestimonialsSection";
 import DemoPreviewSection from "@/components/landing/DemoPreviewSection";
 import { InteractivePhoneMockup } from "@/components/landing/InteractivePhoneMockup";
