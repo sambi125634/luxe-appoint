@@ -153,7 +153,14 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
           {/* Trust indicators */}
           <motion.div
-            className="flex flex-wrap gap-6 justify-center text-sm text-muted-foreground"
+            className="flex flex-wrap gap-6 justify-center"
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '13px',
+              fontWeight: 400,
+              opacity: 0.55,
+              color: '#f5f5f7',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.0 }}
