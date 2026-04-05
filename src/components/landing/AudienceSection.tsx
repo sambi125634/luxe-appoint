@@ -1,54 +1,65 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
+import nailsImg from "@/assets/audience/nails.jpg";
+import hairImg from "@/assets/audience/hair.jpg";
+import facialImg from "@/assets/audience/facial.jpg";
+import lashesImg from "@/assets/audience/lashes.jpg";
+import depilationImg from "@/assets/audience/depilation.jpg";
+import aestheticsImg from "@/assets/audience/aesthetics.jpg";
+import massageImg from "@/assets/audience/massage.jpg";
+import spaImg from "@/assets/audience/spa.jpg";
+import bodyImg from "@/assets/audience/body.jpg";
+import specialistImg from "@/assets/audience/specialist.jpg";
+
 const categories = [
   {
-    emoji: "💅",
+    image: nailsImg,
     title: "Paznokcie i dłonie",
     items: ["Salon paznokci", "Manicure hybrydowy", "Przedłużanie paznokci", "Pedicure leczniczy", "Nail art studio"],
   },
   {
-    emoji: "✂️",
+    image: hairImg,
     title: "Fryzjerstwo i włosy",
     items: ["Salon fryzjerski", "Barber shop", "Koloryzacja i balayage", "Przedłużanie włosów", "Studio stylizacji"],
   },
   {
-    emoji: "✨",
+    image: facialImg,
     title: "Kosmetyka i twarz",
     items: ["Gabinet kosmetyczny", "Peeling kawitacyjny", "Mikrodermabrazja", "Oczyszczanie wodorowe", "Lifting twarzy"],
   },
   {
-    emoji: "🫧",
+    image: lashesImg,
     title: "Rzęsy i brwi",
     items: ["Stylizacja rzęs", "Lash lifting", "Laminacja brwi", "Microblading", "PMU i makijaż permanentny"],
   },
   {
-    emoji: "⚡",
+    image: depilationImg,
     title: "Depilacja",
     items: ["Depilacja laserowa", "Depilacja IPL", "Woskowanie i sugaring", "Studio depilacji"],
   },
   {
-    emoji: "🩺",
+    image: aestheticsImg,
     title: "Medycyna estetyczna",
     items: ["Gabinet medycyny estetycznej", "Klinika anti-aging", "Mezoterapia", "Botoks i wypełniacze", "Osocze bogatopłytkowe"],
   },
   {
-    emoji: "💆",
+    image: massageImg,
     title: "Masaż i wellness",
     items: ["Salon masażu", "Masaż tajski / leczniczy", "Refleksologia", "Studio wellness i relaksu"],
   },
   {
-    emoji: "🌿",
+    image: spaImg,
     title: "SPA i kompleksy",
     items: ["Salon SPA", "Hotel SPA", "Centrum odnowy biologicznej", "Strefa relaksu"],
   },
   {
-    emoji: "💪",
+    image: bodyImg,
     title: "Sylwetka i ciało",
     items: ["Studio modelowania sylwetki", "Kriolipoliza", "Endermologia", "Drenaż limfatyczny"],
   },
   {
-    emoji: "🔬",
+    image: specialistImg,
     title: "Specjalistyczne",
     items: ["Gabinet trychologiczny", "Studio bridal (makijaż ślubny)", "Gabinet podologiczny", "Studio opalania natryskowego", "Solarium"],
   },
@@ -76,19 +87,28 @@ export const AudienceSection = () => {
           {categories.map((cat, i) => (
             <motion.div
               key={i}
-              className="p-4 rounded-xl bg-card border border-border/50 hover:border-primary/20 transition-all duration-300"
+              className="rounded-xl bg-card border border-border/50 hover:border-primary/20 transition-all duration-300 overflow-hidden"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4 }}
             >
-              <div className="text-2xl mb-2">{cat.emoji}</div>
-              <h3 className="font-bold text-sm mb-2">{cat.title}</h3>
-              <ul className="space-y-1">
-                {cat.items.map((item, j) => (
-                  <li key={j} className="text-xs text-muted-foreground">{item}</li>
-                ))}
-              </ul>
+              <img
+                src={cat.image}
+                alt={cat.title}
+                className="w-full h-32 object-cover"
+                loading="lazy"
+                width={640}
+                height={512}
+              />
+              <div className="p-4">
+                <h3 className="font-bold text-sm mb-2">{cat.title}</h3>
+                <ul className="space-y-1">
+                  {cat.items.map((item, j) => (
+                    <li key={j} className="text-xs text-muted-foreground">{item}</li>
+                  ))}
+                </ul>
+              </div>
             </motion.div>
           ))}
         </div>
