@@ -102,7 +102,7 @@ export const InteractivePhoneMockup = () => {
                     </div>
                   ) : (
                     <iframe
-                      src="/app"
+                      src="/s/demo-salon"
                       className="w-full h-full border-0"
                       title="Beauty Calendar — aplikacja klientki"
                       onError={() => setIframeError(true)}
@@ -120,26 +120,6 @@ export const InteractivePhoneMockup = () => {
                 <div className="w-24 h-1 bg-white/20 rounded-full mx-auto mt-3" />
               </div>
 
-              {/* Floating badge — loyalty */}
-              <motion.div
-                animate={{ y: [0, -8, 0], rotate: [-2, 2, -2] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -right-12 top-20 bg-white rounded-2xl p-3 shadow-xl min-w-[140px] hidden md:block"
-              >
-                <p className="text-xs text-muted-foreground mb-1">Nowa pieczątka ✓</p>
-                <p className="font-bold text-sm text-foreground">7 / 10 wizyt</p>
-                <p className="text-xs text-muted-foreground">jeszcze 3 do nagrody!</p>
-              </motion.div>
-
-              {/* Floating badge — booking */}
-              <motion.div
-                animate={{ y: [0, -6, 0], rotate: [2, -2, 2] }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -left-14 bottom-32 bg-primary rounded-2xl p-3 shadow-xl min-w-[130px] hidden md:block"
-              >
-                <p className="text-xs text-primary-foreground/70 mb-1">Rezerwacja potwierdzona</p>
-                <p className="font-bold text-sm text-primary-foreground">Manicure · jutro 10:30</p>
-              </motion.div>
             </div>
           </motion.div>
         </div>
