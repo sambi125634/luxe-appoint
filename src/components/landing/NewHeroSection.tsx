@@ -41,7 +41,13 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             <Badge
               variant="outline"
-              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
+              className="px-4 py-2 border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
+              style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.04em',
+              }}
             >
               Większość właścicielek salonów nie wie że...
             </Badge>
@@ -50,14 +56,20 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           {/* H1 — sequential reveal */}
           <div className="space-y-1">
             {[
-              { text: "Pracujesz.", delay: 0.3 },
-              { text: "Zarabiasz.", delay: 0.45 },
-              { text: "I budujesz", delay: 0.6 },
-              { text: "czyjś biznes.", delay: 0.75 },
-            ].map(({ text, delay }) => (
+              { text: "Pracujesz.", delay: 0.3, weight: 300 },
+              { text: "Zarabiasz.", delay: 0.45, weight: 400 },
+              { text: "I budujesz", delay: 0.6, weight: 500 },
+              { text: "czyjś biznes.", delay: 0.75, weight: 700 },
+            ].map(({ text, delay, weight }) => (
               <motion.span
                 key={text}
-                className="block text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight"
+                className="block leading-[1.0] tracking-[-0.02em]"
+                style={{
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontSize: 'clamp(56px, 9vw, 120px)',
+                  fontWeight: weight,
+                  color: '#f5f5f7',
+                }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay, ease: "easeOut" }}
@@ -69,7 +81,17 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
           {/* H2 — "Nie swój." */}
           <motion.h2
-            className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-gradient-luxury"
+            className="leading-[1.0] tracking-[-0.02em]"
+            style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: 'clamp(64px, 10vw, 130px)',
+              fontWeight: 600,
+              fontStyle: 'italic',
+              background: 'linear-gradient(135deg, #7c3aed, #ec4899)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
@@ -79,7 +101,13 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
           {/* Sub */}
           <motion.p
-            className="text-lg md:text-xl text-muted-foreground max-w-2xl leading-relaxed"
+            className="max-w-2xl leading-relaxed"
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '18px',
+              fontWeight: 400,
+              color: 'rgba(245, 245, 247, 0.6)',
+            }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.3 }}
@@ -90,7 +118,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <br />
             Jej dane. Jej historia. Jej kontakt.
             <br />
-            <span className="font-semibold text-foreground mt-2 inline-block">Beauty Calendar to zmienia.</span>
+            <span style={{ fontWeight: 600, color: '#f5f5f7', marginTop: '8px', display: 'inline-block' }}>
+              Beauty Calendar to zmienia.
+            </span>
           </motion.p>
 
           {/* CTAs */}
@@ -123,7 +153,14 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
           {/* Trust indicators */}
           <motion.div
-            className="flex flex-wrap gap-6 justify-center text-sm text-muted-foreground"
+            className="flex flex-wrap gap-6 justify-center"
+            style={{
+              fontFamily: "'Inter', system-ui, sans-serif",
+              fontSize: '13px',
+              fontWeight: 400,
+              opacity: 0.55,
+              color: '#f5f5f7',
+            }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.0 }}
