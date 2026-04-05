@@ -1,33 +1,36 @@
 
 
-## Plan: Usunięcie DataOwnershipSection + rozbudowa OwnYourClientsSection
+## Plan: Usunięcie ValueStackSection i wchłonięcie "value stack" do ComparisonSection
 
-### Co robimy
+### Problem
+`ComparisonSection` — 12 unikalnych funkcji z opisami korzyści.
+`ValueStackSection` — te same 13-14 funkcji, ale z przekreślonymi cenami i sumą "3 910 zł/mies → 99 zł".
 
-1. **Usuwamy `<DataOwnershipSection />`** z `Index.tsx` — czarna sekcja znika, zero duplikacji.
+To mówi to samo dwa razy. Użytkownik scrolluje i widzi te same nazwy ponownie.
 
-2. **Rozbudowujemy `OwnYourClientsSection.tsx`** — jedyna sekcja o własności danych, ale mocniejsza:
+### Rozwiązanie
 
-### Nowy layout OwnYourClientsSection
+**Usuwamy `ValueStackSection`** z `Index.tsx` — komponent zostaje w repo, ale nie jest renderowany.
 
-**Lewa kolumna — copy (rozbudowany):**
-- Badge "Wiedziałaś o tym?" zostaje
-- Headline: "Pracujesz na budowę cudzej bazy klientek." — zostaje, mocny
-- Dodajemy konkretniejszy, bardziej emocjonalny copy:
-  - Analogia Allegro zostaje, ale dodajemy punchline o konsekwencjach: "Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję tej samej klientce za 10 zł taniej. A Ty nie możesz nic zrobić." (przeniesione z DataOwnership — najlepsze zdania)
-  - Zamknięcie: "Przez lata budujesz ich biznes. Nie swój." → wzmocnione o "Bo to ich baza. Nie Twoja."
+**Przenosimy "punchline cenowy"** do `ComparisonSection` — pod gridem 12 funkcji i rozwijaną tabelą wspólnych funkcji dodajemy kompaktowy blok:
 
-**Prawa kolumna — karty porównawcze:**
-- Marketplace card: wzmocniony copy (dodajemy "Jutro mogą zmienić zasady" i "Konkurencja wyświetlana obok Ciebie")
-- Beauty Calendar card: wzmocniony copy (dodajemy "Twoje dane — eksport jednym kliknięciem, zawsze" i "Żadna platforma nie może Ci ich zabrać")
-- Cytat na dole: "Nie budujesz na cudzej ziemi. Budujesz własny dom." — zostaje
+```text
+┌─────────────────────────────────────────────┐
+│ Gdybyś płaciła za każde narzędzie osobno:   │
+│ ̶3̶ ̶9̶1̶0̶ ̶z̶ł̶/̶m̶i̶e̶s̶                               │
+│ Twoja cena: 99 zł netto/mies               │
+│ + 0 zł prowizji. Zawsze.                   │
+└─────────────────────────────────────────────┘
+```
+
+Bez powtarzania listy — sam knockout cenowy. Karty cenowe BC vs Marketplace na górze ComparisonSection już pokazują cenę, więc ten blok to zamknięcie argumentu po zobaczeniu 12 funkcji.
 
 ### Zmiany w plikach
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/OwnYourClientsSection.tsx` | Rozbudowa copy: wchłonięcie najlepszych zdań z DataOwnership, mocniejsze bullet points w kartach |
-| `src/pages/Index.tsx` | Usunięcie `<DataOwnershipSection />` (linia 44) i importu (linia 11) |
+| `src/pages/Index.tsx` | Usunięcie `<ValueStackSection />` i importu |
+| `src/components/landing/ComparisonSection.tsx` | Dodanie kompaktowego bloku "value knockout" (przekreślona suma + cena 99 zł) między rozwijaną tabelą a CTA |
 
-Dwa pliki. Treść DataOwnership nie ginie — najlepsze fragmenty trafiają do OwnYourClientsSection.
+Dwa pliki. Lista funkcji pojawia się raz — w ComparisonSection. Argument cenowy zostaje, ale bez duplikacji.
 
