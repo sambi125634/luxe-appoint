@@ -1,46 +1,56 @@
 
 
-## Plan: Zamiana emoji na wygenerowane zdjęcia nisz w AudienceSection
+## Plan: Zmiana głównego komunikatu Hero na narrację o własności danych
 
-### Koncept
-Zamiast emoji (💅, ✂️, ✨...) — każda z 10 kart nisz dostaje profesjonalne, wygenerowane zdjęcie przedstawiające daną niszę beauty. Zdjęcia w formacie rounded, na górze karty, pozwalają odwiedzającym od razu utożsamić się ze swoją branżą.
+### Nowy copy
 
-### Realizacja
+**Eyebrow badge:** "Większość właścicielek salonów nie wie że..."
 
-**1. Generowanie 10 zdjęć (edge function + Nano banana pro)**
+**H1 (bold, sekwencyjnie):**
+```
+Pracujesz.
+Zarabiasz.
+I budujesz
+czyjś biznes.
+```
 
-Skrypt generuje 10 obrazków przez `google/gemini-3-pro-image-preview` z promptami dopasowanymi do każdej niszy:
+**H2 (gradient muted, pod H1):**
+```
+Nie swój.
+```
 
-| Kategoria | Prompt (skrót) |
-|-----------|----------------|
-| Paznokcie i dłonie | Elegant close-up of manicured nails, soft lighting, premium salon |
-| Fryzjerstwo i włosy | Stylist working on client's hair, modern salon interior |
-| Kosmetyka i twarz | Facial treatment in aesthetic clinic, clean minimal |
-| Rzęsy i brwi | Lash extension procedure, close-up, professional |
-| Depilacja | Laser hair removal device, clinical setting |
-| Medycyna estetyczna | Aesthetic medicine procedure, modern clinic |
-| Masaż i wellness | Relaxing massage, warm spa ambiance |
-| SPA i kompleksy | Luxury spa interior, candles, warm tones |
-| Sylwetka i ciało | Body contouring treatment, modern equipment |
-| Specjalistyczne | Trichology/bridal makeup, specialized tools |
+**Sub (muted-foreground):**
+```
+Każda klientka którą pozyskałaś przez platformę
+marketplace — należy do platformy.
+Jej dane. Jej historia. Jej kontakt.
 
-Zdjęcia zapisane do `src/assets/audience/` jako PNG (np. `nails.png`, `hair.png`...).
+Beauty Calendar to zmienia.
+```
 
-**2. Zmiana AudienceSection.tsx**
+### Zmiana w `NewHeroSection.tsx`
 
-- Zamiast `emoji: "💅"` → `image: import` z `src/assets/audience/`
-- Zamiast `<div className="text-2xl mb-2">{cat.emoji}</div>` → `<img src={cat.image} className="w-full h-32 object-cover rounded-lg mb-3" />`
-- Karty nieco wyższe, zdjęcie zajmuje górną część karty
-- Overflow hidden na karcie dla czystego wyglądu
+- Badge text: zmiana z "dla właścicielek salonów w Polsce" → "Większość właścicielek salonów nie wie że..."
+- Usunięcie `animate-pulse` z badge (pulse nie pasuje do poważnego tonu)
+- H1: 4 linie tekstu, każda jako osobny `<span className="block">` z sekwencyjnym fade-in (stagger 150ms) — efekt "uderzenia" linia po linii
+- H2 "Nie swój." — `text-gradient-luxury` (lub `text-muted-foreground` gradient), większy font, osobny motion.div z delay
+- Sub: 4 linie tekstu z `text-muted-foreground`, ostatnia linia "Beauty Calendar to zmienia." w `text-foreground font-semibold`
+- CTAs i trust indicators — bez zmian (zostają)
 
-**3. Fix runtime error**
-Usunięcie ewentualnej referencji do `DemoPreviewSection` w Index.tsx (jeśli istnieje w wersji buildowej).
+### Animacja sekwencyjna
 
-### Pliki do edycji/utworzenia
+Każda linia H1 wchodzi osobno:
+- "Pracujesz." → delay 0.3s
+- "Zarabiasz." → delay 0.45s
+- "I budujesz" → delay 0.6s
+- "czyjś biznes." → delay 0.75s
+- "Nie swój." → delay 1.0s (osobny motion.div, większy efekt)
+
+### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| Skrypt generujący | Generacja 10 zdjęć przez AI, zapis do `src/assets/audience/` |
-| `src/components/landing/AudienceSection.tsx` | Import zdjęć zamiast emoji, img tag zamiast text div |
-| `src/pages/Index.tsx` | Fix runtime error (jeśli referencja DemoPreviewSection wciąż istnieje) |
+| `src/components/landing/NewHeroSection.tsx` | Zmiana copy: badge, H1, H2, sub — nowa narracja o własności danych |
+
+Jeden plik. Struktura, CTAs, trust badges, social proof — bez zmian.
 
