@@ -6,7 +6,7 @@ import { SocialProofBar } from "@/components/landing/SocialProofBar";
 
 import { ProblemSection } from "@/components/landing/ProblemSection";
 
-import { ClientJourneySection } from "@/components/landing/ClientJourneySection";
+import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
 import { DataOwnershipSection } from "@/components/landing/DataOwnershipSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
@@ -39,7 +39,7 @@ const Index = () => {
         
         <ProblemSection onScrollToForm={scrollToForm} />
         
-        <ClientJourneySection />
+        <SystemFlowSection onScrollToForm={scrollToForm} />
         <OwnYourClientsSection />
         <DataOwnershipSection />
         <ComparisonSection />
