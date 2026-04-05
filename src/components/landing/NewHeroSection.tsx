@@ -41,7 +41,13 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             <Badge
               variant="outline"
-              className="px-4 py-2 text-sm font-medium border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
+              className="px-4 py-2 border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
+              style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.04em',
+              }}
             >
               Większość właścicielek salonów nie wie że...
             </Badge>
