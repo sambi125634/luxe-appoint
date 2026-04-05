@@ -17,22 +17,23 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-dark via-background to-muted/30" />
-
+    <section
+      className="relative min-h-screen flex items-center overflow-hidden"
+      style={{
+        background: "linear-gradient(160deg, #0d0520 0%, #1a0838 40%, #120c2e 70%, #0a0a14 100%)",
+      }}
+    >
       <Suspense fallback={null}>
         <Hero3DScene />
       </Suspense>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20 z-[1]" />
+      {/* Single subtle vignette for depth */}
       <div className="absolute inset-0 z-[1]" style={{
-        background: "radial-gradient(ellipse 60% 70% at 50% 50%, hsl(var(--background) / 0.85) 0%, hsl(var(--background) / 0.3) 60%, transparent 100%)"
+        background: "radial-gradient(ellipse 70% 60% at 50% 50%, transparent 0%, rgba(10, 10, 20, 0.4) 100%)"
       }} />
-      <div className="absolute inset-0 bg-background/50 md:bg-transparent z-[1]" />
 
       <div className="container relative z-10 py-20 lg:py-32">
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto space-y-8">
-          {/* Badge */}
           {/* Eyebrow badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -41,7 +42,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           >
             <Badge
               variant="outline"
-              className="px-4 py-2 border-primary/30 bg-primary/5 text-primary backdrop-blur-sm"
+              className="px-4 py-2 border-white/20 bg-white/5 text-white/80 backdrop-blur-sm"
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
                 fontSize: '12px',
@@ -144,7 +145,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             <Button
               variant="outline"
               size="lg"
-              className="group px-8 py-6 text-lg border-2 hover:bg-primary/5 backdrop-blur-sm"
+              className="group px-8 py-6 text-lg border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm"
               onClick={scrollToDemo}
             >
               Zobacz jak to działa →
@@ -158,8 +159,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               fontFamily: "'Inter', system-ui, sans-serif",
               fontSize: '13px',
               fontWeight: 400,
-              opacity: 0.55,
-              color: '#f5f5f7',
+              color: 'rgba(245, 245, 247, 0.55)',
             }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -172,8 +172,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               "Twoje dane — zawsze Twoje",
             ].map((item, index) => (
               <div key={index} className="flex items-center gap-2">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                  <Check className="w-3 h-3 text-emerald-600" />
+                <div className="w-5 h-5 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                  <Check className="w-3 h-3 text-emerald-400" />
                 </div>
                 <span>{item}</span>
               </div>
@@ -191,14 +191,14 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               {["AK", "MW", "JP", "KW", "LS"].map((initials, idx) => (
                 <div
                   key={idx}
-                  className="w-7 h-7 rounded-full bg-primary/20 border-2 border-background flex items-center justify-center text-xs font-bold text-primary"
+                  className="w-7 h-7 rounded-full bg-primary/30 border-2 border-[#120c2e] flex items-center justify-center text-xs font-bold text-primary"
                 >
                   {initials}
                 </div>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground">
-              Średnio <span className="font-bold text-foreground">23 klientki</span>{" "}
+            <p className="text-sm" style={{ color: 'rgba(245, 245, 247, 0.5)' }}>
+              Średnio <span className="font-bold" style={{ color: '#f5f5f7' }}>23 klientki</span>{" "}
               wróciły do salonów, które uruchomiły system w tym tygodniu
             </p>
           </motion.div>
@@ -207,8 +207,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
-        <div className="w-6 h-10 rounded-full border-2 border-primary/30 flex justify-center pt-2">
-          <div className="w-1.5 h-3 bg-primary/50 rounded-full animate-pulse" />
+        <div className="w-6 h-10 rounded-full border-2 border-white/20 flex justify-center pt-2">
+          <div className="w-1.5 h-3 bg-white/40 rounded-full animate-pulse" />
         </div>
       </div>
     </section>
