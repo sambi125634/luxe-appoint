@@ -1,36 +1,39 @@
 
 
-## Plan: Przywrócenie stylu kolorystycznego Hero z poprzedniej wersji (screenshot)
+## Plan: Nowy headline Hero + przesunięcie akcentów na unikalne funkcje AI
 
-### Co widzę na screenshocie (poprzednia wersja)
-- **Tło**: ciepłe białe (`#FAFAF8`) z subtelnym ciepłym gradientem na dole (peach → transparent)
-- **Badge**: z emoji ✨🚀, tekst "Jedyny kalendarz z AI dla salonów beauty", obramowanie primary
-- **Headline**: głęboki fiolet/plum kolor (~`#2D1B4E` / `#1A1A2E`), duży serif-style font
-- **Gradient accent**: "I nie bierze prowizji od Twoich klientek." w gradient fioletowo-różowym
-- **Sub**: szary muted text
-- **CTA primary**: warm bronze (`#B87D5E`) z "Załóż konto za darmo →"
-- **CTA secondary**: outline z ikoną play "Zobacz demo na żywo"
-- **Trust badge**: zielona kropka + "Zaufało nam już ponad 150+ salonów w całej Polsce" w zielonym obramowaniu
-- **Trust indicators**: ✅ Bez karty kredytowej · Gotowe w 5 minut · 0% prowizji — zawsze
+### 1. Nowy headline (Hero)
 
-### Co zmieniam
-Zachowuję **aktualną treść** (Pracujesz. Zarabiasz. / I budujesz czyjś biznes. / Nie swój.) ale przywracam **kolorystykę i styl** ze screenshota:
+Obecny headline ma 14 słów — za długi. Statystycznie najlepsze headline'y mają 8–11 słów.
 
-1. **Tło sekcji** — warm white `bg-background` z subtelnym ciepłym gradientem na dole (peach/bronze glow)
-2. **Badge** — dodanie emoji ✨🚀, zmiana tekstu badge na "Jedyny kalendarz z AI dla salonów beauty"… **NIE** — user powiedział zachować treści. Zostawiam badge "Większość właścicielek salonów nie wie że..."
-3. **Headline kolor** — deep plum/navy `#1A1A2E` (text-secondary) — to już jest
-4. **"Nie swój." gradient** — zachowuję gradient fioletowo-różowy ale dopasowuję do cieplejszych tonów ze screenshota
-5. **CTAs** — primary: `bg-primary` (warm bronze #B87D5E), secondary: outline z ikoną play ▷
-6. **Trust badge** — dodanie zielonego badge "Zaufało nam już ponad 150+ salonów w całej Polsce" między CTAs a trust indicators
-7. **Trust indicators** — "0% prowizji — zawsze" (dodanie "— zawsze")
-8. **Subtly warm gradient** na dole sekcji hero (peach/bronze glow)
-9. **Usunięcie floating icons** — na screenshocie ich nie ma, sekcja jest czysta i minimalistyczna
+**Propozycja headline + subheadline:**
+
+**H1:** `Więcej wizyt. Więcej powrotów. Zero prowizji.`
+(8 słów, szeroki wizualnie, rytmiczny, loss-aversion + benefit)
+
+**Gradient accent (italic):** `Zero prowizji.`
+
+**Subheadline:** `Jedyna platforma beauty z AI, która automatycznie wypełnia luki w grafiku, odzyskuje śpiące klientki i maksymalizuje wartość każdej wizyty — bez pobierania ani złotówki od Twoich przychodów.`
+
+Badge zostaje: `✨ 🚀 Jedyny kalendarz z AI dla salonów beauty`
+
+### 2. Przesunięcie narracji z "powiadomień SMS/email" na unikalne funkcje AI
+
+**Gdzie zmieniam:** Subheadline Hero + ewentualnie OwnYourClientsSection
+
+Obecny sub mówi o "eliminuje no-showy i wypełnia luki" — to ok, ale nie wyróżnia nas od Booksy. Nowy sub podkreśla:
+- **AI wypełnia luki** (Booksy tego nie ma)
+- **Odzyskuje śpiące klientki** (automatyczna retencja — Booksy tego nie ma)
+- **Maksymalizuje wartość wizyty** (upsell engine — Booksy tego nie ma)
+- **0% prowizji** (główny ból)
+
+Powiadomienia SMS/email nie znikają z produktu — po prostu nie są highlight'owane w hero, bo to standard branżowy.
 
 ### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/NewHeroSection.tsx` | Przywrócenie kolorystyki: ciepłe tło, bronze CTAs, trust badge, usunięcie floating icons, warm gradient accent |
+| `src/components/landing/NewHeroSection.tsx` | Nowy H1 (8 słów), nowy subheadline, bez zmian w layout/animacjach/CTA |
 
-Jeden plik. Treść bez zmian (poza drobnymi dopasowaniami trust indicators). Layout centered — bez zmian.
+Jeden plik. Zmiana tylko treści tekstowych (3 linie).
 
