@@ -87,8 +87,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          Pierwszy system z AI, który przewiduje przychody, eliminuje no-showy
-          i wypełnia luki w grafiku — automatycznie. Za 0% prowizji.
+          Jedyna platforma beauty z AI, która automatycznie wypełnia luki w grafiku,
+          odzyskuje śpiące klientki i maksymalizuje wartość każdej wizyty
+          — bez pobierania ani złotówki od Twoich przychodów.
         </motion.p>
 
         <motion.div
