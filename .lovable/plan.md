@@ -1,59 +1,36 @@
 
 
-## Plan: Hero w stylu Notion — wycentrowany, animowany, z pływającymi elementami
+## Plan: Przywrócenie stylu kolorystycznego Hero z poprzedniej wersji (screenshot)
 
-### Inspiracja Notion
-Notion ma: (1) wycentrowany układ, (2) duży, gruby sans-serif headline, (3) pływające animowane ikonki/elementy wokół, (4) mockup produktu pod tekstem, (5) subtelne ciemne tło z akcentami.
+### Co widzę na screenshocie (poprzednia wersja)
+- **Tło**: ciepłe białe (`#FAFAF8`) z subtelnym ciepłym gradientem na dole (peach → transparent)
+- **Badge**: z emoji ✨🚀, tekst "Jedyny kalendarz z AI dla salonów beauty", obramowanie primary
+- **Headline**: głęboki fiolet/plum kolor (~`#2D1B4E` / `#1A1A2E`), duży serif-style font
+- **Gradient accent**: "I nie bierze prowizji od Twoich klientek." w gradient fioletowo-różowym
+- **Sub**: szary muted text
+- **CTA primary**: warm bronze (`#B87D5E`) z "Załóż konto za darmo →"
+- **CTA secondary**: outline z ikoną play "Zobacz demo na żywo"
+- **Trust badge**: zielona kropka + "Zaufało nam już ponad 150+ salonów w całej Polsce" w zielonym obramowaniu
+- **Trust indicators**: ✅ Bez karty kredytowej · Gotowe w 5 minut · 0% prowizji — zawsze
 
-### Zmiany w NewHeroSection.tsx
+### Co zmieniam
+Zachowuję **aktualną treść** (Pracujesz. Zarabiasz. / I budujesz czyjś biznes. / Nie swój.) ale przywracam **kolorystykę i styl** ze screenshota:
 
-**1. Layout: split → centered**
-- Zamiast `grid lg:grid-cols-2` → `text-center max-w-4xl mx-auto`
-- Headline, sub, CTAs wycentrowane
-- Mockup produktu pod tekstem (pełna szerokość, z perspektywą)
-
-**2. Typografia — grubsza, bardziej bold**
-- H1: zmiana z Cormorant Garamond (serif) → Inter/Plus Jakarta Sans (sans-serif, jak Notion)
-- Rozmiar: `clamp(40px, 6vw, 72px)`, font-weight 700
-- Kolor: `#1A1A2E` (ciemny na jasnym tle)
-- "Nie swój." — zostaje gradient italic, ale też sans-serif bold
-
-**3. Pływające animowane elementy (Notion-style)**
-- 6-8 małych ikon beauty (nożyczki, kalendarz, serce, gwiazdka, wiadomość, pieczątka) w postaci emoji lub Lucide icons
-- Rozmieszczone absolutnie wokół sekcji
-- Każda ma animację `float` — powolne unoszenie się w górę/dół (CSS keyframes lub framer-motion `animate` z `repeat: Infinity`)
-- Reagują subtelnie na scroll (parallax via `useTransform`)
-
-**4. Mockup produktu — pod tekstem, Notion-style**
-- Screenshot kalendarza poniżej CTAs
-- Perspektywa: `perspective(1200px) rotateX(2deg)` — lekkie pochylenie jak u Notion
-- Cień: `shadow-2xl` + glow za mockupem
-- Animacja: wjeżdża od dołu z `opacity: 0, y: 60` → `opacity: 1, y: 0`
-
-**5. Badge, CTAs, trust indicators**
-- Przeniesione na środek (text-center)
-- CTAs obok siebie, wycentrowane
-- Trust indicators pod CTAs, wycentrowane
-
-### Animacje sekwencyjne (zachowane, ulepszone)
-
-```text
-0.0s  — Badge fade-in
-0.2s  — "Pracujesz. Zarabiasz." slide-up
-0.4s  — "I budujesz czyjś biznes." slide-up  
-0.7s  — "Nie swój." scale-in z gradient
-0.9s  — Sub text fade-in
-1.1s  — CTAs fade-in
-1.3s  — Trust indicators fade-in
-1.5s  — Mockup slide-up z perspektywą
-1.7s  — Floating icons pojawiają się (stagger)
-```
+1. **Tło sekcji** — warm white `bg-background` z subtelnym ciepłym gradientem na dole (peach/bronze glow)
+2. **Badge** — dodanie emoji ✨🚀, zmiana tekstu badge na "Jedyny kalendarz z AI dla salonów beauty"… **NIE** — user powiedział zachować treści. Zostawiam badge "Większość właścicielek salonów nie wie że..."
+3. **Headline kolor** — deep plum/navy `#1A1A2E` (text-secondary) — to już jest
+4. **"Nie swój." gradient** — zachowuję gradient fioletowo-różowy ale dopasowuję do cieplejszych tonów ze screenshota
+5. **CTAs** — primary: `bg-primary` (warm bronze #B87D5E), secondary: outline z ikoną play ▷
+6. **Trust badge** — dodanie zielonego badge "Zaufało nam już ponad 150+ salonów w całej Polsce" między CTAs a trust indicators
+7. **Trust indicators** — "0% prowizji — zawsze" (dodanie "— zawsze")
+8. **Subtly warm gradient** na dole sekcji hero (peach/bronze glow)
+9. **Usunięcie floating icons** — na screenshocie ich nie ma, sekcja jest czysta i minimalistyczna
 
 ### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/NewHeroSection.tsx` | Centered layout, sans-serif bold typography, floating animated icons, mockup pod tekstem z perspektywą |
+| `src/components/landing/NewHeroSection.tsx` | Przywrócenie kolorystyki: ciepłe tło, bronze CTAs, trust badge, usunięcie floating icons, warm gradient accent |
 
-Jeden plik. Treść bez zmian. Tylko layout, typografia, animacje.
+Jeden plik. Treść bez zmian (poza drobnymi dopasowaniami trust indicators). Layout centered — bez zmian.
 
