@@ -3,7 +3,7 @@ import { LandingNavbar } from "@/components/landing";
 import { TopBanner } from "@/components/landing/TopBanner";
 import { NewHeroSection } from "@/components/landing/NewHeroSection";
 import { OwnYourClientsSection } from "@/components/landing/OwnYourClientsSection";
-import { ProblemSection } from "@/components/landing/ProblemSection";
+import { SalonLossCalculator } from "@/components/landing/SalonLossCalculator";
 import { SystemFlowSection } from "@/components/landing/SystemFlowSection";
 import { ComparisonSection } from "@/components/landing/ComparisonSection";
 import { InteractivePhoneMockup } from "@/components/landing/InteractivePhoneMockup";
@@ -29,7 +29,7 @@ const Index = () => {
       <main>
         <NewHeroSection onScrollToForm={scrollToPricing} />
         <OwnYourClientsSection />
-        <ProblemSection onScrollToForm={scrollToPricing} />
+        <SalonLossCalculator />
         <SystemFlowSection onScrollToForm={scrollToPricing} />
         <ComparisonSection />
         <InteractivePhoneMockup />
