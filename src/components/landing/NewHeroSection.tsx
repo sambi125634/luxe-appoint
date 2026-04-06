@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
-import heroCalendar from "@/assets/screenshots/hero-calendar.png";
 
 interface NewHeroSectionProps {
   onScrollToForm: () => void;
@@ -14,12 +13,12 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col items-center overflow-hidden bg-background">
-      {/* Warm peach/bronze glow at bottom */}
+    <section className="relative min-h-[85vh] flex flex-col items-center overflow-hidden bg-background">
+      {/* Warm gradient at bottom — peach/lavender fade */}
       <div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[90%] h-[40%] rounded-full opacity-[0.08] pointer-events-none"
+        className="absolute bottom-0 left-0 right-0 h-[35%] pointer-events-none"
         style={{
-          background: "radial-gradient(ellipse at center, hsl(var(--primary)) 0%, hsl(var(--accent)) 40%, transparent 70%)",
+          background: "linear-gradient(to top, hsl(30 30% 92% / 0.6), hsl(280 20% 94% / 0.3), transparent)",
         }}
       />
 
@@ -32,72 +31,57 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         >
           <Badge
             variant="outline"
-            className="px-4 py-2 border-primary/20 bg-primary/5 text-primary mb-6"
-            style={{ fontSize: "12px", fontWeight: 500, letterSpacing: "0.04em" }}
+            className="px-5 py-2.5 border-primary/20 bg-primary/5 text-primary mb-8"
+            style={{ fontSize: "14px", fontWeight: 500, letterSpacing: "0.02em" }}
           >
-            Większość właścicielek salonów nie wie że...
+            ✨ 🚀 Jedyny kalendarz z AI dla salonów beauty
           </Badge>
         </motion.div>
 
-        {/* H1 — centered, bold sans-serif */}
-        <div className="max-w-3xl space-y-0">
-          {[
-            { text: "Pracujesz. Zarabiasz.", delay: 0.2 },
-            { text: "I budujesz czyjś biznes.", delay: 0.4 },
-          ].map(({ text, delay }) => (
-            <motion.span
-              key={text}
-              className="block leading-[1.1] tracking-[-0.03em] text-secondary"
-              style={{
-                fontSize: "clamp(40px, 6vw, 72px)",
-                fontWeight: 700,
-              }}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay, ease: "easeOut" }}
-            >
-              {text}
-            </motion.span>
-          ))}
-        </div>
-
-        {/* H2 — gradient */}
-        <motion.h2
-          className="leading-[1.1] tracking-[-0.03em] mt-1"
+        {/* H1 — serif, dark plum */}
+        <motion.h1
+          className="max-w-4xl leading-[1.08] tracking-[-0.02em]"
           style={{
-            fontSize: "clamp(44px, 7vw, 80px)",
+            fontFamily: "'Cormorant Garamond', 'Playfair Display', serif",
+            fontSize: "clamp(36px, 5.5vw, 64px)",
             fontWeight: 700,
-            fontStyle: "italic",
-            background: "linear-gradient(135deg, hsl(var(--primary)), #c06070)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
+            color: "#1A1A2E",
           }}
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.7, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         >
-          Nie swój.
-        </motion.h2>
+          Twój system rezerwacji pracuje za Ciebie 24/7.{" "}
+          <span
+            style={{
+              background: "linear-gradient(135deg, #7c3aed, #9b2d6b)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            I nie bierze prowizji od Twoich klientek.
+          </span>
+        </motion.h1>
 
         {/* Sub */}
         <motion.p
-          className="max-w-lg leading-relaxed text-muted-foreground mt-6"
+          className="max-w-xl leading-relaxed text-muted-foreground mt-7"
           style={{ fontSize: "17px" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
-          Każda klientka którą pozyskałaś przez platformę marketplace — należy do platformy. Jej dane. Jej historia. Jej kontakt.{" "}
-          <span className="font-semibold text-foreground">Beauty Calendar to zmienia.</span>
+          Pierwszy system z AI, który przewiduje przychody, eliminuje no-showy
+          i wypełnia luki w grafiku — automatycznie. Za 0% prowizji.
         </motion.p>
 
         {/* CTAs */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-3 mt-8"
+          className="flex flex-col sm:flex-row gap-3 mt-9"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.1 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
         >
           <Button
             size="lg"
@@ -105,7 +89,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="group relative overflow-hidden bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-base shadow-lg hover:shadow-xl transition-all duration-300"
           >
             <span className="relative z-10 flex items-center gap-2">
-              Zacznij za darmo
+              Załóż konto za darmo
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </span>
           </Button>
@@ -122,10 +106,10 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
         {/* Trust badge — green */}
         <motion.div
-          className="mt-5"
+          className="mt-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.25 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-200 bg-emerald-50/60">
             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -137,11 +121,11 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
         {/* Trust indicators */}
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mt-4"
+          className="flex flex-wrap justify-center gap-5 mt-5"
           style={{ fontSize: "13px" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.4 }}
+          transition={{ duration: 0.6, delay: 1.1 }}
         >
           {["Bez karty kredytowej", "Gotowe w 5 minut", "0% prowizji — zawsze"].map((item, index) => (
             <div key={index} className="flex items-center gap-1.5 text-muted-foreground">
@@ -151,52 +135,6 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               <span>{item}</span>
             </div>
           ))}
-        </motion.div>
-
-        {/* Product mockup */}
-        <motion.div
-          className="relative w-full max-w-5xl mt-14"
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 1.5, ease: "easeOut" }}
-        >
-          <div className="relative" style={{ perspective: "1200px" }}>
-            <img
-              src={heroCalendar}
-              alt="Kalendarz Beauty Calendar — widok tygodniowy z rezerwacjami"
-              className="w-full h-auto rounded-2xl shadow-2xl"
-              style={{ transform: "rotateX(2deg)" }}
-            />
-            <div
-              className="absolute inset-0 -z-10 blur-3xl opacity-20 scale-110"
-              style={{
-                background: "radial-gradient(ellipse at center, hsl(var(--primary)) 0%, transparent 70%)",
-              }}
-            />
-          </div>
-        </motion.div>
-
-        {/* Social proof */}
-        <motion.div
-          className="flex items-center justify-center gap-3 mt-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.7 }}
-        >
-          <div className="flex -space-x-2">
-            {["AK", "MW", "JP", "KW", "LS"].map((initials, idx) => (
-              <div
-                key={idx}
-                className="w-7 h-7 rounded-full bg-primary/10 border-2 border-background flex items-center justify-center text-xs font-bold text-primary"
-              >
-                {initials}
-              </div>
-            ))}
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Średnio <span className="font-bold text-foreground">23 klientki</span>{" "}
-            wróciły do salonów, które uruchomiły system w tym tygodniu
-          </p>
         </motion.div>
       </div>
     </section>
