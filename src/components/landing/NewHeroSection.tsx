@@ -13,17 +13,30 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-[90vh] flex flex-col items-center overflow-hidden bg-background">
-      {/* Warm lavender-peach gradient at bottom */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-[45%] pointer-events-none"
-        style={{
-          background: "linear-gradient(to top, hsl(30 25% 90% / 0.7), hsl(280 15% 92% / 0.5), transparent)",
-        }}
-      />
+    <section className="relative min-h-[90vh] overflow-hidden bg-background">
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute -left-[12%] -top-28 h-[32rem] w-[32rem] rounded-full blur-3xl"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--primary) / 0.22) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute right-[-4%] top-[4%] h-[18rem] w-[18rem] rounded-full blur-3xl"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--accent) / 0.14) 0%, transparent 72%)",
+          }}
+        />
+        <div
+          className="absolute bottom-[-12%] left-1/2 h-[22rem] w-[58rem] -translate-x-1/2 rounded-full blur-3xl"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, hsl(var(--accent) / 0.22) 0%, hsl(var(--primary) / 0.08) 50%, transparent 76%)",
+          }}
+        />
+      </div>
 
-      <div className="container relative z-10 py-16 lg:py-24 flex flex-col items-center text-center">
-        {/* Eyebrow badge */}
+      <div className="container relative z-10 flex flex-col items-center px-6 pb-28 pt-20 text-center lg:pt-24">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -31,21 +44,22 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         >
           <Badge
             variant="outline"
-            className="px-5 py-2.5 border-primary/20 bg-primary/5 text-primary mb-10"
+            className="mb-10 rounded-full border-primary/20 bg-background/80 px-6 py-3 text-primary backdrop-blur-sm"
             style={{ fontSize: "14px", fontWeight: 500, letterSpacing: "0.02em" }}
           >
             ✨ 🚀 Jedyny kalendarz z AI dla salonów beauty
           </Badge>
         </motion.div>
 
-        {/* H1 — serif, dark plum, large */}
         <motion.h1
-          className="max-w-5xl leading-[1.05] tracking-[-0.01em]"
+          className="max-w-[980px] text-foreground"
           style={{
-            fontFamily: "'Cormorant Garamond', 'Playfair Display', serif",
-            fontSize: "clamp(40px, 6vw, 72px)",
-            fontWeight: 700,
-            color: "#2D1B4E",
+            fontFamily: "var(--font-serif)",
+            fontSize: "clamp(48px, 6vw, 78px)",
+            fontWeight: 600,
+            lineHeight: 0.94,
+            letterSpacing: "-0.03em",
+            textWrap: "balance",
           }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -55,7 +69,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           <span
             style={{
               fontStyle: "italic",
-              background: "linear-gradient(135deg, #7c3aed, #9b2d6b)",
+              background:
+                "linear-gradient(180deg, hsl(var(--violet-light)) 0%, hsl(var(--secondary)) 96%)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
               backgroundClip: "text",
@@ -65,10 +80,9 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           </span>
         </motion.h1>
 
-        {/* Sub */}
         <motion.p
-          className="max-w-xl leading-relaxed mt-8"
-          style={{ fontSize: "17px", color: "#6B6B7B" }}
+          className="mt-8 max-w-[760px] leading-relaxed text-muted-foreground"
+          style={{ fontSize: "17px" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
@@ -77,65 +91,71 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           i wypełnia luki w grafiku — automatycznie. Za 0% prowizji.
         </motion.p>
 
-        {/* CTAs */}
         <motion.div
-          className="flex flex-col sm:flex-row gap-4 mt-10"
+          className="mt-10 flex flex-col gap-4 sm:flex-row"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
         >
-          <button
+          <Button
+            size="lg"
             onClick={onScrollToForm}
-            className="group relative overflow-hidden px-9 py-4 text-base font-medium rounded-xl text-white shadow-lg hover:shadow-xl transition-all duration-300"
-            style={{ backgroundColor: "#4A2272" }}
-            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#3D1B61")}
-            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#4A2272")}
+            className="h-14 rounded-2xl px-10 text-[17px] shadow-soft sm:min-w-[294px]"
           >
             <span className="flex items-center gap-2">
               Załóż konto za darmo
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </span>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
             onClick={scrollToDemo}
-            className="group flex items-center justify-center gap-2 px-9 py-4 text-base font-medium rounded-xl border border-border bg-background text-foreground hover:bg-accent/50 transition-all duration-300"
+            className="h-14 rounded-2xl bg-background/75 px-10 text-[17px] text-foreground backdrop-blur-sm sm:min-w-[314px]"
           >
             <Play className="w-4 h-4" />
             Zobacz demo na żywo
-          </button>
+          </Button>
         </motion.div>
 
-        {/* Trust badge — green */}
         <motion.div
           className="mt-7"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.9 }}
         >
-          <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-emerald-200 bg-emerald-50/60">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-sm text-emerald-700 font-medium">
+          <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-5 py-2.5 shadow-sm backdrop-blur-sm">
+            <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
+            <span className="text-sm font-medium text-emerald-700">
               Zaufało nam już ponad 150+ salonów w całej Polsce
             </span>
           </div>
         </motion.div>
 
-        {/* Trust indicators */}
         <motion.div
-          className="flex flex-wrap justify-center gap-6 mt-5"
+          className="mt-5 flex flex-wrap justify-center gap-6"
           style={{ fontSize: "14px" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.1 }}
         >
-          {["Bez karty kredytowej", "Gotowe w 5 minut", "0% prowizji — zawsze"].map((item, index) => (
-            <div key={index} className="flex items-center gap-2 text-muted-foreground">
-              <Check className="w-4 h-4 text-emerald-500" />
+          {["Bez karty kredytowej", "Gotowe w 5 minut", "0% prowizji — zawsze"].map((item) => (
+            <div key={item} className="flex items-center gap-2 text-muted-foreground">
+              <Check className="h-4 w-4 text-emerald-500" />
               <span>{item}</span>
             </div>
           ))}
         </motion.div>
       </div>
+
+      <motion.div
+        className="absolute bottom-8 left-1/2 z-10 flex h-12 w-7 -translate-x-1/2 items-start justify-center rounded-full border border-primary/20 bg-background/40 p-2 backdrop-blur-sm"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 1.2 }}
+      >
+        <div className="h-3 w-1 rounded-full bg-primary/35" />
+      </motion.div>
     </section>
   );
 };
