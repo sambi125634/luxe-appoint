@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarCheck, Bell, RotateCcw, Heart } from "lucide-react";
+import { CalendarCheck, Bell, RotateCcw, Brain, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
 
@@ -11,6 +11,7 @@ import stepClients from "@/assets/screenshots/step-clients.png";
 
 interface Step {
   icon: LucideIcon;
+  number: number;
   title: string;
   description: string;
   image: string;
@@ -20,39 +21,52 @@ interface Step {
 const steps: Step[] = [
   {
     icon: CalendarCheck,
-    title: "Klientka rezerwuje",
+    number: 1,
+    title: "Rezerwacja jak w aplikacji — bez aplikacji",
     description:
-      "Widget na Twojej stronie, Instagramie lub przez link w bio. Bez telefonu. Bez \u201Esprawdzę i oddzwonię\u201D.",
+      "Klientka rezerwuje wizytę w przeglądarce, z doświadczeniem identycznym jak w aplikacji mobilnej. Bez instalacji, bez konta, bez bariery wejścia. Rewolucja: żaden inny system tego nie oferuje. Koniec z formularzami kontaktowymi i głuchymi telefonami.",
     image: stepBooking,
-    imageAlt: "Widget rezerwacyjny Beauty Calendar — wybór usługi",
+    imageAlt: "Widget rezerwacyjny Beauty Calendar — rezerwacja online jak w aplikacji",
   },
   {
     icon: Bell,
-    title: "Przypomnienie automatyczne",
+    number: 2,
+    title: "Przypomnienie + potwierdzenie + rozgrzewka",
     description:
-      "24h przed wizytą — SMS. 2h przed — push. Zero no-showów. (-67% no-showów po pierwszym miesiącu)",
+      "Inne salony tylko przypominają. Nasz system potwierdza wizytę z klientką i rozgrzewa ją treściami o zarezerwowanej usłudze — tak, że nie może się doczekać. Efekt? -67% no-showów już w pierwszym miesiącu.",
     image: stepDashboard,
-    imageAlt: "Dashboard Beauty Calendar — podsumowanie dnia",
+    imageAlt: "System przypomnień i potwierdzeń wizyt Beauty Calendar",
   },
   {
     icon: RotateCcw,
-    title: "Sekwencja powrotu",
+    number: 3,
+    title: "Sekwencje powrotu — kilka wizyt z każdego klienta",
     description:
-      "Spersonalizowana oferta kolejnej wizyty. W optymalnym momencie. Kiedy klientka jest gotowa wrócić.",
+      "Automatyczne sekwencje wiadomości w optymalnym momencie, aby każdy nowy klient zarezerwował kolejne wizyty w ustalonym oknie czasowym. Nie czekasz aż wróci — system prowadzi go za rękę.",
     image: stepRetention,
-    imageAlt: "Ścieżka Klientki — system powrotów Beauty Calendar",
+    imageAlt: "Sekwencje powrotu klientek — automatyzacja wizyt",
   },
   {
-    icon: Heart,
-    title: "Klientka wraca — sama",
+    icon: Brain,
+    number: 4,
+    title: "Retencja + AI Autopilot",
     description:
-      "Bez Twojego działania. Bez telefonu. Bez ręcznego pisania wiadomości. Twój salon zarabia nawet gdy śpisz.",
+      "AI wykrywa klientki zagrożone odejściem zanim odejdą. Automatycznie wysyła spersonalizowane oferty powrotu. Wypełnia luki w grafiku. Maksymalizuje wartość każdej wizyty — bez Twojego udziału.",
     image: stepClients,
-    imageAlt: "Lista klientek z historią wizyt w Beauty Calendar",
+    imageAlt: "AI Autopilot — automatyczna retencja klientek",
+  },
+  {
+    icon: Gift,
+    number: 5,
+    title: "System poleceń, który działa sam",
+    description:
+      "Każda zadowolona klientka staje się ambasadorką Twojego salonu. Zautomatyzowany program poleceń z nagrodami, śledzeniem konwersji i rankingiem — bez Twojego wysiłku.",
+    image: stepClients,
+    imageAlt: "Zautomatyzowany system poleceń Beauty Calendar",
   },
 ];
 
-const AUTO_SWITCH_MS = 5000;
+const AUTO_SWITCH_MS = 6000;
 
 interface SystemFlowSectionProps {
   onScrollToForm?: () => void;
@@ -75,8 +89,7 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
   const handleStepClick = (index: number) => {
     setActiveStep(index);
     setIsPaused(true);
-    // Resume auto after 10s
-    setTimeout(() => setIsPaused(false), 10000);
+    setTimeout(() => setIsPaused(false), 12000);
   };
 
   return (
@@ -93,14 +106,14 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
             Jak to działa
           </span>
           <h2 className="mt-4 text-3xl md:text-4xl font-serif font-bold leading-tight text-foreground">
-            Od pierwszej rezerwacji{" "}
+            5 kroków od nowej klientki{" "}
             <br className="hidden md:block" />
-            do stałej klientki.{" "}
+            do stałej ambasadorki.{" "}
             <span className="text-primary">Automatycznie.</span>
           </h2>
         </motion.div>
 
-        <div className="grid lg:grid-cols-[340px_1fr] gap-8 lg:gap-12 items-start">
+        <div className="grid lg:grid-cols-[380px_1fr] gap-8 lg:gap-12 items-start">
           {/* Left — Step list */}
           <motion.div
             className="flex flex-col gap-1"
@@ -122,15 +135,15 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
                       : "hover:bg-muted/50"
                   }`}
                 >
-                  {/* Icon circle */}
+                  {/* Number + Icon circle */}
                   <div
-                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-colors duration-300 text-sm font-bold ${
                       isActive
                         ? "bg-primary text-primary-foreground shadow-md"
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    <Icon className="w-5 h-5" />
+                    {step.number}
                   </div>
 
                   <div className="flex-1 min-w-0">
