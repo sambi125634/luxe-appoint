@@ -1,48 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Check, ArrowRight, Scissors, Calendar, Heart, Star, MessageCircle, Stamp } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { Check, ArrowRight, Play } from "lucide-react";
+import { motion } from "framer-motion";
 import heroCalendar from "@/assets/screenshots/hero-calendar.png";
 
 interface NewHeroSectionProps {
   onScrollToForm: () => void;
 }
 
-const floatingIcons = [
-  { Icon: Scissors, top: "8%", left: "5%", delay: 0, size: 22 },
-  { Icon: Calendar, top: "18%", right: "7%", delay: 0.3, size: 20 },
-  { Icon: Heart, top: "55%", left: "3%", delay: 0.6, size: 18 },
-  { Icon: Star, top: "40%", right: "4%", delay: 0.15, size: 24 },
-  { Icon: MessageCircle, top: "72%", left: "8%", delay: 0.45, size: 20 },
-  { Icon: Stamp, top: "65%", right: "6%", delay: 0.75, size: 18 },
-];
-
 export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end start"],
-  });
-
   const scrollToDemo = () => {
     document.getElementById("demo-preview")?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section ref={sectionRef} className="relative min-h-[90vh] flex flex-col items-center overflow-hidden bg-background">
-      {/* Subtle radial accent */}
+    <section className="relative min-h-[90vh] flex flex-col items-center overflow-hidden bg-background">
+      {/* Warm peach/bronze glow at bottom */}
       <div
-        className="absolute top-[-20%] left-1/2 -translate-x-1/2 w-[80%] h-[60%] rounded-full opacity-[0.06] pointer-events-none"
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[90%] h-[40%] rounded-full opacity-[0.08] pointer-events-none"
         style={{
-          background: "radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)",
+          background: "radial-gradient(ellipse at center, hsl(var(--primary)) 0%, hsl(var(--accent)) 40%, transparent 70%)",
         }}
       />
-
-      {/* Floating animated icons */}
-      {floatingIcons.map(({ Icon, delay, size, ...pos }, idx) => (
-        <FloatingIcon key={idx} Icon={Icon} delay={delay} size={size} style={pos} scrollYProgress={scrollYProgress} />
-      ))}
 
       <div className="container relative z-10 py-20 lg:py-28 flex flex-col items-center text-center">
         {/* Eyebrow badge */}
@@ -63,15 +42,15 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         {/* H1 — centered, bold sans-serif */}
         <div className="max-w-3xl space-y-0">
           {[
-            { text: "Pracujesz. Zarabiasz.", delay: 0.2, weight: 700 },
-            { text: "I budujesz czyjś biznes.", delay: 0.4, weight: 700 },
-          ].map(({ text, delay, weight }) => (
+            { text: "Pracujesz. Zarabiasz.", delay: 0.2 },
+            { text: "I budujesz czyjś biznes.", delay: 0.4 },
+          ].map(({ text, delay }) => (
             <motion.span
               key={text}
               className="block leading-[1.1] tracking-[-0.03em] text-secondary"
               style={{
                 fontSize: "clamp(40px, 6vw, 72px)",
-                fontWeight: weight,
+                fontWeight: 700,
               }}
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -89,7 +68,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             fontSize: "clamp(44px, 7vw, 80px)",
             fontWeight: 700,
             fontStyle: "italic",
-            background: "linear-gradient(135deg, #7c3aed, #ec4899)",
+            background: "linear-gradient(135deg, hsl(var(--primary)), #c06070)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -136,19 +115,35 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="group px-8 py-6 text-base border-border text-foreground hover:bg-accent/50"
             onClick={scrollToDemo}
           >
-            Zobacz jak to działa →
+            <Play className="w-4 h-4 mr-1" />
+            Zobacz demo na żywo
           </Button>
+        </motion.div>
+
+        {/* Trust badge — green */}
+        <motion.div
+          className="mt-5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.25 }}
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-emerald-200 bg-emerald-50/60">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-sm text-emerald-700 font-medium">
+              Zaufało nam już ponad 150+ salonów w całej Polsce
+            </span>
+          </div>
         </motion.div>
 
         {/* Trust indicators */}
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mt-5"
+          className="flex flex-wrap justify-center gap-4 mt-4"
           style={{ fontSize: "13px" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.3 }}
+          transition={{ duration: 0.6, delay: 1.4 }}
         >
-          {["Bez karty kredytowej", "Gotowe w 5 minut", "0% prowizji"].map((item, index) => (
+          {["Bez karty kredytowej", "Gotowe w 5 minut", "0% prowizji — zawsze"].map((item, index) => (
             <div key={index} className="flex items-center gap-1.5 text-muted-foreground">
               <div className="w-4 h-4 rounded-full bg-emerald-500/10 flex items-center justify-center">
                 <Check className="w-2.5 h-2.5 text-emerald-600" />
@@ -158,28 +153,20 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           ))}
         </motion.div>
 
-        {/* Product mockup — below text, with perspective */}
+        {/* Product mockup */}
         <motion.div
           className="relative w-full max-w-5xl mt-14"
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.5, ease: "easeOut" }}
         >
-          <div
-            className="relative"
-            style={{
-              perspective: "1200px",
-            }}
-          >
+          <div className="relative" style={{ perspective: "1200px" }}>
             <img
               src={heroCalendar}
               alt="Kalendarz Beauty Calendar — widok tygodniowy z rezerwacjami"
               className="w-full h-auto rounded-2xl shadow-2xl"
-              style={{
-                transform: "rotateX(2deg)",
-              }}
+              style={{ transform: "rotateX(2deg)" }}
             />
-            {/* Glow behind mockup */}
             <div
               className="absolute inset-0 -z-10 blur-3xl opacity-20 scale-110"
               style={{
@@ -213,36 +200,5 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.div>
       </div>
     </section>
-  );
-};
-
-/* ── Floating Icon component ── */
-
-interface FloatingIconProps {
-  Icon: React.ElementType;
-  delay: number;
-  size: number;
-  style: Record<string, string | undefined>;
-  scrollYProgress: ReturnType<typeof useScroll>["scrollYProgress"];
-}
-
-const FloatingIcon = ({ Icon, delay, size, style, scrollYProgress }: FloatingIconProps) => {
-  const y = useTransform(scrollYProgress, [0, 1], [0, -40]);
-
-  return (
-    <motion.div
-      className="absolute z-0 text-primary/15 hidden lg:block"
-      style={{ ...style, y }}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, delay: 1.7 + delay }}
-    >
-      <motion.div
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 4 + delay * 2, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <Icon size={size} strokeWidth={1.5} />
-      </motion.div>
-    </motion.div>
   );
 };
