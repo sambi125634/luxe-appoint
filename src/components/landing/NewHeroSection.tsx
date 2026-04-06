@@ -65,7 +65,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         >
-          Twój system rezerwacji pracuje za Ciebie 24/7.{" "}
+        Więcej wizyt. Więcej powrotów.{" "}
           <span
             style={{
               fontStyle: "italic",
@@ -76,7 +76,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               backgroundClip: "text",
             }}
           >
-            I nie bierze prowizji od Twoich klientek.
+            Zero prowizji.
           </span>
         </motion.h1>
 
