@@ -1,60 +1,59 @@
 
 
-## Plan: Redesign sekcji opinii — Video Testimonial w mockupie telefonu + 2 opinie tekstowe
+## Plan: Redesign OwnYourClientsSection — premium visual upgrade
 
-### Koncept UX
+### Problem
+Sekcja jest czysto tekstowa, płaska, wygląda jak generic blog post. Dwa bloki list z ikonkami ❌/✅ są funkcjonalne ale nudne wizualnie. Brakuje dramaturgii wizualnej, która pasowałaby do reszty landing page'a.
 
-Layout na desktop: 3-kolumnowy układ z centralnym **mockupem telefonu** zawierającym wideo-recenzję, a po bokach **2 opinie pisane** (lekko przytłumione, mniejsze — żeby mockup z wideo dominował).
+### Koncept
+
+Zamiast 2-kolumnowego grid (tekst | listy) — **ciemna dramatyczna sekcja** z narracją wizualną:
 
 ```text
-┌─────────────────────────────────────────────────┐
-│              Nagłówek sekcji                     │
-│                                                  │
-│  ┌──────────┐   ┌──────────────┐   ┌──────────┐ │
-│  │  Opinia   │   │  ┌────────┐  │   │  Opinia  │ │
-│  │  pisana   │   │  │ VIDEO  │  │   │  pisana  │ │
-│  │  #1       │   │  │ mockup │  │   │  #2      │ │
-│  │           │   │  │ phone  │  │   │          │ │
-│  │  mniejsza │   │  │  ▶️    │  │   │ mniejsza │ │
-│  │  opacity  │   │  └────────┘  │   │ opacity  │ │
-│  │  0.85     │   │  Imię + rola │   │ 0.85     │ │
-│  └──────────┘   └──────────────┘   └──────────┘ │
-└─────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  ██████████  CIEMNE TŁO (#1A1A2E)  █████████████   │
+│                                                      │
+│         ⚠️ Wiedziałaś o tym?                        │
+│                                                      │
+│      Pracujesz na budowę cudzej                      │
+│          bazy klientek.                              │
+│                                                      │
+│    (krótki paragraf narracyjny — skondensowany)      │
+│                                                      │
+│  ┌──────────────────┐    ┌──────────────────────┐   │
+│  │  MARKETPLACE      │    │  BEAUTY CALENDAR     │   │
+│  │  (glass card,     │    │  (glass card,        │   │
+│  │   red accent,     │    │   bronze accent,     │   │
+│  │   subtle glow)    │    │   golden glow)       │   │
+│  │                   │    │                      │   │
+│  │  ❌ punkt 1       │    │  ✅ punkt 1          │   │
+│  │  ❌ punkt 2       │    │  ✅ punkt 2          │   │
+│  │  ❌ punkt 3       │    │  ✅ punkt 3          │   │
+│  └──────────────────┘    └──────────────────────┘   │
+│                                                      │
+│     „Nie budujesz na cudzej ziemi.                   │
+│         Budujesz własny dom."                        │
+└─────────────────────────────────────────────────────┘
 ```
 
-Mobile: Wideo mockup na pełną szerokość u góry, pod spodem karuzela 2 opinii pisanych (jak teraz, z kropkami).
+### Szczegóły wizualne
 
-### Szczegóły techniczne
+1. **Ciemne tło sekcji** (`bg-[#1A1A2E]`, biały tekst) — kontrast z jasnymi sekcjami dookoła, buduje dramaturgię i wagę przekazu
+2. **Nagłówek wycentrowany** — badge + H2 + jeden skondensowany paragraf narracyjny (zamiast 4 osobnych — łaczymy w 2 zdania max)
+3. **Dwie karty obok siebie** w glassmorphism style:
+   - **Marketplace**: `bg-white/5 backdrop-blur border-white/10` z czerwonym akcentem u góry (thin gradient line), ikony ❌ w kolorze `#D94F3D`
+   - **Beauty Calendar**: `bg-white/5 backdrop-blur border-primary/20` ze złotym/bronze akcentem u góry, ikony ✅ w kolorze `#B87D5E`, lekki `box-shadow` bronze glow
+4. **Karty animowane** — stagger entrance, lewa karta wjeżdża z lewej, prawa z prawej
+5. **Cytat na dole** — większy, serif, z subtlenym gradient text effect (white → white/60)
+6. **Redukcja punktów**: z 6 do 4–5 na kartę — mniej = czytelniej, każdy punkt bardziej konkretny
+7. **Mobile**: karty stack vertically, pełna szerokość
 
-**Plik:** `src/components/landing/TestimonialsSection.tsx` — pełna przebudowa
-
-1. **Mockup telefonu z wideo:**
-   - Ramka telefonu (rounded-[40px], border, shadow-xl) z aspect-ratio 9:16
-   - Wewnątrz: element `<video>` z posterem i przyciskiem play (ikona Play z lucide)
-   - Wideo placeholder: szary gradient z tekstem "Wideo wkrótce" + ikona Play (do momentu aż wgrasz prawdziwe wideo)
-   - Po kliknięciu: odtwarza wideo inline (controls natywne)
-   - Pod mockupem: imię, rola, gwiazdki
-
-2. **2 opinie pisane** (zachowane z obecnych danych — np. Karolina W. i Anna S.):
-   - Mniejsze karty niż obecnie
-   - `opacity-90` na desktop, żeby wideo dominowało
-   - Vertically centered relative to mockupu
-
-3. **Redukcja z 5 do 2 opinii pisanych** — czyściej, mniej overwhelming
-
-4. **Animacje:** fade-in-up na scroll, stagger: lewy → center → prawy
-
-5. **Przygotowanie na prawdziwe wideo:**
-   - Prop/const `VIDEO_URL` — na razie `null`, po wgraniu zamienisz na URL z storage
-   - Gdy `VIDEO_URL = null` → pokazuje placeholder z komunikatem "Recenzja wideo wkrótce"
-
-### Mobile
-- Mockup telefonu z wideo — pełna szerokość, mniejszy padding
-- Pod spodem: 2 opinie pisane w karuzeli z kropkami (jak teraz, ale tylko 2)
+### Treści — bez zmian
+Wszystkie teksty zostają identyczne, jedynie układ wizualny się zmienia. Narracja z lewej kolumny zostaje skondensowana do 2 akapitów nad kartami.
 
 ### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/TestimonialsSection.tsx` | Pełna przebudowa: video mockup centralny + 2 opinie po bokach |
+| `src/components/landing/OwnYourClientsSection.tsx` | Przebudowa: ciemne tło, centered layout, glassmorphism karty, stagger animacje |
 
