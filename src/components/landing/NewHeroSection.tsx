@@ -13,7 +13,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
   };
 
   return (
-    <section className="relative min-h-[90vh] overflow-hidden bg-background">
+    <section className="relative min-h-screen overflow-hidden bg-background">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute -left-[12%] -top-28 h-[32rem] w-[32rem] rounded-full blur-3xl"
@@ -36,7 +36,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         />
       </div>
 
-      <div className="container relative z-10 flex flex-col items-center px-6 pb-28 pt-20 text-center lg:pt-24">
+      <div className="container relative z-10 flex min-h-screen flex-col items-center justify-center px-6 py-12 text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -44,7 +44,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         >
           <Badge
             variant="outline"
-            className="mb-10 rounded-full border-primary/20 bg-background/80 px-6 py-3 text-primary backdrop-blur-sm"
+            className="mb-12 rounded-full border-primary/20 bg-background/80 px-6 py-3 text-primary backdrop-blur-sm"
             style={{ fontSize: "14px", fontWeight: 500, letterSpacing: "0.02em" }}
           >
             ✨ 🚀 Jedyny kalendarz z AI dla salonów beauty
@@ -81,8 +81,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.h1>
 
         <motion.p
-          className="mt-8 max-w-[760px] leading-relaxed text-muted-foreground"
-          style={{ fontSize: "17px" }}
+          className="mt-10 max-w-[760px] leading-relaxed text-muted-foreground"
+          style={{ fontSize: "18px" }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
@@ -93,7 +93,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.p>
 
         <motion.div
-          className="mt-10 flex flex-col gap-4 sm:flex-row"
+          className="mt-12 flex flex-col gap-4 sm:flex-row"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
@@ -120,7 +120,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.div>
 
         <motion.div
-          className="mt-7"
+          className="mt-8"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.9 }}
@@ -134,7 +134,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.div>
 
         <motion.div
-          className="mt-5 flex flex-wrap justify-center gap-6"
+          className="mt-6 flex flex-wrap justify-center gap-8"
           style={{ fontSize: "14px" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
