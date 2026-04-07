@@ -1,39 +1,33 @@
 
 
-## Plan: Nowy headline Hero + przesunięcie akcentów na unikalne funkcje AI
+## Plan: Hero na pełny ekran (100vh) z proporcjonalnym rozłożeniem treści
 
-### 1. Nowy headline (Hero)
+### Problem
+Sekcja Hero ma `min-h-[90vh]` — nie wypełnia ekranu, widać "prześwit" do następnej sekcji. Treść jest ściśnięta w górnej części.
 
-Obecny headline ma 14 słów — za długi. Statystycznie najlepsze headline'y mają 8–11 słów.
+### Rozwiązanie
 
-**Propozycja headline + subheadline:**
+Zmiana w jednym pliku: `src/components/landing/NewHeroSection.tsx`
 
-**H1:** `Więcej wizyt. Więcej powrotów. Zero prowizji.`
-(8 słów, szeroki wizualnie, rytmiczny, loss-aversion + benefit)
+1. **Sekcja → `min-h-screen`** (100vh zamiast 90vh) — wypełnia cały viewport
+2. **Flex justify-center** na kontenerze wewnętrznym — centruje treść pionowo w dostępnej przestrzeni
+3. **Zwiększenie spacingów proporcjonalnie:**
+   - Badge: `mb-10` → `mb-12`
+   - Subheadline: `mt-8` → `mt-10`, font `17px` → `18px`
+   - CTAs: `mt-10` → `mt-12`
+   - Trust badge: `mt-7` → `mt-8`
+   - Trust indicators: `mt-5` → `mt-6`, `gap-6` → `gap-8`
+4. **Padding dostosowanie:** `pb-28 pt-20 lg:pt-24` → `py-0` (flex justify-center zajmie się centrowaniem)
+5. **Scroll indicator** zostaje na `bottom-8` — działa naturalnie z pełnym ekranem
+6. **Mobile:** `min-h-screen` działa poprawnie na mobile, flex-center zapewni dobre proporcje bez ręcznego paddingu
 
-**Gradient accent (italic):** `Zero prowizji.`
-
-**Subheadline:** `Jedyna platforma beauty z AI, która automatycznie wypełnia luki w grafiku, odzyskuje śpiące klientki i maksymalizuje wartość każdej wizyty — bez pobierania ani złotówki od Twoich przychodów.`
-
-Badge zostaje: `✨ 🚀 Jedyny kalendarz z AI dla salonów beauty`
-
-### 2. Przesunięcie narracji z "powiadomień SMS/email" na unikalne funkcje AI
-
-**Gdzie zmieniam:** Subheadline Hero + ewentualnie OwnYourClientsSection
-
-Obecny sub mówi o "eliminuje no-showy i wypełnia luki" — to ok, ale nie wyróżnia nas od Booksy. Nowy sub podkreśla:
-- **AI wypełnia luki** (Booksy tego nie ma)
-- **Odzyskuje śpiące klientki** (automatyczna retencja — Booksy tego nie ma)
-- **Maksymalizuje wartość wizyty** (upsell engine — Booksy tego nie ma)
-- **0% prowizji** (główny ból)
-
-Powiadomienia SMS/email nie znikają z produktu — po prostu nie są highlight'owane w hero, bo to standard branżowy.
+### Efekt
+- Desktop: Hero zajmuje dokładnie cały ekran, treść wycentrowana pionowo, zero prześwitu
+- Mobile: to samo — pełny viewport, czytelne proporcje
 
 ### Plik do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/NewHeroSection.tsx` | Nowy H1 (8 słów), nowy subheadline, bez zmian w layout/animacjach/CTA |
-
-Jeden plik. Zmiana tylko treści tekstowych (3 linie).
+| `src/components/landing/NewHeroSection.tsx` | `min-h-screen`, flex justify-center, zwiększone spacingi |
 
