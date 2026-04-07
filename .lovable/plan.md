@@ -1,47 +1,60 @@
 
 
-## Analiza: Scraping Booksy — co działa, co nie, i jak to ulepszyć
+## Plan: Redesign sekcji opinii — Video Testimonial w mockupie telefonu + 2 opinie tekstowe
 
-### Diagnoza problemu
+### Koncept UX
 
-Po przetestowaniu systemu na żywo, oto wyniki:
+Layout na desktop: 3-kolumnowy układ z centralnym **mockupem telefonu** zawierającym wideo-recenzję, a po bokach **2 opinie pisane** (lekko przytłumione, mniejsze — żeby mockup z wideo dominował).
 
-1. **Firecrawl DZIAŁA z Booksy** — aktywne profile salonów są scrapowane poprawnie. Testowałem na "Baber Barbershop Skawina" — system wyciągnął 20 usług z dokładnymi cenami, kategoriami i czasami trwania.
+```text
+┌─────────────────────────────────────────────────┐
+│              Nagłówek sekcji                     │
+│                                                  │
+│  ┌──────────┐   ┌──────────────┐   ┌──────────┐ │
+│  │  Opinia   │   │  ┌────────┐  │   │  Opinia  │ │
+│  │  pisana   │   │  │ VIDEO  │  │   │  pisana  │ │
+│  │  #1       │   │  │ mockup │  │   │  #2      │ │
+│  │           │   │  │ phone  │  │   │          │ │
+│  │  mniejsza │   │  │  ▶️    │  │   │ mniejsza │ │
+│  │  opacity  │   │  └────────┘  │   │ opacity  │ │
+│  │  0.85     │   │  Imię + rola │   │ 0.85     │ │
+│  └──────────┘   └──────────────┘   └──────────┘ │
+└─────────────────────────────────────────────────┘
+```
 
-2. **Problem: nieaktywne/błędne URL** — gdy salon został zamknięty lub URL jest niepoprawny, Booksy pokazuje stronę "Ten biznes nie jest już dostępny", a AI poprawnie raportuje brak usług. To nie jest bug — to prawidłowe zachowanie.
+Mobile: Wideo mockup na pełną szerokość u góry, pod spodem karuzela 2 opinii pisanych (jak teraz, z kropkami).
 
-3. **Booksy NIE blokuje scrapingu** — pomimo że na stronie nie da się kopiować tekstu kursorem (CSS `user-select: none`), Firecrawl renderuje stronę w headless browser i wyciąga pełny markdown (2168 linii dla aktywnego salonu).
+### Szczegóły techniczne
 
-### Co można ulepszyć
+**Plik:** `src/components/landing/TestimonialsSection.tsx` — pełna przebudowa
 
-Obecny system działa, ale ma kilka słabych punktów:
+1. **Mockup telefonu z wideo:**
+   - Ramka telefonu (rounded-[40px], border, shadow-xl) z aspect-ratio 9:16
+   - Wewnątrz: element `<video>` z posterem i przyciskiem play (ikona Play z lucide)
+   - Wideo placeholder: szary gradient z tekstem "Wideo wkrótce" + ikona Play (do momentu aż wgrasz prawdziwe wideo)
+   - Po kliknięciu: odtwarza wideo inline (controls natywne)
+   - Pod mockupem: imię, rola, gwiazdki
 
-| Problem | Rozwiązanie |
-|---------|-------------|
-| Brak walidacji URL przed skanowaniem | Sprawdzać czy URL prowadzi do aktywnego salonu |
-| Brak informacji zwrotnej o błędnym URL | Wyświetlać konkretny komunikat "Ten salon nie istnieje na Booksy" |
-| Format URL Booksy nie jest walidowany | Dodać regex sprawdzający pattern `booksy.com/pl-pl/{id}_{slug}` |
-| Godziny otwarcia nie są scrapowane | Booksy je ukrywa — trzeba dodać `waitFor` dłuższy lub użyć screenshota |
-| Fallback na generowanie danych bez informowania usera | Jasno powiedzieć "nie udało się zescrapować, generuję szablon" |
+2. **2 opinie pisane** (zachowane z obecnych danych — np. Karolina W. i Anna S.):
+   - Mniejsze karty niż obecnie
+   - `opacity-90` na desktop, żeby wideo dominowało
+   - Vertically centered relative to mockupu
 
-### Plan zmian (3 pliki)
+3. **Redukcja z 5 do 2 opinii pisanych** — czyściej, mniej overwhelming
 
-**1. `supabase/functions/ai-profile-scanner/index.ts`**
-- Dodać wstępną walidację URL (fetch HEAD → sprawdzić czy nie 404/redirect do strony "nie istnieje")
-- Zwiększyć `waitFor` z 3000 do 5000ms (Booksy ładuje usługi dynamicznie)
-- Dodać format `screenshot` jako fallback gdy markdown jest pusty/krótki
-- Gdy scraped content zawiera "Ten biznes nie jest już dostępny" — zwrócić jasny error zamiast pustych danych
-- Lepszy system prompt dla AI: wyraźnie odróżniać "znaleziono usługi" vs "strona pusta"
+4. **Animacje:** fade-in-up na scroll, stagger: lewy → center → prawy
 
-**2. `src/pages/OnboardingPage.tsx`**
-- Dodać walidację formatu URL Booksy (regex: `booksy.com/pl-pl/\d+_`)
-- Lepsze komunikaty błędów: "Ten salon nie istnieje na Booksy" vs "Nie udało się połączyć"
-- Dodać przycisk "Spróbuj ponownie" po błędzie zamiast auto-skip
-- Hint pod polem URL: "Wklej link do profilu salonu z Booksy, np. booksy.com/pl-pl/12345_nazwa-salonu..."
+5. **Przygotowanie na prawdziwe wideo:**
+   - Prop/const `VIDEO_URL` — na razie `null`, po wgraniu zamienisz na URL z storage
+   - Gdy `VIDEO_URL = null` → pokazuje placeholder z komunikatem "Recenzja wideo wkrótce"
 
-**3. Brak zmian w Firecrawl** — działa poprawnie, nie wymaga modyfikacji.
+### Mobile
+- Mockup telefonu z wideo — pełna szerokość, mniejszy padding
+- Pod spodem: 2 opinie pisane w karuzeli z kropkami (jak teraz, ale tylko 2)
 
-### Podsumowanie
+### Plik do edycji
 
-Scraping Booksy **działa** — problem leżał prawdopodobnie w podaniu URL do nieaktywnego salonu. Zmiany skupią się na: (1) lepszej walidacji URL, (2) czytelnych komunikatach błędów, (3) opcji retry zamiast auto-skip.
+| Plik | Co |
+|------|----|
+| `src/components/landing/TestimonialsSection.tsx` | Pełna przebudowa: video mockup centralny + 2 opinie po bokach |
 
