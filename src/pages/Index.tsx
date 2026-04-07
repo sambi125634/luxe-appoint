@@ -33,8 +33,8 @@ const Index = () => {
         <SalonLossCalculator />
         <ComparisonSection />
         <InteractivePhoneMockup />
-        <TestimonialsSection />
         <AudienceSection />
+        <TestimonialsSection />
         <div ref={pricingRef}>
           <PricingSection onScrollToForm={scrollToPricing} />
         </div>
