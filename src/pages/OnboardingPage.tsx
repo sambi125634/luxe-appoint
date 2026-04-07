@@ -431,10 +431,13 @@ export default function OnboardingPage() {
     await supabase.from("staff_services").insert(staffServices);
   };
 
+  const [scanError, setScanError] = useState<string | null>(null);
+
   const startAiScan = async () => {
     setScanning(true);
     setScanMessageIndex(0);
     setScanPercentage(0);
+    setScanError(null);
 
     // Run animation and API call in parallel, sync at the end
     const animationPromise = (async () => {
@@ -464,16 +467,34 @@ export default function OnboardingPage() {
     const { data, error } = apiResult;
 
     if (error || !data?.success) {
-      toast.error("Nie udało się przeskanować profilu. Kontynuuję z domyślnymi ustawieniami.");
-      setScanSkipped(true);
-      await saveDefaultServices(createdSalonId ?? undefined);
+      const errorType = data?.error;
+      let errorMsg = "Nie udało się przeskanować profilu.";
+
+      if (errorType === "inactive_salon") {
+        errorMsg = data?.message || "Ten salon nie jest już dostępny na Booksy. Sprawdź czy link jest poprawny.";
+      } else if (errorType === "no_services_found") {
+        errorMsg = data?.message || "Nie znaleziono usług na podanej stronie.";
+      }
+
+      setScanError(errorMsg);
       setScanning(false);
-      goTo(2);
       return;
     }
 
     setScanResult(data.data as ScanResult);
     setScanning(false);
+  };
+
+  const handleScanRetry = () => {
+    setScanError(null);
+    startAiScan();
+  };
+
+  const handleScanSkip = async () => {
+    setScanError(null);
+    setScanSkipped(true);
+    await saveDefaultServices(createdSalonId ?? undefined);
+    goTo(2);
   };
 
   const handleSaveScanResults = async () => {
