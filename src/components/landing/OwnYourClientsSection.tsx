@@ -28,12 +28,19 @@ export const OwnYourClientsSection = () => {
       <div className="container max-w-5xl mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div
-          className="text-center mb-16"
+          className="relative text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
         >
+          {/* Owalny czerwony glow */}
+          <div
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[320px] md:w-[700px] md:h-[400px] rounded-full pointer-events-none"
+            style={{
+              background: "radial-gradient(ellipse, rgba(217,79,61,0.08) 0%, rgba(217,79,61,0.03) 40%, transparent 70%)",
+            }}
+          />
           <div className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium mb-6" style={{ backgroundColor: "#FEF2F2", border: "1px solid #FECACA", color: "#D94F3D" }}>
             <AlertTriangle className="w-3.5 h-3.5" />
             Wiedziałaś o tym?
