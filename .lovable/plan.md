@@ -1,59 +1,36 @@
 
 
-## Plan: Redesign OwnYourClientsSection — premium visual upgrade
+## Plan: Przenieś OwnYourClientsSection pod Hero + dopasuj kolorystykę do ciepłej palety
 
-### Problem
-Sekcja jest czysto tekstowa, płaska, wygląda jak generic blog post. Dwa bloki list z ikonkami ❌/✅ są funkcjonalne ale nudne wizualnie. Brakuje dramaturgii wizualnej, która pasowałaby do reszty landing page'a.
+### Zmiany
 
-### Koncept
+**1. Index.tsx — zmiana kolejności sekcji**
 
-Zamiast 2-kolumnowego grid (tekst | listy) — **ciemna dramatyczna sekcja** z narracją wizualną:
+Przenieść `<OwnYourClientsSection />` z pozycji 3 (po SystemFlow) na pozycję 2 (zaraz po Hero, przed SystemFlow).
 
-```text
-┌─────────────────────────────────────────────────────┐
-│  ██████████  CIEMNE TŁO (#1A1A2E)  █████████████   │
-│                                                      │
-│         ⚠️ Wiedziałaś o tym?                        │
-│                                                      │
-│      Pracujesz na budowę cudzej                      │
-│          bazy klientek.                              │
-│                                                      │
-│    (krótki paragraf narracyjny — skondensowany)      │
-│                                                      │
-│  ┌──────────────────┐    ┌──────────────────────┐   │
-│  │  MARKETPLACE      │    │  BEAUTY CALENDAR     │   │
-│  │  (glass card,     │    │  (glass card,        │   │
-│  │   red accent,     │    │   bronze accent,     │   │
-│  │   subtle glow)    │    │   golden glow)       │   │
-│  │                   │    │                      │   │
-│  │  ❌ punkt 1       │    │  ✅ punkt 1          │   │
-│  │  ❌ punkt 2       │    │  ✅ punkt 2          │   │
-│  │  ❌ punkt 3       │    │  ✅ punkt 3          │   │
-│  └──────────────────┘    └──────────────────────┘   │
-│                                                      │
-│     „Nie budujesz na cudzej ziemi.                   │
-│         Budujesz własny dom."                        │
-└─────────────────────────────────────────────────────┘
-```
+Nowa kolejność: Hero → OwnYourClients → SystemFlow → SalonLossCalculator → ...
 
-### Szczegóły wizualne
+**2. OwnYourClientsSection.tsx — przebudowa kolorystyczna**
 
-1. **Ciemne tło sekcji** (`bg-[#1A1A2E]`, biały tekst) — kontrast z jasnymi sekcjami dookoła, buduje dramaturgię i wagę przekazu
-2. **Nagłówek wycentrowany** — badge + H2 + jeden skondensowany paragraf narracyjny (zamiast 4 osobnych — łaczymy w 2 zdania max)
-3. **Dwie karty obok siebie** w glassmorphism style:
-   - **Marketplace**: `bg-white/5 backdrop-blur border-white/10` z czerwonym akcentem u góry (thin gradient line), ikony ❌ w kolorze `#D94F3D`
-   - **Beauty Calendar**: `bg-white/5 backdrop-blur border-primary/20` ze złotym/bronze akcentem u góry, ikony ✅ w kolorze `#B87D5E`, lekki `box-shadow` bronze glow
-4. **Karty animowane** — stagger entrance, lewa karta wjeżdża z lewej, prawa z prawej
-5. **Cytat na dole** — większy, serif, z subtlenym gradient text effect (white → white/60)
-6. **Redukcja punktów**: z 6 do 4–5 na kartę — mniej = czytelniej, każdy punkt bardziej konkretny
-7. **Mobile**: karty stack vertically, pełna szerokość
+Obecny styl: ciemne tło `#1A1A2E`, biały tekst, glassmorphism na ciemnym tle.
 
-### Treści — bez zmian
-Wszystkie teksty zostają identyczne, jedynie układ wizualny się zmienia. Narracja z lewej kolumny zostaje skondensowana do 2 akapitów nad kartami.
+Nowy styl dopasowany do warm ivory palety strony:
 
-### Plik do edycji
+- **Tło sekcji**: `#FAFAF8` (Warm White) — spójne z resztą strony
+- **Nagłówek H2**: kolor `#1A1A2E` (Deep Navy), akcent "cudzej bazy klientek" w `#D94F3D` (Error red)
+- **Badge "Wiedziałaś o tym?"**: tło `#FEF2F2`, border `#FECACA`, tekst `#D94F3D` — ciepły czerwony alarm na jasnym tle
+- **Paragraf**: kolor `#4A4A5A` (body text), pogrubienia w `#1A1A2E`
+- **Karta Marketplace**: białe tło `#FFFFFF`, border `#F0ECE6`, shadow-md, czerwona linia akcentowa u góry, tekst `#4A4A5A`, ikony X w `#D94F3D`, nagłówek karty `#1A1A2E`
+- **Karta Beauty Calendar**: białe tło `#FFFFFF`, border w odcieniu bronze `rgba(184,125,94,0.3)`, shadow z bronze glow, brązowa linia akcentowa, ikony Check w `#B87D5E`, nagłówek `#1A1A2E`, pogrubienia w `#B87D5E`
+- **Cytat na dole**: gradient tekstu `#1A1A2E → #4A4A5A` (zamiast white → transparent)
+- **Radial glow**: subtelny bronze glow z `opacity-[0.04]` na jasnym tle
+
+Treści bez zmian. Animacje bez zmian. Layout bez zmian.
+
+### Pliki do edycji
 
 | Plik | Co |
 |------|----|
-| `src/components/landing/OwnYourClientsSection.tsx` | Przebudowa: ciemne tło, centered layout, glassmorphism karty, stagger animacje |
+| `src/pages/Index.tsx` | Przesunięcie OwnYourClientsSection na pozycję 2 (po Hero) |
+| `src/components/landing/OwnYourClientsSection.tsx` | Zamiana ciemnej palety na ciepłą ivory — tło, karty, tekst, akcenty |
 
