@@ -827,6 +827,28 @@ export default function OnboardingPage() {
                       <div className="h-full bg-[#E91E8C] rounded-full transition-all duration-700" style={{ width: `${scanPercentage}%` }} />
                     </div>
                   </div>
+                ) : scanError ? (
+                  <div className="text-center py-8 space-y-6">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+                      <Globe className="w-10 h-10 text-destructive" />
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="font-bold text-lg">Nie udało się zeskanować</h2>
+                      <p className="text-sm text-muted-foreground max-w-sm mx-auto">{scanError}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Sprawdź czy link prowadzi do aktywnego profilu salonu, np.:<br/>
+                      <code className="bg-muted px-2 py-0.5 rounded text-[11px]">booksy.com/pl-pl/12345_nazwa-salonu...</code>
+                    </p>
+                    <div className="flex gap-3 max-w-sm mx-auto">
+                      <Button variant="outline" onClick={handleScanSkip} className="flex-1">
+                        Pomiń — użyj szablonów
+                      </Button>
+                      <Button onClick={handleScanRetry} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
+                        Spróbuj ponownie
+                      </Button>
+                    </div>
+                  </div>
                 ) : scanResult ? (
                   <div className="space-y-5">
                     <div className="flex items-center gap-3">
