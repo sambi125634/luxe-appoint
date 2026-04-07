@@ -6,7 +6,16 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function scrapeUrl(url: string, firecrawlKey: string): Promise<string | null> {
+const INACTIVE_SALON_MARKERS = [
+  "ten biznes nie jest już dostępny",
+  "this business is no longer available",
+  "nie znaleziono",
+  "strona nie istnieje",
+  "404",
+  "nie jest już dostępn",
+];
+
+async function scrapeUrl(url: string, firecrawlKey: string): Promise<{ markdown: string | null; isInactive: boolean }> {
   try {
     let formattedUrl = url.trim();
     if (!formattedUrl.startsWith("http://") && !formattedUrl.startsWith("https://")) {
@@ -25,22 +34,33 @@ async function scrapeUrl(url: string, firecrawlKey: string): Promise<string | nu
         url: formattedUrl,
         formats: ["markdown"],
         onlyMainContent: true,
-        waitFor: 3000,
+        waitFor: 5000,
       }),
     });
 
     if (!response.ok) {
       console.error("Firecrawl error for", formattedUrl, response.status);
-      return null;
+      return { markdown: null, isInactive: false };
     }
 
     const data = await response.json();
     const markdown = data?.data?.markdown || data?.markdown || null;
     console.log("Scraped", formattedUrl, "- length:", markdown?.length || 0);
-    return markdown;
+
+    // Check if the salon page indicates inactive/closed business
+    if (markdown) {
+      const lowerContent = markdown.toLowerCase();
+      const isInactive = INACTIVE_SALON_MARKERS.some(marker => lowerContent.includes(marker));
+      if (isInactive) {
+        console.log("Detected inactive salon for", formattedUrl);
+        return { markdown, isInactive: true };
+      }
+    }
+
+    return { markdown, isInactive: false };
   } catch (error) {
     console.error("Scrape failed for", url, error);
-    return null;
+    return { markdown: null, isInactive: false };
   }
 }
 
@@ -52,7 +72,6 @@ serve(async (req) => {
   try {
     const { urls, salon_type } = await req.json();
 
-    // Support both old format (url string) and new format (urls array)
     const urlList: string[] = [];
     if (urls && Array.isArray(urls)) {
       urlList.push(...urls.filter((u: string) => u && u.trim()));
@@ -75,27 +94,42 @@ serve(async (req) => {
 
     const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
 
-    // Stage 1: Scrape all URLs using Firecrawl
     let scrapedContent = "";
-    
+    let anyInactive = false;
+    let allInactive = true;
+
     if (FIRECRAWL_API_KEY) {
       const scrapeResults = await Promise.all(
         urlList.map(url => scrapeUrl(url, FIRECRAWL_API_KEY))
       );
 
-      scrapeResults.forEach((content, i) => {
-        if (content) {
-          scrapedContent += `\n\n--- ŹRÓDŁO ${i + 1}: ${urlList[i]} ---\n\n${content}`;
+      scrapeResults.forEach((result, i) => {
+        if (result.isInactive) {
+          anyInactive = true;
+        } else {
+          allInactive = false;
+        }
+        if (result.markdown) {
+          scrapedContent += `\n\n--- ŹRÓDŁO ${i + 1}: ${urlList[i]} ---\n\n${result.markdown}`;
         }
       });
+
+      // If ALL URLs point to inactive salons, return specific error
+      if (allInactive && anyInactive) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "inactive_salon",
+            message: "Ten salon nie jest już dostępny na Booksy. Sprawdź czy link jest poprawny lub podaj inny adres.",
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
-    // If no content scraped, fall back to URL-based generation
     const hasScrapedData = scrapedContent.trim().length > 100;
-
     const salonTypeHint = salon_type || "multi";
 
-    // Stage 2: AI extraction with real data
     const systemPrompt = hasScrapedData
       ? `Jesteś asystentem AI specjalizującym się w ekstrakcji danych salonów beauty w Polsce.
 Otrzymasz PRAWDZIWĄ treść stron internetowych salonu. Twoim zadaniem jest WYODRĘBNIĆ dane, NIE generować wymyślonych.
@@ -109,6 +143,8 @@ ZASADY:
 - Wyodrębnij numer telefonu salonu jeśli jest podany
 - Wyodrębnij godziny otwarcia jeśli są podane
 - Kategorie usług grupuj logicznie (np. "Paznokcie", "Brwi i rzęsy", "Twarz", "Ciało")
+- Jeśli treść strony nie zawiera żadnych usług (strona zamknięta, błąd, brak danych) — zwróć PUSTĄ tablicę services
+- NIE wymyślaj usług jeśli ich nie ma na stronie
 - Odpowiedz używając tool call "extract_salon_data"`
       : `Jesteś asystentem AI specjalizującym się w analizie profili salonów beauty w Polsce.
 Na podstawie podanych URL wygeneruj realistyczne dane salonu typu: ${salonTypeHint}.
@@ -118,6 +154,7 @@ Odpowiedz używając tool call "extract_salon_data".`;
     const userPrompt = hasScrapedData
       ? `Wyodrębnij usługi i dane z poniższej treści strony salonu beauty.
 Maksymalnie 80 najważniejszych usług. Grupuj je w logiczne kategorie.
+WAŻNE: Jeśli strona nie zawiera usług (np. salon zamknięty) — zwróć pustą tablicę services [].
 
 TREŚĆ STRON:
 ${scrapedContent.slice(0, 30000)}`
@@ -224,6 +261,18 @@ Wygeneruj co najmniej 20 usług z cenami typowymi dla polskiego rynku.`;
 
     const salonData = JSON.parse(toolCall.function.arguments);
     console.log("Extracted services count:", salonData.services?.length || 0);
+
+    // If scraped data existed but AI found 0 services, it means the page had no service data
+    if (hasScrapedData && (!salonData.services || salonData.services.length === 0)) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "no_services_found",
+          message: "Nie znaleziono usług na podanej stronie. Sprawdź czy link prowadzi do aktywnego profilu salonu.",
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     return new Response(
       JSON.stringify({ success: true, data: salonData }),
