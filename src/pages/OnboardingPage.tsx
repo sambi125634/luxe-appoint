@@ -431,10 +431,13 @@ export default function OnboardingPage() {
     await supabase.from("staff_services").insert(staffServices);
   };
 
+  const [scanError, setScanError] = useState<string | null>(null);
+
   const startAiScan = async () => {
     setScanning(true);
     setScanMessageIndex(0);
     setScanPercentage(0);
+    setScanError(null);
 
     // Run animation and API call in parallel, sync at the end
     const animationPromise = (async () => {
@@ -464,16 +467,34 @@ export default function OnboardingPage() {
     const { data, error } = apiResult;
 
     if (error || !data?.success) {
-      toast.error("Nie udało się przeskanować profilu. Kontynuuję z domyślnymi ustawieniami.");
-      setScanSkipped(true);
-      await saveDefaultServices(createdSalonId ?? undefined);
+      const errorType = data?.error;
+      let errorMsg = "Nie udało się przeskanować profilu.";
+
+      if (errorType === "inactive_salon") {
+        errorMsg = data?.message || "Ten salon nie jest już dostępny na Booksy. Sprawdź czy link jest poprawny.";
+      } else if (errorType === "no_services_found") {
+        errorMsg = data?.message || "Nie znaleziono usług na podanej stronie.";
+      }
+
+      setScanError(errorMsg);
       setScanning(false);
-      goTo(2);
       return;
     }
 
     setScanResult(data.data as ScanResult);
     setScanning(false);
+  };
+
+  const handleScanRetry = () => {
+    setScanError(null);
+    startAiScan();
+  };
+
+  const handleScanSkip = async () => {
+    setScanError(null);
+    setScanSkipped(true);
+    await saveDefaultServices(createdSalonId ?? undefined);
+    goTo(2);
   };
 
   const handleSaveScanResults = async () => {
@@ -804,6 +825,28 @@ export default function OnboardingPage() {
                     </div>
                     <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
                       <div className="h-full bg-[#E91E8C] rounded-full transition-all duration-700" style={{ width: `${scanPercentage}%` }} />
+                    </div>
+                  </div>
+                ) : scanError ? (
+                  <div className="text-center py-8 space-y-6">
+                    <div className="w-20 h-20 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
+                      <Globe className="w-10 h-10 text-destructive" />
+                    </div>
+                    <div className="space-y-2">
+                      <h2 className="font-bold text-lg">Nie udało się zeskanować</h2>
+                      <p className="text-sm text-muted-foreground max-w-sm mx-auto">{scanError}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Sprawdź czy link prowadzi do aktywnego profilu salonu, np.:<br/>
+                      <code className="bg-muted px-2 py-0.5 rounded text-[11px]">booksy.com/pl-pl/12345_nazwa-salonu...</code>
+                    </p>
+                    <div className="flex gap-3 max-w-sm mx-auto">
+                      <Button variant="outline" onClick={handleScanSkip} className="flex-1">
+                        Pomiń — użyj szablonów
+                      </Button>
+                      <Button onClick={handleScanRetry} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
+                        Spróbuj ponownie
+                      </Button>
                     </div>
                   </div>
                 ) : scanResult ? (
