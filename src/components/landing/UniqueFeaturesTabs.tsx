@@ -50,7 +50,7 @@ const ACCENT_CLASSES: Record<string, { bg: string; text: string; border: string;
 const tabs: Tab[] = [
   {
     emoji: "😤",
-    label: "Klientka nie wróciła",
+    label: "Nie wróciła",
     cards: [
       {
         icon: RefreshCw,
@@ -110,7 +110,7 @@ const tabs: Tab[] = [
   },
   {
     emoji: "📱",
-    label: "Własna marka",
+    label: "Marka",
     cards: [
       {
         icon: Smartphone,
@@ -140,7 +140,7 @@ const tabs: Tab[] = [
   },
   {
     emoji: "📊",
-    label: "Dane które działają",
+    label: "Dane",
     cards: [
       {
         icon: Database,
@@ -252,7 +252,7 @@ export function UniqueFeaturesTabs() {
   const [isPaused, setIsPaused] = useState(false);
   const [progress, setProgress] = useState(0);
 
-  const INTERVAL_MS = 5000;
+  const INTERVAL_MS = 8000;
   const TICK_MS = 50;
 
   useEffect(() => {
@@ -324,20 +324,20 @@ export function UniqueFeaturesTabs() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.15 }}
       >
-        <div className="flex gap-2 bg-gray-50 rounded-2xl p-1.5 mb-1 max-w-2xl mx-auto">
+        <div className="flex items-center gap-2 mb-10 p-1.5 bg-gray-100 rounded-2xl max-w-2xl mx-auto">
           {tabs.map((tab, i) => (
             <button
               key={i}
               onClick={() => handleTabClick(i)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 whitespace-nowrap",
+                "flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl transition-all duration-300 text-sm font-semibold",
                 activeTab === i
-                  ? "bg-white shadow-sm text-violet-700 font-semibold"
-                  : "text-gray-500 hover:text-gray-700 hover:bg-white/50"
+                  ? "bg-violet-600 text-white shadow-md shadow-violet-200"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-white/60"
               )}
             >
-              <span>{tab.emoji}</span>
-              <span className="hidden sm:inline">{tab.label}</span>
+              <span className="text-base leading-none">{tab.emoji}</span>
+              <span className="leading-none">{tab.label}</span>
             </button>
           ))}
         </div>
