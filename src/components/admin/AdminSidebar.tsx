@@ -74,8 +74,8 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       items: [
         { icon: Route, labelKey: "admin.clientJourney", tab: "pipeline" },
         { icon: Radar, labelKey: "admin.retention", tab: "retention" },
-        { icon: Heart, labelKey: "admin.referral", tab: "referral" },
         { icon: Bot, labelKey: "admin.autopilot", tab: "autopilot" },
+        { icon: Heart, labelKey: "admin.referral", tab: "referral" },
       ],
     },
     {
