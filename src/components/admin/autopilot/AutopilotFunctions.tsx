@@ -128,9 +128,9 @@ const FUNCTIONS: FunctionCardProps[] = [
     exampleBg: "bg-orange-50", exampleBorder: "border-orange-100",
     exampleTitleColor: "text-orange-700", exampleTextColor: "text-orange-800", exampleSubColor: "text-orange-600",
     examples: [
-      { emoji: "1️⃣", title: "+30 min: „Widzimy że nie dotarłaś…"", sub: "Zaproponuj nowy termin" },
-      { emoji: "2️⃣", title: "+24h: „Mamy wolne miejsce jutro o…"", sub: "Konkretna propozycja" },
-      { emoji: "3️⃣", title: "+72h: „-15% na kolejną wizytę"", sub: "Ostatnia szansa" },
+      { emoji: "1️⃣", title: '+30 min: "Widzimy że nie dotarłaś..."', sub: "Zaproponuj nowy termin" },
+      { emoji: "2️⃣", title: '+24h: "Mamy wolne miejsce jutro o..."', sub: "Konkretna propozycja" },
+      { emoji: "3️⃣", title: '+72h: "-15% na kolejną wizytę"', sub: "Ostatnia szansa" },
     ],
     footer: "Automatycznie · SMS sekwencja",
   },
@@ -156,7 +156,7 @@ const FUNCTIONS: FunctionCardProps[] = [
     exampleTitleColor: "text-green-700", exampleTextColor: "text-green-800", exampleSubColor: "text-green-600",
     examples: [
       { emoji: "🔗", title: "Marta Z. poleciła 3 klientki", sub: "Zarobiłaś +450 zł z poleceń" },
-      { emoji: "📱", title: "SMS: „Podziel się rabatem -10% z koleżanką"", sub: "Automatyczny link po 3. wizycie" },
+      { emoji: "📱", title: 'SMS: "Podziel się rabatem -10% z koleżanką"', sub: "Automatyczny link po 3. wizycie" },
     ],
     footer: "Po 3. wizycie · SMS z linkiem",
   },
