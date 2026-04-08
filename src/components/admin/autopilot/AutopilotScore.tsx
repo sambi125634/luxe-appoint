@@ -1,10 +1,35 @@
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { DEMO_AUTOPILOT_DATA } from "./demo-data";
 
-export function AutopilotScore() {
-  // In a real app, calculate from Supabase data
-  // +20: retention > 50%, +20: no-show < 10%, +20: 5+ reviews (90d)
-  // +20: no empty slots > 3 weeks, +20: active return sequences
-  const score = 72;
+interface AutopilotScoreProps {
+  isDemo?: boolean;
+}
+
+function useAnimatedCount(target: number, duration: number, enabled: boolean) {
+  const [count, setCount] = useState(enabled ? 0 : target);
+
+  useEffect(() => {
+    if (!enabled) {
+      setCount(target);
+      return;
+    }
+    const start = Date.now();
+    const timer = setInterval(() => {
+      const progress = Math.min((Date.now() - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * target));
+      if (progress === 1) clearInterval(timer);
+    }, 16);
+    return () => clearInterval(timer);
+  }, [target, duration, enabled]);
+
+  return count;
+}
+
+export function AutopilotScore({ isDemo }: AutopilotScoreProps) {
+  const score = isDemo ? DEMO_AUTOPILOT_DATA.score : 72;
+  const animatedScore = useAnimatedCount(score, 2000, !!isDemo);
 
   const getColor = (s: number) => {
     if (s >= 80) return "text-green-600";
@@ -19,16 +44,18 @@ export function AutopilotScore() {
     return "Wymaga działania";
   };
 
+  const displayScore = isDemo ? animatedScore : score;
+
   return (
     <div className="flex flex-col items-end">
       <div className="flex items-baseline gap-1">
-        <span className={cn("text-3xl font-black tabular-nums", getColor(score))}>
-          {score}
+        <span className={cn("text-3xl font-black tabular-nums", getColor(displayScore))}>
+          {displayScore}
         </span>
         <span className="text-muted-foreground text-sm">/100</span>
       </div>
-      <span className={cn("text-xs font-medium", getColor(score))}>
-        {getLabel(score)}
+      <span className={cn("text-xs font-medium", getColor(displayScore))}>
+        {getLabel(displayScore)}
       </span>
       <span className="text-xs text-muted-foreground">Autopilot Score</span>
     </div>

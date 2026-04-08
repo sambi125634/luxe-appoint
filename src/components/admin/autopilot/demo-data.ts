@@ -1,0 +1,57 @@
+export const DEMO_AUTOPILOT_DATA = {
+  score: 84,
+  scoreLabel: "Doskonały",
+
+  kpi: {
+    actionsToday: 7,
+    actionsTotal: 312,
+    revenueRecovered: 3240,
+    noShowRate: 4,
+    noShowPrev: 23,
+    newReviews: 8,
+  },
+
+  plannedActions: [
+    { time: "18:00", description: "Wyśle 3 prośby o opinię (Cisi Ambasadorzy)" },
+    { time: "19:30", description: "Oferta flash na wolny czwartek 14:00" },
+    { time: "20:00", description: "Raport VIP klientek na jutro" },
+  ],
+
+  recentActions: [
+    { time: "14:23", type: "VIP na jutro", typeBadge: "vip" as const, clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
+    { time: "13:41", type: "No-show Recovery", typeBadge: "noshow" as const, clientName: "Kasia M.", status: "success" as const, statusLabel: "✓ Wróciła", effect: 180 },
+    { time: "12:15", type: "Cichy Ambasador", typeBadge: "ambassador" as const, clientName: "Magda W.", status: "success" as const, statusLabel: "✓ Opinia ★★★★★", effect: null },
+    { time: "11:30", type: "Martwe godziny", typeBadge: "slots" as const, clientName: "8 klientek", status: "success" as const, statusLabel: "✓ Rezerwacja", effect: 240 },
+    { time: "10:00", type: "Kula Śnieżna", typeBadge: "referral" as const, clientName: "Ania K.", status: "success" as const, statusLabel: "✓ Link aktywny", effect: null },
+    { time: "09:15", type: "Pamięta zabieg", typeBadge: "reminder" as const, clientName: "Joanna L.", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
+    { time: "08:00", type: "Raport tygodniowy", typeBadge: "brief" as const, clientName: "—", status: "success" as const, statusLabel: "✓ Otwarto", effect: null },
+  ],
+
+  historyActions: [
+    { time: "dziś 14:23", type: "VIP na jutro", clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
+    { time: "dziś 13:41", type: "No-show Recovery", clientName: "Kasia M.", status: "success" as const, statusLabel: "✓ Wróciła", effect: 180 },
+    { time: "dziś 12:15", type: "Cichy Ambasador", clientName: "Magda W.", status: "success" as const, statusLabel: "✓ Opinia ★×5", effect: null },
+    { time: "dziś 11:30", type: "Martwe godziny", clientName: "—", status: "success" as const, statusLabel: "✓ Rezerwacja", effect: 240 },
+    { time: "dziś 10:00", type: "Kula Śnieżna", clientName: "Ania K.", status: "success" as const, statusLabel: "✓ Aktywny", effect: null },
+    { time: "dziś 09:15", type: "Pamięta zabieg", clientName: "Joanna L.", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
+    { time: "wczoraj 20:00", type: "VIP na jutro", clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
+    { time: "wczoraj 18:00", type: "Cichy Ambasador", clientName: "Beata W.", status: "failed" as const, statusLabel: "✗ Brak odpowiedzi", effect: null },
+    { time: "wczoraj 15:30", type: "No-show Recovery", clientName: "Paula S.", status: "pending" as const, statusLabel: "⏳ Czeka", effect: null },
+    { time: "wczoraj 12:00", type: "Martwe godziny", clientName: "—", status: "success" as const, statusLabel: "✓ Rezerwacja", effect: 180 },
+    { time: "wczoraj 09:00", type: "Raport tygodniowy", clientName: "—", status: "success" as const, statusLabel: "✓ Otwarto", effect: null },
+    { time: "2 dni temu 20:00", type: "VIP na jutro", clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
+    { time: "2 dni temu 18:00", type: "Cichy Ambasador", clientName: "Kasia T.", status: "success" as const, statusLabel: "✓ Opinia ★×5", effect: null },
+    { time: "2 dni temu 14:00", type: "Kula Śnieżna", clientName: "Marta R.", status: "success" as const, statusLabel: "✓ Aktywny", effect: null },
+    { time: "3 dni temu 13:00", type: "No-show Recovery", clientName: "Zofia K.", status: "success" as const, statusLabel: "✓ Wróciła", effect: 120 },
+  ],
+
+  functions: {
+    vip: { enabled: true },
+    slots: { enabled: false },
+    reminder: { enabled: true },
+    radar: { enabled: true },
+    noshow: { enabled: true },
+    ambassador: { enabled: true },
+    referral: { enabled: false },
+  } as Record<string, { enabled: boolean }>,
+};
