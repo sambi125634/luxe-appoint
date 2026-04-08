@@ -1,36 +1,85 @@
 
 
-## Plan: Przenieś OwnYourClientsSection pod Hero + dopasuj kolorystykę do ciepłej palety
+## Plan: Pełny moduł AI Autopilot jako osobna sekcja w sidebar
 
-### Zmiany
+### Zakres
 
-**1. Index.tsx — zmiana kolejności sekcji**
+Nowa zakładka **"autopilot"** w AdminSidebar (sekcja Marketing, ikona `Bot`) z dedykowanym modułem 4-zakładkowym. Konfiguracja Autopilota zostanie usunięta z `AutomationSettings` (Ustawienia → Automatyzacja).
 
-Przenieść `<OwnYourClientsSection />` z pozycji 3 (po SystemFlow) na pozycję 2 (zaraz po Hero, przed SystemFlow).
+### Struktura modułu
 
-Nowa kolejność: Hero → OwnYourClients → SystemFlow → SalonLossCalculator → ...
+```text
+src/components/admin/autopilot/
+├── AutopilotModule.tsx        ← główny komponent z 4 zakładkami
+├── AutopilotDashboard.tsx     ← (1) statystyki tygodniowe + KPI cards
+├── AutopilotConfig.tsx        ← (2) konfiguracja per-typ z edycją wiadomości
+├── AutopilotHistory.tsx       ← (3) historia akcji z filtrami
+├── AutopilotQueue.tsx         ← (4) podgląd kolejki zaplanowanych
+└── index.ts
+```
 
-**2. OwnYourClientsSection.tsx — przebudowa kolorystyczna**
+### Szczegóły zmian
 
-Obecny styl: ciemne tło `#1A1A2E`, biały tekst, glassmorphism na ciemnym tle.
+**1. AdminSidebar.tsx**
+- Dodać `"autopilot"` do `TabType`
+- Dodać `{ icon: Bot, labelKey: "admin.autopilot", tab: "autopilot" }` w sekcji Marketing (po Referral)
+- Dodać permission mapping: `autopilot: "can_manage_marketing"`
 
-Nowy styl dopasowany do warm ivory palety strony:
+**2. AdminDashboard.tsx**
+- Import `AutopilotModule`
+- Dodać case `"autopilot"` w `getPageTitle()` → "AI Autopilot"
+- Dodać case w `renderContent()` → `<AutopilotModule />`
 
-- **Tło sekcji**: `#FAFAF8` (Warm White) — spójne z resztą strony
-- **Nagłówek H2**: kolor `#1A1A2E` (Deep Navy), akcent "cudzej bazy klientek" w `#D94F3D` (Error red)
-- **Badge "Wiedziałaś o tym?"**: tło `#FEF2F2`, border `#FECACA`, tekst `#D94F3D` — ciepły czerwony alarm na jasnym tle
-- **Paragraf**: kolor `#4A4A5A` (body text), pogrubienia w `#1A1A2E`
-- **Karta Marketplace**: białe tło `#FFFFFF`, border `#F0ECE6`, shadow-md, czerwona linia akcentowa u góry, tekst `#4A4A5A`, ikony X w `#D94F3D`, nagłówek karty `#1A1A2E`
-- **Karta Beauty Calendar**: białe tło `#FFFFFF`, border w odcieniu bronze `rgba(184,125,94,0.3)`, shadow z bronze glow, brązowa linia akcentowa, ikony Check w `#B87D5E`, nagłówek `#1A1A2E`, pogrubienia w `#B87D5E`
-- **Cytat na dole**: gradient tekstu `#1A1A2E → #4A4A5A` (zamiast white → transparent)
-- **Radial glow**: subtelny bronze glow z `opacity-[0.04]` na jasnym tle
+**3. AutopilotModule.tsx** — 4 zakładki (Tabs):
+- Dashboard | Konfiguracja | Historia | Kolejka
 
-Treści bez zmian. Animacje bez zmian. Layout bez zmian.
+**4. AutopilotDashboard.tsx** — zakładka Dashboard:
+- 4 KPI cards: akcje tygodniowe, odzyskany przychód, reaktywowane klientki, zebrane opinie
+- Wykres tygodniowy (Recharts BarChart)
+- Globalny toggle ON/OFF + status pauzy
+- Dane z `useAutopilotStats()` i `useAutopilotConfig()`
 
-### Pliki do edycji
+**5. AutopilotConfig.tsx** — zakładka Konfiguracja:
+- Lista 7 typów akcji (retention, review, reminder, noshow, revenue_suggestion, pixel_sync, brief)
+- Każdy typ: toggle ON/OFF, parametry (np. `retention_trigger_days`, `reminder_hours_before`), edytor szablonu wiadomości SMS/email
+- Godziny ciszy, max wiadomości per klient
+- Przeniesienie logiki z `AutomationSettings` (karta Autopilot) tutaj
 
-| Plik | Co |
-|------|----|
-| `src/pages/Index.tsx` | Przesunięcie OwnYourClientsSection na pozycję 2 (po Hero) |
-| `src/components/landing/OwnYourClientsSection.tsx` | Zamiana ciemnej palety na ciepłą ivory — tło, karty, tekst, akcenty |
+**6. AutopilotHistory.tsx** — zakładka Historia:
+- Tabela akcji z `useAutopilotActions()`
+- Filtry: typ akcji, status, zakres dat
+- Kolumny: data, typ, klientka, status, AI explanation
+- Pagination
+
+**7. AutopilotQueue.tsx** — zakładka Kolejka:
+- Lista akcji ze statusem `pending` posortowanych wg `scheduled_at`
+- Przyciski: Wykonaj teraz / Odrzuć / Edytuj wiadomość
+- Dane z `useAutopilotActions()` filtrowane po `status === "pending"`
+
+**8. AutomationSettings.tsx** — usunięcie karty Autopilot:
+- Usunąć pierwszą kartę "Autopilot Global" (linie 196-271)
+- Zostawić: Default Settings, GDPR, Module Status
+
+**9. i18n** — dodać klucz `admin.autopilot: "AI Autopilot"` w en.json i pl.json
+
+### Dane
+- Hooki już istnieją: `useAutopilotConfig`, `useAutopilotActions`, `useAutopilotStats`, `useToggleAutopilotPause`, `useDismissAction`, `useExecuteAction`
+- Tabele DB już istnieją: `autopilot_config`, `autopilot_actions`, `autopilot_stats`
+- Brak zmian w bazie danych
+
+### Pliki do edycji/utworzenia
+
+| Plik | Akcja |
+|------|-------|
+| `src/components/admin/AdminSidebar.tsx` | Edycja — dodać tab "autopilot" |
+| `src/pages/AdminDashboard.tsx` | Edycja — dodać case autopilot |
+| `src/components/admin/autopilot/AutopilotModule.tsx` | Nowy |
+| `src/components/admin/autopilot/AutopilotDashboard.tsx` | Nowy |
+| `src/components/admin/autopilot/AutopilotConfig.tsx` | Nowy |
+| `src/components/admin/autopilot/AutopilotHistory.tsx` | Nowy |
+| `src/components/admin/autopilot/AutopilotQueue.tsx` | Nowy |
+| `src/components/admin/autopilot/index.ts` | Nowy |
+| `src/components/admin/settings/AutomationSettings.tsx` | Edycja — usunąć kartę Autopilot |
+| `src/i18n/locales/pl.json` | Edycja — dodać klucz |
+| `src/i18n/locales/en.json` | Edycja — dodać klucz |
 
