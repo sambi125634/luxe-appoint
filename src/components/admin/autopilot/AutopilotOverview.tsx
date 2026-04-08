@@ -142,9 +142,9 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
                 </div>
                 <span className={cn(
                   "text-xs px-2 py-0.5 rounded-full flex-shrink-0",
-                  action.status === "success" && "bg-green-100 text-green-700",
-                  action.status === "pending" && "bg-amber-100 text-amber-700",
-                  action.status === "failed" && "bg-red-100 text-red-700",
+                  (action.status as string) === "success" && "bg-green-100 text-green-700",
+                  (action.status as string) === "pending" && "bg-amber-100 text-amber-700",
+                  (action.status as string) === "failed" && "bg-red-100 text-red-700",
                 )}>
                   {action.statusLabel}
                 </span>
