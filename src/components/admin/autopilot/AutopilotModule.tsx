@@ -6,7 +6,11 @@ import { AutopilotConfig } from "./AutopilotConfig";
 import { AutopilotHistory } from "./AutopilotHistory";
 import { AutopilotQueue } from "./AutopilotQueue";
 
-export function AutopilotModule() {
+interface AutopilotModuleProps {
+  isDemo?: boolean;
+}
+
+export function AutopilotModule({ isDemo }: AutopilotModuleProps) {
   const { t } = useTranslation();
 
   return (
