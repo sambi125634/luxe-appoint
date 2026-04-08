@@ -12,12 +12,16 @@ export const DEMO_AUTOPILOT_DATA = {
   },
 
   plannedActions: [
+    { time: "17:30", description: "Ankieta po wizycie — Kasia W. (Strażnik reputacji)" },
     { time: "18:00", description: "Wyśle 3 prośby o opinię (Cisi Ambasadorzy)" },
+    { time: "19:00", description: "Upsell przed wizytą — jutro 6 klientek" },
     { time: "19:30", description: "Oferta flash na wolny czwartek 14:00" },
     { time: "20:00", description: "Raport VIP klientek na jutro" },
   ],
 
   recentActions: [
+    { time: "15:45", type: "Strażnik reputacji", typeBadge: "review" as const, clientName: "Joanna M.", status: "success" as const, statusLabel: "★★★★★ → Google", effect: null },
+    { time: "15:12", type: "Upsell", typeBadge: "upsell" as const, clientName: "Ania K.", status: "success" as const, statusLabel: "✓ Przyjęła", effect: 80 },
     { time: "14:23", type: "VIP na jutro", typeBadge: "vip" as const, clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
     { time: "13:41", type: "No-show Recovery", typeBadge: "noshow" as const, clientName: "Kasia M.", status: "success" as const, statusLabel: "✓ Wróciła", effect: 180 },
     { time: "12:15", type: "Cichy Ambasador", typeBadge: "ambassador" as const, clientName: "Magda W.", status: "success" as const, statusLabel: "✓ Opinia ★★★★★", effect: null },
@@ -53,5 +57,14 @@ export const DEMO_AUTOPILOT_DATA = {
     noshow: { enabled: true },
     ambassador: { enabled: true },
     referral: { enabled: false },
+    priceDetector: { enabled: true },
+    upsell: { enabled: true },
+    profitAlarm: { enabled: true },
+    firstVisitSequence: { enabled: true },
+    abandonedBooking: { enabled: true },
+    loyalty: { enabled: true },
+    vacationBrain: { enabled: true },
+    reviewGuard: { enabled: true },
+    priceChangeFollowup: { enabled: true },
   } as Record<string, { enabled: boolean }>,
 };
