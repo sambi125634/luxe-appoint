@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check } from "lucide-react";
+import { Check, ChevronLeft, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Progress } from "@/components/ui/progress";
 
 type ContactHabit = "good" | "sometimes" | "rarely" | "never";
 
@@ -45,81 +44,94 @@ const AnimatedLossCounter = ({ target }: { target: number }) => {
 
   return (
     <div className="relative inline-block">
-      <span className="text-5xl md:text-7xl font-black text-destructive tracking-tight">
+      <span className="text-5xl md:text-7xl font-black text-red-400 tracking-tight">
         -{count.toLocaleString("pl-PL")} zł
       </span>
-      <div className="absolute inset-0 bg-destructive/10 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute inset-0 bg-red-500/20 blur-3xl rounded-full pointer-events-none" />
     </div>
   );
 };
 
-// ─── Navigation ──────────────────────────────
-const SlideNavigation = ({
-  onNext,
-  onBack,
-  canNext,
-  showBack,
-  nextLabel = "Dalej →",
-}: {
-  onNext: () => void;
-  onBack: () => void;
-  canNext: boolean;
-  showBack: boolean;
-  nextLabel?: string;
-}) => (
-  <div className="flex justify-between items-center pt-6">
-    {showBack ? (
-      <button
-        onClick={onBack}
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-      >
-        ← Wstecz
-      </button>
-    ) : (
-      <div />
-    )}
-    <button
-      onClick={onNext}
-      disabled={!canNext}
-      className={cn(
-        "px-8 py-3 rounded-2xl font-semibold text-sm transition-all duration-200",
-        canNext
-          ? "bg-primary text-primary-foreground hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] shadow-md"
-          : "bg-muted text-muted-foreground cursor-not-allowed"
-      )}
-    >
-      {nextLabel}
-    </button>
-  </div>
-);
-
-// ─── Option Card ─────────────────────────────
-const OptionCard = ({
+// ─── Grid Option Card (Slides 1 & 3) ────────
+const GridOptionCard = ({
   selected,
   onClick,
-  children,
-  className: extraClass,
+  label,
+  sub,
 }: {
   selected: boolean;
   onClick: () => void;
-  children: React.ReactNode;
-  className?: string;
+  label: string;
+  sub: string;
 }) => (
   <button
     onClick={onClick}
     className={cn(
-      "w-full p-4 rounded-2xl border-2 text-left transition-all duration-200 hover:border-primary/60",
-      selected ? "border-primary bg-primary/5" : "border-border bg-card",
-      extraClass
+      "text-left p-5 rounded-2xl border-2 transition-all duration-200",
+      selected
+        ? "border-violet-600 bg-violet-50 shadow-lg shadow-violet-100"
+        : "border-gray-100 bg-gray-50/50 hover:border-violet-300 hover:bg-violet-50/30"
     )}
   >
-    {children}
+    <div className="flex items-start justify-between gap-2">
+      <span className="font-semibold text-foreground text-sm">{label}</span>
+      <div
+        className={cn(
+          "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+          selected ? "border-violet-600 bg-violet-600" : "border-gray-300"
+        )}
+      >
+        {selected && <Check className="w-3 h-3 text-white" />}
+      </div>
+    </div>
+    <span className="text-xs text-muted-foreground mt-1 block">{sub}</span>
   </button>
 );
 
-const SelectedCheck = () => (
-  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-    <Check className="w-4 h-4 text-primary-foreground" />
+// ─── List Option Card (Slides 2 & 4) ────────
+const ListOptionCard = ({
+  selected,
+  onClick,
+  label,
+  sub,
+  emoji,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  label: string;
+  sub?: string;
+  emoji?: string;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-200 flex items-center gap-4",
+      selected
+        ? "border-violet-600 bg-violet-50"
+        : "border-gray-100 bg-gray-50/50 hover:border-violet-200 hover:bg-violet-50/20"
+    )}
+  >
+    {emoji && <span className="text-2xl flex-shrink-0">{emoji}</span>}
+    <div
+      className={cn(
+        "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
+        selected ? "border-violet-600 bg-violet-600" : "border-gray-300"
+      )}
+    >
+      {selected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+    </div>
+    <div className="flex-1 min-w-0">
+      <span className="font-semibold text-foreground text-sm block">{label}</span>
+      {sub && <span className="text-xs text-muted-foreground block mt-0.5">{sub}</span>}
+    </div>
+  </button>
+);
+
+// ─── Question Header ─────────────────────────
+const QuestionHeader = ({ question, subtext }: { question: string; subtext?: string }) => (
+  <div className="mb-6">
+    <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight">{question}</h3>
+    {subtext && <p className="text-sm text-muted-foreground mt-2">{subtext}</p>}
   </div>
 );
 
@@ -139,31 +151,20 @@ const Slide1 = ({
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight">
-          Ile klientek wraca do Ciebie regularnie?
-        </h3>
-        <p className="text-sm text-muted-foreground mt-2">
-          Pomyśl o klientkach z ostatniego roku.
-        </p>
-      </div>
-
-      <div className="space-y-3">
-        {options.map((option) => (
-          <OptionCard
-            key={option.value}
-            selected={selectedOption === option.value}
-            onClick={() => handleSelect(option.value, "retention")}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-semibold text-foreground">{option.label}</div>
-                <div className="text-sm text-muted-foreground">{option.sub}</div>
-              </div>
-              {selectedOption === option.value && <SelectedCheck />}
-            </div>
-          </OptionCard>
+    <div>
+      <QuestionHeader
+        question="Ile klientek wraca do Ciebie regularnie?"
+        subtext="Pomyśl o klientkach z ostatniego roku."
+      />
+      <div className="grid grid-cols-2 gap-3">
+        {options.map((opt) => (
+          <GridOptionCard
+            key={opt.value}
+            selected={selectedOption === opt.value}
+            onClick={() => handleSelect(opt.value, "retention")}
+            label={opt.label}
+            sub={opt.sub}
+          />
         ))}
       </div>
     </div>
@@ -186,31 +187,25 @@ const Slide2 = ({
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5">
-        <span className="text-xs font-semibold text-primary uppercase tracking-wider">
+    <div>
+      <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl p-5 mb-6">
+        <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">
           Pytanie szczere
         </span>
         <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight mt-2">
           Kiedy ostatnio napisałaś do klientki której dawno nie widziałaś?
         </h3>
       </div>
-
       <div className="space-y-3">
-        {options.map((option) => (
-          <OptionCard
-            key={option.value}
-            selected={selectedOption === option.value}
-            onClick={() => handleSelect(option.value, "contactHabit")}
-            className="flex items-center gap-4"
-          >
-            <span className="text-2xl flex-shrink-0">{option.emoji}</span>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-foreground">{option.label}</div>
-              <div className="text-sm text-muted-foreground">{option.sub}</div>
-            </div>
-            {selectedOption === option.value && <SelectedCheck />}
-          </OptionCard>
+        {options.map((opt) => (
+          <ListOptionCard
+            key={opt.value}
+            selected={selectedOption === opt.value}
+            onClick={() => handleSelect(opt.value, "contactHabit")}
+            label={opt.label}
+            sub={opt.sub}
+            emoji={opt.emoji}
+          />
         ))}
       </div>
     </div>
@@ -226,39 +221,27 @@ const Slide3 = ({
   handleSelect: (v: number, f: keyof Answers) => void;
 }) => {
   const options = [
-    { label: "do 100 zł", sub: "np. manicure podstawowy", value: 80, example: "~80 zł" },
-    { label: "100–200 zł", sub: "np. hybryda, stylizacja", value: 150, example: "~150 zł" },
-    { label: "200–400 zł", sub: "np. koloryzacja, zabiegi twarzy", value: 290, example: "~290 zł" },
-    { label: "ponad 400 zł", sub: "np. medycyna estetyczna, laser", value: 480, example: "~480 zł" },
+    { label: "do 100 zł", sub: "np. manicure podstawowy", value: 80 },
+    { label: "100–200 zł", sub: "np. hybryda, stylizacja", value: 150 },
+    { label: "200–400 zł", sub: "np. koloryzacja, zabiegi twarzy", value: 290 },
+    { label: "ponad 400 zł", sub: "np. medycyna estetyczna, laser", value: 480 },
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight">
-          Ile wynosi średnia wartość jednej wizyty?
-        </h3>
-        <p className="text-sm text-muted-foreground mt-2">
-          Weź pod uwagę swoje najpopularniejsze usługi.
-        </p>
-      </div>
-
-      <div className="space-y-3">
-        {options.map((option) => (
-          <OptionCard
-            key={option.value}
-            selected={selectedOption === option.value}
-            onClick={() => handleSelect(option.value, "avgVisit")}
-          >
-            <div className="font-semibold text-foreground">{option.label}</div>
-            <div className="text-sm text-muted-foreground">{option.sub}</div>
-            {selectedOption === option.value && (
-              <div className="flex items-center gap-2 mt-2">
-                <Check className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-primary">{option.example}</span>
-              </div>
-            )}
-          </OptionCard>
+    <div>
+      <QuestionHeader
+        question="Ile wynosi średnia wartość jednej wizyty?"
+        subtext="Weź pod uwagę swoje najpopularniejsze usługi."
+      />
+      <div className="grid grid-cols-2 gap-3">
+        {options.map((opt) => (
+          <GridOptionCard
+            key={opt.value}
+            selected={selectedOption === opt.value}
+            onClick={() => handleSelect(opt.value, "avgVisit")}
+            label={opt.label}
+            sub={opt.sub}
+          />
         ))}
       </div>
     </div>
@@ -281,31 +264,21 @@ const Slide4 = ({
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight">
-          Ile razy w tym tygodniu fotel stał pusty bo klientka po prostu nie przyszła?
-        </h3>
-        <p className="text-sm text-muted-foreground mt-2">
-          Bez telefonu. Bez odwołania. Po prostu nie.
-        </p>
-      </div>
-
+    <div>
+      <QuestionHeader
+        question="Ile razy w tym tygodniu fotel stał pusty bo klientka po prostu nie przyszła?"
+        subtext="Bez telefonu. Bez odwołania. Po prostu nie."
+      />
       <div className="space-y-3">
-        {options.map((option) => (
-          <OptionCard
-            key={option.value}
-            selected={selectedOption === option.value}
-            onClick={() => handleSelect(option.value, "noShows")}
-            className="flex items-center gap-4"
-          >
-            <span className="text-2xl flex-shrink-0">{option.emoji}</span>
-            <div className="flex-1 min-w-0">
-              <div className="font-semibold text-foreground">{option.label}</div>
-              <div className="text-sm text-muted-foreground">{option.sub}</div>
-            </div>
-            {selectedOption === option.value && <SelectedCheck />}
-          </OptionCard>
+        {options.map((opt) => (
+          <ListOptionCard
+            key={opt.value}
+            selected={selectedOption === opt.value}
+            onClick={() => handleSelect(opt.value, "noShows")}
+            label={opt.label}
+            sub={opt.sub}
+            emoji={opt.emoji}
+          />
         ))}
       </div>
     </div>
@@ -335,50 +308,65 @@ const ResultSlide = ({
       ? "Masz klientki które o Tobie zapomniały — nie dlatego że nie chciały wrócić. Dlatego że nikt im nie przypomniał."
       : "Robisz to ręcznie. Wyobraź sobie że dzieje się automatycznie — dla każdej klientki — bez Twojego udziału.";
 
+  const emotionalHighlight =
+    answers.contactHabit === "never" || answers.contactHabit === "rarely"
+      ? "Beauty Calendar przypomina za Ciebie — każdej klientce, automatycznie."
+      : "Automatyzacja retencji to Twoja nowa supermoc.";
+
+  const contexts = [
+    { emoji: "🚗", value: rata, label: "rat za samochód" },
+    { emoji: "✈️", value: wyjazd, label: "wyjazdów zagranicznych" },
+    { emoji: "🧘", value: bufor, label: "mies. spokoju finansowego" },
+  ];
+
   return (
     <div className="space-y-8 text-center">
-      <div className="space-y-4">
-        <p className="text-muted-foreground text-sm font-medium uppercase tracking-wider">
-          Szacujemy że tracisz rocznie:
+      <div className="space-y-3">
+        <p className="text-sm font-medium uppercase tracking-wider text-gray-400">
+          Szacujemy że tracisz rocznie
         </p>
         <AnimatedLossCounter target={totalLoss} />
-        <p className="text-muted-foreground text-sm">
-          na klientkach które nie wróciły i pustych fotelach
+        <p className="text-sm text-gray-400">
+          w klientkach które nie wróciły i pustych fotelach
         </p>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
-        {[
-          { emoji: "🚗", value: rata, label: "rat za samochód" },
-          { emoji: "✈️", value: wyjazd, label: "wyjazdów zagranicznych" },
-          { emoji: "🧘", value: bufor, label: "mies. spokoju finansowego" },
-        ].map((item, i) => (
-          <div key={i} className="text-center">
-            <span className="text-2xl">{item.emoji}</span>
-            <div className="text-2xl font-bold text-foreground mt-1">{item.value}×</div>
-            <div className="text-xs text-muted-foreground">{item.label}</div>
-          </div>
+        {contexts.map((ctx, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 + i * 0.15, duration: 0.4 }}
+            className="text-center"
+          >
+            <span className="text-2xl">{ctx.emoji}</span>
+            <div className="text-2xl font-bold text-foreground mt-1">{ctx.value}×</div>
+            <div className="text-xs text-muted-foreground">{ctx.label}</div>
+          </motion.div>
         ))}
       </div>
 
-      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5">
-        <p className="text-sm text-foreground italic leading-relaxed">
+      <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl p-5 text-left">
+        <p className="text-sm text-foreground/80 italic leading-relaxed">
           &ldquo;{emotionalComment}&rdquo;
         </p>
+        <p className="text-sm font-semibold text-violet-400 mt-2">{emotionalHighlight}</p>
       </div>
 
-      <div>
+      <div className="space-y-3">
         <button
           onClick={() => (window.location.href = "/auth")}
-          className="w-full py-4 px-6 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-base rounded-2xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/30 mb-3"
+          className="w-full py-4 px-6 bg-gradient-to-r from-violet-600 to-violet-500 text-white font-semibold text-base rounded-2xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-violet-500/30"
         >
-          Zacznij odzyskiwać — za darmo →
+          Zacznij odzyskiwać te pieniądze →
         </button>
         <button
           onClick={onReset}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1.5"
         >
-          ↺ Przelicz ponownie
+          <RotateCcw className="w-3.5 h-3.5" />
+          Przelicz ponownie
         </button>
       </div>
     </div>
@@ -430,47 +418,65 @@ export const SalonLossCalculator = () => {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-background">
-      <div className="container max-w-2xl mx-auto">
-        <motion.div
+    <section className="relative py-20 lg:py-28 bg-[#0F0B1A] overflow-hidden">
+      {/* Glow orbs */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-fuchsia-600/8 rounded-full blur-[100px] pointer-events-none" />
+
+      <div className="container max-w-2xl mx-auto relative z-10">
+        {/* Transitional sentence */}
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          className="text-center text-lg md:text-xl text-gray-400 mb-10 font-medium"
         >
-          <span className="inline-block text-xs font-semibold text-primary uppercase tracking-wider mb-3">
-            4 pytania · wynik w 60 sekund
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-3">
-            Ile traci Twój salon?
-          </h2>
-          <p className="text-muted-foreground max-w-lg mx-auto">
-            Odpowiedz na 4 pytania. Pokażemy Ci dokładną kwotę.
-          </p>
-        </motion.div>
+          Policzmy konkretnie ile to kosztuje{" "}
+          <span className="text-white font-semibold">właśnie Twój salon.</span>
+        </motion.p>
 
+        {/* Quiz card */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="bg-card rounded-3xl shadow-lg border border-border/50 p-6 md:p-10 overflow-hidden"
+          className="bg-white rounded-3xl shadow-2xl shadow-black/20 p-6 md:p-10 overflow-hidden"
         >
+          {/* Progress bar */}
           {currentSlide < 4 && (
-            <div className="mb-6">
-              <Progress value={((currentSlide + 1) / 4) * 100} className="h-1.5" />
+            <div className="h-0.5 bg-gray-100 rounded-full overflow-hidden mb-6">
+              <motion.div
+                className="h-full bg-violet-500 rounded-full"
+                initial={false}
+                animate={{ width: `${((currentSlide + 1) / 4) * 100}%` }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              />
             </div>
           )}
 
+          {/* Step indicator */}
           {currentSlide < 4 && (
-            <div className="mb-6">
+            <div className="flex items-center justify-between mb-6">
               <span className="text-xs font-medium text-muted-foreground">
                 Pytanie {currentSlide + 1} z 4
               </span>
+              <div className="flex gap-1.5">
+                {[0, 1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "w-2 h-2 rounded-full transition-all duration-300",
+                      i <= currentSlide ? "bg-violet-500" : "bg-gray-200"
+                    )}
+                  />
+                ))}
+              </div>
             </div>
           )}
 
+          {/* Slides */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSlide}
@@ -481,67 +487,63 @@ export const SalonLossCalculator = () => {
               transition={{ duration: 0.3 }}
             >
               {currentSlide === 0 && (
-                <>
-                  <Slide1
-                    selectedOption={answers.retention}
-                    handleSelect={handleSelect as (v: number, f: keyof Answers) => void}
-                  />
-                  <SlideNavigation
-                    onNext={handleNext}
-                    onBack={handleBack}
-                    canNext={selectedOption !== null}
-                    showBack={false}
-                  />
-                </>
+                <Slide1
+                  selectedOption={answers.retention}
+                  handleSelect={handleSelect as (v: number, f: keyof Answers) => void}
+                />
               )}
               {currentSlide === 1 && (
-                <>
-                  <Slide2
-                    selectedOption={answers.contactHabit}
-                    handleSelect={handleSelect as (v: ContactHabit, f: keyof Answers) => void}
-                  />
-                  <SlideNavigation
-                    onNext={handleNext}
-                    onBack={handleBack}
-                    canNext={selectedOption !== null}
-                    showBack
-                  />
-                </>
+                <Slide2
+                  selectedOption={answers.contactHabit}
+                  handleSelect={handleSelect as (v: ContactHabit, f: keyof Answers) => void}
+                />
               )}
               {currentSlide === 2 && (
-                <>
-                  <Slide3
-                    selectedOption={answers.avgVisit}
-                    handleSelect={handleSelect as (v: number, f: keyof Answers) => void}
-                  />
-                  <SlideNavigation
-                    onNext={handleNext}
-                    onBack={handleBack}
-                    canNext={selectedOption !== null}
-                    showBack
-                  />
-                </>
+                <Slide3
+                  selectedOption={answers.avgVisit}
+                  handleSelect={handleSelect as (v: number, f: keyof Answers) => void}
+                />
               )}
               {currentSlide === 3 && (
-                <>
-                  <Slide4
-                    selectedOption={answers.noShows}
-                    handleSelect={handleSelect as (v: number, f: keyof Answers) => void}
-                  />
-                  <SlideNavigation
-                    onNext={handleNext}
-                    onBack={handleBack}
-                    canNext={selectedOption !== null}
-                    showBack
-                    nextLabel="Pokaż wynik →"
-                  />
-                </>
+                <Slide4
+                  selectedOption={answers.noShows}
+                  handleSelect={handleSelect as (v: number, f: keyof Answers) => void}
+                />
               )}
               {currentSlide === 4 && (
                 <ResultSlide answers={answers} onReset={handleReset} />
               )}
             </motion.div>
           </AnimatePresence>
+
+          {/* Navigation */}
+          {currentSlide < 4 && (
+            <div className="flex justify-between items-center pt-6">
+              {currentSlide > 0 ? (
+                <button
+                  onClick={handleBack}
+                  className="text-gray-400 text-xs flex items-center gap-1.5 hover:text-violet-500 transition-colors"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  Poprzednie pytanie
+                </button>
+              ) : (
+                <div />
+              )}
+              <button
+                onClick={handleNext}
+                disabled={selectedOption === null}
+                className={cn(
+                  "px-8 py-3 rounded-2xl font-semibold text-sm transition-all duration-200",
+                  selectedOption !== null
+                    ? "bg-violet-600 text-white hover:bg-violet-700 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-violet-200"
+                    : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                )}
+              >
+                {currentSlide === 3 ? "Pokaż wynik →" : "Dalej →"}
+              </button>
+            </div>
+          )}
         </motion.div>
       </div>
     </section>
