@@ -51,12 +51,12 @@ export const DEMO_AUTOPILOT_DATA = {
 
   functions: {
     vip: { enabled: true },
-    slots: { enabled: false },
+    slots: { enabled: true },
     reminder: { enabled: true },
     radar: { enabled: true },
     noshow: { enabled: true },
     ambassador: { enabled: true },
-    referral: { enabled: false },
+    referral: { enabled: true },
     priceDetector: { enabled: true },
     upsell: { enabled: true },
     profitAlarm: { enabled: true },
