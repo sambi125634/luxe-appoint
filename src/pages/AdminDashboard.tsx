@@ -28,6 +28,7 @@ import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
+import { AutopilotModule } from "@/components/admin/autopilot";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -98,6 +99,7 @@ export default function AdminDashboard() {
       case "retention": return "Retencja klientek";
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
+      case "autopilot": return "AI Autopilot";
       default: return "Dashboard";
     }
   };
@@ -127,6 +129,7 @@ export default function AdminDashboard() {
       
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
+      case "autopilot": return <AutopilotModule />;
       default: return null;
     }
   };
