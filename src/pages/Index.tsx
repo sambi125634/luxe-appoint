@@ -29,8 +29,8 @@ const Index = () => {
       <main>
         <NewHeroSection onScrollToForm={scrollToPricing} />
         <OwnYourClientsSection />
-        <SystemFlowSection onScrollToForm={scrollToPricing} />
         <SalonLossCalculator />
+        <SystemFlowSection onScrollToForm={scrollToPricing} />
         <ComparisonSection />
         <InteractivePhoneMockup />
         <AudienceSection />

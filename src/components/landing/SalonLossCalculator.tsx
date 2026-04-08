@@ -44,10 +44,10 @@ const AnimatedLossCounter = ({ target }: { target: number }) => {
 
   return (
     <div className="relative inline-block">
-      <span className="text-5xl md:text-7xl font-black text-red-400 tracking-tight">
+      <span className="text-5xl md:text-7xl font-black text-destructive tracking-tight">
         -{count.toLocaleString("pl-PL")} zł
       </span>
-      <div className="absolute inset-0 bg-red-500/20 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute inset-0 bg-destructive/10 blur-3xl rounded-full pointer-events-none" />
     </div>
   );
 };
@@ -69,8 +69,8 @@ const GridOptionCard = ({
     className={cn(
       "text-left p-5 rounded-2xl border-2 transition-all duration-200",
       selected
-        ? "border-violet-600 bg-violet-50 shadow-lg shadow-violet-100"
-        : "border-gray-100 bg-gray-50/50 hover:border-violet-300 hover:bg-violet-50/30"
+        ? "border-primary bg-primary/5 shadow-lg shadow-primary/10"
+        : "border-gray-100 bg-gray-50/50 hover:border-primary/40 hover:bg-primary/5"
     )}
   >
     <div className="flex items-start justify-between gap-2">
@@ -78,7 +78,7 @@ const GridOptionCard = ({
       <div
         className={cn(
           "w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
-          selected ? "border-violet-600 bg-violet-600" : "border-gray-300"
+          selected ? "border-primary bg-primary" : "border-gray-300"
         )}
       >
         {selected && <Check className="w-3 h-3 text-white" />}
@@ -107,15 +107,15 @@ const ListOptionCard = ({
     className={cn(
       "w-full text-left px-5 py-4 rounded-2xl border-2 transition-all duration-200 flex items-center gap-4",
       selected
-        ? "border-violet-600 bg-violet-50"
-        : "border-gray-100 bg-gray-50/50 hover:border-violet-200 hover:bg-violet-50/20"
+        ? "border-primary bg-primary/5"
+        : "border-gray-100 bg-gray-50/50 hover:border-primary/30 hover:bg-primary/5"
     )}
   >
     {emoji && <span className="text-2xl flex-shrink-0">{emoji}</span>}
     <div
       className={cn(
         "w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all",
-        selected ? "border-violet-600 bg-violet-600" : "border-gray-300"
+        selected ? "border-primary bg-primary" : "border-gray-300"
       )}
     >
       {selected && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
@@ -188,8 +188,8 @@ const Slide2 = ({
 
   return (
     <div>
-      <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl p-5 mb-6">
-        <span className="text-xs font-semibold text-violet-400 uppercase tracking-wider">
+      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 mb-6">
+        <span className="text-xs font-semibold text-primary uppercase tracking-wider">
           Pytanie szczere
         </span>
         <h3 className="text-xl md:text-2xl font-bold text-foreground leading-tight mt-2">
@@ -322,11 +322,11 @@ const ResultSlide = ({
   return (
     <div className="space-y-8 text-center">
       <div className="space-y-3">
-        <p className="text-sm font-medium uppercase tracking-wider text-gray-400">
+        <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
           Szacujemy że tracisz rocznie
         </p>
         <AnimatedLossCounter target={totalLoss} />
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-muted-foreground">
           w klientkach które nie wróciły i pustych fotelach
         </p>
       </div>
@@ -347,17 +347,17 @@ const ResultSlide = ({
         ))}
       </div>
 
-      <div className="bg-violet-500/10 border border-violet-500/20 rounded-2xl p-5 text-left">
+      <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 text-left">
         <p className="text-sm text-foreground/80 italic leading-relaxed">
           &ldquo;{emotionalComment}&rdquo;
         </p>
-        <p className="text-sm font-semibold text-violet-400 mt-2">{emotionalHighlight}</p>
+        <p className="text-sm font-semibold text-primary mt-2">{emotionalHighlight}</p>
       </div>
 
       <div className="space-y-3">
         <button
           onClick={() => (window.location.href = "/auth")}
-          className="w-full py-4 px-6 bg-gradient-to-r from-violet-600 to-violet-500 text-white font-semibold text-base rounded-2xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-violet-500/30"
+          className="w-full py-4 px-6 bg-gradient-to-r from-primary to-[#D4A574] text-white font-semibold text-base rounded-2xl hover:opacity-90 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-primary/30"
         >
           Zacznij odzyskiwać te pieniądze →
         </button>
@@ -418,10 +418,10 @@ export const SalonLossCalculator = () => {
   };
 
   return (
-    <section className="relative py-20 lg:py-28 bg-[#0F0B1A] overflow-hidden">
-      {/* Glow orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-fuchsia-600/8 rounded-full blur-[100px] pointer-events-none" />
+    <section className="relative py-20 lg:py-28 bg-background overflow-hidden">
+      {/* Glow orbs — warm peach/lavender like Hero */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/[0.12] rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/[0.14] rounded-full blur-[100px] pointer-events-none" />
 
       <div className="container max-w-2xl mx-auto relative z-10">
         {/* Transitional sentence */}
@@ -430,10 +430,10 @@ export const SalonLossCalculator = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6 }}
-          className="text-center text-lg md:text-xl text-gray-400 mb-10 font-medium"
+          className="text-center text-lg md:text-xl text-muted-foreground mb-10 font-medium"
         >
           Policzmy konkretnie ile to kosztuje{" "}
-          <span className="text-white font-semibold">właśnie Twój salon.</span>
+          <span className="text-foreground font-semibold">właśnie Twój salon.</span>
         </motion.p>
 
         {/* Quiz card */}
@@ -442,13 +442,13 @@ export const SalonLossCalculator = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="bg-white rounded-3xl shadow-2xl shadow-black/20 p-6 md:p-10 overflow-hidden"
+          className="bg-white rounded-3xl shadow-[0_12px_60px_-12px_rgba(0,0,0,0.08)] p-6 md:p-10 overflow-hidden"
         >
           {/* Progress bar */}
           {currentSlide < 4 && (
             <div className="h-0.5 bg-gray-100 rounded-full overflow-hidden mb-6">
               <motion.div
-                className="h-full bg-violet-500 rounded-full"
+                className="h-full bg-primary rounded-full"
                 initial={false}
                 animate={{ width: `${((currentSlide + 1) / 4) * 100}%` }}
                 transition={{ duration: 0.4, ease: "easeOut" }}
@@ -468,7 +468,7 @@ export const SalonLossCalculator = () => {
                     key={i}
                     className={cn(
                       "w-2 h-2 rounded-full transition-all duration-300",
-                      i <= currentSlide ? "bg-violet-500" : "bg-gray-200"
+                      i <= currentSlide ? "bg-primary" : "bg-gray-200"
                     )}
                   />
                 ))}
@@ -522,7 +522,7 @@ export const SalonLossCalculator = () => {
               {currentSlide > 0 ? (
                 <button
                   onClick={handleBack}
-                  className="text-gray-400 text-xs flex items-center gap-1.5 hover:text-violet-500 transition-colors"
+                  className="text-muted-foreground text-xs flex items-center gap-1.5 hover:text-primary transition-colors"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                   Poprzednie pytanie
@@ -536,7 +536,7 @@ export const SalonLossCalculator = () => {
                 className={cn(
                   "px-8 py-3 rounded-2xl font-semibold text-sm transition-all duration-200",
                   selectedOption !== null
-                    ? "bg-violet-600 text-white hover:bg-violet-700 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-violet-200"
+                    ? "bg-primary text-white hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] shadow-md shadow-primary/20"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 )}
               >
