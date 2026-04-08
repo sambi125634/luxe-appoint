@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart, ChevronDown
+  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart, ChevronDown, Bot
 } from "lucide-react";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "consultation" | "referral";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "consultation" | "referral" | "autopilot";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -33,6 +33,7 @@ const TAB_PERMISSION_MAP: Partial<Record<TabType, keyof StaffPermissions>> = {
   widgets: "can_manage_marketing",
   retention: "can_manage_marketing",
   referral: "can_manage_marketing",
+  autopilot: "can_manage_marketing",
   products: "can_manage_products",
   services: "can_edit_services",
 };
@@ -74,6 +75,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
         { icon: Route, labelKey: "admin.clientJourney", tab: "pipeline" },
         { icon: Radar, labelKey: "admin.retention", tab: "retention" },
         { icon: Heart, labelKey: "admin.referral", tab: "referral" },
+        { icon: Bot, labelKey: "admin.autopilot", tab: "autopilot" },
       ],
     },
     {
