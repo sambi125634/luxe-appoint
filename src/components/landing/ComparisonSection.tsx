@@ -1,100 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Brain,
-  Calculator,
-  Scan,
-  TrendingUp,
-  Users,
-  Shield,
-  Layout,
-  Target,
-  Sparkles,
-  Heart,
-  Package,
-  Gift,
   Check,
-  ArrowRight,
   ChevronDown,
   AlertTriangle,
+  ArrowRight,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-const uniqueFeatures = [
-  {
-    icon: Brain,
-    title: "AI Autopilot (12 funkcji)",
-    description:
-      "Nie musisz ręcznie szukać wolnych terminów, dzwonić w urodziny ani zgadywać kto odejdzie. 12 funkcji AI robi to za Ciebie — codziennie, bez przerwy.",
-  },
-  {
-    icon: Calculator,
-    title: "True Profit per zabieg",
-    description:
-      "Wiesz ile naprawdę zarabiasz na każdym zabiegu — po odliczeniu materiałów. Koniec zgadywania, które usługi Ci się opłacają.",
-  },
-  {
-    icon: Heart,
-    title: "Retencja — strefy zagrożenia",
-    description:
-      "Widzisz które klientki zaraz odejdą — zanim to się stanie. System sam wysyła SMS lub email, żeby je zatrzymać.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Prognoza przychodów AI",
-    description:
-      "Wiesz ile zarobisz za 30, 60 i 90 dni. Planujesz zakupy, urlopy i inwestycje na twardych danych, nie przeczuciu.",
-  },
-  {
-    icon: Shield,
-    title: "Własność bazy danych",
-    description:
-      "Twoja baza klientek należy do Ciebie. Eksportujesz jednym kliknięciem. Żadna platforma nie może Ci jej zabrać ani zablokować.",
-  },
-  {
-    icon: Layout,
-    title: "Prywatna aplikacja mobilna",
-    description:
-      "Twoje klientki widzą tylko Twój salon — nie konkurencję obok. Zero reklam innych salonów w Twojej aplikacji.",
-  },
-  {
-    icon: Users,
-    title: "Automatyczna segmentacja",
-    description:
-      "System sam oznacza klientki: VIP, zagrożona odejściem, nowa, no-show. Nie musisz ręcznie tagować setek osób.",
-  },
-  {
-    icon: Package,
-    title: "Receptury zabiegowe",
-    description:
-      "Przypisujesz składniki do zabiegu raz — magazyn aktualizuje się sam po każdej wizycie. Koniec ręcznego liczenia zużycia.",
-  },
-  {
-    icon: Scan,
-    title: "Skaner kodów kamerą",
-    description:
-      "Przyjmujesz dostawę aparatem telefonu. Skanujesz kod — produkt trafia do magazynu. Bez czytnika, bez ręcznego wpisywania.",
-  },
-  {
-    icon: Target,
-    title: "Ścieżka Klientki™ + Auto-zaliczki",
-    description:
-      "Widzisz dokładnie na jakim etapie jest każda klientka — od pierwszej wizyty do stałej. Automatyczne zaliczki chronią Cię przed no-showami.",
-  },
-  {
-    icon: Gift,
-    title: "Program poleceń z ROI",
-    description:
-      "Każda klientka ma unikalny link polecający. Widzisz ile nowych osób przyprowadziła i ile na tym zarobiłaś.",
-  },
-  {
-    icon: Sparkles,
-    title: "Widget per kampania",
-    description:
-      "Osobny widget rezerwacji dla Instagrama, strony i Google Ads. Wiesz która kampania przynosi rezerwacje.",
-  },
-];
+import { UniqueFeaturesTabs } from "./UniqueFeaturesTabs";
 
 const sharedFeatures = [
   { name: "Kalendarz online z rezerwacjami", bc: true, market: true },
@@ -120,7 +34,7 @@ export const ComparisonSection = () => {
   };
 
   return (
-    <section className="py-20 lg:py-32 bg-muted/20" id="comparison">
+    <section className="py-20 lg:py-32 bg-white" id="comparison">
       <div className="container max-w-5xl">
         {/* Header */}
         <motion.div
@@ -188,53 +102,8 @@ export const ComparisonSection = () => {
           </div>
         </motion.div>
 
-        {/* Unique features header */}
-        <motion.div
-          className="mb-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <h3 className="text-xl md:text-2xl font-bold text-center">
-            <span className="text-primary">{uniqueFeatures.length} funkcji</span>, które znajdziesz tylko u nas
-          </h3>
-        </motion.div>
-
-        {/* Feature cards grid */}
-        <div className="grid md:grid-cols-2 gap-4">
-          {uniqueFeatures.map((feature, i) => {
-            const Icon = feature.icon;
-            return (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.04, duration: 0.4 }}
-                className="group relative rounded-xl border border-border bg-card p-5 hover:border-primary/30 hover:shadow-md transition-all duration-300"
-              >
-                <Badge
-                  variant="outline"
-                  className="absolute top-4 right-4 text-[10px] text-primary border-primary/30 bg-primary/5"
-                >
-                  Tylko u nas
-                </Badge>
-                <div className="flex gap-3.5">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/15 transition-colors">
-                    <Icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div className="pr-16">
-                    <h4 className="font-bold text-sm mb-1">{feature.title}</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+        {/* NEW: Unique features tabs */}
+        <UniqueFeaturesTabs />
 
         {/* Shared features disclaimer + collapsible */}
         <motion.div
