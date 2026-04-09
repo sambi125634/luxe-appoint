@@ -1,28 +1,63 @@
 
 
-## Plan: 6 kroków z copywritingiem Direct Response w SystemFlowSection
+## Plan: Uporządkowanie ComparisonSection — spójna narracja bez duplikatów ceny
 
-### Plik: `src/components/landing/SystemFlowSection.tsx`
+### Problem
 
-**Nowy nagłówek sekcji:**
-- Kicker: "Jak to działa"
-- H2: **"Jedna klientka. Pięć wizyt. Zero Twojego wysiłku."**
+ComparisonSection pokazuje cenę **dwa razy**: na górze (karty 99 zł vs 145+ zł) i na dole (Value Knockout z przekreśloną 3 910 zł). To osłabia efekt — cena powinna pojawić się raz, jako punchline po zbudowaniu wartości.
 
-**Rozbudowa z 5 do 6 kroków — treści Direct Response:**
+### Nowa struktura sekcji
 
-| # | Ikona | Tytuł | Opis |
-|---|-------|-------|------|
-| 1 | CalendarCheck | Rezerwacja w 30 sekund — bez aplikacji | Klientka otwiera link, wybiera termin i rezerwuje. Bez pobierania aplikacji, bez zakładania konta, bez dzwonienia. 30 sekund od kliknięcia do potwierdzenia. Żaden inny system na polskim rynku tego nie oferuje. |
-| 2 | Bell | Rozgrzewka przed wizytą | Inne systemy wysyłają suche przypomnienie. Twój wysyła treści edukacyjne o zarezerwowanej usłudze — klientka czeka na wizytę jak na prezent. Efekt? −67% no-showów w pierwszym miesiącu. |
-| 3 | RotateCcw | Sekwencja 5 wizyt | Statystyka jest brutalna: 60% nowych klientek nie wraca po pierwszej wizycie. System wysyła idealnie wyczasowane wiadomości, które prowadzą klientkę od pierwszej wizyty do piątej — automatycznie, bez Twojego udziału. |
-| 4 | Brain | Radar Odejść — AI, który nie śpi | AI analizuje zachowanie każdej klientki i wykrywa sygnały odejścia 3 tygodnie wcześniej. Zanim klientka zdąży zapomnieć o Twoim salonie, dostaje spersonalizowaną ofertę powrotu. Ty nawet nie wiesz, że była zagrożona. |
-| 5 | Gift | Efekt Kuli Śnieżnej | Zadowolona klientka poleca Twój salon koleżance. Koleżanka dostaje powitalny rabat, klientka — nagrodę. System śledzi każde polecenie, nalicza nagrody i buduje ranking ambasadorek. Bez Twojego wysiłku. |
-| 6 | TrendingUp | True Profit — ile naprawdę zarabiasz | Inne systemy pokazują przychód. Twój odejmuje koszt produktów, czas pracy, prowizje — i pokazuje realny zysk z każdej usługi, każdego dnia, każdej stylistki. Pierwszy raz wiesz, ile naprawdę zarabiasz. |
+```text
+┌─────────────────────────────────────────────┐
+│  KICKER: "Uczciwe porównanie"               │
+│  HEADLINE: "Wszystko to dostajesz.          │
+│             Nigdzie indziej tego nie ma."    │
+│                                             │
+│  ┌───────────────────────────────────────┐  │
+│  │  UniqueFeaturesTabs (12 funkcji)      │  │
+│  │  (bez zmian — taby + karty + progres) │  │
+│  └───────────────────────────────────────┘  │
+│                                             │
+│  "CRM, SMS, magazyn? Obie platformy to      │
+│   mają. Różnica w tym, co dzieje się potem." │
+│  [▼ Porównaj standardowe funkcje]           │
+│                                             │
+│  ┌───────────────────────────────────────┐  │
+│  │  VALUE KNOCKOUT (jedyne miejsce z ceną)│  │
+│  │  Przekreślone 3 910 zł → 99 zł netto │  │
+│  │  + "0% prowizji. Zawsze."             │  │
+│  │  + dodatkowy kontekst vs marketplace  │  │
+│  └───────────────────────────────────────┘  │
+│                                             │
+│  [CTA: Zacznij za darmo]                    │
+└─────────────────────────────────────────────┘
+```
 
-### Zmiany techniczne
+### Co się zmienia
 
-- Dodanie importu `TrendingUp` z lucide-react
-- Krok 6 screenshot: `stepDashboard` (dashboard z analityką)
-- Headline zmieniony na nowy Direct Response
-- Bez zmian: layout, animacje, auto-switch 6s, progress bar, mechanika isPaused, CTA
+**1. Usunięcie kart cenowych z góry** (linie 56-103)
+- Karty "99 zł vs 145+ zł" znikają — cena porównawcza pojawia się dopiero w Value Knockout na dole po zbudowaniu wartości 12 funkcji
+- To klasyczna technika Hormoziego: najpierw stos wartości, potem cena jako kontrast
+
+**2. Nowy headline**
+- Kicker: "Uczciwe porównanie"
+- H2: **"Wszystko to dostajesz. Nigdzie indziej tego nie ma."**
+- Krótszy, pewniejszy siebie, Direct Response
+
+**3. Rozbudowa Value Knockout** — jedyne miejsce z ceną
+- Dodanie linii kontekstu marketplace: "Marketplace: 145+ zł/mies + do 45% prowizji od nowych klientek"
+- Zachowanie: przekreślone 3 910 zł → 99 zł netto → 0% prowizji
+- To jedyny moment, w którym użytkownik widzi cenę w tej sekcji — po obejrzeniu 12 unikalnych funkcji
+
+### Czego NIE zmieniam
+- UniqueFeaturesTabs — zero zmian (taby, karty, auto-rotate 8s, progress bar)
+- Collapsible shared features table — zero zmian
+- CTA na dole — zero zmian
+- ValueStackSection.tsx — nie jest używana w Index.tsx, nie ruszam
+
+### Plik do edycji
+| Plik | Co |
+|------|----|
+| `src/components/landing/ComparisonSection.tsx` | Usunięcie kart cenowych z góry, nowy headline, rozbudowany Value Knockout |
 
