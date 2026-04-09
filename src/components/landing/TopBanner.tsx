@@ -6,13 +6,8 @@ export const TopBanner = () => {
   return (
     <div className="fixed top-0 left-0 right-0 z-[60] bg-black text-white py-2 md:py-2.5 text-center">
       <p className="text-xs md:text-sm px-4">
-        <span className="hidden md:inline">
-          Przeciętna właścicielka salonu traci{" "}
-          <span className="font-bold">72 000 zł rocznie</span> na klientkach które nie wróciły. Ile Ty tracisz?{" "}
-        </span>
-        <span className="md:hidden">
-          Ile tracisz rocznie na klientkach?{" "}
-        </span>
+        Przeciętna właścicielka salonu traci{" "}
+        <span className="font-bold">72 000 zł rocznie</span> na klientkach które nie wróciły. Ile Ty tracisz?{" "}
         <button
           onClick={scrollToCalculator}
           className="text-primary underline underline-offset-2 font-semibold hover:text-primary/80 transition-colors"
