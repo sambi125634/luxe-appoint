@@ -34,31 +34,12 @@ export const InteractivePhoneMockup = () => {
               </span>
             </h2>
 
-            <p className="text-white/60 text-lg leading-relaxed mb-8 max-w-md">
+            <p className="text-white/60 text-lg leading-relaxed mb-6 max-w-md">
               Bez marketplace'u. Bez konkurencji obok. Tylko Twój salon w jej telefonie.
             </p>
 
-            <div className="space-y-5 mb-10">
-              {[
-                { title: "", desc: "" },
-                { title: "Twoja marka, Twoje kolory, Twoje logo", desc: "" },
-                { title: "Push powiadomienia = bezpośredni dostęp", desc: "Nie czekasz aż klientka wejdzie na stronę. Piszesz do niej prosto na ekran blokady." },
-                { title: "AI podpowiada wolne terminy", desc: "System proponuje klientce godziny, które wypełniają luki w Twoim grafiku. Ona myśli, że dostała VIP termin." },
-                { title: "Cyfrowa karta lojalnościowa", desc: "Pieczątki, punkty, nagrody. Klientka zbiera za każdą wizytę i nie może się doczekać następnej." },
-                { title: "Usługi prezentowane przez wideo", desc: "Portfolio zabiegów w ruchu. Klientka ogląda efekty zanim zarezerwuje — i rezerwuje droższe usługi." },
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="text-primary font-mono font-bold mt-0.5">→</span>
-                  <div>
-                    <span className="text-white font-semibold text-sm">{item.title}</span>
-                    <p className="text-white/50 text-sm mt-0.5">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-white/30 text-xs italic">
-              * Interaktywne demo — kliknij, aby przetestować
+            <p className="text-white/40 text-sm leading-relaxed max-w-md">
+              Obok widzisz interaktywne demo aplikacji mobilnej, którą pobierają Twoje klientki. Przeklikaj się — dokładnie tak wygląda ich doświadczenie: wybór usługi, rezerwacja terminu, płatność. Wszystko w Twojej marce, bez śladu konkurencji.
             </p>
           </motion.div>
 
