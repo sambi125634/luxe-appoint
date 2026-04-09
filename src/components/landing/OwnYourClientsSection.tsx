@@ -2,19 +2,21 @@ import { AlertTriangle, X, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 const marketplacePoints = [
-  "Klientki należą do platformy — nie do Ciebie",
-  "Odejście = utrata całej historii i danych",
-  "Walczysz ceną z konkurencją wyświetlaną obok",
-  "Jutro mogą zmienić zasady — i nic na to nie poradzisz",
-  "Prowizja od każdej wizyty przez Boost",
+  "Eksportujesz: imię, telefon, email. I nic więcej.",
+  "Jutro mogą podnieść prowizję — i nic nie zrobisz",
+  "Twoja konkurencja jest wyświetlana obok Ciebie",
+  "Brak sekwencji — klientka znika i nikt jej nie goni",
+  "Klientki porównują Cię z tańszą konkurencją w jednym widoku",
+  "Budujesz ich bazę. Ich brand. Ich biznes. Nie swój.",
 ];
 
 const bcPoints = [
   { text: "Twoje klientki. Twoje dane. Na zawsze.", bold: true },
-  { text: "Eksport jednym kliknięciem — nikt nie może Ci ich zabrać" },
-  { text: "Prywatna aplikacja — klientka widzi tylko Twój salon" },
-  { text: "Automatyczne sekwencje retencyjne — klientki wracają same" },
-  { text: "0% prowizji od rezerwacji. Zawsze." },
+  { text: "0% prowizji — dziś, jutro i za 5 lat" },
+  { text: "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej" },
+  { text: "Auto-zaliczka od klientek z historią no-show — bez niezręcznej rozmowy" },
+  { text: "Budujesz własną bazę — nikt Ci jej nie odbierze" },
+  { text: "Za rok masz asset który pracuje dla Ciebie — nie dla platformy" },
 ];
 
 export const OwnYourClientsSection = () => {
@@ -52,8 +54,8 @@ export const OwnYourClientsSection = () => {
           </h2>
 
           <p className="max-w-2xl mx-auto text-base md:text-lg leading-relaxed" style={{ color: "#4A4A5A" }}>
-            Platformy marketplace działają jak Allegro dla usług beauty — klientka wybiera najtańszego, a jej dane należą do platformy.{" "}
-            <span style={{ color: "#1A1A2E", fontWeight: 500 }}>Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję za 10 zł taniej.</span>
+            Czy zastanawiałaś się, czym różni się wystawienie Twojego salonu na marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo — a klientka decyduje jedynie ceną, ilością opinii lub szczęściem?{" "}
+            <span style={{ color: "#1A1A2E", fontWeight: 500 }}>A jej unikatowe dane — preferencje, historia wizyt, zachowania zakupowe — należą do platformy. Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję za 10 zł taniej.</span>
           </p>
         </motion.div>
 
