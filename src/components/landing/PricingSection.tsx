@@ -17,7 +17,7 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
   const plans = getPlans(isAnnual);
 
   return (
-    <section id="pricing" className="py-20 lg:py-32 bg-gradient-to-b from-background to-muted/20">
+    <section id="pricing" className="py-16 md:py-20 lg:py-32 bg-gradient-to-b from-background to-muted/20">
       <div className="container">
         <motion.div
           className="text-center mb-10"
@@ -26,7 +26,7 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
             Prosta cena. Zero prowizji.
             <br />
             <span className="text-gradient-luxury">Pełna kontrola nad Twoim biznesem.</span>
@@ -45,7 +45,7 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
         </div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <PricingCard key={index} plan={plan} index={index} onScrollToForm={onScrollToForm} />
           ))}
@@ -59,9 +59,9 @@ export const PricingSection = ({ onScrollToForm }: PricingSectionProps) => {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <div className="inline-flex items-center gap-3 bg-card border border-border rounded-2xl px-8 py-4">
+          <div className="inline-flex items-center gap-2 md:gap-3 bg-card border border-border rounded-2xl px-4 md:px-8 py-3 md:py-4">
             <Percent className="w-5 h-5 text-primary" />
-            <p className="font-bold text-lg">0% prowizji od rezerwacji — <span className="text-primary">zawsze.</span></p>
+            <p className="font-bold text-base md:text-lg">0% prowizji od rezerwacji — <span className="text-primary">zawsze.</span></p>
           </div>
           <p className="text-sm text-muted-foreground mt-3">
             W żadnym pakiecie nie pobieramy prowizji od wizyt Twoich klientek. Nigdy.

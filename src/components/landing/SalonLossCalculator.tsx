@@ -44,7 +44,7 @@ const AnimatedLossCounter = ({ target }: { target: number }) => {
 
   return (
     <div className="relative inline-block">
-      <span className="text-5xl md:text-7xl font-black text-destructive tracking-tight">
+      <span className="text-4xl md:text-5xl lg:text-7xl font-black text-destructive tracking-tight">
         -{count.toLocaleString("pl-PL")} zł
       </span>
       <div className="absolute inset-0 bg-destructive/10 blur-3xl rounded-full pointer-events-none" />
@@ -156,7 +156,7 @@ const Slide1 = ({
         question="Ile klientek wraca do Ciebie regularnie?"
         subtext="Pomyśl o klientkach z ostatniego roku."
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt) => (
           <GridOptionCard
             key={opt.value}
@@ -233,7 +233,7 @@ const Slide3 = ({
         question="Ile wynosi średnia wartość jednej wizyty?"
         subtext="Weź pod uwagę swoje najpopularniejsze usługi."
       />
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {options.map((opt) => (
           <GridOptionCard
             key={opt.value}
@@ -340,9 +340,9 @@ const ResultSlide = ({
             transition={{ delay: 0.8 + i * 0.15, duration: 0.4 }}
             className="text-center"
           >
-            <span className="text-2xl">{ctx.emoji}</span>
-            <div className="text-2xl font-bold text-foreground mt-1">{ctx.value}×</div>
-            <div className="text-xs text-muted-foreground">{ctx.label}</div>
+            <span className="text-xl md:text-2xl">{ctx.emoji}</span>
+            <div className="text-xl md:text-2xl font-bold text-foreground mt-1">{ctx.value}×</div>
+            <div className="text-[10px] md:text-xs text-muted-foreground">{ctx.label}</div>
           </motion.div>
         ))}
       </div>
@@ -418,7 +418,7 @@ export const SalonLossCalculator = () => {
   };
 
   return (
-    <section id="calculator" className="relative py-20 lg:py-28 bg-background overflow-hidden">
+    <section id="calculator" className="relative py-16 md:py-20 lg:py-28 bg-background overflow-hidden">
       {/* Glow orbs — warm peach/lavender like Hero */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/[0.12] rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/[0.14] rounded-full blur-[100px] pointer-events-none" />
@@ -442,7 +442,7 @@ export const SalonLossCalculator = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.6, delay: 0.15 }}
-          className="bg-white rounded-3xl shadow-[0_12px_60px_-12px_rgba(0,0,0,0.08)] p-6 md:p-10 overflow-hidden"
+          className="bg-white rounded-3xl shadow-[0_12px_60px_-12px_rgba(0,0,0,0.08)] p-5 md:p-6 lg:p-10 overflow-hidden"
         >
           {/* Progress bar */}
           {currentSlide < 4 && (

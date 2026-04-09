@@ -104,19 +104,19 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
   };
 
   return (
-    <section className="py-24 bg-background">
+    <section className="py-16 md:py-20 lg:py-24 bg-background">
       <div className="container max-w-6xl mx-auto px-4">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <span className="text-sm font-medium tracking-widest uppercase text-muted-foreground">
+          <span className="text-xs md:text-sm font-medium tracking-widest uppercase text-muted-foreground">
             Jak to działa
           </span>
-          <h2 className="mt-4 text-3xl md:text-4xl font-serif font-bold leading-tight text-foreground">
+          <h2 className="mt-3 md:mt-4 text-2xl md:text-4xl font-serif font-bold leading-tight text-foreground">
             Jedna klientka. Pięć wizyt.{" "}
             <br className="hidden md:block" />
             <span className="text-primary">Zero Twojego wysiłku.</span>
@@ -209,7 +209,7 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
                 key={activeStep}
                 src={steps[activeStep].image}
                 alt={steps[activeStep].imageAlt}
-                className="w-full h-auto rounded-2xl shadow-xl"
+                className="w-full h-auto rounded-2xl shadow-xl max-h-[300px] lg:max-h-none object-contain"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
