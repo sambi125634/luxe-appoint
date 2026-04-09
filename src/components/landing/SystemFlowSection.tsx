@@ -4,10 +4,12 @@ import { CalendarCheck, Bell, RotateCcw, Brain, Gift, TrendingUp } from "lucide-
 import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
 
-import stepBooking from "@/assets/screenshots/step-booking.png";
+import stepBookingNew from "@/assets/screenshots/step-booking-new.png";
+import stepAutopilot from "@/assets/screenshots/step-autopilot.png";
+import stepPipeline from "@/assets/screenshots/step-pipeline.png";
+import stepRadar from "@/assets/screenshots/step-radar.png";
+import stepReferral from "@/assets/screenshots/step-referral.png";
 import stepDashboard from "@/assets/screenshots/step-dashboard.png";
-import stepRetention from "@/assets/screenshots/step-retention.png";
-import stepClients from "@/assets/screenshots/step-clients.png";
 
 interface Step {
   icon: LucideIcon;
