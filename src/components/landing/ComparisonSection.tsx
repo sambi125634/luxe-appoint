@@ -46,10 +46,6 @@ export const ComparisonSection = () => {
           <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
             Uczciwe porównanie
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Wszystko to dostajesz.{" "}
-            <span className="text-gradient-luxury">Nigdzie indziej tego nie ma.</span>
-          </h2>
         </motion.div>
 
 
