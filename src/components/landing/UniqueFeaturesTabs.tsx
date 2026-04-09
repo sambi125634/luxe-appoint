@@ -289,7 +289,7 @@ export function UniqueFeaturesTabs() {
   };
 
   return (
-    <div className="py-20 lg:py-28">
+    <div className="py-16 md:py-20 lg:py-28">
       {/* Header */}
       <motion.div
         className="text-center mb-12"
@@ -303,11 +303,11 @@ export function UniqueFeaturesTabs() {
           <span className="text-sm font-medium text-violet-600">Tylko u nas</span>
         </div>
 
-        <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold leading-tight mb-4">
+        <h2 className="text-2xl md:text-4xl lg:text-[42px] font-bold leading-tight mb-4">
           <span className="text-primary">12 funkcji,</span> które same zarabiają za Ciebie
         </h2>
 
-        <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           Każda rozwiązuje problem, który dziś kosztuje Cię{" "}
           <span className="text-foreground font-medium">czas i pieniądze.</span>
         </p>
@@ -320,20 +320,20 @@ export function UniqueFeaturesTabs() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.15 }}
       >
-        <div className="flex items-center gap-2 mb-10 p-1.5 bg-gray-100 rounded-2xl max-w-2xl mx-auto">
+        <div className="flex items-center gap-1 md:gap-2 mb-8 md:mb-10 p-1 md:p-1.5 bg-gray-100 rounded-2xl max-w-2xl mx-auto">
           {tabs.map((tab, i) => (
             <button
               key={i}
               onClick={() => handleTabClick(i)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl transition-all duration-300 text-sm font-semibold",
+                "flex-1 flex items-center justify-center gap-1 md:gap-1.5 px-2 md:px-3 py-2 md:py-2.5 rounded-xl transition-all duration-300 text-xs md:text-sm font-semibold",
                 activeTab === i
                   ? "bg-violet-600 text-white shadow-md shadow-violet-200"
                   : "text-gray-400 hover:text-gray-600 hover:bg-white/60"
               )}
             >
-              <span className="text-base leading-none">{tab.emoji}</span>
-              <span className="leading-none">{tab.label}</span>
+              <span className="text-sm md:text-base leading-none">{tab.emoji}</span>
+              <span className="leading-none hidden sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
@@ -356,7 +356,7 @@ export function UniqueFeaturesTabs() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.3 }}
-          className="grid md:grid-cols-3 gap-5"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5"
           onMouseEnter={handleAreaEnter}
           onMouseLeave={handleAreaLeave}
         >

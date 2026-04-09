@@ -67,16 +67,16 @@ const categories = [
 
 export const AudienceSection = () => {
   return (
-    <section className="py-20 lg:py-32">
+    <section className="py-16 md:py-20 lg:py-32">
       <div className="container">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.7 }}
         >
-          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
+          <h2 className="text-2xl md:text-4xl font-serif font-bold mb-4">
             Beauty Calendar jest dla Ciebie —
             <br />
             <span className="text-gradient-luxury">niezależnie od tego czym się zajmujesz</span>
@@ -96,7 +96,7 @@ export const AudienceSection = () => {
               <img
                 src={cat.image}
                 alt={cat.title}
-                className="w-full h-32 object-cover"
+                className="w-full h-24 md:h-32 object-cover"
                 loading="lazy"
                 width={640}
                 height={512}
@@ -115,7 +115,7 @@ export const AudienceSection = () => {
 
         {/* Bottom CTA */}
         <motion.div
-          className="text-center mt-10 p-6 bg-primary/5 border border-primary/10 rounded-2xl max-w-2xl mx-auto"
+          className="text-center mt-8 md:mt-10 p-4 md:p-6 bg-primary/5 border border-primary/10 rounded-2xl max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

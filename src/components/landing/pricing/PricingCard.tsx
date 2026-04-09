@@ -40,7 +40,7 @@ export const PricingCard = ({ plan, index, onScrollToForm }: PricingCardProps) =
     >
       <Card className={cn(
         "relative overflow-hidden transition-all duration-300 hover:-translate-y-1 h-full",
-        plan.popular ? "border-primary shadow-xl scale-105 z-10" : "border-border/50 hover:border-border hover:shadow-lg"
+        plan.popular ? "border-primary shadow-xl md:scale-105 z-10" : "border-border/50 hover:border-border hover:shadow-lg"
       )}>
         {plan.popular && (
           <div className="absolute top-0 left-0 right-0 bg-primary text-primary-foreground text-center py-1 text-sm font-medium">
@@ -60,7 +60,7 @@ export const PricingCard = ({ plan, index, onScrollToForm }: PricingCardProps) =
           </div>
           <h3 className="text-xl font-bold">{plan.name}</h3>
           <div className="mt-4">
-            <span className="text-4xl font-bold">{plan.price}</span>
+            <span className="text-3xl md:text-4xl font-bold">{plan.price}</span>
             <span className="text-muted-foreground text-sm"> {plan.period}</span>
             {plan.setupFee && (
               <span className="text-sm text-muted-foreground block mt-1">+ {plan.setupPrice} jednorazowy onboarding</span>
