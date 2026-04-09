@@ -1,63 +1,32 @@
 
 
-## Plan: Uporządkowanie ComparisonSection — spójna narracja bez duplikatów ceny
+## Plan: Aktualizacja screenshotów w SystemFlowSection
 
-### Problem
+### Mapowanie uploaded screenshots → kroki
 
-ComparisonSection pokazuje cenę **dwa razy**: na górze (karty 99 zł vs 145+ zł) i na dole (Value Knockout z przekreśloną 3 910 zł). To osłabia efekt — cena powinna pojawić się raz, jako punchline po zbudowaniu wartości.
+| Krok | Temat | Obecny obraz | Nowy obraz (uploaded) |
+|------|-------|--------------|-----------------------|
+| 1 | Rezerwacja w 30s | step-booking.png | Screenshot 1 — widok rezerwacji z krokami i listą usług |
+| 2 | Rozgrzewka przed wizytą | step-dashboard.png | Screenshot 4 — AI Autopilot z zaplanowanymi akcjami na dziś |
+| 3 | Sekwencja 5 wizyt | step-retention.png | Screenshot 2 — Ścieżka klientki z etapami kanban |
+| 4 | Radar Odejść | step-clients.png | Screenshot 3 — Powracalność klientek ze strefami ryzyka |
+| 5 | Efekt Kuli Śnieżnej | step-clients.png | Screenshot 5 — Moduł poleceń z aktywnością ambasadorek |
+| 6 | True Profit | step-dashboard.png | bez zmian (step-dashboard.png) |
 
-### Nowa struktura sekcji
+### Zmiany
 
-```text
-┌─────────────────────────────────────────────┐
-│  KICKER: "Uczciwe porównanie"               │
-│  HEADLINE: "Wszystko to dostajesz.          │
-│             Nigdzie indziej tego nie ma."    │
-│                                             │
-│  ┌───────────────────────────────────────┐  │
-│  │  UniqueFeaturesTabs (12 funkcji)      │  │
-│  │  (bez zmian — taby + karty + progres) │  │
-│  └───────────────────────────────────────┘  │
-│                                             │
-│  "CRM, SMS, magazyn? Obie platformy to      │
-│   mają. Różnica w tym, co dzieje się potem." │
-│  [▼ Porównaj standardowe funkcje]           │
-│                                             │
-│  ┌───────────────────────────────────────┐  │
-│  │  VALUE KNOCKOUT (jedyne miejsce z ceną)│  │
-│  │  Przekreślone 3 910 zł → 99 zł netto │  │
-│  │  + "0% prowizji. Zawsze."             │  │
-│  │  + dodatkowy kontekst vs marketplace  │  │
-│  └───────────────────────────────────────┘  │
-│                                             │
-│  [CTA: Zacznij za darmo]                    │
-└─────────────────────────────────────────────┘
-```
+1. Skopiować 5 uploadowanych obrazów do `src/assets/screenshots/` jako:
+   - `step-booking-new.png`
+   - `step-autopilot.png`
+   - `step-pipeline.png`
+   - `step-radar.png`
+   - `step-referral.png`
 
-### Co się zmienia
+2. W `SystemFlowSection.tsx` — zaktualizować importy i przypisania `image` w tablicy `steps`
 
-**1. Usunięcie kart cenowych z góry** (linie 56-103)
-- Karty "99 zł vs 145+ zł" znikają — cena porównawcza pojawia się dopiero w Value Knockout na dole po zbudowaniu wartości 12 funkcji
-- To klasyczna technika Hormoziego: najpierw stos wartości, potem cena jako kontrast
-
-**2. Nowy headline**
-- Kicker: "Uczciwe porównanie"
-- H2: **"Wszystko to dostajesz. Nigdzie indziej tego nie ma."**
-- Krótszy, pewniejszy siebie, Direct Response
-
-**3. Rozbudowa Value Knockout** — jedyne miejsce z ceną
-- Dodanie linii kontekstu marketplace: "Marketplace: 145+ zł/mies + do 45% prowizji od nowych klientek"
-- Zachowanie: przekreślone 3 910 zł → 99 zł netto → 0% prowizji
-- To jedyny moment, w którym użytkownik widzi cenę w tej sekcji — po obejrzeniu 12 unikalnych funkcji
-
-### Czego NIE zmieniam
-- UniqueFeaturesTabs — zero zmian (taby, karty, auto-rotate 8s, progress bar)
-- Collapsible shared features table — zero zmian
-- CTA na dole — zero zmian
-- ValueStackSection.tsx — nie jest używana w Index.tsx, nie ruszam
-
-### Plik do edycji
+### Pliki do edycji
 | Plik | Co |
 |------|----|
-| `src/components/landing/ComparisonSection.tsx` | Usunięcie kart cenowych z góry, nowy headline, rozbudowany Value Knockout |
+| `src/assets/screenshots/` | 5 nowych plików graficznych |
+| `src/components/landing/SystemFlowSection.tsx` | Zmiana importów i mapowania obrazów |
 
