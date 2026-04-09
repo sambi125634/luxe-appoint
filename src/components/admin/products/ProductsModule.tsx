@@ -59,6 +59,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
     { id: "orders" as ProductTab, label: "Zamówienia", icon: ShoppingCart },
     { id: "inv-stats" as ProductTab, label: "Statystyki", icon: BarChart3 },
     { id: "sales-report" as ProductTab, label: t("products.salesReport"), icon: TrendingUp },
+    { id: "true-profit" as ProductTab, label: "True Profit", icon: Coins },
     { id: "suppliers" as ProductTab, label: t("products.suppliers"), icon: Building2 },
   ];
 
