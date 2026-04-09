@@ -52,7 +52,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.div>
 
         <motion.h1
-          className="max-w-[980px] text-foreground font-extrabold font-serif text-2xl"
+          className="max-w-[980px] text-foreground font-extrabold font-serif text-4xl"
           style={{
             fontFamily: "var(--font-serif)",
             fontSize: "clamp(32px, 8vw, 78px)",
