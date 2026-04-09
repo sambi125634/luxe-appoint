@@ -108,7 +108,7 @@ const ServiceRecipes: React.FC<ServiceRecipesProps> = ({ salonId, isDemo }) => {
           .filter(r => !r.is_optional)
           .reduce((sum, r) => {
             const p = products.find(pr => pr.id === r.product_id);
-            return sum + (r.quantity_value / 100) * (p?.purchase_price_net || 0);
+            return sum + r.quantity_value * (p?.purchase_price_net || 0);
           }, 0);
         const margin = s.price > 0 ? ((s.price - totalCost) / s.price) * 100 : 0;
         return { service: s, ingredients: ings, totalCost, margin };
@@ -119,7 +119,7 @@ const ServiceRecipes: React.FC<ServiceRecipesProps> = ({ salonId, isDemo }) => {
 
   const calcIngCost = (r: DemoRecipe) => {
     const p = products.find(pr => pr.id === r.product_id);
-    return (r.quantity_value / 100) * (p?.purchase_price_net || 0);
+    return r.quantity_value * (p?.purchase_price_net || 0);
   };
 
   const openEditor = (recipe?: { service: typeof services[0]; ingredients: DemoRecipe[] }) => {
