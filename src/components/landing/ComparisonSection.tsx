@@ -48,8 +48,8 @@ export const ComparisonSection = () => {
             Uczciwe porównanie
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Co dostajesz u nas,{" "}
-            <span className="text-gradient-luxury">czego nie ma nigdzie indziej.</span>
+            Wszystko to dostajesz.{" "}
+            <span className="text-gradient-luxury">Nigdzie indziej tego nie ma.</span>
           </h2>
         </motion.div>
 
@@ -206,7 +206,12 @@ export const ComparisonSection = () => {
             <p className="text-4xl font-black line-through text-muted-foreground mb-3">3 910 zł/mies</p>
             <p className="text-sm text-muted-foreground mb-2">Twoja cena z Beauty Calendar PRO:</p>
             <p className="text-5xl font-black text-primary mb-1">99 zł netto/mies</p>
-            <p className="text-sm font-semibold text-muted-foreground">+ 0 zł prowizji od rezerwacji. Zawsze.</p>
+            <p className="text-sm font-semibold text-muted-foreground mb-4">+ 0 zł prowizji od rezerwacji. Zawsze.</p>
+            <div className="border-t border-primary/10 pt-4">
+              <p className="text-xs text-muted-foreground/70">
+                Marketplace: 145+ zł/mies + do 45% prowizji od nowych klientek (Boost)
+              </p>
+            </div>
           </div>
         </motion.div>
 
