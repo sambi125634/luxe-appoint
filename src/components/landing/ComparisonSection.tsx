@@ -42,6 +42,7 @@ export const ComparisonSection = () => {
         <UniqueFeaturesTabs />
 
         {/* Shared features disclaimer + collapsible */}
+        {/* Collapsible shared features */}
         <motion.div
           className="mt-12 max-w-3xl mx-auto"
           initial={{ opacity: 0 }}
@@ -49,9 +50,6 @@ export const ComparisonSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-
-          {/* Collapsible shared features */}
-          <div className="mt-6">
             <button
               onClick={() => setShowShared(!showShared)}
               className="mx-auto flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
@@ -118,7 +116,6 @@ export const ComparisonSection = () => {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
         </motion.div>
 
         {/* Value knockout */}
