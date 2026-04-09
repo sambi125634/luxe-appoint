@@ -326,14 +326,14 @@ export function UniqueFeaturesTabs() {
               key={i}
               onClick={() => handleTabClick(i)}
               className={cn(
-                "flex-1 flex items-center justify-center gap-1 md:gap-1.5 px-2 md:px-3 py-2 md:py-2.5 rounded-xl transition-all duration-300 text-xs md:text-sm font-semibold",
+                "flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 md:px-3 py-2.5 md:py-2.5 rounded-xl transition-all duration-300 text-xs md:text-sm font-semibold",
                 activeTab === i
                   ? "bg-violet-600 text-white shadow-md shadow-violet-200"
                   : "text-gray-400 hover:text-gray-600 hover:bg-white/60"
               )}
             >
-              <span className="text-sm md:text-base leading-none">{tab.emoji}</span>
-              <span className="leading-none hidden sm:inline">{tab.label}</span>
+              <span className="text-base leading-none">{tab.emoji}</span>
+              <span className="leading-none text-[10px] sm:text-xs md:text-sm">{tab.label}</span>
             </button>
           ))}
         </div>
