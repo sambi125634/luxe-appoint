@@ -1,38 +1,38 @@
 
 
-## Plan: Aktualizacja treści w OwnYourClientsSection
+## Plan: Aktualizacja treści OwnYourClientsSection
 
 ### Plik: `src/components/landing/OwnYourClientsSection.tsx`
 
-**1. Nowe bullet pointy — lewa karta (marketplace), 6 zamiast 5:**
+**1. Nowy opis pod nagłówkiem:**
+
+> Gdyby się nad tym zastanowić, to czym różni się platforma marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo? Dlaczego nie możesz wyeksportować najważniejszych unikatowych danych klienta, takich jak preferencje zakupowe czy historia wizyt? Bo należą one do platformy. Jutro mogą podnieść prowizję, pojutrze wyświetlić Twoją konkurencję 10 zł taniej — zachęcając Cię do oddania 50% prowizji, obiecując, że być może Ciebie wyświetlą dziś użytkownikom.
+
+**2. Marketplace — 7 bullet pointów (było 6):**
 
 ```
-✗ Eksportujesz: imię, telefon, email. I nic więcej.
+✗ 45%–55% prowizji od pozyskanego nowego klienta
+✗ Brak sekwencji — klientka znika i nikt jej nie goni, bo nie mają na tym zarobku
 ✗ Jutro mogą podnieść prowizję — i nic nie zrobisz
 ✗ Twoja konkurencja jest wyświetlana obok Ciebie
-✗ Brak sekwencji — klientka znika i nikt jej nie goni
+✗ Eksportujesz: imię, telefon, email. I nic więcej.
 ✗ Klientki porównują Cię z tańszą konkurencją w jednym widoku
-✗ Budujesz ich bazę. Ich brand. Ich biznes. Nie swój.
+✗ Budujesz ich bazę. Ich brand. Ich biznes. Nie swój. (Ich biznes to gromadzenie kupujących w aplikacji, a nie pozycjonowanie Twojego biznesu)
 ```
 
-**2. Nowe bullet pointy — prawa karta (Beauty Calendar), 6 zamiast 5:**
+**3. Beauty Calendar — 7 bullet pointów (było 6):**
 
 ```
-✓ Twoje klientki. Twoje dane. Na zawsze. (bold, bronze)
+✓ Twoje klientki. Twoje dane. Na zawsze. (bold bronze)
 ✓ 0% prowizji — dziś, jutro i za 5 lat
-✓ Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej
+✓ Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej i komunikuje się z nimi, aby temu zapobiec
 ✓ Auto-zaliczka od klientek z historią no-show — bez niezręcznej rozmowy
-✓ Budujesz własną bazę — nikt Ci jej nie odbierze
+✓ Budujesz własną bazę w prywatnej aplikacji mobilnej — nikt Ci jej nie odbierze
 ✓ Za rok masz asset który pracuje dla Ciebie — nie dla platformy
+✓ Stała stawka za pozyskiwanie nowych klientów, na których zarobisz kilkukrotnie więcej dzięki stworzonej do tego platformie
 ```
 
-**3. Nowy tekst opisu pod nagłówkiem:**
+### Zakres
 
-Zmiana z obecnego akapitu na bardziej emocjonalny:
-
-> Czy zastanawiałaś się, czym różni się wystawienie Twojego salonu na marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo — a klientka decyduje jedynie ceną, ilością opinii lub szczęściem? **A jej unikatowe dane — preferencje, historia wizyt, zachowania zakupowe — należą do platformy. Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję za 10 zł taniej.**
-
-### Zakres zmian
-
-Tylko treść (tablice `marketplacePoints`, `bcPoints`, akapit `<p>` pod nagłówkiem). Zero zmian w layoucie, kolorach, animacjach czy strukturze komponentu.
+Tylko zmiana tablic `marketplacePoints`, `bcPoints` i akapitu `<p>` pod nagłówkiem. Zero zmian w layoucie, animacjach czy strukturze.
 
