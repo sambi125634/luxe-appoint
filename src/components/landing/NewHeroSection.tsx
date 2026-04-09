@@ -103,7 +103,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="h-12 md:h-14 rounded-2xl px-6 md:px-10 text-[15px] md:text-[17px] shadow-soft sm:min-w-[294px]"
           >
             <span className="flex items-center gap-2">
-              Załóż konto za darmo
+              Wypróbuj 14 dni za darmo
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </span>
           </Button>

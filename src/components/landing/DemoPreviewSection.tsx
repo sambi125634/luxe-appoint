@@ -86,23 +86,14 @@ const DemoPreviewSection = () => {
           <div className="mx-auto w-[90%] h-1.5 bg-[#1a1a1a] rounded-b-lg border-x border-b border-border/30" />
         </motion.div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex items-center justify-center">
           <Button
             size="lg"
             className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 shadow-lg"
             onClick={() => (window.location.href = "/demo")}
           >
             <Settings className="mr-2 w-4 h-4" />
-            Otwórz pełne demo
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="px-8"
-            onClick={() => (window.location.href = "/auth")}
-          >
-            Załóż swoje konto za darmo
-            <ArrowRight className="ml-2 w-4 h-4" />
+            Przetestuj panel demo
           </Button>
         </div>
       </div>

@@ -227,7 +227,7 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
           transition={{ duration: 0.5, delay: 0.6 }}
         >
           <Button size="lg" className="rounded-full" onClick={onScrollToForm}>
-            Chcę taki system — zaczynam za darmo
+            Chcę taki system →
           </Button>
         </motion.div>
       </div>

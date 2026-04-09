@@ -383,24 +383,13 @@ export function UniqueFeaturesTabs() {
         <p className="text-sm text-muted-foreground mb-5">
           To dopiero 12 z ponad 60 funkcji Beauty Calendar
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Button
-            onClick={scrollToPricing}
-            size="lg"
-            className="rounded-full px-8 text-base"
-          >
-            Zacznij za darmo →
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="rounded-full px-6 text-base gap-2"
-            onClick={() => window.open("/demo", "_blank")}
-          >
-            <ExternalLink className="w-4 h-4" />
-            Zobacz demo
-          </Button>
-        </div>
+        <Button
+          onClick={scrollToPricing}
+          size="lg"
+          className="rounded-full px-8 text-base"
+        >
+          Sprawdź cennik →
+        </Button>
       </motion.div>
     </div>
   );
