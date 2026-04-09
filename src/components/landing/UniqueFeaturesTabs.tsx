@@ -304,16 +304,12 @@ export function UniqueFeaturesTabs() {
         </div>
 
         <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold leading-tight mb-4">
-          <span className="text-primary">Funkcji</span> których nie znajdziesz nigdzie indziej
+          <span className="text-primary">12 funkcji,</span> które same zarabiają za Ciebie
         </h2>
 
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Zaprojektowane dla sytuacji{" "}
-          <span className="text-foreground font-medium">które znasz z własnego salonu.</span>
-        </p>
-
-        <p className="text-sm text-muted-foreground mt-3 max-w-xl mx-auto">
-          Każda funkcja odpowiada na konkretny problem który kosztuje Cię czas i pieniądze — każdego dnia.
+          Każda rozwiązuje problem, który dziś kosztuje Cię{" "}
+          <span className="text-foreground font-medium">czas i pieniądze.</span>
         </p>
       </motion.div>
 
