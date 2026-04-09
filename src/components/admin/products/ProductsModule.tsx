@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart, FileText } from "lucide-react";
+import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart, FileText, Coins } from "lucide-react";
 import { ProductsCatalog } from "./ProductsCatalog";
 import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
@@ -12,6 +12,7 @@ import { PurchaseOrdersList } from "./PurchaseOrdersList";
 import { InvoiceAIScanner } from "./InvoiceAIScanner";
 import ServiceRecipes from "@/modules/inventory/ServiceRecipes";
 import InventoryStats from "@/modules/inventory/InventoryStats";
+import { TrueProfitDashboard } from "@/modules/analytics/TrueProfitDashboard";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useProducts } from "@/hooks/useProducts";
 import { usePurchaseOrders } from "@/hooks/usePurchaseOrders";
@@ -58,6 +59,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
     { id: "orders" as ProductTab, label: "Zamówienia", icon: ShoppingCart },
     { id: "inv-stats" as ProductTab, label: "Statystyki", icon: BarChart3 },
     { id: "sales-report" as ProductTab, label: t("products.salesReport"), icon: TrendingUp },
+    { id: "true-profit" as ProductTab, label: "True Profit", icon: Coins },
     { id: "suppliers" as ProductTab, label: t("products.suppliers"), icon: Building2 },
   ];
 
@@ -144,6 +146,10 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
 
         <TabsContent value="sales-report" className="mt-6">
           <ProductSalesReport />
+        </TabsContent>
+
+        <TabsContent value="true-profit" className="mt-6">
+          <TrueProfitDashboard isDemo={isDemo} onNavigate={(tab) => setActiveTab(tab as ProductTab)} />
         </TabsContent>
 
         <TabsContent value="suppliers" className="mt-6">
