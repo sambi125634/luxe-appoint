@@ -21,18 +21,18 @@ const DEMO_SERVICES = [
 
 // Ceny = koszt za 1 jednostkę bazową (1ml, 1szt, 1g)
 const DEMO_PRODUCTS = [
-  { id: 'demo-p1', name: 'Koktajl meso NCTF 135HA 5ml', purchase_price_net: 185 },     // 1 amp = 185 zł
-  { id: 'demo-p2', name: 'Igły meso 32G (op. 10szt)', purchase_price_net: 4.20 },       // 42 zł / 10 = 4.20/szt
-  { id: 'demo-p3', name: 'Środek dezynfekcyjny 500ml', purchase_price_net: 0.064 },     // 32 zł / 500ml
-  { id: 'demo-p4', name: 'Maseczka kojąca 50ml', purchase_price_net: 0.76 },            // 38 zł / 50ml
-  { id: 'demo-p5', name: 'Żel HIFU 250ml', purchase_price_net: 0.18 },                  // 45 zł / 250ml
-  { id: 'demo-p6', name: 'Peeling TCA 15% 30ml', purchase_price_net: 4.00 },            // 120 zł / 30ml
-  { id: 'demo-p7', name: 'Baza hybrydowa 8ml', purchase_price_net: 3.50 },              // 28 zł / 8ml
-  { id: 'demo-p8', name: 'Lakier hybrydowy 7ml', purchase_price_net: 5.00 },            // 35 zł / 7ml
-  { id: 'demo-p9', name: 'Top coat no-wipe 8ml', purchase_price_net: 4.00 },            // 32 zł / 8ml
-  { id: 'demo-p10', name: 'Waciki bezpyłowe (op. 500szt)', purchase_price_net: 0.05 },  // 25 zł / 500
-  { id: 'demo-p11', name: 'Krem drenujący 200ml', purchase_price_net: 0.34 },           // 68 zł / 200ml
-  { id: 'demo-p12', name: 'Cleaner 500ml', purchase_price_net: 0.06 },                  // 30 zł / 500ml
+  { id: 'demo-p1', name: 'Fillmed NCTF 135HA (fiolka 3ml)', purchase_price_net: 115 },   // ~119-125 zł brutto, netto ~115 zł
+  { id: 'demo-p2', name: 'Igły meso 32G MESORAM (op. 100szt)', purchase_price_net: 0.60 }, // ~60 zł/100szt
+  { id: 'demo-p3', name: 'Środek dezynfekcyjny 1L', purchase_price_net: 0.03 },           // ~30 zł/1000ml
+  { id: 'demo-p4', name: 'Maseczka kojąca alg. 50ml', purchase_price_net: 0.56 },         // ~28 zł/50ml
+  { id: 'demo-p5', name: 'Żel do ultradźwięków 500ml', purchase_price_net: 0.052 },       // ~26 zł netto/500ml (Bielenda Prof.)
+  { id: 'demo-p6', name: 'Peeling TCA 15% 30ml', purchase_price_net: 3.50 },             // ~105 zł netto/30ml
+  { id: 'demo-p7', name: 'Baza hybrydowa Semilac 7ml', purchase_price_net: 3.00 },        // ~21 zł netto/7ml
+  { id: 'demo-p8', name: 'Lakier hybrydowy NeoNail 7.2ml', purchase_price_net: 2.80 },    // ~20 zł netto/7.2ml
+  { id: 'demo-p9', name: 'Top coat no-wipe 7ml', purchase_price_net: 3.20 },              // ~22 zł netto/7ml
+  { id: 'demo-p10', name: 'Waciki bezpyłowe (op. 500szt)', purchase_price_net: 0.04 },    // ~20 zł/500szt
+  { id: 'demo-p11', name: 'Krem drenujący Bielenda 500ml', purchase_price_net: 0.10 },    // ~50 zł netto/500ml
+  { id: 'demo-p12', name: 'Cleaner/odtłuszczacz 500ml', purchase_price_net: 0.04 },       // ~20 zł/500ml
 ];
 
 interface DemoRecipe {
@@ -47,25 +47,25 @@ interface DemoRecipe {
 }
 
 const INITIAL_DEMO_RECIPES: DemoRecipe[] = [
-  // Mezoterapia igłowa (450 zł) → koszt ~205 zł, marża ~54%
-  { id: 'dr1', service_id: 'demo-s1', product_id: 'demo-p1', quantity_value: 1, quantity_unit: 'amp', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr2', service_id: 'demo-s1', product_id: 'demo-p2', quantity_value: 2, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr3', service_id: 'demo-s1', product_id: 'demo-p3', quantity_value: 15, quantity_unit: 'ml', is_optional: false, notes: 'Dezynfekcja przed i po', mix_ratio: null },
+  // Mezoterapia igłowa (450 zł) → NCTF 115 + igły 3×0.60 + dezyn. + maseczka ≈ 123 zł, marża ~73%
+  { id: 'dr1', service_id: 'demo-s1', product_id: 'demo-p1', quantity_value: 1, quantity_unit: 'fiolka', is_optional: false, notes: 'Fillmed NCTF 135HA 3ml', mix_ratio: null },
+  { id: 'dr2', service_id: 'demo-s1', product_id: 'demo-p2', quantity_value: 5, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr3', service_id: 'demo-s1', product_id: 'demo-p3', quantity_value: 20, quantity_unit: 'ml', is_optional: false, notes: 'Dezynfekcja przed i po', mix_ratio: null },
   { id: 'dr4', service_id: 'demo-s1', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka kojąca po zabiegu', mix_ratio: null },
-  // HIFU (1200 zł) → koszt ~15 zł, marża ~99%
-  { id: 'dr5', service_id: 'demo-s2', product_id: 'demo-p5', quantity_value: 50, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr6', service_id: 'demo-s2', product_id: 'demo-p4', quantity_value: 8, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka po zabiegu', mix_ratio: null },
-  // Peeling TCA (350 zł) → koszt ~28 zł, marża ~92%
+  // HIFU (1200 zł) → żel 80ml + maseczka ≈ 10 zł, marża ~99%
+  { id: 'dr5', service_id: 'demo-s2', product_id: 'demo-p5', quantity_value: 80, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr6', service_id: 'demo-s2', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka po zabiegu', mix_ratio: null },
+  // Peeling TCA (350 zł) → peeling 5ml + maseczka 10ml ≈ 23 zł, marża ~93%
   { id: 'dr7', service_id: 'demo-s3', product_id: 'demo-p6', quantity_value: 5, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr8', service_id: 'demo-s3', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  // Manicure premium (180 zł) → koszt ~16 zł, marża ~91%
+  // Manicure premium (180 zł) → baza+lakier+top+waciki+cleaner ≈ 11 zł, marża ~94%
   { id: 'dr9', service_id: 'demo-s4', product_id: 'demo-p7', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr10', service_id: 'demo-s4', product_id: 'demo-p8', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr11', service_id: 'demo-s4', product_id: 'demo-p9', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr12', service_id: 'demo-s4', product_id: 'demo-p10', quantity_value: 10, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr12', service_id: 'demo-s4', product_id: 'demo-p10', quantity_value: 8, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr13', service_id: 'demo-s4', product_id: 'demo-p12', quantity_value: 10, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  // Drenaż limfatyczny (280 zł) → koszt ~14 zł, marża ~95%
-  { id: 'dr14', service_id: 'demo-s5', product_id: 'demo-p11', quantity_value: 40, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  // Drenaż limfatyczny (280 zł) → krem 50ml ≈ 5 zł, marża ~98%
+  { id: 'dr14', service_id: 'demo-s5', product_id: 'demo-p11', quantity_value: 50, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
 ];
 
 interface ServiceRecipesProps {
