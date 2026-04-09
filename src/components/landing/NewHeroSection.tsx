@@ -44,18 +44,18 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         >
           <Badge
             variant="outline"
-            className="mb-6 md:mb-12 rounded-full border-primary/20 bg-background/80 px-4 md:px-6 py-2.5 md:py-3 text-primary backdrop-blur-sm"
-            style={{ fontSize: "13px", fontWeight: 500, letterSpacing: "0.02em" }}
+            className="mb-6 md:mb-12 rounded-full border-primary/20 bg-background/80 px-4 md:px-6 py-2.5 md:py-3 text-[11px] md:text-[13px] text-primary backdrop-blur-sm"
+            style={{ fontWeight: 500, letterSpacing: "0.02em" }}
           >
             ✨ 🚀 Zarabiaj więcej, robiąc jeszcze mniej niż do tej pory
           </Badge>
         </motion.div>
 
         <motion.h1
-          className="max-w-[980px] text-foreground font-extrabold font-serif text-4xl"
+          className="max-w-[980px] text-foreground font-extrabold font-serif"
           style={{
             fontFamily: "var(--font-serif)",
-            fontSize: "clamp(32px, 8vw, 78px)",
+            fontSize: "clamp(36px, 8vw, 78px)",
             fontWeight: 600,
             lineHeight: 0.94,
             letterSpacing: "-0.03em",
@@ -133,7 +133,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         </motion.div>
 
         <motion.div
-          className="mt-5 md:mt-6 flex flex-wrap justify-center gap-4 md:gap-8"
+          className="mt-5 md:mt-6 flex flex-wrap justify-center gap-3 md:gap-8"
           style={{ fontSize: "13px" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

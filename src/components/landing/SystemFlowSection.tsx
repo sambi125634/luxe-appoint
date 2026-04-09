@@ -165,7 +165,7 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
                       {step.title}
                     </h3>
                     <AnimatePresence mode="wait">
-                      {isActive && (
+                    {isActive && (
                         <motion.p
                           className="text-xs text-muted-foreground mt-1 leading-relaxed"
                           initial={{ opacity: 0, height: 0 }}
@@ -190,6 +190,18 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
                         />
                       </div>
                     )}
+
+                    {/* Mobile inline screenshot */}
+                    {isActive && (
+                      <motion.img
+                        src={step.image}
+                        alt={step.imageAlt}
+                        className="mt-3 w-full rounded-xl shadow-md object-contain max-h-[220px] lg:hidden"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      />
+                    )}
                   </div>
                 </button>
               );
@@ -198,7 +210,7 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
 
           {/* Right — Screenshot */}
           <motion.div
-            className="relative"
+            className="relative hidden lg:block"
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -209,7 +221,7 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
                 key={activeStep}
                 src={steps[activeStep].image}
                 alt={steps[activeStep].imageAlt}
-                className="w-full h-auto rounded-2xl shadow-xl max-h-[300px] lg:max-h-none object-contain"
+                className="w-full h-auto rounded-2xl shadow-xl object-contain"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
