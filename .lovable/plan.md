@@ -1,38 +1,38 @@
 
 
-## Plan: Jasne tło kalkulatora + przesunięcie pod OwnYourClientsSection
+## Plan: Aktualizacja treści w OwnYourClientsSection
 
-### Zmiany
+### Plik: `src/components/landing/OwnYourClientsSection.tsx`
 
-**1. Index.tsx — zmiana kolejności**
+**1. Nowe bullet pointy — lewa karta (marketplace), 6 zamiast 5:**
 
-Obecna: Hero → OwnYourClients → SystemFlow → **SalonLossCalculator** → Comparison → ...
+```
+✗ Eksportujesz: imię, telefon, email. I nic więcej.
+✗ Jutro mogą podnieść prowizję — i nic nie zrobisz
+✗ Twoja konkurencja jest wyświetlana obok Ciebie
+✗ Brak sekwencji — klientka znika i nikt jej nie goni
+✗ Klientki porównują Cię z tańszą konkurencją w jednym widoku
+✗ Budujesz ich bazę. Ich brand. Ich biznes. Nie swój.
+```
 
-Nowa: Hero → OwnYourClients → **SalonLossCalculator** → SystemFlow → Comparison → ...
+**2. Nowe bullet pointy — prawa karta (Beauty Calendar), 6 zamiast 5:**
 
-Kalkulator ląduje zaraz po sekcji o marketplace (OwnYourClients), tworząc naturalną kontynuację: "marketplace Cię okrada" → "policz ile dokładnie tracisz".
+```
+✓ Twoje klientki. Twoje dane. Na zawsze. (bold, bronze)
+✓ 0% prowizji — dziś, jutro i za 5 lat
+✓ Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej
+✓ Auto-zaliczka od klientek z historią no-show — bez niezręcznej rozmowy
+✓ Budujesz własną bazę — nikt Ci jej nie odbierze
+✓ Za rok masz asset który pracuje dla Ciebie — nie dla platformy
+```
 
-**2. SalonLossCalculator.tsx — zamiana ciemnego tła na jasne z gradientowymi orbami**
+**3. Nowy tekst opisu pod nagłówkiem:**
 
-| Element | Było (ciemne) | Będzie (jasne, styl Hero) |
-|---------|--------------|--------------------------|
-| Tło sekcji | `bg-[#0F0B1A]` | `bg-background` (#FAFAF8) |
-| Glow orby | violet/fuchsia na ciemnym | Brzoskwiniowo-lawendowe radial gradienty (jak Hero: `hsl(var(--primary)/0.12)`, `hsl(var(--accent)/0.14)`) — subtelne, rozmyte |
-| Tekst przejściowy | `text-gray-400` + `text-white` | `text-muted-foreground` + `text-foreground font-semibold` |
-| Karta quizu | `bg-white` (bez zmian) | Bez zmian — biała karta na ciepłym tle |
-| Shadow karty | `shadow-black/20` | `shadow-[0_12px_60px_-12px_rgba(0,0,0,0.08)]` (miękki, jasny) |
-| Progress bar dots | `bg-violet-500` | `bg-primary` (#B87D5E bronze) |
-| Przyciski selected | `border-violet-600 bg-violet-50` | `border-primary bg-primary/5` |
-| CTA gradient | `from-violet-600 to-violet-500` | `bg-gradient-to-r from-primary to-[#D4A574]` (bronze gradient) |
-| Result counter | `text-red-400` z czerwonym glow | `text-destructive` (#D94F3D) z subtlnym glow `bg-destructive/10` |
-| Emotional box | `bg-violet-500/10 border-violet-500/20` | `bg-primary/5 border-primary/20` |
+Zmiana z obecnego akapitu na bardziej emocjonalny:
 
-Wizualnie sekcja będzie jasna, ciepła i spójna z Hero — subtelne glow orby w tle, biała karta quizu z bronze akcentami zamiast fioletu.
+> Czy zastanawiałaś się, czym różni się wystawienie Twojego salonu na marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo — a klientka decyduje jedynie ceną, ilością opinii lub szczęściem? **A jej unikatowe dane — preferencje, historia wizyt, zachowania zakupowe — należą do platformy. Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję za 10 zł taniej.**
 
-### Pliki do edycji
+### Zakres zmian
 
-| Plik | Co |
-|------|----|
-| `src/pages/Index.tsx` | Przesunięcie SalonLossCalculator na pozycję 3 (po OwnYourClients, przed SystemFlow) |
-| `src/components/landing/SalonLossCalculator.tsx` | Zamiana ciemnej palety na jasną ciepłą — tło, orby, akcenty, cienie |
+Tylko treść (tablice `marketplacePoints`, `bcPoints`, akapit `<p>` pod nagłówkiem). Zero zmian w layoucie, kolorach, animacjach czy strukturze komponentu.
 
