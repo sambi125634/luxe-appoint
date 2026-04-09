@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CalendarCheck, Bell, RotateCcw, Brain, Gift } from "lucide-react";
+import { CalendarCheck, Bell, RotateCcw, Brain, Gift, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { LucideIcon } from "lucide-react";
 
@@ -22,47 +22,56 @@ const steps: Step[] = [
   {
     icon: CalendarCheck,
     number: 1,
-    title: "Rezerwacja jak w aplikacji — bez aplikacji",
+    title: "Rezerwacja w 30 sekund — bez aplikacji",
     description:
-      "Klientka rezerwuje wizytę w przeglądarce, z doświadczeniem identycznym jak w aplikacji mobilnej. Bez instalacji, bez konta, bez bariery wejścia. Rewolucja: żaden inny system tego nie oferuje. Koniec z formularzami kontaktowymi i głuchymi telefonami.",
+      "Klientka otwiera link, wybiera termin i rezerwuje. Bez pobierania aplikacji, bez zakładania konta, bez dzwonienia. 30 sekund od kliknięcia do potwierdzenia. Żaden inny system na polskim rynku tego nie oferuje.",
     image: stepBooking,
-    imageAlt: "Widget rezerwacyjny Beauty Calendar — rezerwacja online jak w aplikacji",
+    imageAlt: "Rezerwacja online w 30 sekund bez aplikacji — Beauty Calendar",
   },
   {
     icon: Bell,
     number: 2,
-    title: "Przypomnienie + potwierdzenie + rozgrzewka",
+    title: "Rozgrzewka przed wizytą",
     description:
-      "Inne salony tylko przypominają. Nasz system potwierdza wizytę z klientką i rozgrzewa ją treściami o zarezerwowanej usłudze — tak, że nie może się doczekać. Efekt? -67% no-showów już w pierwszym miesiącu.",
+      "Inne systemy wysyłają suche przypomnienie. Twój wysyła treści edukacyjne o zarezerwowanej usłudze — klientka czeka na wizytę jak na prezent. Efekt? −67% no-showów w pierwszym miesiącu.",
     image: stepDashboard,
-    imageAlt: "System przypomnień i potwierdzeń wizyt Beauty Calendar",
+    imageAlt: "Rozgrzewka przed wizytą — redukcja no-showów o 67%",
   },
   {
     icon: RotateCcw,
     number: 3,
-    title: "Sekwencje powrotu — kilka wizyt z każdego klienta",
+    title: "Sekwencja 5 wizyt",
     description:
-      "Automatyczne sekwencje wiadomości w optymalnym momencie, aby każdy nowy klient zarezerwował kolejne wizyty w ustalonym oknie czasowym. Nie czekasz aż wróci — system prowadzi go za rękę.",
+      "Statystyka jest brutalna: 60% nowych klientek nie wraca po pierwszej wizycie. System wysyła idealnie wyczasowane wiadomości, które prowadzą klientkę od pierwszej wizyty do piątej — automatycznie, bez Twojego udziału.",
     image: stepRetention,
-    imageAlt: "Sekwencje powrotu klientek — automatyzacja wizyt",
+    imageAlt: "Automatyczna sekwencja 5 wizyt — retencja klientek",
   },
   {
     icon: Brain,
     number: 4,
-    title: "Retencja + AI Autopilot",
+    title: "Radar Odejść — AI, który nie śpi",
     description:
-      "AI wykrywa klientki zagrożone odejściem zanim odejdą. Automatycznie wysyła spersonalizowane oferty powrotu. Wypełnia luki w grafiku. Maksymalizuje wartość każdej wizyty — bez Twojego udziału.",
+      "AI analizuje zachowanie każdej klientki i wykrywa sygnały odejścia 3 tygodnie wcześniej. Zanim klientka zdąży zapomnieć o Twoim salonie, dostaje spersonalizowaną ofertę powrotu. Ty nawet nie wiesz, że była zagrożona.",
     image: stepClients,
-    imageAlt: "AI Autopilot — automatyczna retencja klientek",
+    imageAlt: "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej",
   },
   {
     icon: Gift,
     number: 5,
-    title: "System poleceń, który działa sam",
+    title: "Efekt Kuli Śnieżnej",
     description:
-      "Każda zadowolona klientka staje się ambasadorką Twojego salonu. Zautomatyzowany program poleceń z nagrodami, śledzeniem konwersji i rankingiem — bez Twojego wysiłku.",
+      "Zadowolona klientka poleca Twój salon koleżance. Koleżanka dostaje powitalny rabat, klientka — nagrodę. System śledzi każde polecenie, nalicza nagrody i buduje ranking ambasadorek. Bez Twojego wysiłku.",
     image: stepClients,
-    imageAlt: "Zautomatyzowany system poleceń Beauty Calendar",
+    imageAlt: "Efekt Kuli Śnieżnej — automatyczny system poleceń",
+  },
+  {
+    icon: TrendingUp,
+    number: 6,
+    title: "True Profit — ile naprawdę zarabiasz",
+    description:
+      "Inne systemy pokazują przychód. Twój odejmuje koszt produktów, czas pracy, prowizje — i pokazuje realny zysk z każdej usługi, każdego dnia, każdej stylistki. Pierwszy raz wiesz, ile naprawdę zarabiasz.",
+    image: stepDashboard,
+    imageAlt: "True Profit — realny zysk z każdej usługi i stylistki",
   },
 ];
 
@@ -106,10 +115,9 @@ export const SystemFlowSection = ({ onScrollToForm }: SystemFlowSectionProps) =>
             Jak to działa
           </span>
           <h2 className="mt-4 text-3xl md:text-4xl font-serif font-bold leading-tight text-foreground">
-            5 kroków od nowej klientki{" "}
+            Jedna klientka. Pięć wizyt.{" "}
             <br className="hidden md:block" />
-            do stałej ambasadorki.{" "}
-            <span className="text-primary">Automatycznie.</span>
+            <span className="text-primary">Zero Twojego wysiłku.</span>
           </h2>
         </motion.div>
 
