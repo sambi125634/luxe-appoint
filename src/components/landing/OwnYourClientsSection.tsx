@@ -54,8 +54,8 @@ export const OwnYourClientsSection = () => {
           </h2>
 
           <p className="max-w-2xl mx-auto text-base md:text-lg leading-relaxed" style={{ color: "#4A4A5A" }}>
-            Czy zastanawiałaś się, czym różni się wystawienie Twojego salonu na marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo — a klientka decyduje jedynie ceną, ilością opinii lub szczęściem?{" "}
-            <span style={{ color: "#1A1A2E", fontWeight: 500 }}>A jej unikatowe dane — preferencje, historia wizyt, zachowania zakupowe — należą do platformy. Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję za 10 zł taniej.</span>
+            Gdyby się nad tym zastanowić, to czym różni się platforma marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo? Dlaczego nie możesz wyeksportować najważniejszych unikatowych danych klienta, takich jak preferencje zakupowe czy historia wizyt?{" "}
+            <span style={{ color: "#1A1A2E", fontWeight: 500 }}>Bo należą one do platformy. Jutro mogą podnieść prowizję, pojutrze wyświetlić Twoją konkurencję 10 zł taniej — zachęcając Cię do oddania 50% prowizji, obiecując, że być może Ciebie wyświetlą dziś użytkownikom.</span>
           </p>
         </motion.div>
 
