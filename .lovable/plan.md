@@ -1,38 +1,28 @@
 
 
-## Plan: Aktualizacja treści OwnYourClientsSection
+## Plan: 6 kroków z copywritingiem Direct Response w SystemFlowSection
 
-### Plik: `src/components/landing/OwnYourClientsSection.tsx`
+### Plik: `src/components/landing/SystemFlowSection.tsx`
 
-**1. Nowy opis pod nagłówkiem:**
+**Nowy nagłówek sekcji:**
+- Kicker: "Jak to działa"
+- H2: **"Jedna klientka. Pięć wizyt. Zero Twojego wysiłku."**
 
-> Gdyby się nad tym zastanowić, to czym różni się platforma marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo? Dlaczego nie możesz wyeksportować najważniejszych unikatowych danych klienta, takich jak preferencje zakupowe czy historia wizyt? Bo należą one do platformy. Jutro mogą podnieść prowizję, pojutrze wyświetlić Twoją konkurencję 10 zł taniej — zachęcając Cię do oddania 50% prowizji, obiecując, że być może Ciebie wyświetlą dziś użytkownikom.
+**Rozbudowa z 5 do 6 kroków — treści Direct Response:**
 
-**2. Marketplace — 7 bullet pointów (było 6):**
+| # | Ikona | Tytuł | Opis |
+|---|-------|-------|------|
+| 1 | CalendarCheck | Rezerwacja w 30 sekund — bez aplikacji | Klientka otwiera link, wybiera termin i rezerwuje. Bez pobierania aplikacji, bez zakładania konta, bez dzwonienia. 30 sekund od kliknięcia do potwierdzenia. Żaden inny system na polskim rynku tego nie oferuje. |
+| 2 | Bell | Rozgrzewka przed wizytą | Inne systemy wysyłają suche przypomnienie. Twój wysyła treści edukacyjne o zarezerwowanej usłudze — klientka czeka na wizytę jak na prezent. Efekt? −67% no-showów w pierwszym miesiącu. |
+| 3 | RotateCcw | Sekwencja 5 wizyt | Statystyka jest brutalna: 60% nowych klientek nie wraca po pierwszej wizycie. System wysyła idealnie wyczasowane wiadomości, które prowadzą klientkę od pierwszej wizyty do piątej — automatycznie, bez Twojego udziału. |
+| 4 | Brain | Radar Odejść — AI, który nie śpi | AI analizuje zachowanie każdej klientki i wykrywa sygnały odejścia 3 tygodnie wcześniej. Zanim klientka zdąży zapomnieć o Twoim salonie, dostaje spersonalizowaną ofertę powrotu. Ty nawet nie wiesz, że była zagrożona. |
+| 5 | Gift | Efekt Kuli Śnieżnej | Zadowolona klientka poleca Twój salon koleżance. Koleżanka dostaje powitalny rabat, klientka — nagrodę. System śledzi każde polecenie, nalicza nagrody i buduje ranking ambasadorek. Bez Twojego wysiłku. |
+| 6 | TrendingUp | True Profit — ile naprawdę zarabiasz | Inne systemy pokazują przychód. Twój odejmuje koszt produktów, czas pracy, prowizje — i pokazuje realny zysk z każdej usługi, każdego dnia, każdej stylistki. Pierwszy raz wiesz, ile naprawdę zarabiasz. |
 
-```
-✗ 45%–55% prowizji od pozyskanego nowego klienta
-✗ Brak sekwencji — klientka znika i nikt jej nie goni, bo nie mają na tym zarobku
-✗ Jutro mogą podnieść prowizję — i nic nie zrobisz
-✗ Twoja konkurencja jest wyświetlana obok Ciebie
-✗ Eksportujesz: imię, telefon, email. I nic więcej.
-✗ Klientki porównują Cię z tańszą konkurencją w jednym widoku
-✗ Budujesz ich bazę. Ich brand. Ich biznes. Nie swój. (Ich biznes to gromadzenie kupujących w aplikacji, a nie pozycjonowanie Twojego biznesu)
-```
+### Zmiany techniczne
 
-**3. Beauty Calendar — 7 bullet pointów (było 6):**
-
-```
-✓ Twoje klientki. Twoje dane. Na zawsze. (bold bronze)
-✓ 0% prowizji — dziś, jutro i za 5 lat
-✓ Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej i komunikuje się z nimi, aby temu zapobiec
-✓ Auto-zaliczka od klientek z historią no-show — bez niezręcznej rozmowy
-✓ Budujesz własną bazę w prywatnej aplikacji mobilnej — nikt Ci jej nie odbierze
-✓ Za rok masz asset który pracuje dla Ciebie — nie dla platformy
-✓ Stała stawka za pozyskiwanie nowych klientów, na których zarobisz kilkukrotnie więcej dzięki stworzonej do tego platformie
-```
-
-### Zakres
-
-Tylko zmiana tablic `marketplacePoints`, `bcPoints` i akapitu `<p>` pod nagłówkiem. Zero zmian w layoucie, animacjach czy strukturze.
+- Dodanie importu `TrendingUp` z lucide-react
+- Krok 6 screenshot: `stepDashboard` (dashboard z analityką)
+- Headline zmieniony na nowy Direct Response
+- Bez zmian: layout, animacje, auto-switch 6s, progress bar, mechanika isPaused, CTA
 
