@@ -47,25 +47,25 @@ interface DemoRecipe {
 }
 
 const INITIAL_DEMO_RECIPES: DemoRecipe[] = [
-  // Mezoterapia igłowa (450 zł) → koszt ~205 zł, marża ~54%
-  { id: 'dr1', service_id: 'demo-s1', product_id: 'demo-p1', quantity_value: 1, quantity_unit: 'amp', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr2', service_id: 'demo-s1', product_id: 'demo-p2', quantity_value: 2, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr3', service_id: 'demo-s1', product_id: 'demo-p3', quantity_value: 15, quantity_unit: 'ml', is_optional: false, notes: 'Dezynfekcja przed i po', mix_ratio: null },
+  // Mezoterapia igłowa (450 zł) → NCTF 115 + igły 3×0.60 + dezyn. + maseczka ≈ 123 zł, marża ~73%
+  { id: 'dr1', service_id: 'demo-s1', product_id: 'demo-p1', quantity_value: 1, quantity_unit: 'fiolka', is_optional: false, notes: 'Fillmed NCTF 135HA 3ml', mix_ratio: null },
+  { id: 'dr2', service_id: 'demo-s1', product_id: 'demo-p2', quantity_value: 5, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr3', service_id: 'demo-s1', product_id: 'demo-p3', quantity_value: 20, quantity_unit: 'ml', is_optional: false, notes: 'Dezynfekcja przed i po', mix_ratio: null },
   { id: 'dr4', service_id: 'demo-s1', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka kojąca po zabiegu', mix_ratio: null },
-  // HIFU (1200 zł) → koszt ~15 zł, marża ~99%
-  { id: 'dr5', service_id: 'demo-s2', product_id: 'demo-p5', quantity_value: 50, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr6', service_id: 'demo-s2', product_id: 'demo-p4', quantity_value: 8, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka po zabiegu', mix_ratio: null },
-  // Peeling TCA (350 zł) → koszt ~28 zł, marża ~92%
+  // HIFU (1200 zł) → żel 80ml + maseczka ≈ 10 zł, marża ~99%
+  { id: 'dr5', service_id: 'demo-s2', product_id: 'demo-p5', quantity_value: 80, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr6', service_id: 'demo-s2', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka po zabiegu', mix_ratio: null },
+  // Peeling TCA (350 zł) → peeling 5ml + maseczka 10ml ≈ 23 zł, marża ~93%
   { id: 'dr7', service_id: 'demo-s3', product_id: 'demo-p6', quantity_value: 5, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr8', service_id: 'demo-s3', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  // Manicure premium (180 zł) → koszt ~16 zł, marża ~91%
+  // Manicure premium (180 zł) → baza+lakier+top+waciki+cleaner ≈ 11 zł, marża ~94%
   { id: 'dr9', service_id: 'demo-s4', product_id: 'demo-p7', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr10', service_id: 'demo-s4', product_id: 'demo-p8', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr11', service_id: 'demo-s4', product_id: 'demo-p9', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr12', service_id: 'demo-s4', product_id: 'demo-p10', quantity_value: 10, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr12', service_id: 'demo-s4', product_id: 'demo-p10', quantity_value: 8, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
   { id: 'dr13', service_id: 'demo-s4', product_id: 'demo-p12', quantity_value: 10, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  // Drenaż limfatyczny (280 zł) → koszt ~14 zł, marża ~95%
-  { id: 'dr14', service_id: 'demo-s5', product_id: 'demo-p11', quantity_value: 40, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  // Drenaż limfatyczny (280 zł) → krem 50ml ≈ 5 zł, marża ~98%
+  { id: 'dr14', service_id: 'demo-s5', product_id: 'demo-p11', quantity_value: 50, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
 ];
 
 interface ServiceRecipesProps {
