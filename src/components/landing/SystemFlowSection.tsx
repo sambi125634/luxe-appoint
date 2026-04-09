@@ -27,7 +27,7 @@ const steps: Step[] = [
     title: "Rezerwacja w 30 sekund — bez aplikacji",
     description:
       "Klientka otwiera link, wybiera termin i rezerwuje. Bez pobierania aplikacji, bez zakładania konta, bez dzwonienia. 30 sekund od kliknięcia do potwierdzenia. Żaden inny system na polskim rynku tego nie oferuje.",
-    image: stepBooking,
+    image: stepBookingNew,
     imageAlt: "Rezerwacja online w 30 sekund bez aplikacji — Beauty Calendar",
   },
   {
@@ -36,7 +36,7 @@ const steps: Step[] = [
     title: "Rozgrzewka przed wizytą",
     description:
       "Inne systemy wysyłają suche przypomnienie. Twój wysyła treści edukacyjne o zarezerwowanej usłudze — klientka czeka na wizytę jak na prezent. Efekt? −67% no-showów w pierwszym miesiącu.",
-    image: stepDashboard,
+    image: stepAutopilot,
     imageAlt: "Rozgrzewka przed wizytą — redukcja no-showów o 67%",
   },
   {
@@ -45,7 +45,7 @@ const steps: Step[] = [
     title: "Sekwencja 5 wizyt",
     description:
       "Statystyka jest brutalna: 60% nowych klientek nie wraca po pierwszej wizycie. System wysyła idealnie wyczasowane wiadomości, które prowadzą klientkę od pierwszej wizyty do piątej — automatycznie, bez Twojego udziału.",
-    image: stepRetention,
+    image: stepPipeline,
     imageAlt: "Automatyczna sekwencja 5 wizyt — retencja klientek",
   },
   {
@@ -54,7 +54,7 @@ const steps: Step[] = [
     title: "Radar Odejść — AI, który nie śpi",
     description:
       "AI analizuje zachowanie każdej klientki i wykrywa sygnały odejścia 3 tygodnie wcześniej. Zanim klientka zdąży zapomnieć o Twoim salonie, dostaje spersonalizowaną ofertę powrotu. Ty nawet nie wiesz, że była zagrożona.",
-    image: stepClients,
+    image: stepRadar,
     imageAlt: "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej",
   },
   {
@@ -63,7 +63,7 @@ const steps: Step[] = [
     title: "Efekt Kuli Śnieżnej",
     description:
       "Zadowolona klientka poleca Twój salon koleżance. Koleżanka dostaje powitalny rabat, klientka — nagrodę. System śledzi każde polecenie, nalicza nagrody i buduje ranking ambasadorek. Bez Twojego wysiłku.",
-    image: stepClients,
+    image: stepReferral,
     imageAlt: "Efekt Kuli Śnieżnej — automatyczny system poleceń",
   },
   {
