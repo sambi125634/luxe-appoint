@@ -49,12 +49,6 @@ export const ComparisonSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-sm text-muted-foreground leading-relaxed text-center">
-            CRM, SMS, magazyn, raporty, karty lojalnościowe — tak, to mają obie platformy.{" "}
-            <span className="text-foreground font-medium">
-              Różnica? W tym co dzieje się potem — gdy klientka nie wraca.
-            </span>
-          </p>
 
           {/* Collapsible shared features */}
           <div className="mt-6">
