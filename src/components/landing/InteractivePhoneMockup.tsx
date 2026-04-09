@@ -40,8 +40,8 @@ export const InteractivePhoneMockup = () => {
 
             <div className="space-y-5 mb-10">
               {[
-                { title: "Zero konkurencji w zasięgu wzroku", desc: "W marketplace obok Ciebie stoi 20 salonów. W Twojej aplikacji klientka widzi TYLKO Ciebie." },
-                { title: "Twoja marka, Twoje kolory, Twoje logo", desc: "Klientka otwiera aplikację i widzi Twój salon — nie marketplace z logo konkurencji. Prestiż buduje lojalność." },
+                { title: "", desc: "" },
+                { title: "Twoja marka, Twoje kolory, Twoje logo", desc: "" },
                 { title: "Push powiadomienia = bezpośredni dostęp", desc: "Nie czekasz aż klientka wejdzie na stronę. Piszesz do niej prosto na ekran blokady." },
                 { title: "AI podpowiada wolne terminy", desc: "System proponuje klientce godziny, które wypełniają luki w Twoim grafiku. Ona myśli, że dostała VIP termin." },
                 { title: "Cyfrowa karta lojalnościowa", desc: "Pieczątki, punkty, nagrody. Klientka zbiera za każdą wizytę i nie może się doczekać następnej." },
