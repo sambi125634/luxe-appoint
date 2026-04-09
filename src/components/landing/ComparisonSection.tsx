@@ -36,19 +36,6 @@ export const ComparisonSection = () => {
     <section className="py-20 lg:py-32 bg-white" id="comparison">
       <div className="container max-w-5xl">
         {/* Header */}
-        <motion.div
-          className="text-center mb-14"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <p className="text-sm font-medium text-primary uppercase tracking-wider mb-3">
-            Uczciwe porównanie
-          </p>
-        </motion.div>
-
-
 
 
         {/* NEW: Unique features tabs */}
