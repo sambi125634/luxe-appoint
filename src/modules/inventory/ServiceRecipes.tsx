@@ -10,29 +10,29 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import RecipeEditorDrawer, { type RecipeForEdit } from './RecipeEditorDrawer';
 
-// Demo data
+// Demo data — realne usługi Med-Spa z cenami rynkowymi 2026
 const DEMO_SERVICES = [
-  { id: 'demo-s1', name: 'Manicure hybrydowy', price: 120, is_active: true, duration: 75 },
-  { id: 'demo-s2', name: 'Peeling enzymatyczny', price: 150, is_active: true, duration: 60 },
-  { id: 'demo-s3', name: 'Mezoterapia igłowa', price: 350, is_active: true, duration: 45 },
-  { id: 'demo-s4', name: 'Henna brwi i rzęs', price: 80, is_active: true, duration: 30 },
-  { id: 'demo-s5', name: 'Masaż relaksacyjny 60 min', price: 200, is_active: true, duration: 60 },
+  { id: 'demo-s1', name: 'Mezoterapia igłowa twarzy', price: 450, is_active: true, duration: 60 },
+  { id: 'demo-s2', name: 'HIFU – lifting bez skalpela', price: 1200, is_active: true, duration: 90 },
+  { id: 'demo-s3', name: 'Peeling chemiczny TCA', price: 350, is_active: true, duration: 45 },
+  { id: 'demo-s4', name: 'Manicure hybrydowy premium', price: 180, is_active: true, duration: 75 },
+  { id: 'demo-s5', name: 'Drenaż limfatyczny – pełny', price: 280, is_active: true, duration: 60 },
 ];
 
+// Ceny = koszt za 1 jednostkę bazową (1ml, 1szt, 1g)
 const DEMO_PRODUCTS = [
-  { id: 'demo-p1', name: 'Baza hybrydowa 8ml', purchase_price_net: 12 },
-  { id: 'demo-p2', name: 'Lakier hybrydowy 7ml', purchase_price_net: 15 },
-  { id: 'demo-p3', name: 'Top coat 8ml', purchase_price_net: 14 },
-  { id: 'demo-p4', name: 'Waciki bezpyłowe (op. 500)', purchase_price_net: 0.05 },
-  { id: 'demo-p5', name: 'Cleaner 500ml', purchase_price_net: 0.03 },
-  { id: 'demo-p6', name: 'Baza peelingująca 100ml', purchase_price_net: 0.15 },
-  { id: 'demo-p7', name: 'Enzym papainowy 30ml', purchase_price_net: 0.80 },
-  { id: 'demo-p8', name: 'Serum z wit. C 30ml', purchase_price_net: 1.17 },
-  { id: 'demo-p9', name: 'Olejek różany 15ml', purchase_price_net: 0.40 },
-  { id: 'demo-p10', name: 'Maska kojąca 50ml', purchase_price_net: 0.20 },
-  { id: 'demo-p11', name: 'Henna proszkowa 15g', purchase_price_net: 18 },
-  { id: 'demo-p12', name: 'Utleniacz 3% 50ml', purchase_price_net: 8 },
-  { id: 'demo-p13', name: 'Olejek do masażu 250ml', purchase_price_net: 0.12 },
+  { id: 'demo-p1', name: 'Koktajl meso NCTF 135HA 5ml', purchase_price_net: 185 },     // 1 amp = 185 zł
+  { id: 'demo-p2', name: 'Igły meso 32G (op. 10szt)', purchase_price_net: 4.20 },       // 42 zł / 10 = 4.20/szt
+  { id: 'demo-p3', name: 'Środek dezynfekcyjny 500ml', purchase_price_net: 0.064 },     // 32 zł / 500ml
+  { id: 'demo-p4', name: 'Maseczka kojąca 50ml', purchase_price_net: 0.76 },            // 38 zł / 50ml
+  { id: 'demo-p5', name: 'Żel HIFU 250ml', purchase_price_net: 0.18 },                  // 45 zł / 250ml
+  { id: 'demo-p6', name: 'Peeling TCA 15% 30ml', purchase_price_net: 4.00 },            // 120 zł / 30ml
+  { id: 'demo-p7', name: 'Baza hybrydowa 8ml', purchase_price_net: 3.50 },              // 28 zł / 8ml
+  { id: 'demo-p8', name: 'Lakier hybrydowy 7ml', purchase_price_net: 5.00 },            // 35 zł / 7ml
+  { id: 'demo-p9', name: 'Top coat no-wipe 8ml', purchase_price_net: 4.00 },            // 32 zł / 8ml
+  { id: 'demo-p10', name: 'Waciki bezpyłowe (op. 500szt)', purchase_price_net: 0.05 },  // 25 zł / 500
+  { id: 'demo-p11', name: 'Krem drenujący 200ml', purchase_price_net: 0.34 },           // 68 zł / 200ml
+  { id: 'demo-p12', name: 'Cleaner 500ml', purchase_price_net: 0.06 },                  // 30 zł / 500ml
 ];
 
 interface DemoRecipe {
@@ -47,19 +47,25 @@ interface DemoRecipe {
 }
 
 const INITIAL_DEMO_RECIPES: DemoRecipe[] = [
-  { id: 'dr1', service_id: 'demo-s1', product_id: 'demo-p1', quantity_value: 1, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr1b', service_id: 'demo-s1', product_id: 'demo-p2', quantity_value: 1, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr2', service_id: 'demo-s1', product_id: 'demo-p3', quantity_value: 1, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr3', service_id: 'demo-s1', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr4', service_id: 'demo-s1', product_id: 'demo-p5', quantity_value: 15, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr5', service_id: 'demo-s2', product_id: 'demo-p6', quantity_value: 15, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: 60 },
-  { id: 'dr6', service_id: 'demo-s2', product_id: 'demo-p7', quantity_value: 5, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: 20 },
-  { id: 'dr7', service_id: 'demo-s2', product_id: 'demo-p8', quantity_value: 3, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: 12 },
-  { id: 'dr8', service_id: 'demo-s2', product_id: 'demo-p9', quantity_value: 4, quantity_unit: 'krople', is_optional: false, notes: null, mix_ratio: 8 },
-  { id: 'dr9', service_id: 'demo-s2', product_id: 'demo-p10', quantity_value: 10, quantity_unit: 'ml', is_optional: true, notes: 'Na życzenie klientki', mix_ratio: null },
-  { id: 'dr10', service_id: 'demo-s4', product_id: 'demo-p11', quantity_value: 2, quantity_unit: 'g', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr11', service_id: 'demo-s4', product_id: 'demo-p12', quantity_value: 5, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
-  { id: 'dr12', service_id: 'demo-s5', product_id: 'demo-p13', quantity_value: 30, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  // Mezoterapia igłowa (450 zł) → koszt ~205 zł, marża ~54%
+  { id: 'dr1', service_id: 'demo-s1', product_id: 'demo-p1', quantity_value: 1, quantity_unit: 'amp', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr2', service_id: 'demo-s1', product_id: 'demo-p2', quantity_value: 2, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr3', service_id: 'demo-s1', product_id: 'demo-p3', quantity_value: 15, quantity_unit: 'ml', is_optional: false, notes: 'Dezynfekcja przed i po', mix_ratio: null },
+  { id: 'dr4', service_id: 'demo-s1', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka kojąca po zabiegu', mix_ratio: null },
+  // HIFU (1200 zł) → koszt ~15 zł, marża ~99%
+  { id: 'dr5', service_id: 'demo-s2', product_id: 'demo-p5', quantity_value: 50, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr6', service_id: 'demo-s2', product_id: 'demo-p4', quantity_value: 8, quantity_unit: 'ml', is_optional: true, notes: 'Maseczka po zabiegu', mix_ratio: null },
+  // Peeling TCA (350 zł) → koszt ~28 zł, marża ~92%
+  { id: 'dr7', service_id: 'demo-s3', product_id: 'demo-p6', quantity_value: 5, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr8', service_id: 'demo-s3', product_id: 'demo-p4', quantity_value: 10, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  // Manicure premium (180 zł) → koszt ~16 zł, marża ~91%
+  { id: 'dr9', service_id: 'demo-s4', product_id: 'demo-p7', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr10', service_id: 'demo-s4', product_id: 'demo-p8', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr11', service_id: 'demo-s4', product_id: 'demo-p9', quantity_value: 1, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr12', service_id: 'demo-s4', product_id: 'demo-p10', quantity_value: 10, quantity_unit: 'szt', is_optional: false, notes: null, mix_ratio: null },
+  { id: 'dr13', service_id: 'demo-s4', product_id: 'demo-p12', quantity_value: 10, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
+  // Drenaż limfatyczny (280 zł) → koszt ~14 zł, marża ~95%
+  { id: 'dr14', service_id: 'demo-s5', product_id: 'demo-p11', quantity_value: 40, quantity_unit: 'ml', is_optional: false, notes: null, mix_ratio: null },
 ];
 
 interface ServiceRecipesProps {
