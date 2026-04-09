@@ -23,36 +23,42 @@ export const InteractivePhoneMockup = () => {
             transition={{ duration: 0.8 }}
           >
             <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-4">
-              Aplikacja dla Twoich klientek
+              Twoja prywatna aplikacja
             </p>
 
             <h2 className="text-4xl md:text-5xl font-serif font-bold text-white mb-6 leading-tight">
-              Tak wygląda Twoja
+              Klientka, która ma Twoją aplikację —
               <br />
-              <span className="bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
-                aplikacja dla klientek.
+              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                nie szuka innego salonu.
               </span>
             </h2>
 
             <p className="text-white/60 text-lg leading-relaxed mb-8 max-w-md">
-              Prawdziwa aplikacja mobilna Twojego salonu. Klientka rezerwuje, sprawdza wizyty i zbiera punkty lojalnościowe — wszystko w jednym miejscu.
+              Bez marketplace'u. Bez konkurencji obok. Tylko Twój salon w jej telefonie.
             </p>
 
-            <div className="space-y-4 mb-10">
+            <div className="space-y-5 mb-10">
               {[
-                "Rezerwuje wizytę w 3 kliknięcia",
-                "Widzi historię wizyt i ulubione",
-                "Dostaje powiadomienia i kupony lojalnościowe",
-              ].map((text, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <span className="text-primary font-mono font-bold">→</span>
-                  <span className="text-white/70 text-sm">{text}</span>
+                { title: "Zero konkurencji w zasięgu wzroku", desc: "W marketplace obok Ciebie stoi 20 salonów. W Twojej aplikacji klientka widzi TYLKO Ciebie." },
+                { title: "Twoja marka, Twoje kolory, Twoje logo", desc: "Klientka otwiera aplikację i widzi Twój salon — nie marketplace z logo konkurencji. Prestiż buduje lojalność." },
+                { title: "Push powiadomienia = bezpośredni dostęp", desc: "Nie czekasz aż klientka wejdzie na stronę. Piszesz do niej prosto na ekran blokady." },
+                { title: "AI podpowiada wolne terminy", desc: "System proponuje klientce godziny, które wypełniają luki w Twoim grafiku. Ona myśli, że dostała VIP termin." },
+                { title: "Cyfrowa karta lojalnościowa", desc: "Pieczątki, punkty, nagrody. Klientka zbiera za każdą wizytę i nie może się doczekać następnej." },
+                { title: "Usługi prezentowane przez wideo", desc: "Portfolio zabiegów w ruchu. Klientka ogląda efekty zanim zarezerwuje — i rezerwuje droższe usługi." },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <span className="text-primary font-mono font-bold mt-0.5">→</span>
+                  <div>
+                    <span className="text-white font-semibold text-sm">{item.title}</span>
+                    <p className="text-white/50 text-sm mt-0.5">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
             <p className="text-white/30 text-xs italic">
-              * Wersja demo z przykładowymi danymi salonu
+              * Interaktywne demo — kliknij, aby przetestować
             </p>
           </motion.div>
 
