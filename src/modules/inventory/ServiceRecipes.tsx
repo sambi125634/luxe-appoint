@@ -21,18 +21,18 @@ const DEMO_SERVICES = [
 
 // Ceny = koszt za 1 jednostkę bazową (1ml, 1szt, 1g)
 const DEMO_PRODUCTS = [
-  { id: 'demo-p1', name: 'Koktajl meso NCTF 135HA 5ml', purchase_price_net: 185 },     // 1 amp = 185 zł
-  { id: 'demo-p2', name: 'Igły meso 32G (op. 10szt)', purchase_price_net: 4.20 },       // 42 zł / 10 = 4.20/szt
-  { id: 'demo-p3', name: 'Środek dezynfekcyjny 500ml', purchase_price_net: 0.064 },     // 32 zł / 500ml
-  { id: 'demo-p4', name: 'Maseczka kojąca 50ml', purchase_price_net: 0.76 },            // 38 zł / 50ml
-  { id: 'demo-p5', name: 'Żel HIFU 250ml', purchase_price_net: 0.18 },                  // 45 zł / 250ml
-  { id: 'demo-p6', name: 'Peeling TCA 15% 30ml', purchase_price_net: 4.00 },            // 120 zł / 30ml
-  { id: 'demo-p7', name: 'Baza hybrydowa 8ml', purchase_price_net: 3.50 },              // 28 zł / 8ml
-  { id: 'demo-p8', name: 'Lakier hybrydowy 7ml', purchase_price_net: 5.00 },            // 35 zł / 7ml
-  { id: 'demo-p9', name: 'Top coat no-wipe 8ml', purchase_price_net: 4.00 },            // 32 zł / 8ml
-  { id: 'demo-p10', name: 'Waciki bezpyłowe (op. 500szt)', purchase_price_net: 0.05 },  // 25 zł / 500
-  { id: 'demo-p11', name: 'Krem drenujący 200ml', purchase_price_net: 0.34 },           // 68 zł / 200ml
-  { id: 'demo-p12', name: 'Cleaner 500ml', purchase_price_net: 0.06 },                  // 30 zł / 500ml
+  { id: 'demo-p1', name: 'Fillmed NCTF 135HA (fiolka 3ml)', purchase_price_net: 115 },   // ~119-125 zł brutto, netto ~115 zł
+  { id: 'demo-p2', name: 'Igły meso 32G MESORAM (op. 100szt)', purchase_price_net: 0.60 }, // ~60 zł/100szt
+  { id: 'demo-p3', name: 'Środek dezynfekcyjny 1L', purchase_price_net: 0.03 },           // ~30 zł/1000ml
+  { id: 'demo-p4', name: 'Maseczka kojąca alg. 50ml', purchase_price_net: 0.56 },         // ~28 zł/50ml
+  { id: 'demo-p5', name: 'Żel do ultradźwięków 500ml', purchase_price_net: 0.052 },       // ~26 zł netto/500ml (Bielenda Prof.)
+  { id: 'demo-p6', name: 'Peeling TCA 15% 30ml', purchase_price_net: 3.50 },             // ~105 zł netto/30ml
+  { id: 'demo-p7', name: 'Baza hybrydowa Semilac 7ml', purchase_price_net: 3.00 },        // ~21 zł netto/7ml
+  { id: 'demo-p8', name: 'Lakier hybrydowy NeoNail 7.2ml', purchase_price_net: 2.80 },    // ~20 zł netto/7.2ml
+  { id: 'demo-p9', name: 'Top coat no-wipe 7ml', purchase_price_net: 3.20 },              // ~22 zł netto/7ml
+  { id: 'demo-p10', name: 'Waciki bezpyłowe (op. 500szt)', purchase_price_net: 0.04 },    // ~20 zł/500szt
+  { id: 'demo-p11', name: 'Krem drenujący Bielenda 500ml', purchase_price_net: 0.10 },    // ~50 zł netto/500ml
+  { id: 'demo-p12', name: 'Cleaner/odtłuszczacz 500ml', purchase_price_net: 0.04 },       // ~20 zł/500ml
 ];
 
 interface DemoRecipe {
