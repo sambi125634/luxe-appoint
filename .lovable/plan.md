@@ -1,40 +1,69 @@
 
 
-## Plan: Direct Response copy w InteractivePhoneMockup.tsx
+## Plan: Przebudowa cennika — 3 pakiety płatne + formularz kontaktowy
 
 ### Obecny stan
-Opisowy, generyczny copy: „Tak wygląda Twoja aplikacja dla klientek" — zero korzyści, zero emocji, bullet pointy mówią CO, nie DLACZEGO.
+Cennik ma plan FREE (0 zł), PRO (99 zł netto), ELITE (349 zł). Zawiera nieaktualne limity, „netto" przy cenie, i przycisk „Zacznij za darmo". Brak formularza kontaktowego pod cennikiem.
 
-### Nowe copy (Direct Response — korzyści, nie funkcje)
+### Nowe 3 pakiety
 
-**Kicker:** „Twoja prywatna aplikacja"
+| | STARTER (19 zł/mies) | PRO (99 zł/mies) | ELITE (349 zł/mies + 497 zł onboarding) |
+|---|---|---|---|
+| **Opis** | Dla jednoosobowych salonów, które chcą porządek w rezerwacjach | Pełna platforma dla salonów, które chcą rosnąć | System, który pracuje za Ciebie 24/7 |
+| **Pracownicy** | Max 1 | Nieograniczeni | Nieograniczeni |
+| **Klientki** | Max 100 | Nieograniczone | Nieograniczone |
+| **Usługi** | Max 21 | Nieograniczone | Nieograniczone |
+| **Produkty** | Max 21 | Nieograniczony magazyn | Nieograniczony magazyn |
+| **Powiadomienia** | Email + SMS | Email + SMS | Email + SMS |
+| **Kalendarz + Widget** | ✅ | ✅ | ✅ |
+| **Podstawowe statystyki** | ✅ | ✅ | ✅ |
+| **Aplikacja mobilna** | — | ✅ (właściciel + klientka) | ✅ |
+| **Ścieżka Klientki™** | — | ✅ (ręczna konfiguracja) | ✅ (skonfigurowana za Ciebie) |
+| **Program poleceń** | — | ✅ | ✅ |
+| **Karty konsultacyjne** | — | ✅ | ✅ |
+| **Eksport + raporty finansowe** | — | ✅ | ✅ |
+| **Receptury + True Profit** | — | ✅ | ✅ |
+| **Skanowanie kodów** | — | ✅ | ✅ |
+| **AI Autopilot** | — | — | ✅ (wykrywa, wysyła, reaguje) |
+| **AI Segmentacja klientek** | — | — | ✅ automatyczna |
+| **AI Prognoza przychodów** | — | — | ✅ (30 dni) |
+| **Radar Odejść** | — | — | ✅ |
+| **AI sugestie terminów** | — | — | ✅ |
+| **Onboarding 1:1** | — | — | ✅ prywatny call |
+| **Konfiguracja sekwencji** | — | — | ✅ zrobiona za Ciebie |
+| **Konsultacja strategiczna** | — | — | ✅ sesja dot. biznesu |
+| **Sprawdzone metody pozyskiwania** | — | — | ✅ organik + paid |
+| **Priorytetowy support** | — | — | ✅ odpowiedź w 2h |
 
-**H2:** „Klientka, która ma Twoją aplikację — nie szuka innego salonu."
+**Ceny roczne (toggle -20%):** STARTER 15 zł, PRO 79 zł, ELITE 279 zł
 
-**Subheadline:** „Bez marketplace'u. Bez konkurencji obok. Tylko Twój salon w jej telefonie."
+**CTA przyciski:** Wszystkie 3 → tymczasowo prowadzą do `/auth` (rejestracja). Gdy zdecydujesz się na bramkę płatniczą, podmienimy na checkout.
 
-**6 bullet pointów (zatwierdzony TOP 6 z poprzedniej propozycji):**
+### Formularz kontaktowy pod cennikiem
 
-| # | Bold tytuł | Rozwinięcie |
-|---|-----------|-------------|
-| 1 | **Zero konkurencji w zasięgu wzroku** | W marketplace obok Ciebie stoi 20 salonów. W Twojej aplikacji klientka widzi TYLKO Ciebie. |
-| 2 | **Twoja marka, Twoje kolory, Twoje logo** | Klientka otwiera aplikację i widzi Twój salon — nie marketplace z logo konkurencji. Prestiż buduje lojalność. |
-| 3 | **Push powiadomienia = bezpośredni dostęp** | Nie czekasz aż klientka wejdzie na stronę. Piszesz do niej prosto na ekran blokady. |
-| 4 | **AI podpowiada wolne terminy** | System proponuje klientce godziny, które wypełniają luki w Twoim grafiku. Ona myśli, że dostała VIP termin. |
-| 5 | **Cyfrowa karta lojalnościowa** | Pieczątki, punkty, nagrody. Klientka zbiera za każdą wizytę i nie może się doczekać następnej. |
-| 6 | **Usługi prezentowane przez wideo** | Portfolio zabiegów w ruchu. Klientka ogląda efekty zanim zarezerwuje — i rezerwuje droższe usługi. |
+Pod sekcją „0% prowizji" dodamy nowy blok:
+- Headline: „Nie wiesz, który plan wybrać?"
+- Subheadline: „Zostaw dane — odezwiemy się i pomożemy dobrać najlepszy pakiet dla Twojego salonu."
+- Pola: Imię, Email, Telefon + checkbox RODO
+- Dane zapisywane do istniejącej tabeli `leads` w bazie (RLS już skonfigurowane)
+- Po wysłaniu: komunikat potwierdzający
 
-**Disclaimer:** „* Interaktywne demo — kliknij, aby przetestować"
+### Zmiany w copy sekcji
 
-### Plik do edycji
+- Headline: „Prosta cena. Zero prowizji." → bez zmian (dobry)
+- Subheadline: zmiana z „Zacznij za darmo..." na „Wybierz plan dopasowany do Twojego salonu. Żadnych ukrytych opłat."
+- Usunięcie „netto" z cen
+
+### Pliki do edycji
 
 | Plik | Co |
-|------|----|
-| `src/components/landing/InteractivePhoneMockup.tsx` | Nowy kicker, H2, subheadline, 6 bullet pointów z bold + opis. Gradient tekstu z violet/pink → primary/peach. |
+|---|---|
+| `src/components/landing/PricingSection.tsx` | Nowe 3 pakiety, zaktualizowane ceny/limity/features, formularz kontaktowy na dole |
 
 ### Bez zmian
-- Mockup iPhone z iframe — zero zmian
-- Layout 2-kolumnowy — zero zmian
-- Animacje framer-motion — zero zmian
-- Tło czarne — zero zmian
+- Layout 3-kolumnowy kart
+- Toggle miesięcznie/rocznie
+- Animacje framer-motion
+- Badge „Najpopularniejszy" na PRO
+- Sekcja „0% prowizji"
 
