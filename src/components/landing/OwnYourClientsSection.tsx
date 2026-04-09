@@ -2,21 +2,23 @@ import { AlertTriangle, X, Check } from "lucide-react";
 import { motion } from "framer-motion";
 
 const marketplacePoints = [
-  "Eksportujesz: imię, telefon, email. I nic więcej.",
+  "45%–55% prowizji od pozyskanego nowego klienta",
+  "Brak sekwencji — klientka znika i nikt jej nie goni, bo nie mają na tym zarobku",
   "Jutro mogą podnieść prowizję — i nic nie zrobisz",
   "Twoja konkurencja jest wyświetlana obok Ciebie",
-  "Brak sekwencji — klientka znika i nikt jej nie goni",
+  "Eksportujesz: imię, telefon, email. I nic więcej.",
   "Klientki porównują Cię z tańszą konkurencją w jednym widoku",
-  "Budujesz ich bazę. Ich brand. Ich biznes. Nie swój.",
+  "Budujesz ich bazę. Ich brand. Ich biznes. Nie swój. (Ich biznes to gromadzenie kupujących w aplikacji, a nie pozycjonowanie Twojego biznesu)",
 ];
 
 const bcPoints = [
   { text: "Twoje klientki. Twoje dane. Na zawsze.", bold: true },
   { text: "0% prowizji — dziś, jutro i za 5 lat" },
-  { text: "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej" },
+  { text: "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej i komunikuje się z nimi, aby temu zapobiec" },
   { text: "Auto-zaliczka od klientek z historią no-show — bez niezręcznej rozmowy" },
-  { text: "Budujesz własną bazę — nikt Ci jej nie odbierze" },
+  { text: "Budujesz własną bazę w prywatnej aplikacji mobilnej — nikt Ci jej nie odbierze" },
   { text: "Za rok masz asset który pracuje dla Ciebie — nie dla platformy" },
+  { text: "Stała stawka za pozyskiwanie nowych klientów, na których zarobisz kilkukrotnie więcej dzięki stworzonej do tego platformie" },
 ];
 
 export const OwnYourClientsSection = () => {
@@ -54,8 +56,8 @@ export const OwnYourClientsSection = () => {
           </h2>
 
           <p className="max-w-2xl mx-auto text-base md:text-lg leading-relaxed" style={{ color: "#4A4A5A" }}>
-            Czy zastanawiałaś się, czym różni się wystawienie Twojego salonu na marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo — a klientka decyduje jedynie ceną, ilością opinii lub szczęściem?{" "}
-            <span style={{ color: "#1A1A2E", fontWeight: 500 }}>A jej unikatowe dane — preferencje, historia wizyt, zachowania zakupowe — należą do platformy. Jutro mogą podnieść prowizję. Pojutrze wyświetlić Twoją konkurencję za 10 zł taniej.</span>
+            Gdyby się nad tym zastanowić, to czym różni się platforma marketplace od wystawienia się na targowisku, gdzie wszyscy sprzedają to samo? Dlaczego nie możesz wyeksportować najważniejszych unikatowych danych klienta, takich jak preferencje zakupowe czy historia wizyt?{" "}
+            <span style={{ color: "#1A1A2E", fontWeight: 500 }}>Bo należą one do platformy. Jutro mogą podnieść prowizję, pojutrze wyświetlić Twoją konkurencję 10 zł taniej — zachęcając Cię do oddania 50% prowizji, obiecując, że być może Ciebie wyświetlą dziś użytkownikom.</span>
           </p>
         </motion.div>
 
