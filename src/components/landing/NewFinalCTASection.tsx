@@ -44,7 +44,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           transition={{ delay: 0.3 }}
         >
           <Button size="lg" onClick={onScrollToForm} className="h-14 px-10 text-lg gap-2 relative overflow-hidden">
-            <span>Zacznij za darmo — bez karty kredytowej</span>
+            <span>Rozpocznij 14-dniowy test</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
           <Button size="lg" variant="outline" onClick={onScrollToForm} className="h-14 px-8 text-lg gap-2">

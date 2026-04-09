@@ -125,8 +125,12 @@ export const AudienceSection = () => {
           <p className="text-muted-foreground text-sm mb-4">
             Jeśli masz klientów, terminy i usługi — Beauty Calendar jest dla Ciebie. Działa dla każdego salonu usługowego w Polsce.
           </p>
-          <Button variant="outline" className="gap-2">
-            Porozmawiajmy →
+          <Button
+            variant="outline"
+            className="gap-2"
+            onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
+          >
+            Sprawdź cennik →
           </Button>
         </motion.div>
       </div>
