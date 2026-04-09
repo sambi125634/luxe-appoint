@@ -148,6 +148,10 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
           <ProductSalesReport />
         </TabsContent>
 
+        <TabsContent value="true-profit" className="mt-6">
+          <TrueProfitDashboard isDemo={isDemo} onNavigate={(tab) => setActiveTab(tab as ProductTab)} />
+        </TabsContent>
+
         <TabsContent value="suppliers" className="mt-6">
           <SuppliersManagement salonId={effectiveSalonId} />
         </TabsContent>
