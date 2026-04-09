@@ -47,7 +47,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="mb-12 rounded-full border-primary/20 bg-background/80 px-6 py-3 text-primary backdrop-blur-sm"
             style={{ fontSize: "14px", fontWeight: 500, letterSpacing: "0.02em" }}
           >
-            ✨ 🚀 Jedyny kalendarz z AI dla salonów beauty
+            ✨ 🚀 Jedyny kalendarz z AI, z którym zarobisz więcej, robiąc jeszcze mniej niż do tej pory
           </Badge>
         </motion.div>
 
