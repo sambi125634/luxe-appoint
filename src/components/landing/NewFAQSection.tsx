@@ -57,22 +57,22 @@ const faqs = [
 
 export const NewFAQSection = () => {
   return (
-    <section id="faq" className="py-20 lg:py-32">
-      <div className="container max-w-4xl">
+    <section id="faq" className="py-16 md:py-20 lg:py-32">
+      <div className="container max-w-4xl px-4">
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+          <h2 className="text-2xl md:text-4xl lg:text-5xl font-bold mb-4">
             Pytania które zadajesz{" "}
-            <span className="text-gradient-luxury">zanim klikniesz „zacznij”</span>
+            <span className="text-gradient-luxury">zanim klikniesz „zacznij"</span>
           </h2>
         </motion.div>
 
-        <Accordion type="single" collapsible className="space-y-4">
+        <Accordion type="single" collapsible className="space-y-3 md:space-y-4">
           {faqs.map((faq, index) => (
             <motion.div
               key={index}
@@ -83,17 +83,17 @@ export const NewFAQSection = () => {
             >
               <AccordionItem
                 value={`item-${index}`}
-                className="glass-card border border-border/50 rounded-xl px-6 data-[state=open]:shadow-lg transition-shadow"
+                className="glass-card border border-border/50 rounded-xl px-4 md:px-6 data-[state=open]:shadow-lg transition-shadow"
               >
-                <AccordionTrigger className="hover:no-underline py-5">
-                  <div className="flex items-center gap-4 text-left">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <faq.icon className="w-5 h-5 text-primary" />
+                <AccordionTrigger className="hover:no-underline py-4 md:py-5">
+                  <div className="flex items-center gap-3 md:gap-4 text-left">
+                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <faq.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
-                    <span className="font-semibold text-lg">{faq.question}</span>
+                    <span className="font-semibold text-base md:text-lg">{faq.question}</span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 pl-14 text-muted-foreground leading-relaxed">
+                <AccordionContent className="pb-4 md:pb-5 pl-11 md:pl-14 text-muted-foreground leading-relaxed text-sm md:text-base">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>

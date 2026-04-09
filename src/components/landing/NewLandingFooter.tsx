@@ -55,20 +55,20 @@ const FooterLink = ({ link }: { link: { label: string; href: string; soon?: bool
 export const NewLandingFooter = () => {
   return (
     <footer className="bg-muted/30 border-t border-border">
-      <div className="container py-16">
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 lg:gap-12">
+      <div className="container py-10 md:py-16 px-4">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-6 md:gap-8 lg:gap-12">
           {/* Brand */}
           <div className="col-span-2">
-            <Link to="/" className="inline-block mb-4">
-              <span className="font-serif text-2xl font-bold text-gradient-luxury">Beauty Calendar</span>
+            <Link to="/" className="inline-block mb-3 md:mb-4">
+              <span className="font-serif text-xl md:text-2xl font-bold text-gradient-luxury">Beauty Calendar</span>
             </Link>
-            <p className="text-sm text-muted-foreground mb-2">System zarządzania salonem beauty.</p>
-            <p className="text-sm text-muted-foreground mb-4">0% prowizji · Made in Poland 🇵🇱</p>
+            <p className="text-xs md:text-sm text-muted-foreground mb-1 md:mb-2">System zarządzania salonem beauty.</p>
+            <p className="text-xs md:text-sm text-muted-foreground mb-3 md:mb-4">0% prowizji · Made in Poland 🇵🇱</p>
 
-            <div className="flex gap-3 mb-6">
+            <div className="flex gap-2 md:gap-3 mb-4 md:mb-6">
               {socialLinks.map((social) => (
-                <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors" aria-label={social.label}>
-                  <social.icon className="w-4 h-4" />
+                <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors" aria-label={social.label}>
+                  <social.icon className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 </a>
               ))}
             </div>
@@ -97,31 +97,31 @@ export const NewLandingFooter = () => {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Produkt</h4>
+            <h4 className="font-semibold text-sm md:text-base mb-3 md:mb-4">Produkt</h4>
             <ul className="space-y-2">{footerLinks.product.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Firma</h4>
+            <h4 className="font-semibold text-sm md:text-base mb-3 md:mb-4">Firma</h4>
             <ul className="space-y-2">{footerLinks.company.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Zasoby</h4>
+            <h4 className="font-semibold text-sm md:text-base mb-3 md:mb-4">Zasoby</h4>
             <ul className="space-y-2">{footerLinks.resources.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-4">Legal</h4>
+            <h4 className="font-semibold text-sm md:text-base mb-3 md:mb-4">Legal</h4>
             <ul className="space-y-2">{footerLinks.legal.map((link) => <li key={link.label}><FooterLink link={link} /></li>)}</ul>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Beauty Calendar · beauty-funnels.com · Wszystkie prawa zastrzeżone
+        <div className="mt-8 md:mt-12 pt-6 md:pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
+          <p className="text-xs md:text-sm text-muted-foreground text-center md:text-left">
+            © {new Date().getFullYear()} Beauty Calendar · beauty-funnels.com
           </p>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 md:gap-4">
             <LanguageSwitcher />
-            <span className="text-sm text-muted-foreground flex items-center gap-1">
-              Made with <Heart className="w-4 h-4 text-rose-500 fill-rose-500" /> in Poland
+            <span className="text-xs md:text-sm text-muted-foreground flex items-center gap-1">
+              Made with <Heart className="w-3.5 h-3.5 md:w-4 md:h-4 text-rose-500 fill-rose-500" /> in Poland
             </span>
           </div>
         </div>

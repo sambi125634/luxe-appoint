@@ -23,7 +23,7 @@ const bcPoints = [
 
 export const OwnYourClientsSection = () => {
   return (
-    <section className="relative py-24 md:py-32 overflow-hidden" style={{ backgroundColor: "#FAFAF8" }}>
+    <section className="relative py-16 md:py-24 lg:py-32 overflow-hidden" style={{ backgroundColor: "#FAFAF8" }}>
       {/* Subtle radial glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full opacity-[0.04]" style={{ background: "radial-gradient(circle, #B87D5E 0%, transparent 70%)" }} />
@@ -32,7 +32,7 @@ export const OwnYourClientsSection = () => {
       <div className="container max-w-5xl mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div
-          className="relative text-center mb-16"
+          className="relative text-center mb-10 md:mb-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
@@ -50,22 +50,22 @@ export const OwnYourClientsSection = () => {
             Wiedziałaś o tym?
           </div>
 
-          <h2 className="text-3xl md:text-4xl lg:text-[44px] font-bold mb-6 leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#1A1A2E" }}>
+          <h2 className="text-2xl md:text-4xl lg:text-[44px] font-bold mb-4 md:mb-6 leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: "#1A1A2E" }}>
             Pracujesz na budowę{" "}
             <span style={{ color: "#D94F3D" }}>cudzej bazy klientek.</span>
           </h2>
 
-          <p className="max-w-2xl mx-auto text-base md:text-lg leading-relaxed" style={{ color: "#4A4A5A" }}>
+          <p className="max-w-2xl mx-auto text-sm md:text-base lg:text-lg leading-relaxed" style={{ color: "#4A4A5A" }}>
             Spróbuj wyeksportować bazę klientów z marketplace'u. Dostaniesz imię, telefon, email. Ale nie to, co kupują, ile wydają i kiedy wracają — czyli dokładnie to, dzięki czemu sprzedajesz im więcej.{" "}
             <span style={{ color: "#1A1A2E", fontWeight: 500 }}>Te dane — które pozwalają Ci sprzedawać więcej tej samej klientce — zostają na platformie. Bo jej biznesem jest relacja z klientką. Nie z Tobą.</span>
           </p>
         </motion.div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-2 gap-6 mb-14">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 mb-10 md:mb-14">
           {/* Marketplace card */}
           <motion.div
-            className="relative rounded-2xl p-6 md:p-8 overflow-hidden"
+            className="relative rounded-2xl p-5 md:p-6 lg:p-8 overflow-hidden"
             style={{
               backgroundColor: "#FFFFFF",
               border: "1px solid #F0ECE6",
@@ -79,14 +79,14 @@ export const OwnYourClientsSection = () => {
             {/* Red accent line */}
             <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: "linear-gradient(90deg, transparent, #D94F3D, transparent)" }} />
 
-            <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-3 mb-4 md:mb-5">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base" style={{ backgroundColor: "#FEF2F2" }}>🏪</div>
-              <span className="font-bold text-sm tracking-wide uppercase" style={{ color: "#1A1A2E" }}>Platforma marketplace</span>
+              <span className="font-bold text-xs md:text-sm tracking-wide uppercase" style={{ color: "#1A1A2E" }}>Platforma marketplace</span>
             </div>
 
-            <ul className="space-y-3">
+            <ul className="space-y-2.5 md:space-y-3">
               {marketplacePoints.map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm" style={{ color: "#4A4A5A" }}>
+                <li key={i} className="flex items-start gap-2.5 md:gap-3 text-xs md:text-sm" style={{ color: "#4A4A5A" }}>
                   <X className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#D94F3D" }} />
                   {item}
                 </li>
@@ -96,7 +96,7 @@ export const OwnYourClientsSection = () => {
 
           {/* Beauty Calendar card */}
           <motion.div
-            className="relative rounded-2xl p-6 md:p-8 overflow-hidden"
+            className="relative rounded-2xl p-5 md:p-6 lg:p-8 overflow-hidden"
             style={{
               backgroundColor: "#FFFFFF",
               border: "1px solid rgba(184,125,94,0.3)",
@@ -110,14 +110,14 @@ export const OwnYourClientsSection = () => {
             {/* Bronze accent line */}
             <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: "linear-gradient(90deg, transparent, #B87D5E, transparent)" }} />
 
-            <div className="flex items-center gap-3 mb-5">
+            <div className="flex items-center gap-3 mb-4 md:mb-5">
               <div className="w-9 h-9 rounded-xl flex items-center justify-center text-base" style={{ backgroundColor: "rgba(184,125,94,0.1)" }}>✨</div>
-              <span className="font-bold text-sm tracking-wide uppercase" style={{ color: "#1A1A2E" }}>Beauty Calendar</span>
+              <span className="font-bold text-xs md:text-sm tracking-wide uppercase" style={{ color: "#1A1A2E" }}>Beauty Calendar</span>
             </div>
 
-            <ul className="space-y-3">
+            <ul className="space-y-2.5 md:space-y-3">
               {bcPoints.map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm" style={{ color: "#4A4A5A" }}>
+                <li key={i} className="flex items-start gap-2.5 md:gap-3 text-xs md:text-sm" style={{ color: "#4A4A5A" }}>
                   <Check className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#B87D5E" }} />
                   <span>
                     {item.bold ? <strong style={{ color: "#B87D5E" }}>{item.text}</strong> : item.text}
@@ -130,7 +130,7 @@ export const OwnYourClientsSection = () => {
 
         {/* Quote */}
         <motion.p
-          className="text-center text-lg md:text-xl italic font-medium"
+          className="text-center text-base md:text-lg lg:text-xl italic font-medium"
           style={{
             fontFamily: "'Plus Jakarta Sans', sans-serif",
             background: "linear-gradient(180deg, #1A1A2E 0%, #4A4A5A 100%)",

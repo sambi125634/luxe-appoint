@@ -35,10 +35,10 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-14 md:h-20">
           <a href="/" className="flex items-center gap-2 group">
-            <Calendar className="h-7 w-7 text-gold group-hover:rotate-12 transition-transform duration-300" />
-            <span className="text-xl font-bold text-foreground">
+            <Calendar className="h-6 w-6 md:h-7 md:w-7 text-gold group-hover:rotate-12 transition-transform duration-300" />
+            <span className="text-lg md:text-xl font-bold text-foreground">
               Beauty<span className="text-gold">Calendar</span>
             </span>
           </a>
@@ -96,8 +96,8 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border/50 animate-fade-in bg-background/80 backdrop-blur-xl rounded-b-xl">
-            <div className="flex flex-col gap-4">
+          <div className="md:hidden py-4 px-4 border-t border-border/50 animate-fade-in bg-background/80 backdrop-blur-xl rounded-b-xl">
+            <div className="flex flex-col gap-3">
               <button onClick={() => scrollToSection("features")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.features")}
               </button>
