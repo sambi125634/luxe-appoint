@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   ArrowRight,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { UniqueFeaturesTabs } from "./UniqueFeaturesTabs";
 
@@ -48,59 +47,13 @@ export const ComparisonSection = () => {
             Uczciwe porównanie
           </p>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-            Co dostajesz u nas,{" "}
-            <span className="text-gradient-luxury">czego nie ma nigdzie indziej.</span>
+            Wszystko to dostajesz.{" "}
+            <span className="text-gradient-luxury">Nigdzie indziej tego nie ma.</span>
           </h2>
         </motion.div>
 
-        {/* Pricing knockout — two cards */}
-        <motion.div
-          className="grid md:grid-cols-2 gap-4 mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <div className="relative rounded-2xl border-2 border-primary bg-card p-6 md:p-8 shadow-lg">
-            <Badge className="absolute -top-3 left-6 bg-primary text-primary-foreground text-xs px-3">
-              Beauty Calendar
-            </Badge>
-            <div className="mt-2">
-              <div className="text-4xl md:text-5xl font-black text-foreground">
-                99 <span className="text-lg font-medium text-muted-foreground">zł netto/mies</span>
-              </div>
-              <div className="flex items-center gap-2 mt-3 text-emerald-600 font-semibold">
-                <Check className="w-5 h-5" />
-                <span>0% prowizji — zawsze</span>
-              </div>
-              <div className="flex items-center gap-2 mt-1.5 text-emerald-600 font-semibold">
-                <Check className="w-5 h-5" />
-                <span>Stała cena, bez opłat per-head</span>
-              </div>
-              <p className="mt-4 text-sm text-muted-foreground border-t border-border pt-4">
-                Twoje dane. Twoja baza. Twój brand.<br />
-                Zabierasz kiedy chcesz.
-              </p>
-            </div>
-          </div>
 
-          <div className="rounded-2xl border border-border bg-muted/30 p-6 md:p-8 opacity-80">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground mb-4">
-              Typowy marketplace
-            </p>
-            <div className="text-4xl md:text-5xl font-black text-muted-foreground">
-              145+ <span className="text-lg font-medium">zł netto/mies</span>
-            </div>
-            <div className="mt-3 text-sm text-muted-foreground space-y-1.5">
-              <p>+ 35 zł za każdego dodatkowego pracownika</p>
-              <p>+ do 45% prowizji od nowych klientek (Boost)</p>
-            </div>
-            <p className="mt-4 text-sm text-muted-foreground/70 border-t border-border/50 pt-4">
-              Ich platforma. Ich zasady.<br />
-              Jutro mogą zmienić cennik.
-            </p>
-          </div>
-        </motion.div>
+
 
         {/* NEW: Unique features tabs */}
         <UniqueFeaturesTabs />
@@ -206,7 +159,12 @@ export const ComparisonSection = () => {
             <p className="text-4xl font-black line-through text-muted-foreground mb-3">3 910 zł/mies</p>
             <p className="text-sm text-muted-foreground mb-2">Twoja cena z Beauty Calendar PRO:</p>
             <p className="text-5xl font-black text-primary mb-1">99 zł netto/mies</p>
-            <p className="text-sm font-semibold text-muted-foreground">+ 0 zł prowizji od rezerwacji. Zawsze.</p>
+            <p className="text-sm font-semibold text-muted-foreground mb-4">+ 0 zł prowizji od rezerwacji. Zawsze.</p>
+            <div className="border-t border-primary/10 pt-4">
+              <p className="text-xs text-muted-foreground/70">
+                Marketplace: 145+ zł/mies + do 45% prowizji od nowych klientek (Boost)
+              </p>
+            </div>
           </div>
         </motion.div>
 
