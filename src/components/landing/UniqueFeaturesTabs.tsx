@@ -321,13 +321,13 @@ export function UniqueFeaturesTabs() {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.15 }}
       >
-        <div className="flex items-center gap-1 md:gap-2 mb-8 md:mb-10 p-1 md:p-1.5 bg-gray-100 rounded-2xl max-w-2xl mx-auto">
+        <div className="relative flex items-center gap-1 md:gap-2 mb-8 md:mb-10 p-1 md:p-1.5 bg-gray-100 rounded-2xl max-w-2xl mx-auto">
           {tabs.map((tab, i) => (
             <button
               key={i}
               onClick={() => handleTabClick(i)}
               className={cn(
-                "flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 md:px-3 py-2.5 md:py-2.5 rounded-xl transition-all duration-300 text-xs md:text-sm font-semibold",
+                "flex-1 flex flex-col sm:flex-row items-center justify-center gap-0.5 sm:gap-1.5 px-2 md:px-3 py-2.5 md:py-2.5 rounded-xl transition-all duration-300 text-xs md:text-sm font-semibold relative",
                 activeTab === i
                   ? "bg-violet-600 text-white shadow-md shadow-violet-200"
                   : "text-gray-400 hover:text-gray-600 hover:bg-white/60"
@@ -335,6 +335,16 @@ export function UniqueFeaturesTabs() {
             >
               <span className="text-base leading-none">{tab.emoji}</span>
               <span className="leading-none text-[10px] sm:text-xs md:text-sm">{tab.label}</span>
+              {/* Animated arrow hint on active tab (mobile only) */}
+              {activeTab === i && i < tabs.length - 1 && (
+                <motion.div
+                  className="absolute -right-2.5 top-1/2 -translate-y-1/2 z-10 sm:hidden"
+                  animate={{ x: [0, 4, 0] }}
+                  transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ChevronRight className="w-4 h-4 text-violet-400" />
+                </motion.div>
+              )}
             </button>
           ))}
         </div>
