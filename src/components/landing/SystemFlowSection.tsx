@@ -9,7 +9,7 @@ import stepAutopilot from "@/assets/screenshots/step-autopilot.png";
 import stepPipeline from "@/assets/screenshots/step-pipeline.png";
 import stepRadar from "@/assets/screenshots/step-radar.png";
 import stepReferral from "@/assets/screenshots/step-referral.png";
-import stepDashboard from "@/assets/screenshots/step-dashboard.png";
+import stepTrueProfit from "@/assets/screenshots/step-true-profit.png";
 
 interface Step {
   icon: LucideIcon;
@@ -72,7 +72,7 @@ const steps: Step[] = [
     title: "True Profit — ile naprawdę zarabiasz",
     description:
       "Inne systemy pokazują przychód. Twój odejmuje koszt produktów, czas pracy, prowizje — i pokazuje realny zysk z każdej usługi, każdego dnia, każdej stylistki. Pierwszy raz wiesz, ile naprawdę zarabiasz.",
-    image: stepDashboard,
+    image: stepTrueProfit,
     imageAlt: "True Profit — realny zysk z każdej usługi i stylistki",
   },
 ];
