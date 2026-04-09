@@ -9,7 +9,7 @@ import stepAutopilot from "@/assets/screenshots/step-autopilot.png";
 import stepPipeline from "@/assets/screenshots/step-pipeline.png";
 import stepRadar from "@/assets/screenshots/step-radar.png";
 import stepReferral from "@/assets/screenshots/step-referral.png";
-import stepDashboard from "@/assets/screenshots/step-dashboard.png";
+import stepTrueProfit from "@/assets/screenshots/step-true-profit.png";
 
 interface Step {
   icon: LucideIcon;
