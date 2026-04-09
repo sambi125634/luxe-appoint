@@ -57,7 +57,7 @@ export interface StockMovement {
   supplier?: Supplier;
 }
 
-export type ProductTab = 'catalog' | 'stock' | 'recipes' | 'deliveries' | 'orders' | 'inv-stats' | 'sales-report' | 'true-profit' | 'suppliers';
+export type ProductTab = 'catalog' | 'stock' | 'recipes' | 'deliveries' | 'orders' | 'inv-stats' | 'sales-report' | 'suppliers';
 
 export const productCategories = [
   'Pielęgnacja twarzy',
