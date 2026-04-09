@@ -418,7 +418,7 @@ export const SalonLossCalculator = () => {
   };
 
   return (
-    <section className="relative py-20 lg:py-28 bg-background overflow-hidden">
+    <section id="calculator" className="relative py-20 lg:py-28 bg-background overflow-hidden">
       {/* Glow orbs — warm peach/lavender like Hero */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/[0.12] rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/[0.14] rounded-full blur-[100px] pointer-events-none" />
