@@ -103,14 +103,14 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="h-12 md:h-14 rounded-2xl px-6 md:px-10 text-[15px] md:text-[17px] shadow-soft sm:min-w-[294px]"
           >
             <span className="flex items-center gap-2">
-              Wypróbuj 14 dni za darmo
+              Wypróbuj bez żadnego ryzyka
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </span>
           </Button>
           <Button
             variant="outline"
             size="lg"
-            onClick={scrollToDemo}
+            onClick={() => window.location.href = '/demo'}
             className="h-12 md:h-14 rounded-2xl bg-background/75 px-6 md:px-10 text-[15px] md:text-[17px] text-foreground backdrop-blur-sm sm:min-w-[314px]"
           >
             <Play className="w-4 h-4" />
@@ -125,9 +125,8 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           transition={{ duration: 0.6, delay: 0.9 }}
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-4 md:px-5 py-2 md:py-2.5 shadow-sm backdrop-blur-sm">
-            <div className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
             <span className="text-xs md:text-sm font-medium text-emerald-700">
-              Zaufało nam już ponad 150+ salonów w całej Polsce
+              🇵🇱 Platforma stworzona w Polsce
             </span>
           </div>
         </motion.div>
@@ -139,7 +138,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.1 }}
         >
-          {["Bez karty kredytowej", "Gotowe w 5 minut", "0% prowizji — zawsze"].map((item) => (
+          {["Pełna gwarancja satysfakcji", "Dane zawsze Twoje", "0% prowizji — zawsze"].map((item) => (
             <div key={item} className="flex items-center gap-2 text-muted-foreground">
               <Check className="h-4 w-4 text-emerald-500" />
               <span>{item}</span>
