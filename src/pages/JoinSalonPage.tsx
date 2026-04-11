@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { ClientOnboarding } from "@/components/client-app/ClientOnboarding";
 export default function JoinSalonPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const refCode = searchParams.get("ref");
   const [joining, setJoining] = useState(false);
   const [joined, setJoined] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -54,6 +56,43 @@ export default function JoinSalonPage() {
         { user_id: user.id, role: "client" as any },
         { onConflict: "user_id,role" }
       );
+
+      // Track referral if ref code present
+      if (refCode) {
+        const { data: codeData } = await supabase
+          .from("user_referral_codes")
+          .select("id, user_id")
+          .eq("code", refCode)
+          .eq("salon_id", salon.id)
+          .eq("is_active", true)
+          .maybeSingle();
+
+        if (codeData && codeData.user_id !== user.id) {
+          await supabase.from("user_referrals").upsert(
+            {
+              referrer_user_id: codeData.user_id,
+              referred_user_id: user.id,
+              salon_id: salon.id,
+              referral_code_id: codeData.id,
+              status: "pending",
+            },
+            { onConflict: "referred_user_id,salon_id" }
+          );
+
+          // Welcome coupon for referred user
+          const expiresAt = new Date();
+          expiresAt.setDate(expiresAt.getDate() + 30);
+          await supabase.from("client_coupons").insert({
+            user_id: user.id,
+            salon_id: salon.id,
+            title: "Kupon powitalny -10%",
+            description: "Rabat 10% na pierwszą wizytę z polecenia",
+            discount_type: "percentage",
+            discount_value: 10,
+            valid_until: expiresAt.toISOString(),
+          });
+        }
+      }
 
       setJoined(true);
       toast.success(`Dołączono do ${salon.name}!`);
