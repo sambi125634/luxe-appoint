@@ -18,7 +18,7 @@ export default function ClientApp() {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
-        navigate("/auth?redirect=/app");
+        navigate("/app/auth?redirect=/app");
       } else {
         setIsAuthenticated(true);
       }
@@ -26,7 +26,7 @@ export default function ClientApp() {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
-        navigate("/auth?redirect=/app");
+        navigate("/app/auth?redirect=/app");
       } else {
         setIsAuthenticated(true);
       }
