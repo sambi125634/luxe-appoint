@@ -112,23 +112,75 @@
       "start": "Start working",
       "restartHint": "💡 You can restart the tour by clicking 'Tutorial' in the sidebar",
       "steps": {
-        "welcome": { "title": "Welcome to Beauty Calendar! 🎉", "description": "We'll walk you through every section of your panel. You'll see what you gain in each module and how to start. Takes 2 minutes." },
-        "dashboard": { "title": "Dashboard — Your command center", "description": "See how much you earn, how many clients return, and what needs attention — all at a glance, without opening Excel." },
-        "calendar": { "title": "Calendar — zero phone calls", "description": "Clients book themselves 24/7, you only manage exceptions. See everyone's schedule on one screen." },
-        "widgets": { "title": "Widgets — Your booking link", "description": "Paste the link on Instagram or your website — clients book even at 11 PM. Like an employee who never sleeps." },
-        "staff": { "title": "Team — everyone knows their role", "description": "Each employee has their own calendar, services, and color. The system manages the schedule — you don't need to remember who does what." },
-        "clients": { "title": "Clients — full history", "description": "Full history of every client with tags, notes, and preferences. Know who's VIP, who's disappearing, and who to call." },
-        "conversations": { "title": "Conversations — one view", "description": "SMS, email, WhatsApp — all client conversations in one place. Never lose a thread." },
-        "consultation": { "title": "Consultations — digital documentation", "description": "Consultation cards with GDPR signature, voice notes, and AI — professional documentation without paper bureaucracy." },
-        "services": { "title": "Services — online price list", "description": "Clients see prices and book immediately. Change a price once — the widget updates automatically." },
-        "products": { "title": "Products — inventory under control", "description": "Know how many products are left and when to order. Scan deliveries with your phone — the system calculates margins for you." },
-        "accounting": { "title": "Reports — export with one click", "description": "Close the salon, check the daily report — everything adds up. Export for your accountant with one click." },
-        "pipeline": { "title": "Client journey — react faster", "description": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off. React before they go to competitors." },
-        "retention": { "title": "Retention — automatic returns", "description": "The system automatically takes care of client returns. 5 message sequences react at the right moment — you don't have to remember." },
-        "referral": { "title": "Referrals — free clients", "description": "Happy clients recommend you to friends, the system tracks it. Every referral = a new client without advertising costs." },
-        "settings": { "title": "Settings — configure once", "description": "Logo, colors, notifications, integrations — configure once, effects last forever." },
-        "support": { "title": "Help — ask, get an answer", "description": "The AI Assistant knows the entire system. Ask in your language, get a specific answer instantly." },
-        "cta": { "title": "Ready to start! 🚀", "description": "You now know all the modules. Start by filling in your data — the dashboard checklist will show what's left.", "highlight": "Want this system for your salon? Leave your contact and we'll reach out within 24h!" }
+        "welcome": {
+          "title": "Welcome to Beauty Calendar! 🎉",
+          "description": "We'll walk you through every section of your panel. You'll see what you gain in each module and how to start. Takes 2 minutes."
+        },
+        "dashboard": {
+          "title": "Dashboard — Your command center",
+          "description": "See how much you earn, how many clients return, and what needs attention — all at a glance, without opening Excel."
+        },
+        "calendar": {
+          "title": "Calendar — zero phone calls",
+          "description": "Clients book themselves 24/7, you only manage exceptions. See everyone's schedule on one screen."
+        },
+        "widgets": {
+          "title": "Widgets — Your booking link",
+          "description": "Paste the link on Instagram or your website — clients book even at 11 PM. Like an employee who never sleeps."
+        },
+        "staff": {
+          "title": "Team — everyone knows their role",
+          "description": "Each employee has their own calendar, services, and color. The system manages the schedule — you don't need to remember who does what."
+        },
+        "clients": {
+          "title": "Clients — full history",
+          "description": "Full history of every client with tags, notes, and preferences. Know who's VIP, who's disappearing, and who to call."
+        },
+        "conversations": {
+          "title": "Conversations — one view",
+          "description": "SMS, email, WhatsApp — all client conversations in one place. Never lose a thread."
+        },
+        "consultation": {
+          "title": "Consultations — digital documentation",
+          "description": "Consultation cards with GDPR signature, voice notes, and AI — professional documentation without paper bureaucracy."
+        },
+        "services": {
+          "title": "Services — online price list",
+          "description": "Clients see prices and book immediately. Change a price once — the widget updates automatically."
+        },
+        "products": {
+          "title": "Products — inventory under control",
+          "description": "Know how many products are left and when to order. Scan deliveries with your phone — the system calculates margins for you."
+        },
+        "accounting": {
+          "title": "Reports — export with one click",
+          "description": "Close the salon, check the daily report — everything adds up. Export for your accountant with one click."
+        },
+        "pipeline": {
+          "title": "Client journey — react faster",
+          "description": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off. React before they go to competitors."
+        },
+        "retention": {
+          "title": "Retention — automatic returns",
+          "description": "The system automatically takes care of client returns. 5 message sequences react at the right moment — you don't have to remember."
+        },
+        "referral": {
+          "title": "Referrals — free clients",
+          "description": "Happy clients recommend you to friends, the system tracks it. Every referral = a new client without advertising costs."
+        },
+        "settings": {
+          "title": "Settings — configure once",
+          "description": "Logo, colors, notifications, integrations — configure once, effects last forever."
+        },
+        "support": {
+          "title": "Help — ask, get an answer",
+          "description": "The AI Assistant knows the entire system. Ask in your language, get a specific answer instantly."
+        },
+        "cta": {
+          "title": "Ready to start! 🚀",
+          "description": "You now know all the modules. Start by filling in your data — the dashboard checklist will show what's left.",
+          "highlight": "Want this system for your salon? Leave your contact and we'll reach out within 24h!"
+        }
       }
     },
     "benefits": {
@@ -207,6 +259,11 @@
           "dailyReports": "Daily reports",
           "commissions": "Commissions",
           "vatReady": "VAT ready"
+        },
+        "products": {
+          "stockAlerts": "Stock alerts",
+          "suppliers": "Suppliers",
+          "salesReports": "Sales reports"
         }
       }
     }
@@ -348,23 +405,74 @@
     "start": "Start working",
     "restartHint": "💡 You can restart the tour by clicking 'Tutorial' in the sidebar",
     "steps": {
-      "welcome": { "title": "Welcome to Beauty Calendar! 🎉", "description": "We'll walk you through every section. You'll see what you gain in each module and how to start. Takes 2 minutes." },
-      "dashboard": { "title": "Dashboard — Your command center", "description": "See how much you earn, how many clients return, and what needs attention — all at a glance, without opening Excel." },
-      "calendar": { "title": "Calendar — zero phone calls", "description": "Clients book themselves 24/7, you only manage exceptions. See everyone's schedule on one screen." },
-      "widgets": { "title": "Widgets — Your booking link", "description": "Paste the link on Instagram or your website — clients book even at 11 PM. Like an employee who never sleeps." },
-      "staff": { "title": "Team — everyone knows their role", "description": "Each employee has their own calendar, services, and color. The system manages the schedule for you." },
-      "clients": { "title": "Clients — full history", "description": "Full history of every client with tags, notes, and preferences. Know who's VIP, who's disappearing, and who to call." },
-      "conversations": { "title": "Conversations — one view", "description": "SMS, email, WhatsApp — all client conversations in one place. Never lose a thread." },
-      "consultation": { "title": "Consultations — digital documentation", "description": "Consultation cards with GDPR signature, voice notes, and AI — professional documentation without paper bureaucracy." },
-      "services": { "title": "Services — online price list", "description": "Clients see prices and book immediately. Change a price once — the widget updates automatically." },
-      "products": { "title": "Products — inventory under control", "description": "Know how many products are left and when to order. Scan deliveries with your phone — the system calculates margins." },
-      "accounting": { "title": "Reports — export with one click", "description": "Close the salon, check the daily report — everything adds up. Export for your accountant with one click." },
-      "pipeline": { "title": "Client journey — react faster", "description": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off. React before they leave." },
-      "retention": { "title": "Retention — automatic returns", "description": "The system automatically takes care of client returns. 5 message sequences react at the right moment." },
-      "referral": { "title": "Referrals — free clients", "description": "Happy clients recommend you to friends, the system tracks it. Every referral = a new client without ad costs." },
-      "settings": { "title": "Settings — configure once", "description": "Logo, colors, notifications, integrations — configure once, effects last forever." },
-      "support": { "title": "Help — ask, get an answer", "description": "The AI Assistant knows the entire system. Ask in your language, get a specific answer instantly." },
-      "cta": { "title": "Ready to start! 🚀", "description": "You now know all the modules. Start by filling in your data — the dashboard checklist will show what's left." }
+      "welcome": {
+        "title": "Welcome to Beauty Calendar! 🎉",
+        "description": "We'll walk you through every section. You'll see what you gain in each module and how to start. Takes 2 minutes."
+      },
+      "dashboard": {
+        "title": "Dashboard — Your command center",
+        "description": "See how much you earn, how many clients return, and what needs attention — all at a glance, without opening Excel."
+      },
+      "calendar": {
+        "title": "Calendar — zero phone calls",
+        "description": "Clients book themselves 24/7, you only manage exceptions. See everyone's schedule on one screen."
+      },
+      "widgets": {
+        "title": "Widgets — Your booking link",
+        "description": "Paste the link on Instagram or your website — clients book even at 11 PM. Like an employee who never sleeps."
+      },
+      "staff": {
+        "title": "Team — everyone knows their role",
+        "description": "Each employee has their own calendar, services, and color. The system manages the schedule for you."
+      },
+      "clients": {
+        "title": "Clients — full history",
+        "description": "Full history of every client with tags, notes, and preferences. Know who's VIP, who's disappearing, and who to call."
+      },
+      "conversations": {
+        "title": "Conversations — one view",
+        "description": "SMS, email, WhatsApp — all client conversations in one place. Never lose a thread."
+      },
+      "consultation": {
+        "title": "Consultations — digital documentation",
+        "description": "Consultation cards with GDPR signature, voice notes, and AI — professional documentation without paper bureaucracy."
+      },
+      "services": {
+        "title": "Services — online price list",
+        "description": "Clients see prices and book immediately. Change a price once — the widget updates automatically."
+      },
+      "products": {
+        "title": "Products — inventory under control",
+        "description": "Know how many products are left and when to order. Scan deliveries with your phone — the system calculates margins."
+      },
+      "accounting": {
+        "title": "Reports — export with one click",
+        "description": "Close the salon, check the daily report — everything adds up. Export for your accountant with one click."
+      },
+      "pipeline": {
+        "title": "Client journey — react faster",
+        "description": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off. React before they leave."
+      },
+      "retention": {
+        "title": "Retention — automatic returns",
+        "description": "The system automatically takes care of client returns. 5 message sequences react at the right moment."
+      },
+      "referral": {
+        "title": "Referrals — free clients",
+        "description": "Happy clients recommend you to friends, the system tracks it. Every referral = a new client without ad costs."
+      },
+      "settings": {
+        "title": "Settings — configure once",
+        "description": "Logo, colors, notifications, integrations — configure once, effects last forever."
+      },
+      "support": {
+        "title": "Help — ask, get an answer",
+        "description": "The AI Assistant knows the entire system. Ask in your language, get a specific answer instantly."
+      },
+      "cta": {
+        "title": "Ready to start! 🚀",
+        "description": "You now know all the modules. Start by filling in your data — the dashboard checklist will show what's left."
+      }
     }
   },
   "common": {
@@ -387,7 +495,10 @@
     "success": "Success",
     "saved": "Saved",
     "deleted": "Deleted",
-    "added": "Added"
+    "added": "Added",
+    "optional": "optional",
+    "change": "Change",
+    "total": "Total"
   },
   "dashboard": {
     "welcome": "Welcome!",
@@ -461,6 +572,33 @@
       "completed": "Completed",
       "cancelled": "Cancelled",
       "noShow": "No-show"
+    },
+    "listView": "Client list",
+    "needsAttention": "needs attention",
+    "daysAgo": "days ago",
+    "purchaseGroups": {
+      "title": "Purchase groups",
+      "noGroups": "No purchase groups",
+      "noGroupsHint": "Groups will appear after first client visits",
+      "clients": "Clients",
+      "revenue": "Revenue",
+      "avgVisits": "Avg. visits",
+      "topClients": "Top clients",
+      "viewAll": "View all ({{count}})"
+    },
+    "filters": {
+      "title": "Filters",
+      "clear": "Clear",
+      "byTags": "By tags",
+      "byCategory": "By purchase category",
+      "byInactivity": "By inactivity",
+      "allClients": "All clients",
+      "inactive30": "Inactive >30 days",
+      "inactive60": "Inactive >60 days",
+      "inactive90": "Inactive >90 days",
+      "needsFollowup": "Needs follow-up",
+      "needsFollowupShort": "Follow-up",
+      "inactiveDays": ">{{days}} days"
     }
   },
   "services": {
@@ -570,7 +708,80 @@
     "stockUpdated": "Stock updated",
     "stockUpdateError": "Stock update error",
     "quickSale": "Quick sale",
-    "total": "Total"
+    "total": "Total",
+    "searchSuppliers": "Search supplier...",
+    "searchDeliveries": "Search delivery...",
+    "noSuppliers": "No suppliers",
+    "noDeliveries": "No deliveries",
+    "stockCorrection": "Stock correction",
+    "correctionType": "Correction type",
+    "addStock": "Add",
+    "subtractStock": "Subtract",
+    "correctionNote": "Note",
+    "correctionNotePlaceholder": "e.g. Inventory check, damage...",
+    "applyCorrection": "Apply correction",
+    "totalDeliveries": "Deliveries",
+    "totalItems": "Items",
+    "totalValue": "Value",
+    "date": "Date",
+    "supplier": "Supplier",
+    "invoice": "Invoice",
+    "invoiceNumber": "Invoice no.",
+    "value": "Value",
+    "selectProduct": "Select product",
+    "selectSupplier": "Select supplier",
+    "unitPrice": "Unit price",
+    "totalRevenue": "Revenue",
+    "totalMargin": "Margin",
+    "avgMargin": "Avg. margin",
+    "totalSold": "Sold",
+    "thisWeek": "This week",
+    "thisMonth": "This month",
+    "thisQuarter": "This quarter",
+    "thisYear": "This year",
+    "sold": "Sold",
+    "revenue": "Revenue",
+    "cost": "Cost",
+    "margin": "Margin",
+    "marginPercent": "Margin %",
+    "supplierName": "Company name",
+    "contactPerson": "Contact person",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "paymentTerms": "Payment terms",
+    "discountInfo": "Discount info",
+    "notes": "Notes",
+    "selectCategory": "Select category",
+    "salePrice": "Sale price",
+    "purchasePrice": "Purchase price",
+    "vatRate": "VAT rate",
+    "minStock": "Min. stock",
+    "initialStock": "Initial stock",
+    "description": "Description",
+    "active": "Active",
+    "internalUseOnly": "Internal use only",
+    "variant": "Variant",
+    "addProducts": "Add products",
+    "addProductsToSale": "Add products to sale",
+    "items": "pcs",
+    "searchToAdd": "Search product to add...",
+    "noProductsFound": "No products found",
+    "only": "Only",
+    "left": "left",
+    "productsTotal": "Products total",
+    "client": "Client",
+    "searchClient": "Search client...",
+    "noClientsFound": "No clients found",
+    "paymentMethod": "Payment method",
+    "cash": "Cash",
+    "card": "Card",
+    "transfer": "Transfer",
+    "totalToPay": "Total to pay",
+    "completeSale": "Complete sale",
+    "emptyCart": "Cart is empty",
+    "addProductsFirst": "Add products before completing the sale",
+    "saleCompleted": "Sale completed"
   },
   "timeOff": {
     "title": "Time off & holidays",
@@ -623,7 +834,9 @@
     "duration": "Duration",
     "price": "Price",
     "saveChanges": "Save changes",
-    "createAppointment": "Create appointment"
+    "createAppointment": "Create appointment",
+    "servicePrice": "Service price",
+    "total": "Total"
   },
   "csvImport": {
     "title": "Import services from CSV",
@@ -1503,77 +1716,137 @@
     "howTo": "How to do it",
     "home": {
       "goal": "See how much you earn, how many clients return, and what needs attention — without opening Excel.",
-      "steps": ["Check the setup checklist and fill in missing data", "Share your booking link with clients", "Monitor stats — the system updates them automatically"],
+      "steps": [
+        "Check the setup checklist and fill in missing data",
+        "Share your booking link with clients",
+        "Monitor stats — the system updates them automatically"
+      ],
       "painPoint": "One glance in the morning and you know how your business is doing."
     },
     "calendar": {
       "goal": "Clients book themselves 24/7 — you only manage exceptions.",
-      "steps": ["Add staff and set working hours", "Click an empty slot to add an appointment manually", "Share the widget — clients book themselves, even at 11 PM"],
+      "steps": [
+        "Add staff and set working hours",
+        "Click an empty slot to add an appointment manually",
+        "Share the widget — clients book themselves, even at 11 PM"
+      ],
       "painPoint": "Zero phone calls during treatments. Clients book themselves."
     },
     "widgets": {
       "goal": "Your booking link works like an employee who never sleeps.",
-      "steps": ["Copy the link and paste on Instagram, Facebook, or your website", "Customize colors and logo in the visual editor", "Track how many people visited and how many booked"],
+      "steps": [
+        "Copy the link and paste on Instagram, Facebook, or your website",
+        "Customize colors and logo in the visual editor",
+        "Track how many people visited and how many booked"
+      ],
       "painPoint": "Paste the link on Instagram and clients book at 11 PM."
     },
     "staff": {
       "goal": "Each employee has their own calendar, services, and color — zero mix-ups.",
-      "steps": ["Add an employee (even if you work alone — add yourself)", "Assign services and set working hours", "Choose a color — appointments will be marked this way in the calendar"],
+      "steps": [
+        "Add an employee (even if you work alone — add yourself)",
+        "Assign services and set working hours",
+        "Choose a color — appointments will be marked this way in the calendar"
+      ],
       "painPoint": "You don't need to remember who does what. The system manages the schedule for you."
     },
     "clients": {
       "goal": "Full history of every client — you know who's VIP and who's disappearing.",
-      "steps": ["Add clients manually or import from CSV", "Profiles are also created automatically from online bookings", "Add tags and notes — allergies, preferences, VIP"],
+      "steps": [
+        "Add clients manually or import from CSV",
+        "Profiles are also created automatically from online bookings",
+        "Add tags and notes — allergies, preferences, VIP"
+      ],
       "painPoint": "No more sticky notes and notebooks. Every client has a full profile."
     },
     "conversations": {
       "goal": "All conversations in one place — SMS, email, WhatsApp.",
-      "steps": ["Configure communication channels in Settings", "Client messages appear automatically", "Reply directly from the panel — no more switching between apps"],
+      "steps": [
+        "Configure communication channels in Settings",
+        "Client messages appear automatically",
+        "Reply directly from the panel — no more switching between apps"
+      ],
       "painPoint": "You'll never lose a thread with a client."
     },
     "consultation": {
       "goal": "Digital consultation cards with GDPR signature — always at hand.",
-      "steps": ["Choose a ready-made template or create your own", "Fill in the card with the client — digital signature on the spot", "Record a voice note — AI extracts key information"],
+      "steps": [
+        "Choose a ready-made template or create your own",
+        "Fill in the card with the client — digital signature on the spot",
+        "Record a voice note — AI extracts key information"
+      ],
       "painPoint": "Professional documentation without paper bureaucracy."
     },
     "services": {
       "goal": "Your online price list — clients see prices and book immediately.",
-      "steps": ["Add services with price, duration, and description", "Create categories — Face, Nails, Body", "Assign staff to services"],
+      "steps": [
+        "Add services with price, duration, and description",
+        "Create categories — Face, Nails, Body",
+        "Assign staff to services"
+      ],
       "painPoint": "Change the price once, the widget updates automatically."
     },
     "products": {
       "goal": "You know how many products are left and when to order — zero surprises.",
-      "steps": ["Add products — name, price, EAN code, supplier", "The system warns when a product is running low", "Scan deliveries with your phone — stock updates automatically"],
+      "steps": [
+        "Add products — name, price, EAN code, supplier",
+        "The system warns when a product is running low",
+        "Scan deliveries with your phone — stock updates automatically"
+      ],
       "painPoint": "Scan deliveries with your phone, the system calculates margins for you."
     },
     "accounting": {
       "goal": "Close the salon, check the report — everything adds up.",
-      "steps": ["Select date range and browse reports", "Check the daily cash report — cash, card, online", "Export data to CSV/PDF and send to your accountant"],
+      "steps": [
+        "Select date range and browse reports",
+        "Check the daily cash report — cash, card, online",
+        "Export data to CSV/PDF and send to your accountant"
+      ],
       "painPoint": "Export for your accountant with one click."
     },
     "pipeline": {
       "goal": "See how many clients return after the 1st, 2nd, 3rd visit — and where they drop off.",
-      "steps": ["Clients automatically progress through journey stages", "Click a card to see the full history", "React to clients in the 'Did not show' column"],
+      "steps": [
+        "Clients automatically progress through journey stages",
+        "Click a card to see the full history",
+        "React to clients in the 'Did not show' column"
+      ],
       "painPoint": "React before the client goes to the competition."
     },
     "retention": {
       "goal": "The system automatically takes care of client returns — you don't have to remember.",
-      "steps": ["Configure retention sequences — 5 automatic messages", "The system detects clients at risk of leaving", "Monitor results — how many clients returned thanks to automation"],
+      "steps": [
+        "Configure retention sequences — 5 automatic messages",
+        "The system detects clients at risk of leaving",
+        "Monitor results — how many clients returned thanks to automation"
+      ],
       "painPoint": "Clients come back on their own because the system reacts at the right moment."
     },
     "referral": {
       "goal": "Happy clients recommend you to friends — the system tracks it.",
-      "steps": ["The system automatically generates referral codes for loyal clients", "Clients share the code on Stories or in person", "Monitor how many new clients came from referrals"],
+      "steps": [
+        "The system automatically generates referral codes for loyal clients",
+        "Clients share the code on Stories or in person",
+        "Monitor how many new clients came from referrals"
+      ],
       "painPoint": "Every referral = a new client without advertising costs."
     },
     "settings": {
       "goal": "Your logo and colors are displayed in the widget — professional look.",
-      "steps": ["Complete your salon profile — name, address, logo", "Configure SMS/email notifications", "Set booking rules and integrations"],
+      "steps": [
+        "Complete your salon profile — name, address, logo",
+        "Configure SMS/email notifications",
+        "Set booking rules and integrations"
+      ],
       "painPoint": "Configure once, effects forever."
     },
     "support": {
       "goal": "Ask in your language, get an answer instantly.",
-      "steps": ["Type your question in the chat — in your own words", "Use quick actions for common questions", "The assistant responds with specific instructions"],
+      "steps": [
+        "Type your question in the chat — in your own words",
+        "Use quick actions for common questions",
+        "The assistant responds with specific instructions"
+      ],
       "painPoint": "Like talking to an expert who knows the entire system."
     }
   },
@@ -1615,11 +1888,26 @@
       "lost": "Lost"
     },
     "sequences": {
-      "proactive": { "label": "Before they leave", "description": "Proactive — based on average client interval × 1.3" },
-      "45day": { "label": "45 days — gentle", "description": "Warm, non-intrusive tone with 1-click booking button" },
-      "60day": { "label": "60 days — with value", "description": "Educational — mini-education about treatment + visual results" },
-      "75day": { "label": "75 days — with incentive", "description": "Exclusive return offer with 48h countdown" },
-      "90day": { "label": "90 days — last chance", "description": "Last contact + auto-tag for Meta campaign" }
+      "proactive": {
+        "label": "Before they leave",
+        "description": "Proactive — based on average client interval × 1.3"
+      },
+      "45day": {
+        "label": "45 days — gentle",
+        "description": "Warm, non-intrusive tone with 1-click booking button"
+      },
+      "60day": {
+        "label": "60 days — with value",
+        "description": "Educational — mini-education about treatment + visual results"
+      },
+      "75day": {
+        "label": "75 days — with incentive",
+        "description": "Exclusive return offer with 48h countdown"
+      },
+      "90day": {
+        "label": "90 days — last chance",
+        "description": "Last contact + auto-tag for Meta campaign"
+      }
     },
     "actions": {
       "sent": "Sent",
