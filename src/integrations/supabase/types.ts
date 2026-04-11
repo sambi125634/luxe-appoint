@@ -109,6 +109,7 @@ export type Database = {
           payment_paid_at: string | null
           payment_session_id: string | null
           payment_status: string | null
+          payment_transaction_id: string | null
           price: number | null
           reminder_email_sent: boolean
           reminder_email_sent_at: string | null
@@ -136,6 +137,7 @@ export type Database = {
           payment_paid_at?: string | null
           payment_session_id?: string | null
           payment_status?: string | null
+          payment_transaction_id?: string | null
           price?: number | null
           reminder_email_sent?: boolean
           reminder_email_sent_at?: string | null
@@ -163,6 +165,7 @@ export type Database = {
           payment_paid_at?: string | null
           payment_session_id?: string | null
           payment_status?: string | null
+          payment_transaction_id?: string | null
           price?: number | null
           reminder_email_sent?: boolean
           reminder_email_sent_at?: string | null
@@ -179,6 +182,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_payment_transaction_id_fkey"
+            columns: ["payment_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "payment_transactions"
             referencedColumns: ["id"]
           },
           {
@@ -1491,6 +1501,72 @@ export type Database = {
           },
         ]
       }
+      payment_transactions: {
+        Row: {
+          amount: number
+          appointment_id: string | null
+          completed_at: string | null
+          created_at: string
+          currency: string
+          error_message: string | null
+          id: string
+          p24_order_id: string | null
+          p24_session_id: string | null
+          p24_token: string | null
+          payment_method: string | null
+          salon_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          appointment_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          error_message?: string | null
+          id?: string
+          p24_order_id?: string | null
+          p24_session_id?: string | null
+          p24_token?: string | null
+          payment_method?: string | null
+          salon_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          appointment_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          error_message?: string | null
+          id?: string
+          p24_order_id?: string | null
+          p24_session_id?: string | null
+          p24_token?: string | null
+          payment_method?: string | null
+          salon_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pixel_attributions: {
         Row: {
           ad_campaign: string | null
@@ -2682,6 +2758,7 @@ export type Database = {
           communication_provider: Json | null
           communication_setup_completed: boolean | null
           created_at: string
+          deposit_percent: number | null
           description: string | null
           email: string | null
           id: string
@@ -2691,6 +2768,9 @@ export type Database = {
           onboarding_completed: boolean
           onboarding_step: number
           owner_id: string | null
+          p24_merchant_id: string | null
+          p24_pos_id: string | null
+          payment_required: boolean | null
           phone: string | null
           reschedule_notice_hours: number
           salon_type: string | null
@@ -2713,6 +2793,7 @@ export type Database = {
           communication_provider?: Json | null
           communication_setup_completed?: boolean | null
           created_at?: string
+          deposit_percent?: number | null
           description?: string | null
           email?: string | null
           id?: string
@@ -2722,6 +2803,9 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_step?: number
           owner_id?: string | null
+          p24_merchant_id?: string | null
+          p24_pos_id?: string | null
+          payment_required?: boolean | null
           phone?: string | null
           reschedule_notice_hours?: number
           salon_type?: string | null
@@ -2744,6 +2828,7 @@ export type Database = {
           communication_provider?: Json | null
           communication_setup_completed?: boolean | null
           created_at?: string
+          deposit_percent?: number | null
           description?: string | null
           email?: string | null
           id?: string
@@ -2753,6 +2838,9 @@ export type Database = {
           onboarding_completed?: boolean
           onboarding_step?: number
           owner_id?: string | null
+          p24_merchant_id?: string | null
+          p24_pos_id?: string | null
+          payment_required?: boolean | null
           phone?: string | null
           reschedule_notice_hours?: number
           salon_type?: string | null
