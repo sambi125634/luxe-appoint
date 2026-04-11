@@ -64,7 +64,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         >
-        {t("landing.hero.title1")}{" "}
+        {t("landing.hero.title")}{" "}
           <span
             style={{
               fontStyle: "italic",
@@ -75,7 +75,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               backgroundClip: "text",
             }}
           >
-            {t("landing.hero.title2")}
+            {t("landing.hero.titleHighlight")}
           </span>
         </motion.h1>
 
@@ -100,7 +100,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="h-12 md:h-14 rounded-2xl px-6 md:px-10 text-[15px] md:text-[17px] shadow-soft sm:min-w-[294px]"
           >
             <span className="flex items-center gap-2">
-              {t("landing.hero.cta1")}
+              {t("landing.hero.ctaPrimary")}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </span>
           </Button>
@@ -111,7 +111,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="h-12 md:h-14 rounded-2xl bg-background/75 px-6 md:px-10 text-[15px] md:text-[17px] text-foreground backdrop-blur-sm sm:min-w-[314px]"
           >
             <Play className="w-4 h-4" />
-            {t("landing.hero.cta2")}
+            {t("landing.hero.ctaSecondary")}
           </Button>
         </motion.div>
 
