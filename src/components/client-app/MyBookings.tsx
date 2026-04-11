@@ -214,20 +214,36 @@ export function MyBookings() {
             )}
             <div className="flex items-center gap-1">
               {!isUpcoming && booking.status === "completed" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:text-primary hover:bg-primary/10 -mr-1"
-                  onClick={() => setReviewBooking({
-                    id: booking.id,
-                    serviceName: service?.name ?? "Usługa",
-                    salonName: salon?.name ?? "Salon",
-                    salonId: booking.salon_id,
-                  })}
-                >
-                  <Star className="h-4 w-4 mr-1" />
-                  Oceń
-                </Button>
+                <>
+                  <Button
+                    size="sm"
+                    className="font-semibold"
+                    style={{ backgroundColor: salon?.theme_primary_color ?? "hsl(var(--primary))" }}
+                    onClick={() => setRebookBooking({
+                      ...booking,
+                      services: service,
+                      staff_members: staffMember,
+                      salons: salon,
+                    })}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-1" />
+                    Zarezerwuj ponownie
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:text-primary hover:bg-primary/10 -mr-1"
+                    onClick={() => setReviewBooking({
+                      id: booking.id,
+                      serviceName: service?.name ?? "Usługa",
+                      salonName: salon?.name ?? "Salon",
+                      salonId: booking.salon_id,
+                    })}
+                  >
+                    <Star className="h-4 w-4 mr-1" />
+                    Oceń
+                  </Button>
+                </>
               )}
               {canReschedule && (
                 <Button
