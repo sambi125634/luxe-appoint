@@ -236,6 +236,11 @@ export function ForYou() {
         </Card>
       </motion.div>
 
+      {/* Beauty Rhythms */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mb-4">
+        <BeautyRhythms salonId={activeSalonId} />
+      </motion.div>
+
       {/* Available rewards */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}>
         <h2 className="font-bold text-foreground text-lg mb-3">Dostępne nagrody</h2>

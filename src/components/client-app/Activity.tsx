@@ -18,6 +18,8 @@ const iconMap: Record<string, { icon: typeof Clock; bg: string; color: string; p
   booking: { icon: Calendar, bg: "bg-primary/10", color: "text-primary" },
   waitlist: { icon: Bell, bg: "bg-amber-500/10", color: "text-amber-600", pulse: true },
   reward: { icon: Gift, bg: "bg-green-500/10", color: "text-green-600" },
+  rhythm_reminder: { icon: Sparkles, bg: "bg-purple-500/10", color: "text-purple-600", pulse: true },
+  payment: { icon: CheckCircle2, bg: "bg-green-500/10", color: "text-green-600" },
   info: { icon: Bell, bg: "bg-muted", color: "text-muted-foreground" },
 };
 
