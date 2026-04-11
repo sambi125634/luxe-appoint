@@ -1624,11 +1624,15 @@ export type Database = {
           approved_by: string | null
           avatar_url: string | null
           created_at: string
+          dark_mode: boolean
           email: string
           first_name: string | null
           id: string
           is_approved: boolean
           last_name: string | null
+          notifications_email: boolean
+          notifications_push: boolean
+          notifications_sms: boolean
           phone: string | null
           updated_at: string
         }
@@ -1637,11 +1641,15 @@ export type Database = {
           approved_by?: string | null
           avatar_url?: string | null
           created_at?: string
+          dark_mode?: boolean
           email: string
           first_name?: string | null
           id: string
           is_approved?: boolean
           last_name?: string | null
+          notifications_email?: boolean
+          notifications_push?: boolean
+          notifications_sms?: boolean
           phone?: string | null
           updated_at?: string
         }
@@ -1650,11 +1658,15 @@ export type Database = {
           approved_by?: string | null
           avatar_url?: string | null
           created_at?: string
+          dark_mode?: boolean
           email?: string
           first_name?: string | null
           id?: string
           is_approved?: boolean
           last_name?: string | null
+          notifications_email?: boolean
+          notifications_push?: boolean
+          notifications_sms?: boolean
           phone?: string | null
           updated_at?: string
         }
