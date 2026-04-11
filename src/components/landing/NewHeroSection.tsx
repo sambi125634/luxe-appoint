@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
-import Spline from "@splinetool/react-spline";
-import { Suspense } from "react";
 
 interface NewHeroSectionProps {
   onScrollToForm: () => void;
@@ -15,18 +13,26 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-background">
-      {/* Spline 3D Background */}
-      <div className="absolute inset-0 z-0">
-        <Suspense fallback={
-          <div className="absolute inset-0" style={{
-            background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.08) 0%, transparent 70%)",
-          }} />
-        }>
-          <Spline
-            scene="https://prod.spline.design/6bJ7-4Kmf2JF8QR4/scene.splinecode"
-            style={{ width: "100%", height: "100%" }}
-          />
-        </Suspense>
+      <div className="pointer-events-none absolute inset-0">
+        <div
+          className="absolute -left-[12%] -top-28 h-[16rem] w-[16rem] md:h-[32rem] md:w-[32rem] rounded-full blur-3xl"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--primary) / 0.22) 0%, transparent 70%)",
+          }}
+        />
+        <div
+          className="absolute right-[-4%] top-[4%] h-[10rem] w-[10rem] md:h-[18rem] md:w-[18rem] rounded-full blur-3xl"
+          style={{
+            background: "radial-gradient(circle, hsl(var(--accent) / 0.14) 0%, transparent 72%)",
+          }}
+        />
+        <div
+          className="absolute bottom-[-12%] left-1/2 h-[14rem] w-[30rem] md:h-[22rem] md:w-[58rem] -translate-x-1/2 rounded-full blur-3xl"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, hsl(var(--accent) / 0.22) 0%, hsl(var(--primary) / 0.08) 50%, transparent 76%)",
+          }}
+        />
       </div>
 
       <div className="container relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-12 text-center">
