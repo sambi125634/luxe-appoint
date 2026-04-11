@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Gift, Star, Ticket, ChevronRight, Sparkles, Trophy, Copy, Check, Clock, Award } from "lucide-react";
+import { BeautyRhythms } from "@/components/client-app/BeautyRhythms";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -233,6 +234,11 @@ export function ForYou() {
             </p>
           </CardContent>
         </Card>
+      </motion.div>
+
+      {/* Beauty Rhythms */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.22 }} className="mb-4">
+        <BeautyRhythms salonId={activeSalonId} />
       </motion.div>
 
       {/* Available rewards */}
