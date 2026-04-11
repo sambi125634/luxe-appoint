@@ -321,7 +321,8 @@
     "consultation": "Consultations",
     "retention": "Retention",
     "export": "Data Export",
-    "autopilot": "AI Autopilot"
+    "autopilot": "AI Autopilot",
+    "clientApp": "Client App"
   },
   "settings": {
     "salonProfile": "Salon profile",

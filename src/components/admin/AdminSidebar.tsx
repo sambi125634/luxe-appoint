@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { 
   Calendar, Users, Scissors, Settings, BarChart3, 
-  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart, ChevronDown, Bot
+  LogOut, Sparkles, LayoutDashboard, UserCircle, MessageSquare, Route, Calculator, Code, Package, HelpCircle, Radar, ScanLine, Zap, ClipboardList, Heart, ChevronDown, Bot, Smartphone
 } from "lucide-react";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useStaffPermissions, type StaffPermissions } from "@/hooks/useStaffPermissions";
 
-type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "consultation" | "referral" | "autopilot";
+type TabType = "home" | "calendar" | "widgets" | "clients" | "conversations" | "pipeline" | "accounting" | "products" | "staff" | "services" | "settings" | "support" | "retention" | "consultation" | "referral" | "autopilot" | "client-app";
 
 interface AdminSidebarProps {
   activeTab: TabType;
@@ -57,6 +57,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
       titleKey: "sidebar.clients",
       items: [
         { icon: UserCircle, labelKey: "admin.clients", tab: "clients" },
+        { icon: Smartphone, labelKey: "admin.clientApp", tab: "client-app" },
         { icon: MessageSquare, labelKey: "admin.conversations", tab: "conversations" },
         { icon: ClipboardList, labelKey: "admin.consultation", tab: "consultation" },
       ],
