@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingWidget } from "@/components/booking/BookingWidget";
+import { SalonGallery } from "@/components/client-app/SalonGallery";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
