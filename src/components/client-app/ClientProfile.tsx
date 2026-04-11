@@ -10,9 +10,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function ClientProfile() {
   const navigate = useNavigate();
@@ -35,6 +34,15 @@ export function ClientProfile() {
       return data;
     },
   });
+
+  // Apply dark mode on profile load
+  useEffect(() => {
+    if (profile?.dark_mode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [profile?.dark_mode]);
 
   const { data: salonCount } = useQuery({
     queryKey: ["client-salon-count"],
@@ -73,6 +81,41 @@ export function ClientProfile() {
     },
   });
 
+  const updatePreference = useMutation({
+    mutationFn: async (updates: Record<string, boolean>) => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Brak użytkownika");
+      const { error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", user.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["client-profile"] });
+    },
+    onError: () => {
+      toast.error("Nie udało się zapisać ustawienia");
+    },
+  });
+
+  const handleToggleDarkMode = (checked: boolean) => {
+    if (checked) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    updatePreference.mutate({ dark_mode: checked });
+  };
+
+  const handleToggleNotifications = (checked: boolean) => {
+    updatePreference.mutate({
+      notifications_email: checked,
+      notifications_sms: checked,
+      notifications_push: checked,
+    });
+  };
+
   const handleStartEdit = () => {
     setEditFirstName(profile?.first_name ?? "");
     setEditLastName(profile?.last_name ?? "");
@@ -83,7 +126,7 @@ export function ClientProfile() {
   const handleLogout = async () => {
     await supabase.auth.signOut();
     toast.success("Wylogowano pomyślnie");
-    navigate("/auth");
+    navigate("/app/auth");
   };
 
   const initials = [profile?.first_name, profile?.last_name]
@@ -93,6 +136,8 @@ export function ClientProfile() {
     .toUpperCase() || "U";
 
   const fullName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "Użytkownik";
+
+  const notificationsOn = profile?.notifications_email !== false;
 
   return (
     <div className="px-4 pt-6 pb-24">
@@ -125,39 +170,16 @@ export function ClientProfile() {
         {isEditing ? (
           <div className="w-full space-y-3 mt-2">
             <div className="grid grid-cols-2 gap-3">
-              <Input
-                placeholder="Imię"
-                value={editFirstName}
-                onChange={(e) => setEditFirstName(e.target.value)}
-              />
-              <Input
-                placeholder="Nazwisko"
-                value={editLastName}
-                onChange={(e) => setEditLastName(e.target.value)}
-              />
+              <Input placeholder="Imię" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} />
+              <Input placeholder="Nazwisko" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} />
             </div>
-            <Input
-              placeholder="Telefon"
-              type="tel"
-              value={editPhone}
-              onChange={(e) => setEditPhone(e.target.value)}
-            />
+            <Input placeholder="Telefon" type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setIsEditing(false)}
-              >
-                <X className="h-4 w-4 mr-1" />
-                Anuluj
+              <Button variant="outline" className="flex-1" onClick={() => setIsEditing(false)}>
+                <X className="h-4 w-4 mr-1" />Anuluj
               </Button>
-              <Button
-                className="flex-1"
-                onClick={() => updateProfile.mutate()}
-                disabled={updateProfile.isPending}
-              >
-                <Check className="h-4 w-4 mr-1" />
-                Zapisz
+              <Button className="flex-1" onClick={() => updateProfile.mutate()} disabled={updateProfile.isPending}>
+                <Check className="h-4 w-4 mr-1" />Zapisz
               </Button>
             </div>
           </div>
@@ -205,7 +227,10 @@ export function ClientProfile() {
               </div>
               <span className="text-sm font-medium text-foreground">Powiadomienia</span>
             </div>
-            <Switch defaultChecked />
+            <Switch
+              checked={notificationsOn}
+              onCheckedChange={handleToggleNotifications}
+            />
           </div>
           <div className="flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-3">
@@ -214,16 +239,16 @@ export function ClientProfile() {
               </div>
               <span className="text-sm font-medium text-foreground">Tryb ciemny</span>
             </div>
-            <Switch />
+            <Switch
+              checked={profile?.dark_mode ?? false}
+              onCheckedChange={handleToggleDarkMode}
+            />
           </div>
         </CardContent>
       </Card>
 
       {/* Favorites shortcut */}
-      <button
-        onClick={() => navigate("/app/profile/favorites")}
-        className="w-full mb-4"
-      >
+      <button onClick={() => navigate("/app/profile/favorites")} className="w-full mb-4">
         <Card className="border-border/40 rounded-2xl overflow-hidden hover:shadow-md transition-all">
           <CardContent className="flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-3">
@@ -238,10 +263,7 @@ export function ClientProfile() {
       </button>
 
       {/* Referral shortcut */}
-      <button
-        onClick={() => navigate("/app/profile/referrals")}
-        className="w-full mb-4"
-      >
+      <button onClick={() => navigate("/app/profile/referrals")} className="w-full mb-4">
         <Card className="border-border/40 rounded-2xl overflow-hidden hover:shadow-md transition-all">
           <CardContent className="flex items-center justify-between px-4 py-3.5">
             <div className="flex items-center gap-3">
