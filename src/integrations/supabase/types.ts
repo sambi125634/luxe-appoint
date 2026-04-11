@@ -527,6 +527,53 @@ export type Database = {
           },
         ]
       }
+      birthday_campaigns: {
+        Row: {
+          coupon_valid_days: number
+          created_at: string
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean
+          message_template: string
+          salon_id: string
+          send_days_before: number
+          updated_at: string
+        }
+        Insert: {
+          coupon_valid_days?: number
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean
+          message_template?: string
+          salon_id: string
+          send_days_before?: number
+          updated_at?: string
+        }
+        Update: {
+          coupon_valid_days?: number
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean
+          message_template?: string
+          salon_id?: string
+          send_days_before?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "birthday_campaigns_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: true
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_communication_preferences: {
         Row: {
           client_id: string
@@ -2127,6 +2174,50 @@ export type Database = {
           },
         ]
       }
+      push_notification_history: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          opened_count: number
+          recipients_count: number
+          salon_id: string
+          segment: string
+          sent_at: string
+          title: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          opened_count?: number
+          recipients_count?: number
+          salon_id: string
+          segment?: string
+          sent_at?: string
+          title: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          opened_count?: number
+          recipients_count?: number
+          salon_id?: string
+          segment?: string
+          sent_at?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_notification_history_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_tokens: {
         Row: {
           created_at: string
@@ -2809,6 +2900,13 @@ export type Database = {
       salons: {
         Row: {
           address: string | null
+          advance_booking_days: number
+          allow_cancellation: boolean
+          allow_reschedule: boolean
+          allow_staff_selection: boolean
+          allow_waitlist: boolean
+          buffer_minutes: number
+          cancellation_notice_hours: number
           city: string | null
           client_sources: Json | null
           communication_email: string | null
@@ -2824,6 +2922,7 @@ export type Database = {
           id: string
           is_active: boolean
           logo_url: string | null
+          min_booking_notice_hours: number
           name: string
           onboarding_completed: boolean
           onboarding_step: number
@@ -2835,15 +2934,28 @@ export type Database = {
           reschedule_notice_hours: number
           salon_type: string | null
           settings: Json | null
+          show_prices: boolean
+          show_staff_names: boolean
           slug: string
           social_url: string | null
+          splash_image_url: string | null
           team_size: number | null
           theme_primary_color: string | null
           theme_secondary_color: string | null
           updated_at: string
+          vip_early_access_hours: number
+          vip_min_visits: number
+          welcome_message: string | null
         }
         Insert: {
           address?: string | null
+          advance_booking_days?: number
+          allow_cancellation?: boolean
+          allow_reschedule?: boolean
+          allow_staff_selection?: boolean
+          allow_waitlist?: boolean
+          buffer_minutes?: number
+          cancellation_notice_hours?: number
           city?: string | null
           client_sources?: Json | null
           communication_email?: string | null
@@ -2859,6 +2971,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           logo_url?: string | null
+          min_booking_notice_hours?: number
           name: string
           onboarding_completed?: boolean
           onboarding_step?: number
@@ -2870,15 +2983,28 @@ export type Database = {
           reschedule_notice_hours?: number
           salon_type?: string | null
           settings?: Json | null
+          show_prices?: boolean
+          show_staff_names?: boolean
           slug: string
           social_url?: string | null
+          splash_image_url?: string | null
           team_size?: number | null
           theme_primary_color?: string | null
           theme_secondary_color?: string | null
           updated_at?: string
+          vip_early_access_hours?: number
+          vip_min_visits?: number
+          welcome_message?: string | null
         }
         Update: {
           address?: string | null
+          advance_booking_days?: number
+          allow_cancellation?: boolean
+          allow_reschedule?: boolean
+          allow_staff_selection?: boolean
+          allow_waitlist?: boolean
+          buffer_minutes?: number
+          cancellation_notice_hours?: number
           city?: string | null
           client_sources?: Json | null
           communication_email?: string | null
@@ -2894,6 +3020,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           logo_url?: string | null
+          min_booking_notice_hours?: number
           name?: string
           onboarding_completed?: boolean
           onboarding_step?: number
@@ -2905,12 +3032,18 @@ export type Database = {
           reschedule_notice_hours?: number
           salon_type?: string | null
           settings?: Json | null
+          show_prices?: boolean
+          show_staff_names?: boolean
           slug?: string
           social_url?: string | null
+          splash_image_url?: string | null
           team_size?: number | null
           theme_primary_color?: string | null
           theme_secondary_color?: string | null
           updated_at?: string
+          vip_early_access_hours?: number
+          vip_min_visits?: number
+          welcome_message?: string | null
         }
         Relationships: []
       }
