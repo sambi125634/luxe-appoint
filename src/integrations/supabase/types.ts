@@ -3315,6 +3315,92 @@ export type Database = {
           },
         ]
       }
+      user_referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          is_active: boolean
+          salon_id: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          salon_id: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          salon_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referral_codes_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_referrals: {
+        Row: {
+          completed_at: string | null
+          id: string
+          referral_code_id: string
+          referred_at: string
+          referred_user_id: string
+          referrer_user_id: string
+          reward_points: number
+          salon_id: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          referral_code_id: string
+          referred_at?: string
+          referred_user_id: string
+          referrer_user_id: string
+          reward_points?: number
+          salon_id: string
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          referral_code_id?: string
+          referred_at?: string
+          referred_user_id?: string
+          referrer_user_id?: string
+          reward_points?: number
+          salon_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referrals_referral_code_id_fkey"
+            columns: ["referral_code_id"]
+            isOneToOne: false
+            referencedRelation: "user_referral_codes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_referrals_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
