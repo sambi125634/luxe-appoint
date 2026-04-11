@@ -1,5 +1,5 @@
 import { useEffect, useState, lazy, Suspense } from "react";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomTabBar } from "@/components/client-app/BottomTabBar";
 import { MySalons } from "@/components/client-app/MySalons";
@@ -18,9 +18,16 @@ const PaymentSuccessPage = lazy(() => import("@/pages/PaymentSuccessPage"));
 
 export default function ClientApp() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get("preview") === "true";
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (isPreview) {
+      setIsAuthenticated(true);
+      return;
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!session) {
         navigate("/app/auth?redirect=/app");
@@ -38,7 +45,7 @@ export default function ClientApp() {
     });
 
     return () => subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, isPreview]);
 
   if (!isAuthenticated) return null;
 
@@ -57,8 +64,8 @@ export default function ClientApp() {
         <Route path="terms" element={<TermsOfService />} />
         <Route path="payment-success" element={<Suspense fallback={null}><PaymentSuccessPage /></Suspense>} />
       </Routes>
-      <BottomTabBar />
-      <PushNotificationPrompt />
+      {!isPreview && <BottomTabBar />}
+      {!isPreview && <PushNotificationPrompt />}
     </div>
   );
 }
