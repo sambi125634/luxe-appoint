@@ -18,6 +18,7 @@ import MobileAdminApp from "./pages/MobileAdminApp";
 import JoinSalonPage from "./pages/JoinSalonPage";
 import StaffOnboardingPage from "./pages/StaffOnboardingPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ClientAuthPage from "./pages/ClientAuthPage";
 import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => {
             <Route path="/onboarding/staff" element={<StaffOnboardingPage />} />
             
             {/* Client app routes */}
+            <Route path="/app/auth" element={<ClientAuthPage />} />
             <Route path="/app/*" element={<ClientApp />} />
             
             {/* Mobile admin app */}
