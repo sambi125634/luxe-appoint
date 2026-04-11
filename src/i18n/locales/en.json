@@ -2139,7 +2139,11 @@
       "q7": "Is it really 0% commission? Always?",
       "a7": "Yes, absolutely. Beauty Calendar charges a fixed monthly fee depending on your plan (0 PLN / 99 PLN / 199 PLN). Zero commission on bookings — whether your client books 1 or 1000 appointments per month. This is our fundamental difference from Booksy and similar platforms.",
       "q8": "Does it integrate with Google Calendar?",
-      "a8": "Yes. On PRO and VIP plans you get two-way sync with Google Calendar. Appointments from Beauty Calendar automatically appear in your Google Calendar and vice versa — blocks from Google Calendar block slots in your booking widget."
+      "a8": "Yes. On PRO and VIP plans you get two-way sync with Google Calendar. Appointments from Beauty Calendar automatically appear in your Google Calendar and vice versa — blocks from Google Calendar block slots in your booking widget.",
+      "title1": "Frequently asked",
+      "title2": "questions",
+      "q9": "What if I change my mind?",
+      "a9": "No commitments. Cancel anytime. No questions asked, no hidden fees. We also guarantee a full refund within the first 30 days."
     },
     "newFinalCta": {
       "urgency": "First 30 days with full access to all AI features — no credit card required.",
