@@ -1261,6 +1261,104 @@ export type Database = {
         }
         Relationships: []
       }
+      loyalty_redemptions: {
+        Row: {
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          points_spent: number
+          redemption_code: string
+          reward_id: string
+          salon_id: string
+          status: string | null
+          used_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          points_spent: number
+          redemption_code: string
+          reward_id: string
+          salon_id: string
+          status?: string | null
+          used_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          points_spent?: number
+          redemption_code?: string
+          reward_id?: string
+          salon_id?: string
+          status?: string | null
+          used_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_redemptions_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_rewards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_redemptions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loyalty_rewards: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          points_required: number
+          reward_type: string | null
+          reward_value: number | null
+          salon_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          points_required?: number
+          reward_type?: string | null
+          reward_value?: number | null
+          salon_id: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          points_required?: number
+          reward_type?: string | null
+          reward_value?: number | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_rewards_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loyalty_stamps: {
         Row: {
           appointment_id: string | null
