@@ -134,7 +134,12 @@ export function MyBookings() {
   const BookingCard = ({ booking, isUpcoming = false }: { booking: NonNullable<typeof bookings>[0]; isUpcoming?: boolean }) => {
     const service = booking.services as unknown as { name: string; duration: number; price: number } | null;
     const staffMember = booking.staff_members as unknown as { name: string; avatar_url: string | null; color: string | null } | null;
-    const salon = booking.salons as unknown as { name: string; address: string | null; city: string | null; theme_primary_color: string | null } | null;
+    const salon = booking.salons as unknown as { name: string; address: string | null; city: string | null; theme_primary_color: string | null; reschedule_notice_hours?: number } | null;
+
+    const rescheduleNoticeHours = salon?.reschedule_notice_hours ?? 24;
+    const canReschedule = isUpcoming
+      && (booking.status === "confirmed" || booking.status === "booked")
+      && new Date(booking.start_time) > addHours(new Date(), rescheduleNoticeHours);
 
     const isFirst = isUpcoming && sortedUpcoming[0]?.id === booking.id;
 
