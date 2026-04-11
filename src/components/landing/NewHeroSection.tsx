@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight, Play } from "lucide-react";
@@ -8,9 +9,7 @@ interface NewHeroSectionProps {
 }
 
 export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
-  const scrollToDemo = () => {
-    document.getElementById("demo-preview")?.scrollIntoView({ behavior: "smooth" });
-  };
+  const { t } = useTranslation();
 
   return (
     <section className="relative min-h-screen overflow-hidden bg-background">
@@ -47,7 +46,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="mb-6 md:mb-12 rounded-full border-primary/20 bg-background/80 px-4 md:px-6 py-2.5 md:py-3 text-[11px] md:text-[13px] text-primary backdrop-blur-sm"
             style={{ fontWeight: 500, letterSpacing: "0.02em" }}
           >
-            ✨ 🚀 Zarabiaj więcej, robiąc jeszcze mniej niż do tej pory
+            ✨ 🚀 {t("landing.hero.badge")}
           </Badge>
         </motion.div>
 
@@ -65,7 +64,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
         >
-        Więcej wizyt. Więcej powrotów.{" "}
+        {t("landing.hero.title1")}{" "}
           <span
             style={{
               fontStyle: "italic",
@@ -76,7 +75,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
               backgroundClip: "text",
             }}
           >
-            Zero prowizji.
+            {t("landing.hero.title2")}
           </span>
         </motion.h1>
 
@@ -86,9 +85,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
         >
-          Jedyna platforma beauty z AI, która automatycznie wypełnia luki w grafiku,
-          odzyskuje śpiące klientki i maksymalizuje wartość każdej wizyty
-          — bez pobierania ani złotówki od Twoich przychodów.
+          {t("landing.hero.subtitle")}
         </motion.p>
 
         <motion.div
@@ -103,7 +100,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="h-12 md:h-14 rounded-2xl px-6 md:px-10 text-[15px] md:text-[17px] shadow-soft sm:min-w-[294px]"
           >
             <span className="flex items-center gap-2">
-              Wypróbuj bez żadnego ryzyka
+              {t("landing.hero.cta1")}
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </span>
           </Button>
@@ -114,7 +111,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
             className="h-12 md:h-14 rounded-2xl bg-background/75 px-6 md:px-10 text-[15px] md:text-[17px] text-foreground backdrop-blur-sm sm:min-w-[314px]"
           >
             <Play className="w-4 h-4" />
-            Zobacz demo na żywo
+            {t("landing.hero.cta2")}
           </Button>
         </motion.div>
 
@@ -126,7 +123,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-4 md:px-5 py-2 md:py-2.5 shadow-sm backdrop-blur-sm">
             <span className="text-xs md:text-sm font-medium text-emerald-700">
-              🇵🇱 Platforma stworzona w Polsce
+              🇵🇱 {t("landing.hero.madeIn")}
             </span>
           </div>
         </motion.div>
@@ -138,7 +135,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 1.1 }}
         >
-          {["Pełna gwarancja satysfakcji", "Dane zawsze Twoje", "0% prowizji — zawsze"].map((item) => (
+          {[t("landing.hero.trust1"), t("landing.hero.trust2"), t("landing.hero.trust3")].map((item) => (
             <div key={item} className="flex items-center gap-2 text-muted-foreground">
               <Check className="h-4 w-4 text-emerald-500" />
               <span>{item}</span>

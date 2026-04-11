@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -31,6 +32,8 @@ interface PricingCardProps {
 }
 
 export const PricingCard = ({ plan, index, onScrollToForm }: PricingCardProps) => {
+  const { t } = useTranslation();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -44,7 +47,7 @@ export const PricingCard = ({ plan, index, onScrollToForm }: PricingCardProps) =
       )}>
         {plan.popular && (
           <div className="absolute top-0 left-0 right-0 bg-primary text-primary-foreground text-center py-1 text-sm font-medium">
-            <plan.icon className="w-4 h-4 inline mr-1" />Najpopularniejszy
+            <plan.icon className="w-4 h-4 inline mr-1" />{t("landing.pricing.mostPopular")}
           </div>
         )}
         {plan.badge && !plan.popular && (
@@ -63,7 +66,7 @@ export const PricingCard = ({ plan, index, onScrollToForm }: PricingCardProps) =
             <span className="text-3xl md:text-4xl font-bold">{plan.price}</span>
             <span className="text-muted-foreground text-sm"> {plan.period}</span>
             {plan.setupFee && (
-              <span className="text-sm text-muted-foreground block mt-1">+ {plan.setupPrice} jednorazowy onboarding</span>
+              <span className="text-sm text-muted-foreground block mt-1">+ {plan.setupPrice} {t("landing.pricing.oneTimeOnboarding")}</span>
             )}
           </div>
           <p className="text-sm text-muted-foreground mt-2">{plan.description}</p>
@@ -81,7 +84,7 @@ export const PricingCard = ({ plan, index, onScrollToForm }: PricingCardProps) =
           </ul>
           {plan.limitations && plan.limitations.length > 0 && (
             <div className="mb-6 pt-3 border-t border-border/50">
-              <p className="text-xs text-muted-foreground mb-2 font-medium">Nie zawiera:</p>
+              <p className="text-xs text-muted-foreground mb-2 font-medium">{t("landing.pricing.notIncluded")}</p>
               {plan.limitations.map((lim, i) => (
                 <p key={i} className="text-xs text-muted-foreground/70 mb-1">— {lim}</p>
               ))}

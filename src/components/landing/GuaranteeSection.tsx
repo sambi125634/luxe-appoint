@@ -1,11 +1,13 @@
+import { useTranslation } from "react-i18next";
 import { Shield, Award } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const GuaranteeSection = () => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-12 md:py-16">
       <div className="container max-w-3xl mx-auto px-4 space-y-4 md:space-y-6">
-        {/* Guarantee 1 */}
         <motion.div
           className="bg-gradient-to-br from-green-500/5 to-green-500/10 border-2 border-green-500/20 rounded-2xl p-5 md:p-8"
           initial={{ opacity: 0, y: 40 }}
@@ -19,17 +21,14 @@ export const GuaranteeSection = () => {
             </div>
             <div>
               <span className="bg-green-500/10 text-green-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                GWARANCJA 1
+                {t("landing.guarantee.g1badge")}
               </span>
-              <h3 className="font-bold text-lg md:text-xl mt-2 mb-2">30 dni bez pytań — zwracamy 100%</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Jeśli z jakiegokolwiek powodu nie jesteś zadowolona w pierwszych 30 dniach PRO/ELITE — jeden email wystarczy. Pełny zwrot. Zero formalności.
-              </p>
+              <h3 className="font-bold text-lg md:text-xl mt-2 mb-2">{t("landing.guarantee.g1title")}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{t("landing.guarantee.g1desc")}</p>
             </div>
           </div>
         </motion.div>
 
-        {/* Guarantee 2 */}
         <motion.div
           className="bg-gradient-to-br from-amber-500/5 to-amber-500/10 border-2 border-amber-500/20 rounded-2xl p-5 md:p-8"
           initial={{ opacity: 0, y: 40 }}
@@ -43,15 +42,11 @@ export const GuaranteeSection = () => {
             </div>
             <div>
               <span className="bg-amber-500/10 text-amber-600 text-xs font-bold px-2 py-0.5 rounded-full">
-                GWARANCJA 2 — ELITE
+                {t("landing.guarantee.g2badge")}
               </span>
-              <h3 className="font-bold text-lg md:text-xl mt-2 mb-2">Oszczędź 10 000 zł w 90 dni lub oddamy 3 miesiące abonamentu</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                Jeśli w ciągu 90 dni korzystania z ELITE nie odnotujesz oszczędności minimum 10 000 zł (no-showy + odzyskane klientki + czas), oddamy Ci 3 miesiące abonamentu.
-              </p>
-              <p className="text-xs text-muted-foreground mt-2 italic">
-                Warunek: uruchomiony Autopilot + skonfigurowany Widget.
-              </p>
+              <h3 className="font-bold text-lg md:text-xl mt-2 mb-2">{t("landing.guarantee.g2title")}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{t("landing.guarantee.g2desc")}</p>
+              <p className="text-xs text-muted-foreground mt-2 italic">{t("landing.guarantee.g2condition")}</p>
             </div>
           </div>
         </motion.div>
