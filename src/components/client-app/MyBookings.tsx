@@ -3,10 +3,11 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isPast, parseISO, differenceInHours, differenceInDays, addHours } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays, Star, CalendarClock } from "lucide-react";
+import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays, Star, CalendarClock, RefreshCw } from "lucide-react";
 import { BookingsCalendarView } from "./BookingsCalendarView";
 import { ReviewModal } from "./ReviewModal";
 import { RescheduleModal } from "./RescheduleModal";
+import { RebookingSheet } from "./RebookingSheet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ export function MyBookings() {
   const queryClient = useQueryClient();
   const [reviewBooking, setReviewBooking] = useState<{ id: string; serviceName: string; salonName: string; salonId: string } | null>(null);
   const [rescheduleBooking, setRescheduleBooking] = useState<any>(null);
+  const [rebookBooking, setRebookBooking] = useState<any>(null);
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["client-bookings"],
@@ -212,20 +214,36 @@ export function MyBookings() {
             )}
             <div className="flex items-center gap-1">
               {!isUpcoming && booking.status === "completed" && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary hover:text-primary hover:bg-primary/10 -mr-1"
-                  onClick={() => setReviewBooking({
-                    id: booking.id,
-                    serviceName: service?.name ?? "Usługa",
-                    salonName: salon?.name ?? "Salon",
-                    salonId: booking.salon_id,
-                  })}
-                >
-                  <Star className="h-4 w-4 mr-1" />
-                  Oceń
-                </Button>
+                <>
+                  <Button
+                    size="sm"
+                    className="font-semibold"
+                    style={{ backgroundColor: salon?.theme_primary_color ?? "hsl(var(--primary))" }}
+                    onClick={() => setRebookBooking({
+                      ...booking,
+                      services: service,
+                      staff_members: staffMember,
+                      salons: salon,
+                    })}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-1" />
+                    Zarezerwuj ponownie
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-primary hover:text-primary hover:bg-primary/10 -mr-1"
+                    onClick={() => setReviewBooking({
+                      id: booking.id,
+                      serviceName: service?.name ?? "Usługa",
+                      salonName: salon?.name ?? "Salon",
+                      salonId: booking.salon_id,
+                    })}
+                  >
+                    <Star className="h-4 w-4 mr-1" />
+                    Oceń
+                  </Button>
+                </>
               )}
               {canReschedule && (
                 <Button
@@ -371,6 +389,15 @@ export function MyBookings() {
             open={!!rescheduleBooking}
             onClose={() => setRescheduleBooking(null)}
             appointment={rescheduleBooking}
+          />
+        )}
+
+        {/* Rebooking sheet */}
+        {rebookBooking && (
+          <RebookingSheet
+            open={!!rebookBooking}
+            onClose={() => setRebookBooking(null)}
+            booking={rebookBooking}
           />
         )}
       </div>
