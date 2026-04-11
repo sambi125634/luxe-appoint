@@ -3,10 +3,11 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, isPast, parseISO, differenceInHours, differenceInDays, addHours } from "date-fns";
 import { pl } from "date-fns/locale";
-import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays, Star, CalendarClock } from "lucide-react";
+import { Calendar, Clock, MapPin, User, XCircle, AlertTriangle, CalendarDays, Star, CalendarClock, RefreshCw } from "lucide-react";
 import { BookingsCalendarView } from "./BookingsCalendarView";
 import { ReviewModal } from "./ReviewModal";
 import { RescheduleModal } from "./RescheduleModal";
+import { RebookingSheet } from "./RebookingSheet";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ export function MyBookings() {
   const queryClient = useQueryClient();
   const [reviewBooking, setReviewBooking] = useState<{ id: string; serviceName: string; salonName: string; salonId: string } | null>(null);
   const [rescheduleBooking, setRescheduleBooking] = useState<any>(null);
+  const [rebookBooking, setRebookBooking] = useState<any>(null);
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["client-bookings"],
