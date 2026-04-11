@@ -52,6 +52,7 @@ export default function DemoPage() {
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
       case "autopilot": return "AI Autopilot";
+      case "client-app": return "Aplikacja Klientki";
       default: return "Dashboard";
     }
   };
@@ -91,6 +92,8 @@ export default function DemoPage() {
           return <ReferralEngine isDemo />;
         case "autopilot":
           return <AutopilotModule isDemo />;
+        case "client-app":
+          return <ClientAppPage />;
         default:
           return null;
       }
