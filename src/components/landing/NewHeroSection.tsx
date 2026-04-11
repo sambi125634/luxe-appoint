@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check, ArrowRight, Play } from "lucide-react";
 import { motion } from "framer-motion";
+import Spline from "@splinetool/react-spline";
+import { Suspense } from "react";
 
 interface NewHeroSectionProps {
   onScrollToForm: () => void;
