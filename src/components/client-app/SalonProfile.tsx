@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookingWidget } from "@/components/booking/BookingWidget";
 import { SalonGallery } from "@/components/client-app/SalonGallery";
+import { WaitlistButton } from "@/components/client-app/WaitlistButton";
 import { useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -266,6 +267,11 @@ export function SalonProfile() {
       {/* Main booking widget — displayed directly */}
       <div className="mt-2">
         <BookingWidget salonId={salonId} skipIntro autoClientData={autoClientData} />
+      </div>
+
+      {/* Waitlist CTA */}
+      <div className="px-4 mt-4">
+        <WaitlistButton salonId={salonId!} />
       </div>
     </div>
   );

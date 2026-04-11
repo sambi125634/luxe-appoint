@@ -9,13 +9,15 @@ import { pl } from "date-fns/locale";
 import { motion } from "framer-motion";
 import { useMemo } from "react";
 
-const iconMap: Record<string, { icon: typeof Clock; bg: string; color: string }> = {
+const iconMap: Record<string, { icon: typeof Clock; bg: string; color: string; pulse?: boolean }> = {
   reminder: { icon: Clock, bg: "bg-blue-500/10", color: "text-blue-600" },
   confirmation: { icon: CheckCircle2, bg: "bg-green-500/10", color: "text-green-600" },
   coupon: { icon: Gift, bg: "bg-amber-500/10", color: "text-amber-600" },
   loyalty: { icon: Star, bg: "bg-purple-500/10", color: "text-purple-600" },
   review: { icon: Star, bg: "bg-pink-500/10", color: "text-pink-600" },
   booking: { icon: Calendar, bg: "bg-primary/10", color: "text-primary" },
+  waitlist: { icon: Bell, bg: "bg-amber-500/10", color: "text-amber-600", pulse: true },
+  reward: { icon: Gift, bg: "bg-green-500/10", color: "text-green-600" },
   info: { icon: Bell, bg: "bg-muted", color: "text-muted-foreground" },
 };
 
@@ -120,7 +122,7 @@ export function Activity() {
                         }`}
                       >
                         <CardContent className="flex items-start gap-3 p-4">
-                          <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0 mt-0.5`}>
+                          <div className={`w-10 h-10 rounded-xl ${config.bg} flex items-center justify-center shrink-0 mt-0.5 ${config.pulse ? "animate-pulse" : ""}`}>
                             <Icon className={`h-5 w-5 ${config.color}`} />
                           </div>
                           <div className="flex-1 min-w-0">
