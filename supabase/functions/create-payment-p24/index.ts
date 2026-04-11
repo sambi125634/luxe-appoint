@@ -13,10 +13,10 @@ interface PaymentRequest {
   clientName: string;
   description: string;
   salonId: string;
+  methodRefId?: string;
 }
 
 const generateCRC = (data: string, crcKey: string): string => {
-  // Simple CRC implementation for P24
   const encoder = new TextEncoder();
   const dataBytes = encoder.encode(data + crcKey);
   let hash = 0;
@@ -37,14 +37,23 @@ serve(async (req: Request): Promise<Response> => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { appointmentId, amount, clientEmail, clientName, description, salonId }: PaymentRequest = await req.json();
+    const { appointmentId, amount, clientEmail, clientName, description, salonId, methodRefId }: PaymentRequest = await req.json();
 
     console.log("Creating P24 payment for appointment:", appointmentId, "amount:", amount);
+
+    // Get auth user for payment_transactions
+    const authHeader = req.headers.get("Authorization");
+    let userId: string | null = null;
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const { data: { user } } = await supabase.auth.getUser(token);
+      userId = user?.id ?? null;
+    }
 
     // Fetch salon settings for P24 credentials
     const { data: salon, error: salonError } = await supabase
       .from("salons")
-      .select("settings, name")
+      .select("settings, name, p24_merchant_id, p24_pos_id")
       .eq("id", salonId)
       .single();
 
@@ -56,8 +65,9 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    const settings = salon.settings as any;
-    const p24Config = settings?.integrations?.przelewy24;
+    const settings = salon.settings as Record<string, unknown> | null;
+    const integrations = settings?.integrations as Record<string, unknown> | undefined;
+    const p24Config = integrations?.przelewy24 as Record<string, string | boolean | undefined> | undefined;
 
     if (!p24Config?.enabled || !p24Config?.merchantId || !p24Config?.apiKey) {
       console.error("Przelewy24 not configured for salon:", salonId);
@@ -70,46 +80,44 @@ serve(async (req: Request): Promise<Response> => {
     const sessionId = `BC_${appointmentId}_${Date.now()}`;
     const amountInGrosze = Math.round(amount * 100);
     
-    // Determine API URL based on sandbox mode
     const apiUrl = p24Config.sandbox 
       ? "https://sandbox.przelewy24.pl/api/v1/transaction/register"
       : "https://secure.przelewy24.pl/api/v1/transaction/register";
 
-    // Build return URLs
-    const baseUrl = Deno.env.get("SUPABASE_URL")?.replace("supabase.co", "lovable.app") || "";
-    const returnUrl = `${baseUrl}/payment/success?session=${sessionId}`;
+    const returnUrl = `${supabaseUrl.replace("supabase.co", "lovable.app")}/app/payment-success?session=${sessionId}`;
     const statusUrl = `${supabaseUrl}/functions/v1/webhook-p24-payment`;
 
-    // P24 transaction data
-    const transactionData = {
-      merchantId: parseInt(p24Config.merchantId),
-      posId: parseInt(p24Config.posId || p24Config.merchantId),
-      sessionId: sessionId,
+    const transactionData: Record<string, unknown> = {
+      merchantId: parseInt(p24Config.merchantId as string),
+      posId: parseInt((p24Config.posId || p24Config.merchantId) as string),
+      sessionId,
       amount: amountInGrosze,
       currency: "PLN",
-      description: description || `Zaliczka - ${salon.name}`,
+      description: description || `Wizyta - ${salon.name}`,
       email: clientEmail,
       client: clientName,
       country: "PL",
       language: "pl",
       urlReturn: returnUrl,
       urlStatus: statusUrl,
-      sign: "", // Will be calculated
+      sign: "",
     };
 
-    // Calculate CRC sign
+    if (methodRefId) {
+      transactionData.methodRefId = methodRefId;
+    }
+
     const signData = `${sessionId}|${p24Config.merchantId}|${amountInGrosze}|PLN`;
-    transactionData.sign = generateCRC(signData, p24Config.crcKey);
+    transactionData.sign = generateCRC(signData, p24Config.crcKey as string);
 
     console.log("Registering P24 transaction:", { sessionId, amount: amountInGrosze });
 
-    // Register transaction with P24
-    const authHeader = btoa(`${p24Config.merchantId}:${p24Config.apiKey}`);
+    const p24AuthHeader = btoa(`${p24Config.merchantId}:${p24Config.apiKey}`);
     
     const p24Response = await fetch(apiUrl, {
       method: "POST",
       headers: {
-        "Authorization": `Basic ${authHeader}`,
+        "Authorization": `Basic ${p24AuthHeader}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(transactionData),
@@ -126,22 +134,51 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Update appointment with payment session
-    const { error: updateError } = await supabase
-      .from("appointments")
-      .update({
-        payment_status: "pending",
-        payment_amount: amount,
-        payment_session_id: sessionId,
-      })
-      .eq("id", appointmentId);
+    const trnToken = p24Result.data?.token;
 
-    if (updateError) {
-      console.error("Failed to update appointment:", updateError);
+    // Create payment_transaction record
+    if (userId) {
+      const { data: txn, error: txnError } = await supabase
+        .from("payment_transactions")
+        .insert({
+          appointment_id: appointmentId,
+          user_id: userId,
+          salon_id: salonId,
+          amount,
+          currency: "PLN",
+          p24_session_id: sessionId,
+          p24_token: trnToken,
+          status: "pending",
+        })
+        .select("id")
+        .single();
+
+      if (txnError) {
+        console.error("Failed to create payment transaction:", txnError);
+      } else if (txn) {
+        // Link transaction to appointment
+        await supabase
+          .from("appointments")
+          .update({
+            payment_status: "pending",
+            payment_amount: amount,
+            payment_session_id: sessionId,
+            payment_transaction_id: txn.id,
+          })
+          .eq("id", appointmentId);
+      }
+    } else {
+      // Fallback: update appointment directly
+      await supabase
+        .from("appointments")
+        .update({
+          payment_status: "pending",
+          payment_amount: amount,
+          payment_session_id: sessionId,
+        })
+        .eq("id", appointmentId);
     }
 
-    // Generate payment URL
-    const trnToken = p24Result.data?.token;
     const paymentUrl = p24Config.sandbox
       ? `https://sandbox.przelewy24.pl/trnRequest/${trnToken}`
       : `https://secure.przelewy24.pl/trnRequest/${trnToken}`;
@@ -149,17 +186,14 @@ serve(async (req: Request): Promise<Response> => {
     console.log("Payment URL generated:", paymentUrl);
 
     return new Response(
-      JSON.stringify({ 
-        paymentUrl, 
-        sessionId,
-        token: trnToken 
-      }),
+      JSON.stringify({ paymentUrl, sessionId, token: trnToken }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
-    console.error("Error creating P24 payment:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error creating P24 payment:", message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

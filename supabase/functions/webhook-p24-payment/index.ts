@@ -29,7 +29,6 @@ serve(async (req: Request): Promise<Response> => {
     const orderId = webhookData.orderId || webhookData.p24_order_id;
     const amount = parseInt(webhookData.amount || webhookData.p24_amount || "0");
     const currency = webhookData.currency || webhookData.p24_currency || "PLN";
-    const statement = webhookData.statement || webhookData.p24_statement;
     const methodId = webhookData.methodId || webhookData.p24_method;
     const sign = webhookData.sign || webhookData.p24_sign;
 
@@ -41,23 +40,42 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Find appointment by session ID
-    const { data: appointment, error: appointmentError } = await supabase
-      .from("appointments")
-      .select("*, salons(settings)")
-      .eq("payment_session_id", sessionId)
-      .single();
+    // Try payment_transactions first, fallback to appointments
+    const { data: txn } = await supabase
+      .from("payment_transactions")
+      .select("*, appointments(*, salons(settings))")
+      .eq("p24_session_id", sessionId)
+      .maybeSingle();
 
-    if (appointmentError || !appointment) {
-      console.error("Appointment not found for session:", sessionId);
-      return new Response(
-        JSON.stringify({ error: "Appointment not found" }),
-        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    let appointment: Record<string, unknown> | null = null;
+    let salonSettings: Record<string, unknown> | null = null;
+
+    if (txn?.appointments) {
+      appointment = txn.appointments as Record<string, unknown>;
+      const salons = (appointment as Record<string, unknown>).salons as Record<string, unknown> | undefined;
+      salonSettings = salons?.settings as Record<string, unknown> | null;
+    } else {
+      // Fallback: find by appointments.payment_session_id
+      const { data: appt, error: apptError } = await supabase
+        .from("appointments")
+        .select("*, salons(settings)")
+        .eq("payment_session_id", sessionId)
+        .single();
+
+      if (apptError || !appt) {
+        console.error("Transaction/appointment not found for session:", sessionId);
+        return new Response(
+          JSON.stringify({ error: "Transaction not found" }),
+          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      appointment = appt;
+      const salons = (appt as Record<string, unknown>).salons as Record<string, unknown> | undefined;
+      salonSettings = salons?.settings as Record<string, unknown> | null;
     }
 
-    const salonSettings = appointment.salons?.settings as any;
-    const p24Config = salonSettings?.integrations?.przelewy24;
+    const integrations = salonSettings?.integrations as Record<string, unknown> | undefined;
+    const p24Config = integrations?.przelewy24 as Record<string, string | boolean | undefined> | undefined;
 
     if (!p24Config) {
       console.error("P24 config not found for salon");
@@ -73,13 +91,13 @@ serve(async (req: Request): Promise<Response> => {
       : "https://secure.przelewy24.pl/api/v1/transaction/verify";
 
     const verifyData = {
-      merchantId: parseInt(p24Config.merchantId),
-      posId: parseInt(p24Config.posId || p24Config.merchantId),
-      sessionId: sessionId,
-      amount: amount,
-      currency: currency,
+      merchantId: parseInt(p24Config.merchantId as string),
+      posId: parseInt((p24Config.posId || p24Config.merchantId) as string),
+      sessionId,
+      amount,
+      currency,
       orderId: parseInt(orderId),
-      sign: sign,
+      sign,
     };
 
     const authHeader = btoa(`${p24Config.merchantId}:${p24Config.apiKey}`);
@@ -96,21 +114,6 @@ serve(async (req: Request): Promise<Response> => {
     const verifyResult = await verifyResponse.json();
     console.log("P24 verify response:", verifyResult);
 
-    if (!verifyResponse.ok || verifyResult.error) {
-      console.error("P24 verification failed:", verifyResult);
-      
-      // Update appointment as failed
-      await supabase
-        .from("appointments")
-        .update({ payment_status: "failed" })
-        .eq("id", appointment.id);
-
-      return new Response(
-        JSON.stringify({ error: "Payment verification failed" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
     // Determine payment method
     let paymentMethod = "transfer";
     if (methodId) {
@@ -122,33 +125,78 @@ serve(async (req: Request): Promise<Response> => {
       }
     }
 
+    const appointmentId = (appointment as Record<string, unknown>).id as string;
+
+    if (!verifyResponse.ok || verifyResult.error) {
+      console.error("P24 verification failed:", verifyResult);
+
+      // Update payment_transaction as failed
+      if (txn) {
+        await supabase
+          .from("payment_transactions")
+          .update({ status: "failed", error_message: JSON.stringify(verifyResult) })
+          .eq("id", txn.id);
+      }
+
+      await supabase
+        .from("appointments")
+        .update({ payment_status: "failed" })
+        .eq("id", appointmentId);
+
+      return new Response(
+        JSON.stringify({ error: "Payment verification failed" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Update payment_transaction as completed
+    if (txn) {
+      await supabase
+        .from("payment_transactions")
+        .update({
+          status: "completed",
+          completed_at: new Date().toISOString(),
+          p24_order_id: orderId,
+          payment_method: paymentMethod,
+        })
+        .eq("id", txn.id);
+    }
+
     // Update appointment as paid
-    const { error: updateError } = await supabase
+    await supabase
       .from("appointments")
       .update({
         payment_status: "paid",
         payment_paid_at: new Date().toISOString(),
         payment_method: paymentMethod,
-        status: "confirmed", // Auto-confirm after payment
+        status: "confirmed",
       })
-      .eq("id", appointment.id);
+      .eq("id", appointmentId);
 
-    if (updateError) {
-      console.error("Failed to update appointment:", updateError);
+    console.log("Payment confirmed for appointment:", appointmentId, "method:", paymentMethod);
+
+    // Send notification to client
+    const userId = txn?.user_id;
+    const salonId = (appointment as Record<string, unknown>).salon_id as string;
+    if (userId && salonId) {
+      await supabase.from("client_notifications").insert({
+        user_id: userId,
+        salon_id: salonId,
+        type: "payment",
+        title: "Płatność potwierdzona ✓",
+        description: "Twoja wizyta została opłacona. Do zobaczenia!",
+      });
     }
-
-    console.log("Payment confirmed for appointment:", appointment.id, "method:", paymentMethod);
-
-    // TODO: Send confirmation email about successful payment
 
     return new Response(
       JSON.stringify({ status: "ok" }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
-    console.error("Error in P24 webhook:", error);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error in P24 webhook:", message);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
