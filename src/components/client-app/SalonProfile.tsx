@@ -254,6 +254,15 @@ export function SalonProfile() {
         </div>
       )}
 
+      {/* Gallery section */}
+      {/* TODO: Admin panel - upload zdjęć przez Supabase Storage */}
+      <div className="mt-3 mb-1">
+        <h3 className="text-sm font-medium px-4 pb-2 text-foreground">
+          Nasze realizacje
+        </h3>
+        <SalonGallery salonId={salonId!} />
+      </div>
+
       {/* Main booking widget — displayed directly */}
       <div className="mt-2">
         <BookingWidget salonId={salonId} skipIntro autoClientData={autoClientData} />
