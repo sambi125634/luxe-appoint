@@ -23,7 +23,7 @@ export const NewHeroSection = ({ onScrollToForm }: NewHeroSectionProps) => {
           }} />
         }>
           <Spline
-            scene="https://draft.spline.design/AWNbmlQhmOkJOyYk/scene.splinecode"
+            scene="https://prod.spline.design/6bJ7-4Kmf2JF8QR4/scene.splinecode"
             style={{ width: "100%", height: "100%" }}
           />
         </Suspense>
