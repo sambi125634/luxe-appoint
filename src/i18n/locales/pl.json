@@ -326,7 +326,8 @@
     "consultation": "Konsultacje",
     "retention": "Retencja",
     "export": "Eksport danych",
-    "autopilot": "AI Autopilot"
+    "autopilot": "AI Autopilot",
+    "clientApp": "Aplikacja Klientki"
   },
   "products": {
     "catalog": "Katalog produktów",
