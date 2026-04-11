@@ -467,6 +467,66 @@ export type Database = {
         }
         Relationships: []
       }
+      beauty_rhythms: {
+        Row: {
+          auto_detected: boolean
+          avg_interval_days: number
+          created_at: string
+          id: string
+          last_appointment_date: string | null
+          next_reminder_date: string | null
+          reminder_enabled: boolean
+          salon_id: string
+          service_id: string | null
+          service_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_detected?: boolean
+          avg_interval_days: number
+          created_at?: string
+          id?: string
+          last_appointment_date?: string | null
+          next_reminder_date?: string | null
+          reminder_enabled?: boolean
+          salon_id: string
+          service_id?: string | null
+          service_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_detected?: boolean
+          avg_interval_days?: number
+          created_at?: string
+          id?: string
+          last_appointment_date?: string | null
+          next_reminder_date?: string | null
+          reminder_enabled?: boolean
+          salon_id?: string
+          service_id?: string | null
+          service_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beauty_rhythms_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "beauty_rhythms_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_communication_preferences: {
         Row: {
           client_id: string
@@ -4004,6 +4064,19 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_visit_patterns: {
+        Args: never
+        Returns: {
+          avg_interval_days: number
+          client_id: string
+          last_visit: string
+          salon_id: string
+          service_id: string
+          service_name: string
+          user_id: string
+          visit_count: number
+        }[]
+      }
       get_user_salon_id: { Args: { _user_id: string }; Returns: string }
       has_role: {
         Args: {
