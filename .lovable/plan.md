@@ -1,38 +1,28 @@
 
 
-## Plan: Aktualizacja CTA i trust indicators w Hero
+## Plan: Wygenerowanie dokumentacji aplikacji klienckiej
 
-### Plik: `src/components/landing/NewHeroSection.tsx`
+Stworzę szczegółowy dokument PDF opisujący obecny stan aplikacji mobilnej dla klientów salonów (`/app`). Dokument będzie zawierał:
 
-**4 zmiany:**
+### Zawartość dokumentu
 
-1. **Primary CTA** — tekst z „Wypróbuj 14 dni za darmo" → **„Wypróbuj bez żadnego ryzyka"**
+1. **Architektura i routing** — struktura tras, guard autentykacji, nawigacja
+2. **Onboarding klienta** — flow dołączania do salonu (`/join/:slug`), 4-slajdowy onboarding
+3. **Ekrany główne** (5 zakładek):
+   - Moje Salony — lista powiązanych salonów, pull-to-refresh, ulubione
+   - Wizyty — nadchodzące/historia/widok kalendarza, anulowanie, countdown, ocenianie
+   - Dla Ciebie — program lojalnościowy (pieczątki + punkty), kupony, CTA poleceń
+   - Aktywność — centrum powiadomień, grupowanie po dacie, odczytywanie
+   - Profil — edycja danych, ulubione, polecenia, wylogowanie
+4. **Ekrany dodatkowe** — Profil Salonu (z wbudowanym BookingWidget + auto-fill danych), Ulubione, Poleć Znajomej, Modal Oceny
+5. **Stan techniczny** — co działa z backendem, co jest demo/mock data (ReferFriend = hardcoded demo)
+6. **Tabele bazodanowe** — client_salon_links, loyalty_stamps, client_coupons, client_notifications, client_reviews, profiles
+7. **Brakujące elementy / gaps** — lista rzeczy do rozbudowy
 
-2. **Secondary CTA** — `onClick` z `scrollToDemo` → `() => window.location.href = '/demo'`
+### Plik wyjściowy
 
-3. **Zielony badge** — zamiana „Zaufało nam już ponad 150+ salonów w całej Polsce" → **„Platforma stworzona w Polsce 🇵🇱"** (flaga zamiast zielonej kropki, border i tło zostają)
+PDF w `/mnt/documents/client-app-documentation.pdf` — gotowy do wgrania do Cloud i dalszej pracy.
 
-4. **Trust indicators** — zamiana trzech checkpointów:
-   - ~~Bez karty kredytowej~~ → **Pełna gwarancja satysfakcji**
-   - ~~Gotowe w 5 minut~~ → **Dane zawsze Twoje**
-   - ~~0% prowizji — zawsze~~ → **0% prowizji — zawsze** (zostaje bez zmian)
+### Co NIE jest zmieniane
 
-### Efekt końcowy (mobile):
-```text
-[badge: ✨ Zarabiaj więcej...]
-
-Więcej wizyt. Więcej powrotów.
-Zero prowizji.
-
-Jedyna platforma beauty z AI...
-
-[Wypróbuj bez żadnego ryzyka →]
-[▶ Zobacz demo na żywo        ]
-
-🇵🇱 Platforma stworzona w Polsce
-
-✓ Pełna gwarancja satysfakcji
-✓ Dane zawsze Twoje
-✓ 0% prowizji — zawsze
-```
-
+Żaden plik w kodzie — to wyłącznie wygenerowanie dokumentu analitycznego.
