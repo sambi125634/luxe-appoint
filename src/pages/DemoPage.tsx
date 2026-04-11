@@ -27,6 +27,7 @@ import { InventoryDashboard } from "@/modules/inventory";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
 import { AutopilotModule } from "@/components/admin/autopilot";
+import ClientAppPage from "@/components/admin/client-app/ClientAppPage";
 
 export default function DemoPage() {
   const { t } = useTranslation();
@@ -52,6 +53,7 @@ export default function DemoPage() {
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
       case "autopilot": return "AI Autopilot";
+      case "client-app": return "Aplikacja Klientki";
       default: return "Dashboard";
     }
   };
@@ -91,6 +93,8 @@ export default function DemoPage() {
           return <ReferralEngine isDemo />;
         case "autopilot":
           return <AutopilotModule isDemo />;
+        case "client-app":
+          return <ClientAppPage />;
         default:
           return null;
       }
