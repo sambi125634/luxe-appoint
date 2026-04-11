@@ -334,6 +334,12 @@ export function MyBookings() {
                 <CalendarDays className="h-4 w-4 mr-1" />
                 Miesiąc
               </TabsTrigger>
+              {waitlistEntries.length > 0 && (
+                <TabsTrigger value="waitlist" className="flex-1 rounded-lg data-[state=active]:shadow-sm font-semibold">
+                  <Bell className="h-4 w-4 mr-1" />
+                  Oczekuję ({waitlistEntries.length})
+                </TabsTrigger>
+              )}
             </TabsList>
 
             <TabsContent value="upcoming" className="space-y-3">
