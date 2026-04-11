@@ -40,8 +40,10 @@ export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
     enabled: !!salonId && !isDemo,
   });
 
-  const gallery = isDemo ? DEMO_GALLERY : (liveGallery ?? []);
-  const filtered = activeCategory === "all" ? gallery : gallery.filter((g) => g.category === activeCategory);
+  const normalizedGallery = isDemo
+    ? DEMO_GALLERY
+    : (liveGallery ?? []).map((g) => ({ ...g, url: g.image_url }));
+  const filtered = activeCategory === "all" ? normalizedGallery : normalizedGallery.filter((g) => g.category === activeCategory);
 
   const handleUpload = () => {
     if (isDemo) {
