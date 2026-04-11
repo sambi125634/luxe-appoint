@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -12,15 +13,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 const contactSchema = z.object({
-  first_name: z.string().trim().min(1, "Wpisz swoje imię").max(100),
-  email: z.string().trim().email("Wpisz poprawny adres email").max(255),
-  phone: z.string().trim().min(9, "Wpisz poprawny numer telefonu").max(15),
-  rodo_consent: z.literal(true, { errorMap: () => ({ message: "Wymagana zgoda RODO" }) }),
+  first_name: z.string().trim().min(1, "nameError").max(100),
+  email: z.string().trim().email("emailError").max(255),
+  phone: z.string().trim().min(9, "phoneError").max(15),
+  rodo_consent: z.literal(true, { errorMap: () => ({ message: "rodoError" }) }),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
 
 export const PricingContactForm = () => {
+  const { t } = useTranslation();
   const [submitted, setSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -30,6 +32,11 @@ export const PricingContactForm = () => {
   });
 
   const rodoValue = watch("rodo_consent");
+
+  const getErrorMessage = (key: string | undefined) => {
+    if (!key) return undefined;
+    return t(`landing.pricingForm.${key}`);
+  };
 
   const onSubmit = async (data: ContactFormData) => {
     setIsLoading(true);
@@ -47,12 +54,11 @@ export const PricingContactForm = () => {
       });
 
       if (error) throw error;
-
       setSubmitted(true);
     } catch {
       toast({
-        title: "Błąd",
-        description: "Nie udało się wysłać formularza. Spróbuj ponownie.",
+        title: t("landing.pricingForm.errorTitle"),
+        description: t("landing.pricingForm.errorDesc"),
         variant: "destructive",
       });
     } finally {
@@ -69,8 +75,8 @@ export const PricingContactForm = () => {
         transition={{ duration: 0.4 }}
       >
         <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-        <h3 className="text-2xl font-bold mb-2">Dziękujemy!</h3>
-        <p className="text-muted-foreground">Odezwiemy się do Ciebie najszybciej jak to możliwe.</p>
+        <h3 className="text-2xl font-bold mb-2">{t("landing.pricingForm.successTitle")}</h3>
+        <p className="text-muted-foreground">{t("landing.pricingForm.successDesc")}</p>
       </motion.div>
     );
   }
@@ -86,29 +92,27 @@ export const PricingContactForm = () => {
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 mb-3">
           <MessageCircle className="w-5 h-5 text-primary" />
-          <span className="text-sm font-medium text-primary">Potrzebujesz pomocy?</span>
+          <span className="text-sm font-medium text-primary">{t("landing.pricingForm.needHelp")}</span>
         </div>
-        <h3 className="text-2xl md:text-3xl font-bold mb-2">Nie wiesz, który plan wybrać?</h3>
-        <p className="text-muted-foreground">
-          Zostaw dane — odezwiemy się i pomożemy dobrać najlepszy pakiet dla Twojego salonu.
-        </p>
+        <h3 className="text-2xl md:text-3xl font-bold mb-2">{t("landing.pricingForm.title")}</h3>
+        <p className="text-muted-foreground">{t("landing.pricingForm.subtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="bg-card border border-border rounded-2xl p-6 md:p-8 space-y-4">
         <div>
-          <Label htmlFor="pricing-name">Imię</Label>
-          <Input id="pricing-name" placeholder="Twoje imię" {...register("first_name")} />
-          {errors.first_name && <p className="text-sm text-destructive mt-1">{errors.first_name.message}</p>}
+          <Label htmlFor="pricing-name">{t("landing.pricingForm.name")}</Label>
+          <Input id="pricing-name" placeholder={t("landing.pricingForm.namePlaceholder")} {...register("first_name")} />
+          {errors.first_name && <p className="text-sm text-destructive mt-1">{getErrorMessage(errors.first_name.message)}</p>}
         </div>
         <div>
-          <Label htmlFor="pricing-email">Email</Label>
-          <Input id="pricing-email" type="email" placeholder="twoj@email.pl" {...register("email")} />
-          {errors.email && <p className="text-sm text-destructive mt-1">{errors.email.message}</p>}
+          <Label htmlFor="pricing-email">{t("landing.pricingForm.email")}</Label>
+          <Input id="pricing-email" type="email" placeholder={t("landing.pricingForm.emailPlaceholder")} {...register("email")} />
+          {errors.email && <p className="text-sm text-destructive mt-1">{getErrorMessage(errors.email.message)}</p>}
         </div>
         <div>
-          <Label htmlFor="pricing-phone">Telefon</Label>
-          <Input id="pricing-phone" type="tel" placeholder="500 000 000" {...register("phone")} />
-          {errors.phone && <p className="text-sm text-destructive mt-1">{errors.phone.message}</p>}
+          <Label htmlFor="pricing-phone">{t("landing.pricingForm.phone")}</Label>
+          <Input id="pricing-phone" type="tel" placeholder={t("landing.pricingForm.phonePlaceholder")} {...register("phone")} />
+          {errors.phone && <p className="text-sm text-destructive mt-1">{getErrorMessage(errors.phone.message)}</p>}
         </div>
         <div className="flex items-start gap-2">
           <Checkbox
@@ -117,12 +121,12 @@ export const PricingContactForm = () => {
             onCheckedChange={(checked) => setValue("rodo_consent", checked === true ? true : false as unknown as true)}
           />
           <Label htmlFor="pricing-rodo" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-            Wyrażam zgodę na przetwarzanie moich danych osobowych w celu kontaktu handlowego zgodnie z RODO.
+            {t("landing.pricingForm.rodoConsent")}
           </Label>
         </div>
-        {errors.rodo_consent && <p className="text-sm text-destructive">{errors.rodo_consent.message}</p>}
+        {errors.rodo_consent && <p className="text-sm text-destructive">{getErrorMessage(errors.rodo_consent.message)}</p>}
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Wysyłanie..." : "Skontaktuj się ze mną"}
+          {isLoading ? t("landing.pricingForm.submitting") : t("landing.pricingForm.submit")}
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </form>

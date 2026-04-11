@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Shield, Lock, CreditCard } from "lucide-react";
 import { motion } from "framer-motion";
@@ -7,6 +8,8 @@ interface NewFinalCTASectionProps {
 }
 
 export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) => {
+  const { t } = useTranslation();
+
   return (
     <section className="py-24 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-pink-500/10" />
@@ -19,10 +22,10 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          Każdy dzień bez systemu
+          {t("landing.finalCta.title1")}
           <br />
           <span className="bg-gradient-to-r from-destructive to-amber-500 bg-clip-text text-transparent">
-            to pieniądze które mogłaś mieć.
+            {t("landing.finalCta.title2")}
           </span>
         </motion.h2>
 
@@ -33,7 +36,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.2 }}
         >
-          <p>Dołącz do właścicielek salonów które odzyskały kontrolę nad swoim biznesem — i swoimi klientkami.</p>
+          <p>{t("landing.finalCta.subtitle")}</p>
         </motion.div>
 
         <motion.div
@@ -44,15 +47,14 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           transition={{ delay: 0.3 }}
         >
           <Button size="lg" onClick={onScrollToForm} className="h-14 px-10 text-lg gap-2 relative overflow-hidden">
-            <span>Rozpocznij 14-dniowy test</span>
+            <span>{t("landing.finalCta.cta1")}</span>
             <ArrowRight className="w-5 h-5" />
           </Button>
           <Button size="lg" variant="outline" onClick={onScrollToForm} className="h-14 px-8 text-lg gap-2">
-            Porozmawiajmy najpierw →
+            {t("landing.finalCta.cta2")}
           </Button>
         </motion.div>
 
-        {/* Social proof */}
         <motion.div
           className="flex items-center justify-center gap-3 mb-8"
           initial={{ opacity: 0 }}
@@ -68,11 +70,10 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
             ))}
           </div>
           <p className="text-sm text-muted-foreground">
-            <span className="font-bold text-foreground">23 salony</span> dołączyły w tym tygodniu
+            <span className="font-bold text-foreground">{t("landing.finalCta.socialProof1")}</span> {t("landing.finalCta.socialProof2")}
           </p>
         </motion.div>
 
-        {/* Trust */}
         <motion.div
           className="flex items-center justify-center gap-6 opacity-60 flex-wrap"
           initial={{ opacity: 0 }}
@@ -80,12 +81,12 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
         >
-          <div className="flex items-center gap-1.5 text-sm"><Lock className="w-3.5 h-3.5" />SSL 256-bit</div>
-          <div className="flex items-center gap-1.5 text-sm"><Shield className="w-3.5 h-3.5" />RODO</div>
-          <div className="text-sm font-bold">Przelewy24</div>
-          <div className="text-sm font-bold">BLIK</div>
-          <div className="flex items-center gap-1.5 text-sm"><CreditCard className="w-3.5 h-3.5" />Bez karty</div>
-          <div className="text-sm">Twoje dane — zawsze Twoje</div>
+          <div className="flex items-center gap-1.5 text-sm"><Lock className="w-3.5 h-3.5" />{t("landing.finalCta.trust_ssl")}</div>
+          <div className="flex items-center gap-1.5 text-sm"><Shield className="w-3.5 h-3.5" />{t("landing.finalCta.trust_rodo")}</div>
+          <div className="text-sm font-bold">{t("landing.finalCta.trust_p24")}</div>
+          <div className="text-sm font-bold">{t("landing.finalCta.trust_blik")}</div>
+          <div className="flex items-center gap-1.5 text-sm"><CreditCard className="w-3.5 h-3.5" />{t("landing.finalCta.trust_noCard")}</div>
+          <div className="text-sm">{t("landing.finalCta.trust_data")}</div>
         </motion.div>
       </div>
     </section>

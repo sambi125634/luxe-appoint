@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 export const InteractivePhoneMockup = () => {
+  const { t } = useTranslation();
   const [iframeError, setIframeError] = useState(false);
 
   return (
@@ -14,7 +16,6 @@ export const InteractivePhoneMockup = () => {
         transition={{ duration: 0.8 }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-          {/* Left — text */}
           <motion.div
             className="flex flex-col justify-center order-1 lg:order-1"
             initial={{ opacity: 0, x: -30 }}
@@ -23,27 +24,23 @@ export const InteractivePhoneMockup = () => {
             transition={{ duration: 0.8 }}
           >
             <p className="text-xs font-semibold tracking-widest uppercase text-primary mb-3 md:mb-4">
-              Twoja prywatna aplikacja
+              {t("landing.phoneMockup.label")}
             </p>
-
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-serif font-bold text-white mb-4 md:mb-6 leading-tight">
-              Klientka, która ma Twoją aplikację —
+              {t("landing.phoneMockup.title1")}
               <br className="hidden md:block" />
               <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                nie szuka innego salonu.
+                {t("landing.phoneMockup.title2")}
               </span>
             </h2>
-
             <p className="text-white/60 text-base md:text-lg leading-relaxed mb-4 md:mb-6 max-w-md">
-              Bez marketplace'u. Bez konkurencji obok. Tylko Twój salon w jej telefonie.
+              {t("landing.phoneMockup.subtitle")}
             </p>
-
             <p className="text-white/40 text-sm leading-relaxed max-w-md hidden md:block">
-              Obok widzisz interaktywne demo aplikacji mobilnej, którą pobierają Twoje klientki. Przeklikaj się — dokładnie tak wygląda ich doświadczenie: wybór usługi, rezerwacja terminu, płatność. Wszystko w Twojej marce, bez śladu konkurencji.
+              {t("landing.phoneMockup.description")}
             </p>
           </motion.div>
 
-          {/* Right — phone mockup */}
           <motion.div
             className="flex justify-center items-center py-4 md:py-8 order-2 lg:order-2"
             initial={{ opacity: 0, y: 40, scale: 0.95 }}
@@ -52,10 +49,7 @@ export const InteractivePhoneMockup = () => {
             transition={{ duration: 0.9, delay: 0.2 }}
           >
             <div className="relative">
-              {/* Glow */}
               <div className="absolute -inset-8 bg-primary/20 rounded-full blur-3xl pointer-events-none" />
-
-              {/* iPhone frame */}
               <div
                 className="relative w-[280px] md:w-[320px] bg-[#1a1a1a] rounded-[44px] md:rounded-[50px] p-2.5 md:p-3 shadow-2xl border border-white/10"
                 style={{
@@ -63,12 +57,9 @@ export const InteractivePhoneMockup = () => {
                     "0 0 0 1px rgba(255,255,255,0.08), 0 50px 100px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1)",
                 }}
               >
-                {/* Dynamic Island */}
                 <div className="w-24 md:w-28 h-6 md:h-7 bg-black rounded-full mx-auto mb-2 flex items-center justify-center">
                   <div className="w-2.5 md:w-3 h-2.5 md:h-3 rounded-full bg-[#1a1a1a] border border-white/10" />
                 </div>
-
-                {/* Screen */}
                 <div
                   className="w-full rounded-[32px] md:rounded-[38px] overflow-hidden bg-white"
                   style={{ height: "min(520px, 65vh)" }}
@@ -76,22 +67,20 @@ export const InteractivePhoneMockup = () => {
                   {iframeError ? (
                     <div className="w-full h-full bg-muted flex flex-col items-center justify-center p-6 text-center">
                       <span className="text-4xl mb-4">📱</span>
-                      <p className="font-bold text-foreground mb-2">Aplikacja ładuje się...</p>
-                      <p className="text-sm text-muted-foreground">
-                        Kliknij aby zobaczyć aplikację klientki
-                      </p>
+                      <p className="font-bold text-foreground mb-2">{t("landing.phoneMockup.fallbackTitle")}</p>
+                      <p className="text-sm text-muted-foreground">{t("landing.phoneMockup.fallbackDesc")}</p>
                       <a
                         href="/app"
                         className="mt-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm"
                       >
-                        Otwórz aplikację →
+                        {t("landing.phoneMockup.fallbackCta")}
                       </a>
                     </div>
                   ) : (
                     <iframe
                       src="/s/demo-salon"
                       className="w-full h-full border-0"
-                      title="Beauty Calendar — aplikacja klientki"
+                      title={t("landing.phoneMockup.iframeTitle")}
                       onError={() => setIframeError(true)}
                       style={{
                         transform: "scale(0.85)",
@@ -102,11 +91,8 @@ export const InteractivePhoneMockup = () => {
                     />
                   )}
                 </div>
-
-                {/* Home indicator */}
                 <div className="w-20 md:w-24 h-1 bg-white/20 rounded-full mx-auto mt-2.5 md:mt-3" />
               </div>
-
             </div>
           </motion.div>
         </div>
