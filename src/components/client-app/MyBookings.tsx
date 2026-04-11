@@ -391,6 +391,15 @@ export function MyBookings() {
             appointment={rescheduleBooking}
           />
         )}
+
+        {/* Rebooking sheet */}
+        {rebookBooking && (
+          <RebookingSheet
+            open={!!rebookBooking}
+            onClose={() => setRebookBooking(null)}
+            booking={rebookBooking}
+          />
+        )}
       </div>
     </div>
   );
