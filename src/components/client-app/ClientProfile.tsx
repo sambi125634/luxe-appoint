@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import {
   LogOut, Mail, Phone, Shield, ChevronRight,
-  Bell, Moon, HelpCircle, Star, Edit2, Check, X, Gift
+  Bell, Moon, HelpCircle, Star, Edit2, Check, X, Gift, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -280,7 +280,7 @@ export function ClientProfile() {
       {/* Info cards */}
       <Card className="border-border/40 rounded-2xl mb-6 overflow-hidden">
         <CardContent className="divide-y divide-border/30 p-0">
-          <button className="flex items-center justify-between px-4 py-3.5 w-full text-left hover:bg-muted/50 transition-colors">
+          <button onClick={() => navigate("/app/privacy")} className="flex items-center justify-between px-4 py-3.5 w-full text-left hover:bg-muted/50 transition-colors">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center">
                 <Shield className="h-4 w-4 text-green-600" />
@@ -288,6 +288,18 @@ export function ClientProfile() {
               <div>
                 <p className="text-sm font-medium text-foreground">Prywatność i dane</p>
                 <p className="text-[11px] text-muted-foreground">Zgodne z RODO</p>
+              </div>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </button>
+          <button onClick={() => navigate("/app/terms")} className="flex items-center justify-between px-4 py-3.5 w-full text-left hover:bg-muted/50 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
+                <FileText className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Regulamin</p>
+                <p className="text-[11px] text-muted-foreground">Zasady korzystania</p>
               </div>
             </div>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
