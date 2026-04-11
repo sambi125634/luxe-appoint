@@ -11,6 +11,8 @@ import { SalonProfile } from "@/components/client-app/SalonProfile";
 import { ReferFriend } from "@/components/client-app/ReferFriend";
 import { Favorites } from "@/components/client-app/Favorites";
 import { PushNotificationPrompt } from "@/components/client-app/PushNotificationPrompt";
+import { PrivacyPolicy } from "@/components/client-app/PrivacyPolicy";
+import { TermsOfService } from "@/components/client-app/TermsOfService";
 
 export default function ClientApp() {
   const navigate = useNavigate();
@@ -49,6 +51,8 @@ export default function ClientApp() {
         <Route path="profile/favorites" element={<Favorites />} />
         <Route path="profile/referrals" element={<ReferFriend />} />
         <Route path="salon/:salonId" element={<SalonProfile />} />
+        <Route path="privacy" element={<PrivacyPolicy />} />
+        <Route path="terms" element={<TermsOfService />} />
       </Routes>
       <BottomTabBar />
       <PushNotificationPrompt />

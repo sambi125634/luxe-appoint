@@ -443,8 +443,11 @@ export default function ClientAuthPage() {
                     />
                     <label htmlFor="consent" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
                       Akceptuję{" "}
-                      <a href="/app/privacy" target="_blank" className="underline text-primary hover:text-primary/80">
-                        Regulamin i Politykę Prywatności
+                      <a href="/app/terms" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-primary/80">
+                        Regulamin
+                      </a>{" "}i{" "}
+                      <a href="/app/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary hover:text-primary/80">
+                        Politykę Prywatności
                       </a>
                       . Wyrażam zgodę na przetwarzanie danych osobowych zgodnie z RODO.
                     </label>
