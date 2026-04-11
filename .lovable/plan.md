@@ -1,59 +1,81 @@
 
 
+# Full i18n Translation — Landing Page + Demo
+
 ## Problem
+Almost all landing page components and the demo page have **hardcoded Polish strings** instead of using `useTranslation()` / `t()` calls. The language switcher exists and works, but switching to English changes almost nothing because the text is baked into JSX.
 
-The `MobilePreview.tsx` component renders a hardcoded static mockup (fake cards, fake data) instead of the actual client app (`/app`). It doesn't reflect the real UI that was built across multiple prompts (loyalty, waitlist, gallery, beauty rhythms, etc.).
+## Scope — Files That Need i18n Conversion
 
-## Solution
+**14 landing components** with hardcoded Polish text:
+1. `TopBanner.tsx` — banner text
+2. `NewHeroSection.tsx` — headline, CTA, badges, trust items
+3. `OwnYourClientsSection.tsx` — marketplace vs BC comparison points, headings, quote
+4. `SalonLossCalculator.tsx` — all 4 quiz slides, options, result slide (~100 strings)
+5. `SystemFlowSection.tsx` — 6 step titles/descriptions, section header, CTA
+6. `ComparisonSection.tsx` — feature names, table headers, notes, disclaimer
+7. `UniqueFeaturesTabs.tsx` — 4 tab labels, 12 feature cards (badge/title/description/metric), header, export section
+8. `InteractivePhoneMockup.tsx` — section text, fallback text
+9. `AudienceSection.tsx` — 10 category titles + ~50 items, header, CTA
+10. `TestimonialsSection.tsx` — testimonial content, header, video placeholder
+11. `PricingSection.tsx` — header, toggle labels, zero-commission badge
+12. `GuaranteeSection.tsx` — 2 guarantee blocks
+13. `NewFAQSection.tsx` — 9 FAQ questions + answers, header
+14. `NewLandingFooter.tsx` — footer links, labels, tooltips
 
-Replace the static mockup with an **iframe** pointing to the actual client app routes, while keeping the live-updating branding config (primary color, salon name) functional.
+**Supporting files:**
+15. `pricing/PricingCard.tsx` — "Najpopularniejszy", "Nie zawiera:" labels
+16. `pricing/pricing-plans.ts` — plan names, descriptions, features, limitations, CTAs
+17. `pricing/PricingContactForm.tsx` — form labels, validation messages, success state
 
-### Approach
+**Demo page:**
+18. `DemoPage.tsx` — hardcoded tab titles ("Ścieżka Klientki", "Retencja klientek", etc.)
 
-1. **Replace static content with iframe** in `MobilePreview.tsx`:
-   - Use an iframe pointing to `/app` (or specific sub-routes based on the selected tab)
-   - Tab "Profil" → iframe `/s/demo-salon` (or salon profile route)
-   - Tab "Dla Ciebie" → iframe `/app/for-you`  
-   - Tab "Wizyty" → iframe `/app/bookings`
-   - Add `pointer-events-none` overlay option and `scrolling` control
-   - Scale the iframe content down using CSS `transform: scale()` to fit the phone frame (280x520 viewport)
+## Approach — Efficient Batch Strategy
 
-2. **Keep branding sync working**:
-   - Pass branding config (primary color, salon name) via URL query params or CSS custom properties injected into the iframe
-   - Since the iframe loads the same origin, we can use `postMessage` for live config updates, or simply rely on the fact that branding is saved to the database and the iframe will reflect it on reload
-   - Add a "Odśwież podgląd" button to reload the iframe after saving branding changes
+Instead of touching components one-by-one (which would burn credits), I'll:
 
-3. **Handle auth gracefully**:
-   - The `/app` route requires authentication — the admin user may not be a "client" user
-   - Solution: Create a dedicated preview route `/app/preview` that renders the same components but skips auth check, or use the existing `/s/demo-salon` route for the profile view which is public
-   - For "Dla Ciebie" and "Wizyty" tabs, render with demo/mock data in preview mode (add `?preview=true` query param)
+1. **Add all ~400 new translation keys** to `pl.json` and `en.json` in a single batch per file
+2. **Convert each component** to use `const { t } = useTranslation()` and replace hardcoded strings with `t('key')` calls
+3. Group related components into batches to minimize file writes
 
-4. **Minimal file changes**:
-   - `src/components/admin/client-app/preview/MobilePreview.tsx` — rewrite to use iframe approach
-   - Possibly add a `?preview=true` bypass in `ClientApp.tsx` for admin preview purposes
-
-### Technical Details
-
+### Translation Key Structure
 ```
-MobilePreview.tsx structure:
-┌─────────────────────────┐
-│ ● Podgląd na żywo       │
-│ [Profil] [Dla Ciebie]   │
-│ ┌─────────────────────┐ │
-│ │ ┌───────────────┐   │ │
-│ │ │               │   │ │
-│ │ │   <iframe>    │   │ │
-│ │ │  scale(0.55)  │   │ │
-│ │ │  390x844 →    │   │ │
-│ │ │  fits 280x520 │   │ │
-│ │ │               │   │ │
-│ │ └───────────────┘   │ │
-│ └─────────────────────┘ │
-│  [Odśwież podgląd]      │
-└─────────────────────────┘
+landing.topBanner.text, landing.topBanner.amount, landing.topBanner.cta
+landing.hero.badge, landing.hero.title, landing.hero.subtitle, ...
+landing.ownership.badge, landing.ownership.title, ...
+landing.calculator.slide1.question, landing.calculator.slide1.option1, ...
+landing.systemFlow.label, landing.systemFlow.title, ...
+landing.features.header, landing.features.tab1, ...
+landing.audience.title, landing.audience.cat1.title, ...
+landing.testimonials.title, ...
+landing.pricing.title, landing.pricing.toggle.monthly, ...
+landing.guarantee.g1.title, ...
+landing.faq.q1.question, landing.faq.q1.answer, ...
+landing.footer.product, landing.footer.company, ...
 ```
 
-- iframe renders at 390x844 (iPhone viewport), scaled down via `transform: scale(0.55)` to fit the 280x480 phone frame
-- Each tab switches the iframe `src` to the corresponding route
-- A refresh button forces iframe reload after branding changes
+### English Translation Quality
+All English copy will be **persuasive direct-response copywriting** — not literal translations. Examples:
+- "Więcej wizyt. Więcej powrotów. Zero prowizji." → "More visits. More returns. Zero commission."
+- "Pracujesz na budowę cudzej bazy klientek." → "You're building someone else's client base."
+- "Ile klientek wraca do Ciebie regularnie?" → "How many clients come back to you regularly?"
+
+## Execution Order (optimized for fewest credits)
+
+1. **Batch 1**: Add all new keys to `pl.json` + `en.json` (~400 keys each, 2 file writes)
+2. **Batch 2**: Convert TopBanner + NewHeroSection + OwnYourClientsSection (3 components)
+3. **Batch 3**: Convert SalonLossCalculator (largest single component, ~100 strings)
+4. **Batch 4**: Convert SystemFlowSection + ComparisonSection + UniqueFeaturesTabs
+5. **Batch 5**: Convert InteractivePhoneMockup + AudienceSection + TestimonialsSection
+6. **Batch 6**: Convert PricingSection + pricing/* + GuaranteeSection
+7. **Batch 7**: Convert NewFAQSection + NewLandingFooter + DemoPage
+
+**Estimated: ~7 implementation steps** instead of 18 individual file edits.
+
+## What Won't Change
+- No component structure, styling, or animation changes
+- No new dependencies
+- Keys in pl.json preserve exact current Polish text
+- LanguageSwitcher already works — no changes needed
 
