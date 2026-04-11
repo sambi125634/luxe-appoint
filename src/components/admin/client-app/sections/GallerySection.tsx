@@ -64,7 +64,7 @@ export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
             </CardTitle>
             <CardDescription>Zdjęcia które klientki widzą na profilu Twojego salonu</CardDescription>
           </div>
-          <Badge variant="secondary">{gallery.length} / 30 zdjęć</Badge>
+          <Badge variant="secondary">{normalizedGallery.length} / 30 zdjęć</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
