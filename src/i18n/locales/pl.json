@@ -112,23 +112,75 @@
       "start": "Rozpocznij pracę",
       "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając 'Samouczek' w menu bocznym",
       "steps": {
-        "welcome": { "title": "Witaj w Beauty Calendar! 🎉", "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty." },
-        "dashboard": { "title": "Dashboard — Twoje centrum dowodzenia", "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela." },
-        "calendar": { "title": "Kalendarz — zero telefonów", "description": "Klientki rezerwują same 24/7, Ty zarządzasz tylko wyjątkami. Widzisz grafik wszystkich pracowników na jednym ekranie." },
-        "widgets": { "title": "Widgety — Twój link do rezerwacji", "description": "Wklej link na Instagram lub stronę www — klientki rezerwują nawet o 23:00. Jak pracownik, który nigdy nie śpi." },
-        "staff": { "title": "Zespół — każdy wie co robi", "description": "Każdy pracownik ma swój kalendarz, usługi i kolor. System pilnuje grafiku — Ty nie musisz pamiętać kto co robi." },
-        "clients": { "title": "Klienci — pełna historia", "description": "Pełna historia każdej klientki z tagami, notatkami i preferencjami. Wiesz kto jest VIP, kto znika i do kogo warto zadzwonić." },
-        "conversations": { "title": "Konwersacje — jeden widok", "description": "SMS, email, WhatsApp — wszystkie rozmowy z klientkami w jednym miejscu. Nigdy nie zgubisz wątku." },
-        "consultation": { "title": "Konsultacje — cyfrowa dokumentacja", "description": "Karty konsultacyjne z podpisem RODO, notatki głosowe i AI — profesjonalna dokumentacja bez papierowej biurokracji." },
-        "services": { "title": "Usługi — cennik online", "description": "Klientki widzą ceny i rezerwują od razu. Zmień cenę raz — widget aktualizuje się automatycznie." },
-        "products": { "title": "Produkty — magazyn pod kontrolą", "description": "Wiesz ile produktów zostało i kiedy zamówić. Skanuj dostawy telefonem — system liczy marże za Ciebie." },
-        "accounting": { "title": "Raporty — eksport jednym klikiem", "description": "Zamykasz salon, sprawdzasz raport dzienny — wszystko się zgadza. Eksport dla księgowej jednym kliknięciem." },
-        "pipeline": { "title": "Ścieżka klientki — reaguj szybciej", "description": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają. Reagujesz zanim odejdą do konkurencji." },
-        "retention": { "title": "Retencja — automatyczne powroty", "description": "System automatycznie dba o powroty klientek. 5 sekwencji wiadomości reaguje we właściwym momencie — Ty nie musisz pamiętać." },
-        "referral": { "title": "Polecenia — darmowe klientki", "description": "Zadowolone klientki polecają Cię znajomym, system to trackuje. Każde polecenie = nowa klientka bez kosztu reklamy." },
-        "settings": { "title": "Ustawienia — konfiguracja raz", "description": "Logo, kolory, powiadomienia, integracje — skonfiguruj raz, a efekty działają na zawsze." },
-        "support": { "title": "Pomoc — pytasz, dostajesz odpowiedź", "description": "AI Asystent zna cały system. Pytasz po polsku, dostajesz konkretną odpowiedź natychmiast." },
-        "cta": { "title": "Gotowa do startu! 🚀", "description": "Znasz już wszystkie moduły. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże co jeszcze zostało.", "highlight": "Chcesz taki system dla swojego salonu? Zostaw kontakt, a odezwiemy się w 24h!" }
+        "welcome": {
+          "title": "Witaj w Beauty Calendar! 🎉",
+          "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty."
+        },
+        "dashboard": {
+          "title": "Dashboard — Twoje centrum dowodzenia",
+          "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela."
+        },
+        "calendar": {
+          "title": "Kalendarz — zero telefonów",
+          "description": "Klientki rezerwują same 24/7, Ty zarządzasz tylko wyjątkami. Widzisz grafik wszystkich pracowników na jednym ekranie."
+        },
+        "widgets": {
+          "title": "Widgety — Twój link do rezerwacji",
+          "description": "Wklej link na Instagram lub stronę www — klientki rezerwują nawet o 23:00. Jak pracownik, który nigdy nie śpi."
+        },
+        "staff": {
+          "title": "Zespół — każdy wie co robi",
+          "description": "Każdy pracownik ma swój kalendarz, usługi i kolor. System pilnuje grafiku — Ty nie musisz pamiętać kto co robi."
+        },
+        "clients": {
+          "title": "Klienci — pełna historia",
+          "description": "Pełna historia każdej klientki z tagami, notatkami i preferencjami. Wiesz kto jest VIP, kto znika i do kogo warto zadzwonić."
+        },
+        "conversations": {
+          "title": "Konwersacje — jeden widok",
+          "description": "SMS, email, WhatsApp — wszystkie rozmowy z klientkami w jednym miejscu. Nigdy nie zgubisz wątku."
+        },
+        "consultation": {
+          "title": "Konsultacje — cyfrowa dokumentacja",
+          "description": "Karty konsultacyjne z podpisem RODO, notatki głosowe i AI — profesjonalna dokumentacja bez papierowej biurokracji."
+        },
+        "services": {
+          "title": "Usługi — cennik online",
+          "description": "Klientki widzą ceny i rezerwują od razu. Zmień cenę raz — widget aktualizuje się automatycznie."
+        },
+        "products": {
+          "title": "Produkty — magazyn pod kontrolą",
+          "description": "Wiesz ile produktów zostało i kiedy zamówić. Skanuj dostawy telefonem — system liczy marże za Ciebie."
+        },
+        "accounting": {
+          "title": "Raporty — eksport jednym klikiem",
+          "description": "Zamykasz salon, sprawdzasz raport dzienny — wszystko się zgadza. Eksport dla księgowej jednym kliknięciem."
+        },
+        "pipeline": {
+          "title": "Ścieżka klientki — reaguj szybciej",
+          "description": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają. Reagujesz zanim odejdą do konkurencji."
+        },
+        "retention": {
+          "title": "Retencja — automatyczne powroty",
+          "description": "System automatycznie dba o powroty klientek. 5 sekwencji wiadomości reaguje we właściwym momencie — Ty nie musisz pamiętać."
+        },
+        "referral": {
+          "title": "Polecenia — darmowe klientki",
+          "description": "Zadowolone klientki polecają Cię znajomym, system to trackuje. Każde polecenie = nowa klientka bez kosztu reklamy."
+        },
+        "settings": {
+          "title": "Ustawienia — konfiguracja raz",
+          "description": "Logo, kolory, powiadomienia, integracje — skonfiguruj raz, a efekty działają na zawsze."
+        },
+        "support": {
+          "title": "Pomoc — pytasz, dostajesz odpowiedź",
+          "description": "AI Asystent zna cały system. Pytasz po polsku, dostajesz konkretną odpowiedź natychmiast."
+        },
+        "cta": {
+          "title": "Gotowa do startu! 🚀",
+          "description": "Znasz już wszystkie moduły. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże co jeszcze zostało.",
+          "highlight": "Chcesz taki system dla swojego salonu? Zostaw kontakt, a odezwiemy się w 24h!"
+        }
       }
     },
     "benefits": {
@@ -484,23 +536,74 @@
     "start": "Rozpocznij pracę",
     "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając 'Samouczek' w menu bocznym",
     "steps": {
-      "welcome": { "title": "Witaj w Beauty Calendar! 🎉", "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty." },
-      "dashboard": { "title": "Dashboard — Twoje centrum dowodzenia", "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela." },
-      "calendar": { "title": "Kalendarz — zero telefonów", "description": "Klientki rezerwują same 24/7, Ty zarządzasz tylko wyjątkami. Widzisz grafik wszystkich pracowników na jednym ekranie." },
-      "widgets": { "title": "Widgety — Twój link do rezerwacji", "description": "Wklej link na Instagram lub stronę www — klientki rezerwują nawet o 23:00. Jak pracownik, który nigdy nie śpi." },
-      "staff": { "title": "Zespół — każdy wie co robi", "description": "Każdy pracownik ma swój kalendarz, usługi i kolor. System pilnuje grafiku — Ty nie musisz pamiętać kto co robi." },
-      "clients": { "title": "Klienci — pełna historia", "description": "Pełna historia każdej klientki z tagami, notatkami i preferencjami. Wiesz kto jest VIP, kto znika i do kogo warto zadzwonić." },
-      "conversations": { "title": "Konwersacje — jeden widok", "description": "SMS, email, WhatsApp — wszystkie rozmowy z klientkami w jednym miejscu. Nigdy nie zgubisz wątku." },
-      "consultation": { "title": "Konsultacje — cyfrowa dokumentacja", "description": "Karty konsultacyjne z podpisem RODO, notatki głosowe i AI — profesjonalna dokumentacja bez papierowej biurokracji." },
-      "services": { "title": "Usługi — cennik online", "description": "Klientki widzą ceny i rezerwują od razu. Zmień cenę raz — widget aktualizuje się automatycznie." },
-      "products": { "title": "Produkty — magazyn pod kontrolą", "description": "Wiesz ile produktów zostało i kiedy zamówić. Skanuj dostawy telefonem — system liczy marże za Ciebie." },
-      "accounting": { "title": "Raporty — eksport jednym klikiem", "description": "Zamykasz salon, sprawdzasz raport dzienny — wszystko się zgadza. Eksport dla księgowej jednym kliknięciem." },
-      "pipeline": { "title": "Ścieżka klientki — reaguj szybciej", "description": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają. Reagujesz zanim odejdą do konkurencji." },
-      "retention": { "title": "Retencja — automatyczne powroty", "description": "System automatycznie dba o powroty klientek. 5 sekwencji wiadomości reaguje we właściwym momencie — Ty nie musisz pamiętać." },
-      "referral": { "title": "Polecenia — darmowe klientki", "description": "Zadowolone klientki polecają Cię znajomym, system to trackuje. Każde polecenie = nowa klientka bez kosztu reklamy." },
-      "settings": { "title": "Ustawienia — konfiguracja raz", "description": "Logo, kolory, powiadomienia, integracje — skonfiguruj raz, a efekty działają na zawsze." },
-      "support": { "title": "Pomoc — pytasz, dostajesz odpowiedź", "description": "AI Asystent zna cały system. Pytasz po polsku, dostajesz konkretną odpowiedź natychmiast." },
-      "cta": { "title": "Gotowa do startu! 🚀", "description": "Znasz już wszystkie moduły. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże co jeszcze zostało." }
+      "welcome": {
+        "title": "Witaj w Beauty Calendar! 🎉",
+        "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty."
+      },
+      "dashboard": {
+        "title": "Dashboard — Twoje centrum dowodzenia",
+        "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela."
+      },
+      "calendar": {
+        "title": "Kalendarz — zero telefonów",
+        "description": "Klientki rezerwują same 24/7, Ty zarządzasz tylko wyjątkami. Widzisz grafik wszystkich pracowników na jednym ekranie."
+      },
+      "widgets": {
+        "title": "Widgety — Twój link do rezerwacji",
+        "description": "Wklej link na Instagram lub stronę www — klientki rezerwują nawet o 23:00. Jak pracownik, który nigdy nie śpi."
+      },
+      "staff": {
+        "title": "Zespół — każdy wie co robi",
+        "description": "Każdy pracownik ma swój kalendarz, usługi i kolor. System pilnuje grafiku — Ty nie musisz pamiętać kto co robi."
+      },
+      "clients": {
+        "title": "Klienci — pełna historia",
+        "description": "Pełna historia każdej klientki z tagami, notatkami i preferencjami. Wiesz kto jest VIP, kto znika i do kogo warto zadzwonić."
+      },
+      "conversations": {
+        "title": "Konwersacje — jeden widok",
+        "description": "SMS, email, WhatsApp — wszystkie rozmowy z klientkami w jednym miejscu. Nigdy nie zgubisz wątku."
+      },
+      "consultation": {
+        "title": "Konsultacje — cyfrowa dokumentacja",
+        "description": "Karty konsultacyjne z podpisem RODO, notatki głosowe i AI — profesjonalna dokumentacja bez papierowej biurokracji."
+      },
+      "services": {
+        "title": "Usługi — cennik online",
+        "description": "Klientki widzą ceny i rezerwują od razu. Zmień cenę raz — widget aktualizuje się automatycznie."
+      },
+      "products": {
+        "title": "Produkty — magazyn pod kontrolą",
+        "description": "Wiesz ile produktów zostało i kiedy zamówić. Skanuj dostawy telefonem — system liczy marże za Ciebie."
+      },
+      "accounting": {
+        "title": "Raporty — eksport jednym klikiem",
+        "description": "Zamykasz salon, sprawdzasz raport dzienny — wszystko się zgadza. Eksport dla księgowej jednym kliknięciem."
+      },
+      "pipeline": {
+        "title": "Ścieżka klientki — reaguj szybciej",
+        "description": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają. Reagujesz zanim odejdą do konkurencji."
+      },
+      "retention": {
+        "title": "Retencja — automatyczne powroty",
+        "description": "System automatycznie dba o powroty klientek. 5 sekwencji wiadomości reaguje we właściwym momencie — Ty nie musisz pamiętać."
+      },
+      "referral": {
+        "title": "Polecenia — darmowe klientki",
+        "description": "Zadowolone klientki polecają Cię znajomym, system to trackuje. Każde polecenie = nowa klientka bez kosztu reklamy."
+      },
+      "settings": {
+        "title": "Ustawienia — konfiguracja raz",
+        "description": "Logo, kolory, powiadomienia, integracje — skonfiguruj raz, a efekty działają na zawsze."
+      },
+      "support": {
+        "title": "Pomoc — pytasz, dostajesz odpowiedź",
+        "description": "AI Asystent zna cały system. Pytasz po polsku, dostajesz konkretną odpowiedź natychmiast."
+      },
+      "cta": {
+        "title": "Gotowa do startu! 🚀",
+        "description": "Znasz już wszystkie moduły. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże co jeszcze zostało."
+      }
     }
   },
   "common": {
@@ -1613,77 +1716,137 @@
     "howTo": "Jak to zrobić",
     "home": {
       "goal": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — bez otwierania Excela.",
-      "steps": ["Sprawdź listę kontrolną i uzupełnij brakujące dane", "Udostępnij link do rezerwacji klientkom", "Obserwuj statystyki — system aktualizuje je automatycznie"],
+      "steps": [
+        "Sprawdź listę kontrolną i uzupełnij brakujące dane",
+        "Udostępnij link do rezerwacji klientkom",
+        "Obserwuj statystyki — system aktualizuje je automatycznie"
+      ],
       "painPoint": "Jeden rzut oka rano i wiesz jak stoi Twój biznes."
     },
     "calendar": {
       "goal": "Klientki rezerwują same 24/7 — Ty zarządzasz tylko wyjątkami.",
-      "steps": ["Dodaj pracowników i ustaw godziny pracy", "Kliknij wolny slot, aby dodać wizytę ręcznie", "Udostępnij widget — klientki rezerwują same, nawet o 23:00"],
+      "steps": [
+        "Dodaj pracowników i ustaw godziny pracy",
+        "Kliknij wolny slot, aby dodać wizytę ręcznie",
+        "Udostępnij widget — klientki rezerwują same, nawet o 23:00"
+      ],
       "painPoint": "Zero telefonów w trakcie zabiegu. Klientki rezerwują same."
     },
     "widgets": {
       "goal": "Twój link do rezerwacji działa jak pracownik, który nigdy nie śpi.",
-      "steps": ["Skopiuj link i wklej na Instagram, Facebook lub stronę www", "Dostosuj kolory i logo w edytorze wizualnym", "Śledź ile osób weszło i ile zarezerwowało"],
+      "steps": [
+        "Skopiuj link i wklej na Instagram, Facebook lub stronę www",
+        "Dostosuj kolory i logo w edytorze wizualnym",
+        "Śledź ile osób weszło i ile zarezerwowało"
+      ],
       "painPoint": "Wklej link na Instagram i klientki rezerwują o 23:00."
     },
     "staff": {
       "goal": "Każdy pracownik ma swój kalendarz, usługi i kolor — zero pomyłek.",
-      "steps": ["Dodaj pracownika (nawet jeśli pracujesz sama — dodaj siebie)", "Przypisz usługi i ustaw godziny pracy", "Wybierz kolor — tak będą oznaczone wizyty w kalendarzu"],
+      "steps": [
+        "Dodaj pracownika (nawet jeśli pracujesz sama — dodaj siebie)",
+        "Przypisz usługi i ustaw godziny pracy",
+        "Wybierz kolor — tak będą oznaczone wizyty w kalendarzu"
+      ],
       "painPoint": "Nie musisz pamiętać kto co robi. System pilnuje grafiku za Ciebie."
     },
     "clients": {
       "goal": "Pełna historia każdej klientki — wiesz kto jest VIP, kto znika.",
-      "steps": ["Dodaj klientki ręcznie lub zaimportuj z CSV", "Profile powstają też automatycznie przy rezerwacji online", "Dodawaj tagi i notatki — alergie, preferencje, VIP"],
+      "steps": [
+        "Dodaj klientki ręcznie lub zaimportuj z CSV",
+        "Profile powstają też automatycznie przy rezerwacji online",
+        "Dodawaj tagi i notatki — alergie, preferencje, VIP"
+      ],
       "painPoint": "Koniec z karteczkami i zeszytami. Każda klientka ma pełen profil."
     },
     "conversations": {
       "goal": "Wszystkie rozmowy w jednym miejscu — SMS, email, WhatsApp.",
-      "steps": ["Skonfiguruj kanały komunikacji w Ustawieniach", "Wiadomości od klientek pojawiają się automatycznie", "Odpowiadaj bezpośrednio z panelu — bez przeskakiwania między apkami"],
+      "steps": [
+        "Skonfiguruj kanały komunikacji w Ustawieniach",
+        "Wiadomości od klientek pojawiają się automatycznie",
+        "Odpowiadaj bezpośrednio z panelu — bez przeskakiwania między apkami"
+      ],
       "painPoint": "Nigdy nie zgubisz wątku z klientką."
     },
     "consultation": {
       "goal": "Cyfrowe karty konsultacyjne z podpisem RODO — zawsze pod ręką.",
-      "steps": ["Wybierz gotowy szablon karty lub stwórz własny", "Wypełnij kartę przy klientce — podpis cyfrowy na miejscu", "Nagraj notatkę głosową — AI wyciągnie kluczowe informacje"],
+      "steps": [
+        "Wybierz gotowy szablon karty lub stwórz własny",
+        "Wypełnij kartę przy klientce — podpis cyfrowy na miejscu",
+        "Nagraj notatkę głosową — AI wyciągnie kluczowe informacje"
+      ],
       "painPoint": "Profesjonalna dokumentacja bez papierowej biurokracji."
     },
     "services": {
       "goal": "Twój cennik online — klientki widzą ceny i rezerwują od razu.",
-      "steps": ["Dodaj usługi z ceną, czasem trwania i opisem", "Utwórz kategorie — Twarz, Paznokcie, Ciało", "Przypisz pracowników do usług"],
+      "steps": [
+        "Dodaj usługi z ceną, czasem trwania i opisem",
+        "Utwórz kategorie — Twarz, Paznokcie, Ciało",
+        "Przypisz pracowników do usług"
+      ],
       "painPoint": "Zmień cenę raz, widget aktualizuje się automatycznie."
     },
     "products": {
       "goal": "Wiesz ile produktów zostało i kiedy zamówić — zero niespodzianek.",
-      "steps": ["Dodaj produkty — nazwa, cena, kod EAN, dostawca", "System ostrzega gdy produkt się kończy", "Skanuj dostawy telefonem — stany aktualizują się automatycznie"],
+      "steps": [
+        "Dodaj produkty — nazwa, cena, kod EAN, dostawca",
+        "System ostrzega gdy produkt się kończy",
+        "Skanuj dostawy telefonem — stany aktualizują się automatycznie"
+      ],
       "painPoint": "Skanuj dostawy telefonem, system liczy marże za Ciebie."
     },
     "accounting": {
       "goal": "Zamykasz salon, sprawdzasz raport — wszystko się zgadza.",
-      "steps": ["Wybierz zakres dat i przeglądaj raporty", "Sprawdź dzienny raport kasowy — gotówka, karta, online", "Eksportuj dane do CSV/PDF i wyślij księgowej"],
+      "steps": [
+        "Wybierz zakres dat i przeglądaj raporty",
+        "Sprawdź dzienny raport kasowy — gotówka, karta, online",
+        "Eksportuj dane do CSV/PDF i wyślij księgowej"
+      ],
       "painPoint": "Eksport dla księgowej jednym kliknięciem."
     },
     "pipeline": {
       "goal": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają.",
-      "steps": ["Klientki automatycznie przechodzą przez etapy ścieżki", "Kliknij w kartę, aby zobaczyć pełną historię", "Reaguj na klientki w kolumnie 'Nie pojawiła się'"],
+      "steps": [
+        "Klientki automatycznie przechodzą przez etapy ścieżki",
+        "Kliknij w kartę, aby zobaczyć pełną historię",
+        "Reaguj na klientki w kolumnie 'Nie pojawiła się'"
+      ],
       "painPoint": "Reagujesz zanim klientka odejdzie do konkurencji."
     },
     "retention": {
       "goal": "System automatycznie dba o powroty klientek — Ty nie musisz pamiętać.",
-      "steps": ["Skonfiguruj sekwencje retencyjne — 5 automatycznych wiadomości", "System sam wykrywa klientki zagrożone odejściem", "Monitoruj wyniki — ile klientek wróciło dzięki automatyzacji"],
+      "steps": [
+        "Skonfiguruj sekwencje retencyjne — 5 automatycznych wiadomości",
+        "System sam wykrywa klientki zagrożone odejściem",
+        "Monitoruj wyniki — ile klientek wróciło dzięki automatyzacji"
+      ],
       "painPoint": "Klientki wracają same, bo system reaguje we właściwym momencie."
     },
     "referral": {
       "goal": "Zadowolone klientki polecają Cię znajomym — system to trackuje.",
-      "steps": ["System automatycznie generuje kody polecające dla lojalnych klientek", "Klientki udostępniają kod na Stories lub osobiście", "Monitoruj ile nowych klientek przyszło z poleceń"],
+      "steps": [
+        "System automatycznie generuje kody polecające dla lojalnych klientek",
+        "Klientki udostępniają kod na Stories lub osobiście",
+        "Monitoruj ile nowych klientek przyszło z poleceń"
+      ],
       "painPoint": "Każde polecenie = nowa klientka bez kosztu reklamy."
     },
     "settings": {
       "goal": "Twoje logo i kolory wyświetlają się w widgecie — profesjonalny wygląd.",
-      "steps": ["Uzupełnij profil salonu — nazwa, adres, logo", "Skonfiguruj powiadomienia SMS/email", "Ustaw reguły rezerwacji i integracje"],
+      "steps": [
+        "Uzupełnij profil salonu — nazwa, adres, logo",
+        "Skonfiguruj powiadomienia SMS/email",
+        "Ustaw reguły rezerwacji i integracje"
+      ],
       "painPoint": "Konfiguracja raz, efekty na zawsze."
     },
     "support": {
       "goal": "Pytasz po polsku, dostajesz odpowiedź natychmiast.",
-      "steps": ["Wpisz pytanie w czacie — swoimi słowami", "Użyj szybkich akcji do typowych pytań", "Asystent odpowie z konkretnymi instrukcjami"],
+      "steps": [
+        "Wpisz pytanie w czacie — swoimi słowami",
+        "Użyj szybkich akcji do typowych pytań",
+        "Asystent odpowie z konkretnymi instrukcjami"
+      ],
       "painPoint": "Jak rozmowa z ekspertem, który zna cały system."
     }
   },
@@ -1725,11 +1888,26 @@
       "lost": "Utracone"
     },
     "sequences": {
-      "proactive": { "label": "Zanim odejdzie", "description": "Profilaktyczna — na podstawie średniego interwału klientki × 1.3" },
-      "45day": { "label": "45 dni — łagodna", "description": "Ciepły, nienatarczywy ton z przyciskiem rezerwacji 1-klik" },
-      "60day": { "label": "60 dni — z wartością", "description": "Edukacyjna — mini-edukacja o zabiegu + efekty wizualne" },
-      "75day": { "label": "75 dni — z incentive", "description": "Ekskluzywna oferta powrotu z 48h countdown" },
-      "90day": { "label": "90 dni — ostatnia szansa", "description": "Ostatni kontakt + auto-tag do kampanii Meta" }
+      "proactive": {
+        "label": "Zanim odejdzie",
+        "description": "Profilaktyczna — na podstawie średniego interwału klientki × 1.3"
+      },
+      "45day": {
+        "label": "45 dni — łagodna",
+        "description": "Ciepły, nienatarczywy ton z przyciskiem rezerwacji 1-klik"
+      },
+      "60day": {
+        "label": "60 dni — z wartością",
+        "description": "Edukacyjna — mini-edukacja o zabiegu + efekty wizualne"
+      },
+      "75day": {
+        "label": "75 dni — z incentive",
+        "description": "Ekskluzywna oferta powrotu z 48h countdown"
+      },
+      "90day": {
+        "label": "90 dni — ostatnia szansa",
+        "description": "Ostatni kontakt + auto-tag do kampanii Meta"
+      }
     },
     "actions": {
       "sent": "Wysłano",
@@ -1974,6 +2152,133 @@
       "paymentsDesc": "Przelewy24 & BLIK",
       "supportLabel": "Support",
       "supportDesc": "Polski 24/7"
+    },
+    "topBanner": {
+      "text": "Przeciętna właścicielka salonu traci",
+      "amount": "72 000 zł rocznie",
+      "suffix": "na klientkach które nie wróciły. Ile Ty tracisz?",
+      "cta": "Sprawdź →"
+    },
+    "hero": {
+      "badge": "✨ 🚀 Zarabiaj więcej, robiąc jeszcze mniej niż do tej pory",
+      "title": "Więcej wizyt. Więcej powrotów.",
+      "titleHighlight": "Zero prowizji.",
+      "subtitle": "Jedyna platforma beauty z AI, która automatycznie wypełnia luki w grafiku, odzyskuje śpiące klientki i maksymalizuje wartość każdej wizyty — bez pobierania ani złotówki od Twoich przychodów.",
+      "ctaPrimary": "Wypróbuj bez żadnego ryzyka",
+      "ctaSecondary": "Zobacz demo na żywo",
+      "madeIn": "🇵🇱 Platforma stworzona w Polsce",
+      "trust1": "Pełna gwarancja satysfakcji",
+      "trust2": "Dane zawsze Twoje",
+      "trust3": "0% prowizji — zawsze"
+    },
+    "ownership": {
+      "badge": "Wiedziałaś o tym?",
+      "title": "Pracujesz na budowę",
+      "titleHighlight": "cudzej bazy klientek.",
+      "description": "Spróbuj wyeksportować bazę klientów z marketplace’u. Dostaniesz imię, telefon, email. Ale nie to, co kupują, ile wydają i kiedy wracają — czyli dokładnie to, dzięki czemu sprzedajesz im więcej.",
+      "descriptionBold": "Te dane — które pozwalają Ci sprzedawać więcej tej samej klientce — zostają na platformie. Bo jej biznesem jest relacja z klientką. Nie z Tobą.",
+      "marketplaceLabel": "Platforma marketplace",
+      "bcLabel": "Beauty Calendar",
+      "marketplace1": "45%–55% prowizji od pozyskanego nowego klienta",
+      "marketplace2": "Brak sekwencji — klientka znika i nikt jej nie goni, bo nie mają na tym zarobku",
+      "marketplace3": "Jutro mogą podnieść prowizję — i nic nie zrobisz",
+      "marketplace4": "Twoja konkurencja jest wyświetlana obok Ciebie",
+      "marketplace5": "Eksportujesz: imię, telefon, email. I nic więcej.",
+      "marketplace6": "Klientki porównują Cię z tańszą konkurencją w jednym widoku",
+      "marketplace7": "Budujesz ich bazę. Ich brand. Ich biznes. Nie swój. (Ich biznes to gromadzenie kupujących w aplikacji, a nie pozycjonowanie Twojego biznesu)",
+      "bc1": "Twoje klientki. Twoje dane. Na zawsze.",
+      "bc1bold": true,
+      "bc2": "0% prowizji — dziś, jutro i za 5 lat",
+      "bc3": "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej i komunikuje się z nimi, aby temu zapobiec",
+      "bc4": "Auto-zaliczka od klientek z historią no-show — bez niezręcznej rozmowy",
+      "bc5": "Budujesz własną bazę w prywatnej aplikacji mobilnej — nikt Ci jej nie odbierze",
+      "bc6": "Za rok masz asset który pracuje dla Ciebie — nie dla platformy",
+      "bc7": "Stała stawka za pozyskiwanie nowych klientów, na których zarobisz kilkukrotnie więcej dzięki stworzonej do tego platformie",
+      "quote": "„Nie budujesz na cudzej ziemi. Budujesz własny dom.”"
+    },
+    "calculator": {
+      "intro": "Policzmy konkretnie ile to kosztuje",
+      "introHighlight": "właśnie Twój salon.",
+      "questionOf": "Pytanie {{current}} z {{total}}",
+      "prevQuestion": "Poprzednie pytanie",
+      "next": "Dalej →",
+      "showResult": "Pokaż wynik →",
+      "s1q": "Ile klientek wraca do Ciebie regularnie?",
+      "s1sub": "Pomyśl o klientkach z ostatniego roku.",
+      "s1o1": "mniej niż 2 na 10",
+      "s1o1s": "większość była tylko raz",
+      "s1o2": "3–4 na 10",
+      "s1o2s": "część wraca, część znika",
+      "s1o3": "5–6 na 10",
+      "s1o3s": "połowa jest w miarę stała",
+      "s1o4": "ponad 7 na 10",
+      "s1o4s": "mam dużo stałych klientek",
+      "s2badge": "Pytanie szczere",
+      "s2q": "Kiedy ostatnio napisałaś do klientki której dawno nie widziałaś?",
+      "s2o1": "Robię to regularnie",
+      "s2o1s": "mam system lub zwyczaj",
+      "s2o2": "Czasem — ale ręcznie i rzadko",
+      "s2o2s": "jak mi się przypomni",
+      "s2o3": "Szczerze? Prawie nigdy",
+      "s2o3s": "brakuje czasu i energii",
+      "s2o4": "Nigdy — nie mam jak",
+      "s2o4s": "nawet nie wiem od czego zacząć",
+      "s3q": "Ile wynosi średnia wartość jednej wizyty?",
+      "s3sub": "Weź pod uwagę swoje najpopularniejsze usługi.",
+      "s3o1": "do 100 zł",
+      "s3o1s": "np. manicure podstawowy",
+      "s3o2": "100–200 zł",
+      "s3o2s": "np. hybryda, stylizacja",
+      "s3o3": "200–400 zł",
+      "s3o3s": "np. koloryzacja, zabiegi twarzy",
+      "s3o4": "ponad 400 zł",
+      "s3o4s": "np. medycyna estetyczna, laser",
+      "s4q": "Ile razy w tym tygodniu fotel stał pusty bo klientka po prostu nie przyszła?",
+      "s4sub": "Bez telefonu. Bez odwołania. Po prostu nie.",
+      "s4o1": "0 — u mnie się to nie zdarza",
+      "s4o1s": "mam kaucje lub bardzo lojalne klientki",
+      "s4o2": "1–2 razy",
+      "s4o2s": "zdarza się, ale daję radę",
+      "s4o3": "3–4 razy",
+      "s4o3s": "to zaczyna boleć finansowo",
+      "s4o4": "5 lub więcej",
+      "s4o4s": "to mój największy problem",
+      "resLabel": "Szacujemy że tracisz rocznie",
+      "resCurrency": "zł",
+      "resSuffix": "w klientkach które nie wróciły i pustych fotelach",
+      "resCar": "rat za samochód",
+      "resTrips": "wyjazdów zagranicznych",
+      "resBuffer": "mies. spokoju finansowego",
+      "resCommentNever": "Masz klientki które o Tobie zapomniały — nie dlatego że nie chciały wrócić. Dlatego że nikt im nie przypomniał.",
+      "resCommentSometimes": "Robisz to ręcznie. Wyobraź sobie że dzieje się automatycznie — dla każdej klientki — bez Twojego udziału.",
+      "resHighlightNever": "Beauty Calendar przypomina za Ciebie — każdej klientce, automatycznie.",
+      "resHighlightSometimes": "Automatyzacja retencji to Twoja nowa supermoc.",
+      "resCta": "Zacznij odzyskiwać te pieniądze →",
+      "resReset": "Przelicz ponownie"
+    },
+    "systemFlow": {
+      "label": "Jak to działa",
+      "title": "Jedna klientka. Pięć wizyt.",
+      "titleHighlight": "Zero Twojego wysiłku.",
+      "cta": "Chcę taki system →",
+      "step1t": "Rezerwacja w 30 sekund — bez aplikacji",
+      "step1d": "Klientka otwiera link, wybiera termin i rezerwuje. Bez pobierania aplikacji, bez zakładania konta, bez dzwonienia. 30 sekund od kliknięcia do potwierdzenia. Żaden inny system na polskim rynku tego nie oferuje.",
+      "step1alt": "Rezerwacja online w 30 sekund bez aplikacji — Beauty Calendar",
+      "step2t": "Rozgrzewka przed wizytą",
+      "step2d": "Inne systemy wysyłają suche przypomnienie. Twój wysyła treści edukacyjne o zarezerwowanej usłudze — klientka czeka na wizytę jak na prezent. Efekt? −67% no-showów w pierwszym miesiącu.",
+      "step2alt": "Rozgrzewka przed wizytą — redukcja no-showów o 67%",
+      "step3t": "Sekwencja 5 wizyt",
+      "step3d": "Statystyka jest brutalna: 60% nowych klientek nie wraca po pierwszej wizycie. System wysyła idealnie wyczasowane wiadomości, które prowadzą klientkę od pierwszej wizyty do piątej — automatycznie, bez Twojego udziału.",
+      "step3alt": "Automatyczna sekwencja 5 wizyt — retencja klientek",
+      "step4t": "Radar Odejść — AI, który nie śpi",
+      "step4d": "AI analizuje zachowanie każdej klientki i wykrywa sygnały odejścia 3 tygodnie wcześniej. Zanim klientka zdąży zapomnieć o Twoim salonie, dostaje spersonalizowaną ofertę powrotu. Ty nawet nie wiesz, że była zagrożona.",
+      "step4alt": "Radar Odejść — AI wykrywa zagrożone klientki 3 tygodnie wcześniej",
+      "step5t": "Efekt Kuli Śnieżnej",
+      "step5d": "Zadowolona klientka poleca Twój salon koleżance. Koleżanka dostaje powitalny rabat, klientka — nagrodę. System śledzi każde polecenie, nalicza nagrody i buduje ranking ambasadorek. Bez Twojego wysiłku.",
+      "step5alt": "Efekt Kuli Śnieżnej — automatyczny system poleceń",
+      "step6t": "True Profit — ile naprawdę zarabiasz",
+      "step6d": "Inne systemy pokazują przychód. Twój odejmuje koszt produktów, czas pracy, prowizje — i pokazuje realny zysk z każdej usługi, każdego dnia, każdej stylistki. Pierwszy raz wiesz, ile naprawdę zarabiasz.",
+      "step6alt": "True Profit — realny zysk z każdej usługi i stylistki"
     }
   }
 }
