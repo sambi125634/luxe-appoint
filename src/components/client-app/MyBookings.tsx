@@ -380,7 +380,76 @@ export function MyBookings() {
                 }}
               />
             </TabsContent>
-          </Tabs>
+            <TabsContent value="waitlist" className="space-y-3">
+              {waitlistEntries.map((entry: any) => {
+                const service = entry.services as unknown as { name: string; duration: number; price: number } | null;
+                const salon = entry.salons as unknown as { name: string; theme_primary_color: string | null } | null;
+                const staffMember = entry.staff_members as unknown as { name: string } | null;
+
+                const statusLabelsWl: Record<string, string> = {
+                  waiting: "Czekam",
+                  notified: "Powiadomiona",
+                  booked: "Zarezerwowana",
+                };
+                const statusColorsWl: Record<string, string> = {
+                  waiting: "bg-amber-100 text-amber-700 border-amber-200",
+                  notified: "bg-green-100 text-green-700 border-green-200",
+                  booked: "bg-blue-100 text-blue-700 border-blue-200",
+                };
+
+                const timeLabel = entry.preferred_time_from
+                  ? entry.preferred_time_from === "08:00:00" ? "rano"
+                    : entry.preferred_time_from === "12:00:00" ? "południe"
+                    : "wieczór"
+                  : "dowolna pora";
+
+                return (
+                  <Card key={entry.id} className="overflow-hidden border-border/40">
+                    <div className="h-1.5" style={{ backgroundColor: salon?.theme_primary_color ?? "hsl(var(--primary))" }} />
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-bold text-foreground truncate">{service?.name ?? "Usługa"}</h3>
+                          <p className="text-xs text-muted-foreground">{salon?.name}</p>
+                        </div>
+                        <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full border ${statusColorsWl[entry.status] ?? "bg-muted text-muted-foreground border-border"}`}>
+                          {statusLabelsWl[entry.status] ?? entry.status}
+                        </span>
+                      </div>
+
+                      <p className="text-sm text-muted-foreground flex items-center gap-1.5 mb-1">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Czekam na termin: {format(new Date(entry.preferred_date_from), "d MMM", { locale: pl })}
+                        {entry.preferred_date_to && ` – ${format(new Date(entry.preferred_date_to), "d MMM", { locale: pl })}`}
+                        , {timeLabel}
+                      </p>
+
+                      {staffMember && (
+                        <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                          <User className="h-3 w-3" />
+                          z {staffMember.name}
+                        </p>
+                      )}
+
+                      <div className="mt-3 pt-3 border-t border-border/30">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => cancelWaitlist.mutate(entry.id)}
+                          disabled={cancelWaitlist.isPending}
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Usuń z listy
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </TabsContent>
+
+            </Tabs>
         )}
 
         {/* Review modal */}
