@@ -29,6 +29,7 @@ import { ReferralEngine } from "@/modules/referral";
 import { GuidedTour, useAdminTourState } from "@/components/admin/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { AutopilotModule } from "@/components/admin/autopilot";
+import ClientAppPage from "@/components/admin/client-app/ClientAppPage";
 
 export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -100,6 +101,7 @@ export default function AdminDashboard() {
       case "consultation": return "Karty konsultacyjne";
       case "referral": return "Polecenia & Opinie";
       case "autopilot": return "AI Autopilot";
+      case "client-app": return "Aplikacja Klientki";
       default: return "Dashboard";
     }
   };
@@ -130,6 +132,7 @@ export default function AdminDashboard() {
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
       case "autopilot": return <AutopilotModule />;
+      case "client-app": return <ClientAppPage />;
       default: return null;
     }
   };
