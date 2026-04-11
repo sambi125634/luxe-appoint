@@ -2454,6 +2454,47 @@ export type Database = {
           },
         ]
       }
+      salon_gallery: {
+        Row: {
+          caption: string | null
+          category: string | null
+          created_at: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          salon_id: string
+        }
+        Insert: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          salon_id: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          salon_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salon_gallery_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salons: {
         Row: {
           address: string | null
