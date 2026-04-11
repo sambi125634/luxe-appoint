@@ -2449,6 +2449,7 @@ export type Database = {
           onboarding_step: number
           owner_id: string | null
           phone: string | null
+          reschedule_notice_hours: number
           salon_type: string | null
           settings: Json | null
           slug: string
@@ -2479,6 +2480,7 @@ export type Database = {
           onboarding_step?: number
           owner_id?: string | null
           phone?: string | null
+          reschedule_notice_hours?: number
           salon_type?: string | null
           settings?: Json | null
           slug: string
@@ -2509,6 +2511,7 @@ export type Database = {
           onboarding_step?: number
           owner_id?: string | null
           phone?: string | null
+          reschedule_notice_hours?: number
           salon_type?: string | null
           settings?: Json | null
           slug?: string
