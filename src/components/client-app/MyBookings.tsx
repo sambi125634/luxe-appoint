@@ -64,6 +64,9 @@ export function MyBookings() {
   const [rescheduleBooking, setRescheduleBooking] = useState<any>(null);
   const [rebookBooking, setRebookBooking] = useState<any>(null);
 
+  const { data: waitlistEntries = [] } = useWaitlistEntries();
+  const cancelWaitlist = useCancelWaitlist();
+
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["client-bookings"],
     queryFn: async () => {
