@@ -86,7 +86,7 @@ export function MyBookings() {
 
       const { data, error } = await supabase
         .from("appointments")
-        .select("*, services:service_id(name, duration, price), staff_members:staff_id(name, avatar_url, color), salons:salon_id(name, address, city, theme_primary_color)")
+        .select("*, services:service_id(name, duration, price), staff_members:staff_id(name, avatar_url, color), salons:salon_id(name, address, city, theme_primary_color, reschedule_notice_hours)")
         .in("client_id", clientIds)
         .order("start_time", { ascending: false })
         .limit(50);
