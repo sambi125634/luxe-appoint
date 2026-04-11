@@ -47,14 +47,14 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             <button onClick={() => scrollToSection("features")} className="relative text-muted-foreground hover:text-foreground transition-colors">
               {t("nav.features")}
               <span className="absolute -top-2 -right-8 text-[10px] font-bold bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full leading-none">
-                Nowe
+                {t("nav.newBadge")}
               </span>
             </button>
             <button onClick={() => scrollToSection("pricing")} className="text-muted-foreground hover:text-foreground transition-colors">
-              Cennik
+              {t("nav.pricing")}
             </button>
             <button onClick={() => scrollToSection("demo-preview")} className="text-muted-foreground hover:text-foreground transition-colors">
-              Zobacz demo
+              {t("nav.demo")}
             </button>
             <button onClick={() => scrollToSection("faq")} className="text-muted-foreground hover:text-foreground transition-colors">
               {t("nav.faq")}
@@ -68,13 +68,13 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors font-medium"
             >
               <LogIn className="w-4 h-4" />
-              Zaloguj się
+              {t("nav.login")}
             </a>
             <Button
               onClick={onScrollToForm}
               className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
-              Wypróbuj za darmo
+              {t("nav.cta")}
             </Button>
           </div>
 
@@ -102,23 +102,23 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
                 {t("nav.features")}
               </button>
               <button onClick={() => scrollToSection("pricing")} className="text-left text-muted-foreground hover:text-foreground py-2">
-                Cennik
+                {t("nav.pricing")}
               </button>
               <button onClick={() => scrollToSection("demo-preview")} className="text-left text-muted-foreground hover:text-foreground py-2">
-                Zobacz demo
+                {t("nav.demo")}
               </button>
               <button onClick={() => scrollToSection("faq")} className="text-left text-muted-foreground hover:text-foreground py-2">
                 {t("nav.faq")}
               </button>
               <a href="https://admin.beauty-funnels.com/auth" className="flex items-center gap-1.5 text-left text-muted-foreground hover:text-foreground py-2 font-medium">
                 <LogIn className="w-4 h-4" />
-                Zaloguj się
+                {t("nav.login")}
               </a>
               <Button
                 onClick={() => { onScrollToForm(); setIsMobileMenuOpen(false); }}
                 className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
               >
-                Wypróbuj za darmo
+                {t("nav.cta")}
               </Button>
             </div>
           </div>
