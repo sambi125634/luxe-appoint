@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Gift, Star, Ticket, ChevronRight, Sparkles, Trophy, Copy, Check, Clock, Award } from "lucide-react";
+import { BeautyRhythms } from "@/components/client-app/BeautyRhythms";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
