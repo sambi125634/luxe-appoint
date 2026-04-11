@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointment_waitlist: {
+        Row: {
+          created_at: string
+          expires_at: string
+          id: string
+          notified_at: string | null
+          preferred_date_from: string
+          preferred_date_to: string | null
+          preferred_time_from: string | null
+          preferred_time_to: string | null
+          salon_id: string
+          service_id: string
+          staff_member_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          notified_at?: string | null
+          preferred_date_from: string
+          preferred_date_to?: string | null
+          preferred_time_from?: string | null
+          preferred_time_to?: string | null
+          salon_id: string
+          service_id: string
+          staff_member_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          id?: string
+          notified_at?: string | null
+          preferred_date_from?: string
+          preferred_date_to?: string | null
+          preferred_time_from?: string | null
+          preferred_time_to?: string | null
+          salon_id?: string
+          service_id?: string
+          staff_member_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_waitlist_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_waitlist_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_waitlist_staff_member_id_fkey"
+            columns: ["staff_member_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointment_waitlist_staff_member_id_fkey"
+            columns: ["staff_member_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           client_id: string | null
