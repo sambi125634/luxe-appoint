@@ -10,6 +10,7 @@ import { ClientProfile } from "@/components/client-app/ClientProfile";
 import { SalonProfile } from "@/components/client-app/SalonProfile";
 import { ReferFriend } from "@/components/client-app/ReferFriend";
 import { Favorites } from "@/components/client-app/Favorites";
+import { PushNotificationPrompt } from "@/components/client-app/PushNotificationPrompt";
 
 export default function ClientApp() {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ export default function ClientApp() {
         <Route path="salon/:salonId" element={<SalonProfile />} />
       </Routes>
       <BottomTabBar />
+      <PushNotificationPrompt />
     </div>
   );
 }
