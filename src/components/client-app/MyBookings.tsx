@@ -227,6 +227,22 @@ export function MyBookings() {
                   Oceń
                 </Button>
               )}
+              {canReschedule && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-primary hover:text-primary hover:bg-primary/10"
+                  onClick={() => setRescheduleBooking({
+                    ...booking,
+                    services: service,
+                    staff_members: staffMember,
+                    salons: salon,
+                  })}
+                >
+                  <CalendarClock className="h-4 w-4 mr-1" />
+                  Zmień termin
+                </Button>
+              )}
               {isUpcoming && booking.status !== "cancelled" && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
