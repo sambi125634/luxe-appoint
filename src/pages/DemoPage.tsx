@@ -27,6 +27,7 @@ import { InventoryDashboard } from "@/modules/inventory";
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
 import { AutopilotModule } from "@/components/admin/autopilot";
+import ClientAppPage from "@/components/admin/client-app/ClientAppPage";
 
 export default function DemoPage() {
   const { t } = useTranslation();
