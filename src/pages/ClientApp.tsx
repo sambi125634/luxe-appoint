@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { BottomTabBar } from "@/components/client-app/BottomTabBar";
@@ -13,6 +13,8 @@ import { Favorites } from "@/components/client-app/Favorites";
 import { PushNotificationPrompt } from "@/components/client-app/PushNotificationPrompt";
 import { PrivacyPolicy } from "@/components/client-app/PrivacyPolicy";
 import { TermsOfService } from "@/components/client-app/TermsOfService";
+
+const PaymentSuccessPage = lazy(() => import("@/pages/PaymentSuccessPage"));
 
 export default function ClientApp() {
   const navigate = useNavigate();
@@ -53,6 +55,7 @@ export default function ClientApp() {
         <Route path="salon/:salonId" element={<SalonProfile />} />
         <Route path="privacy" element={<PrivacyPolicy />} />
         <Route path="terms" element={<TermsOfService />} />
+        <Route path="payment-success" element={<Suspense fallback={null}><PaymentSuccessPage /></Suspense>} />
       </Routes>
       <BottomTabBar />
       <PushNotificationPrompt />
