@@ -2139,7 +2139,11 @@
       "q7": "Is it really 0% commission? Always?",
       "a7": "Yes, absolutely. Beauty Calendar charges a fixed monthly fee depending on your plan (0 PLN / 99 PLN / 199 PLN). Zero commission on bookings — whether your client books 1 or 1000 appointments per month. This is our fundamental difference from Booksy and similar platforms.",
       "q8": "Does it integrate with Google Calendar?",
-      "a8": "Yes. On PRO and VIP plans you get two-way sync with Google Calendar. Appointments from Beauty Calendar automatically appear in your Google Calendar and vice versa — blocks from Google Calendar block slots in your booking widget."
+      "a8": "Yes. On PRO and VIP plans you get two-way sync with Google Calendar. Appointments from Beauty Calendar automatically appear in your Google Calendar and vice versa — blocks from Google Calendar block slots in your booking widget.",
+      "title1": "Frequently asked",
+      "title2": "questions",
+      "q9": "What if I change my mind?",
+      "a9": "No commitments. Cancel anytime. No questions asked, no hidden fees. We also guarantee a full refund within the first 30 days."
     },
     "newFinalCta": {
       "urgency": "First 30 days with full access to all AI features — no credit card required.",
@@ -2198,7 +2202,7 @@
       "bc5": "Build your own base in a private mobile app — no one can take it from you",
       "bc6": "In a year you have an asset working for you — not for a platform",
       "bc7": "Fixed rate for acquiring new clients you'll earn multiples more from",
-      "quote": "\"Don't build on rented land. Build your own home.\"",
+      "quote": "Don't build on rented land. Build your own home.",
       "title1": "You're building",
       "title2": "someone else's client base.",
       "desc1": "Try exporting your client base from a marketplace. You'll get a name, phone, email. But not what they buy, how much they spend, or when they return — exactly the data that lets you sell them more.",

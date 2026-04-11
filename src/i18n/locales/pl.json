@@ -2139,7 +2139,11 @@
       "q7": "Czy naprawdę 0% prowizji? Zawsze?",
       "a7": "Tak, absolutnie. Beauty Calendar pobiera stałą opłatę miesięczną zależną od planu (0 zł / 99 zł / 199 zł). Zero prowizji od rezerwacji — nieważne czy klientka zarezerwuje 1 czy 1000 wizyt w miesiącu. To jest nasza fundamentalna różnica względem Booksy i podobnych platform.",
       "q8": "Czy integruje się z Google Calendar?",
-      "a8": "Tak. W planie PRO i VIP masz dwukierunkową synchronizację z Google Calendar. Wizyty z Beauty Calendar pojawiają się automatycznie w Twoim kalendarzu Google i odwrotnie — blokady z Google Calendar blokują sloty w widgecie rezerwacji."
+      "a8": "Tak. W planie PRO i VIP masz dwukierunkową synchronizację z Google Calendar. Wizyty z Beauty Calendar pojawiają się automatycznie w Twoim kalendarzu Google i odwrotnie — blokady z Google Calendar blokują sloty w widgecie rezerwacji.",
+      "title1": "Najczęściej zadawane",
+      "title2": "pytania",
+      "q9": "Co jeśli zmienię zdanie?",
+      "a9": "Nie ma żadnych zobowiązań. Możesz anulować w dowolnym momencie. Bez pytań, bez ukrytych opłat. Gwarantujemy też pełny zwrot w ciągu pierwszych 30 dni."
     },
     "newFinalCta": {
       "urgency": "Pierwsze 30 dni z pełnym dostępem do wszystkich funkcji AI — bez karty kredytowej.",
