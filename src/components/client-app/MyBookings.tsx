@@ -364,6 +364,15 @@ export function MyBookings() {
           salonName={reviewBooking?.salonName ?? ""}
           salonId={reviewBooking?.salonId ?? ""}
         />
+
+        {/* Reschedule modal */}
+        {rescheduleBooking && (
+          <RescheduleModal
+            open={!!rescheduleBooking}
+            onClose={() => setRescheduleBooking(null)}
+            appointment={rescheduleBooking}
+          />
+        )}
       </div>
     </div>
   );
