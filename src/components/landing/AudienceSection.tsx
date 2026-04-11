@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
@@ -12,60 +13,17 @@ import spaImg from "@/assets/audience/spa.jpg";
 import bodyImg from "@/assets/audience/body.jpg";
 import specialistImg from "@/assets/audience/specialist.jpg";
 
-const categories = [
-  {
-    image: nailsImg,
-    title: "Paznokcie i dłonie",
-    items: ["Salon paznokci", "Manicure hybrydowy", "Przedłużanie paznokci", "Pedicure leczniczy", "Nail art studio"],
-  },
-  {
-    image: hairImg,
-    title: "Fryzjerstwo i włosy",
-    items: ["Salon fryzjerski", "Barber shop", "Koloryzacja i balayage", "Przedłużanie włosów", "Studio stylizacji"],
-  },
-  {
-    image: facialImg,
-    title: "Kosmetyka i twarz",
-    items: ["Gabinet kosmetyczny", "Peeling kawitacyjny", "Mikrodermabrazja", "Oczyszczanie wodorowe", "Lifting twarzy"],
-  },
-  {
-    image: lashesImg,
-    title: "Rzęsy i brwi",
-    items: ["Stylizacja rzęs", "Lash lifting", "Laminacja brwi", "Microblading", "PMU i makijaż permanentny"],
-  },
-  {
-    image: depilationImg,
-    title: "Depilacja",
-    items: ["Depilacja laserowa", "Depilacja IPL", "Woskowanie i sugaring", "Studio depilacji"],
-  },
-  {
-    image: aestheticsImg,
-    title: "Medycyna estetyczna",
-    items: ["Gabinet medycyny estetycznej", "Klinika anti-aging", "Mezoterapia", "Botoks i wypełniacze", "Osocze bogatopłytkowe"],
-  },
-  {
-    image: massageImg,
-    title: "Masaż i wellness",
-    items: ["Salon masażu", "Masaż tajski / leczniczy", "Refleksologia", "Studio wellness i relaksu"],
-  },
-  {
-    image: spaImg,
-    title: "SPA i kompleksy",
-    items: ["Salon SPA", "Hotel SPA", "Centrum odnowy biologicznej", "Strefa relaksu"],
-  },
-  {
-    image: bodyImg,
-    title: "Sylwetka i ciało",
-    items: ["Studio modelowania sylwetki", "Kriolipoliza", "Endermologia", "Drenaż limfatyczny"],
-  },
-  {
-    image: specialistImg,
-    title: "Specjalistyczne",
-    items: ["Gabinet trychologiczny", "Studio bridal (makijaż ślubny)", "Gabinet podologiczny", "Studio opalania natryskowego", "Solarium"],
-  },
-];
+const images = [nailsImg, hairImg, facialImg, lashesImg, depilationImg, aestheticsImg, massageImg, spaImg, bodyImg, specialistImg];
 
 export const AudienceSection = () => {
+  const { t } = useTranslation();
+
+  const categories = Array.from({ length: 10 }, (_, i) => ({
+    image: images[i],
+    title: t(`landing.audience.cat${i + 1}`),
+    items: t(`landing.audience.cat${i + 1}items`, { returnObjects: true }) as string[],
+  }));
+
   return (
     <section className="py-16 md:py-20 lg:py-32">
       <div className="container">
@@ -77,9 +35,9 @@ export const AudienceSection = () => {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-2xl md:text-4xl font-serif font-bold mb-4">
-            Beauty Calendar jest dla Ciebie —
+            {t("landing.audience.title1")}
             <br />
-            <span className="text-gradient-luxury">niezależnie od tego czym się zajmujesz</span>
+            <span className="text-gradient-luxury">{t("landing.audience.title2")}</span>
           </h2>
         </motion.div>
 
@@ -93,14 +51,7 @@ export const AudienceSection = () => {
               viewport={{ once: true }}
               transition={{ delay: i * 0.05, duration: 0.4 }}
             >
-              <img
-                src={cat.image}
-                alt={cat.title}
-                className="w-full h-24 md:h-32 object-cover"
-                loading="lazy"
-                width={640}
-                height={512}
-              />
+              <img src={cat.image} alt={cat.title} className="w-full h-24 md:h-32 object-cover" loading="lazy" width={640} height={512} />
               <div className="p-4">
                 <h3 className="font-bold text-sm mb-2">{cat.title}</h3>
                 <ul className="space-y-1">
@@ -113,7 +64,6 @@ export const AudienceSection = () => {
           ))}
         </div>
 
-        {/* Bottom CTA */}
         <motion.div
           className="text-center mt-8 md:mt-10 p-4 md:p-6 bg-primary/5 border border-primary/10 rounded-2xl max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
@@ -121,16 +71,10 @@ export const AudienceSection = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <p className="font-bold text-lg mb-2">Prowadzisz salon którego tu nie ma?</p>
-          <p className="text-muted-foreground text-sm mb-4">
-            Jeśli masz klientów, terminy i usługi — Beauty Calendar jest dla Ciebie. Działa dla każdego salonu usługowego w Polsce.
-          </p>
-          <Button
-            variant="outline"
-            className="gap-2"
-            onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}
-          >
-            Sprawdź cennik →
+          <p className="font-bold text-lg mb-2">{t("landing.audience.notListed")}</p>
+          <p className="text-muted-foreground text-sm mb-4">{t("landing.audience.notListedDesc")}</p>
+          <Button variant="outline" className="gap-2" onClick={() => document.getElementById("pricing")?.scrollIntoView({ behavior: "smooth" })}>
+            {t("landing.audience.checkPricing")}
           </Button>
         </motion.div>
       </div>

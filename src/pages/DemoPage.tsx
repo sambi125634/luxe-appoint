@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Menu, X, ChevronRight, Bell, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Menu, X, ChevronRight, Bell, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AdminSidebar, TabType } from "@/components/admin/AdminSidebar";
@@ -10,20 +10,16 @@ import { ClientsManagement } from "@/components/admin/ClientsManagement";
 import { ServicesManagement } from "@/components/admin/ServicesManagement";
 import { StaffManagement } from "@/components/admin/StaffManagement";
 import { WidgetsManagement } from "@/components/admin/widgets";
-
-
 import { SettingsModule } from "@/components/admin/settings";
 import { ConversationsModule } from "@/components/admin/conversations";
 import { PipelineModule } from "@/components/admin/pipeline";
 import { AccountingModule } from "@/components/admin/accounting";
 import { ProductsModule } from "@/components/admin/products";
-
 import { SupportModule } from "@/components/admin/support";
 import { GuidedTour, useTourState } from "@/components/demo/GuidedTour";
 import { AutopilotStatusBar } from "@/components/admin/AutopilotStatusBar";
 import { RetentionDashboard } from "@/modules/retention";
 import { InventoryDashboard } from "@/modules/inventory";
-
 import { ConsultationModule } from "@/modules/consultation";
 import { ReferralEngine } from "@/modules/referral";
 import { AutopilotModule } from "@/components/admin/autopilot";
@@ -42,18 +38,17 @@ export default function DemoPage() {
       case "widgets": return t("admin.widgets");
       case "clients": return t("admin.clients");
       case "conversations": return t("admin.conversations");
-      case "pipeline": return "Ścieżka Klientki";
+      case "pipeline": return t("landing.demo.pipeline");
       case "accounting": return t("accounting.charts");
       case "products": return t("admin.products");
       case "staff": return t("admin.staff");
       case "services": return t("admin.services");
-      
       case "settings": return t("admin.settings");
-      case "retention": return "Retencja klientek";
-      case "consultation": return "Karty konsultacyjne";
-      case "referral": return "Polecenia & Opinie";
-      case "autopilot": return "AI Autopilot";
-      case "client-app": return "Aplikacja Klientki";
+      case "retention": return t("landing.demo.retention");
+      case "consultation": return t("landing.demo.consultation");
+      case "referral": return t("landing.demo.referral");
+      case "autopilot": return t("landing.demo.autopilot");
+      case "client-app": return t("landing.demo.clientApp");
       default: return "Dashboard";
     }
   };
@@ -109,7 +104,6 @@ export default function DemoPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Guided Tour */}
       {showTour && (
         <GuidedTour 
           onTabChange={setActiveTab} 
@@ -117,21 +111,19 @@ export default function DemoPage() {
         />
       )}
 
-      {/* Demo banner */}
       <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-2.5 px-4 text-center text-sm flex items-center justify-center gap-3 flex-wrap">
         <span className="flex items-center gap-2">
           <Sparkles className="w-4 h-4" />
-          <strong>Chcesz to u siebie?</strong> • Zacznij za darmo — 14 dni pełnego dostępu
+          <strong>{t("landing.demo.banner")}</strong> • {t("landing.demo.bannerSub")}
         </span>
         <a href="/#lead-form">
           <Button variant="secondary" size="sm" className="h-7 text-xs font-semibold">
-            Zapisz się za darmo
+            {t("landing.demo.bannerCta")}
           </Button>
         </a>
       </div>
 
       <div className="flex-1 flex">
-        {/* Mobile sidebar overlay */}
         {sidebarOpen && (
           <div 
             className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden"
@@ -139,7 +131,6 @@ export default function DemoPage() {
           />
         )}
 
-        {/* Sidebar */}
         <aside className={cn(
           "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border transition-transform duration-300 lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -152,9 +143,7 @@ export default function DemoPage() {
           />
         </aside>
 
-        {/* Main content */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Top bar */}
           <header className="h-16 border-b border-border bg-card/50 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
             <div className="flex items-center gap-4">
               <Button
@@ -189,7 +178,6 @@ export default function DemoPage() {
 
           <AutopilotStatusBar isDemo />
 
-          {/* Content */}
           <main className="flex-1 p-4 lg:p-6 overflow-auto">
             {renderContent()}
           </main>
