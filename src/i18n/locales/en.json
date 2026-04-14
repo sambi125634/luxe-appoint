@@ -2692,5 +2692,22 @@
       "autopilot": "AI Autopilot",
       "clientApp": "Client App"
     }
+  },
+  "demoAgent": {
+    "label": "AI Assistant",
+    "title": "Talk to our AI agent",
+    "description": "Click the button below to start a voice conversation with our intelligent assistant. Experience how AI can confirm appointments for your salon.",
+    "back": "Back",
+    "startCall": "Start conversation",
+    "endCall": "End conversation",
+    "tryAgain": "Try again",
+    "backToHome": "Back to homepage",
+    "statusIdle": "Ready to talk",
+    "statusConnecting": "Connecting...",
+    "statusAgentSpeaking": "Agent is speaking...",
+    "statusListening": "Listening...",
+    "statusEnded": "Conversation ended",
+    "statusError": "Connection error",
+    "errorOccurred": "Could not connect to agent. Please try again."
   }
 }

@@ -20,6 +20,7 @@ import StaffOnboardingPage from "./pages/StaffOnboardingPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ClientAuthPage from "./pages/ClientAuthPage";
 import NotFound from "./pages/NotFound";
+import DemoAgentPage from "./pages/DemoAgentPage";
 const queryClient = new QueryClient();
 
 const ADMIN_HOSTNAMES = ["admin.beauty-funnels.com"];
@@ -81,6 +82,7 @@ const App = () => {
             <Route path="/i/:slug" element={<InstagramLanding />} />
             <Route path="/join/:slug" element={<JoinSalonPage />} />
             <Route path="/install" element={<InstallPage />} />
+            <Route path="/demo-agent" element={<DemoAgentPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={adminMode ? <AuthPage /> : <NotFound />} />
