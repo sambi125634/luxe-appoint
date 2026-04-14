@@ -21,6 +21,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ClientAuthPage from "./pages/ClientAuthPage";
 import NotFound from "./pages/NotFound";
 import DemoAgentPage from "./pages/DemoAgentPage";
+import AdLandingPage from "./pages/AdLandingPage";
 const queryClient = new QueryClient();
 
 const ADMIN_HOSTNAMES = ["admin.beauty-funnels.com"];
