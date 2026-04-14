@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 
 type CallStatus = "idle" | "connecting" | "active" | "ended" | "error";
 
-const AGENT_ID = "agent_placeholder"; // Replace with actual Retell agent ID
+const AGENT_ID = "agent_97d146912ae36f5c916710204c";
 
 const DemoAgentPage = () => {
   const { t } = useTranslation();
