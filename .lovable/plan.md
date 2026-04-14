@@ -1,59 +1,49 @@
 
 
-# Plan: Strona /demo-agent z agentem głosowym Retell AI
+# Plan: Wizualny upgrade strony /demo-agent
 
 ## Cel
-Nowa strona `/demo-agent` z przyciskiem uruchamiającym rozmowę głosową z agentem Retell AI w przeglądarce (WebRTC, bez telefonu).
+Przekształcenie obecnej prostej strony z kartą i przyciskiem w immersyjne, premium doświadczenie — styl "Apple meets voice AI" z ciemnym tłem, animowanymi pierścieniami dźwięku i efektem glow.
 
-## Architektura
+## Zmiany wizualne
 
-```text
-Użytkownik klika "Porozmawiaj z agentem"
-        ↓
-Edge Function: create-retell-web-call
-  → POST https://api.retellai.com/v2/create-web-call
-  → zwraca access_token
-        ↓
-Frontend: RetellWebClient.startCall({ accessToken })
-  → rozmowa głosowa w przeglądarce
-```
+### Tło i atmosfera
+- Pełnoekranowe ciemne tło z gradientem radialnym (`#0F0A1A` → `#1E1B2E`) zamiast jasnego `#F5F3FA`
+- Subtelna animowana siatka (grid lines) w tle z niską opacitą — efekt "tech/futuristic"
+- Centralny glow: radial-gradient od `#3D2066/20` za głównym orbem
 
-## Wymagane dane od Ciebie
-- **RETELL_API_KEY** — klucz API z dashboardu Retell AI (zostanie zapisany jako secret)
-- **Agent ID** — ID agenta z Retell AI (będzie w kodzie edge function)
+### Centralny orb (zamiast małego avatara)
+- Duży orb (160px) z gradientem `#3D2066` → `#6B3FA0`, glassmorphism border
+- **Idle**: delikatna "oddychająca" animacja scale + 2 orbitujące pierścienie (conic-gradient) obracające się wokół orba
+- **Connecting**: przyspieszenie rotacji pierścieni + pulsujący glow
+- **Active speaking**: 3–4 koncentryczne fale dźwiękowe rozchodzące się od orba (scale + fade out), dynamiczny glow w kolorze `#6B3FA0`
+- **Active listening**: łagodne pulsowanie pierścieni + zmiana koloru glow na `#9B6B8A`
+- **Ended**: pierścienie zwalniają i gasną
 
-## Kroki implementacji
+### Typografia
+- Nagłówek większy: `text-4xl md:text-5xl`, font-weight 700, kolor biały, tracking-tight
+- Label "Demo AI Agent" z efektem gradient text (`#9B6B8A` → `#6B3FA0`)
+- Opis w `text-white/60`
 
-### 1. Zapisanie secretu RETELL_API_KEY
-Poproszę Cię o wklejenie klucza API z Retell AI.
+### Przycisk CTA
+- Większy, z animowanym border (gradient obracający się wokół przycisku — "rotating border" effect)
+- Hover: scale(1.02) + intensyfikacja glow
+- Ikona telefonu z animacją "ringing" (rotate wiggle) w stanie idle
 
-### 2. Edge Function `create-retell-web-call`
-- Przyjmuje `{ agent_id }` z frontendu
-- Wywołuje `POST https://api.retellai.com/v2/create-web-call` z API key
-- Zwraca `access_token` do frontendu
-- CORS headers, walidacja inputu
+### Stany UI
+- Status text z AnimatePresence (crossfade między stanami)
+- W stanie "ended": confetti-like particles lub subtelne "success" glow w zielonym
+- W stanie "error": czerwony glow zamiast fioletowego
 
-### 3. Instalacja `retell-client-js-sdk`
-Dodanie pakietu npm do projektu.
+### Dodatkowe elementy
+- 3 małe "feature pills" pod kartą: "Rozmowa w przeglądarce" · "Bez numeru telefonu" · "AI w czasie rzeczywistym" — fade-in z delay stagger
+- Floating particles/dots w tle (5-8 małych kropek, powolna animacja drift)
 
-### 4. Strona `/demo-agent` (nowy plik `src/pages/DemoAgentPage.tsx`)
-- Design premium zgodny z design system (bg `#F5F3FA`, karty, Plus Jakarta Sans)
-- Nagłówek + opis czym jest agent AI
-- Przycisk CTA "Porozmawiaj z agentem" → uruchamia rozmowę
-- Stany UI: idle → connecting → active (z animacją pulsujących fal) → ended
-- Przycisk "Zakończ rozmowę" w trakcie połączenia
-- Eventy: `call_started`, `call_ended`, `agent_start_talking`, `agent_stop_talking`, `error`
-- Framer-motion animacje (fade-in, pulse na aktywnym mikrofonie)
-- i18n (klucze PL + EN)
+## Pliki do zmiany
+1. **`src/pages/DemoAgentPage.tsx`** — pełny redesign wizualny (logika bez zmian)
 
-### 5. Routing
-Dodanie `<Route path="/demo-agent" element={<DemoAgentPage />} />` w `App.tsx`.
-
-### 6. Link w funnelu
-Opcjonalnie: dodanie przycisku/linku do `/demo-agent` po zakończeniu demo bookingu lub na landing page.
-
-## Co NIE zmieni się
-- Żadne istniejące komponenty nie będą modyfikowane (poza App.tsx — nowa trasa)
-- Brak zmian w bazie danych
-- Brak zmian w stylach globalnych
+## Co się NIE zmieni
+- Cała logika Retell (startCall, endCall, eventy) — bez zmian
+- Routing, i18n klucze — bez zmian
+- Edge function — bez zmian
 
