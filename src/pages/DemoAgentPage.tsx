@@ -2,7 +2,6 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, PhoneOff, Mic, Bot, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -13,6 +12,127 @@ type CallStatus = "idle" | "connecting" | "active" | "ended" | "error";
 
 const AGENT_ID = "agent_97d146912ae36f5c916710204c";
 
+/* ── Floating particles ── */
+const FloatingParticles = () => {
+  const particles = Array.from({ length: 7 }, (_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: 2 + Math.random() * 3,
+    duration: 12 + Math.random() * 8,
+    delay: Math.random() * 5,
+  }));
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((p) => (
+        <motion.div
+          key={p.id}
+          className="absolute rounded-full bg-[#6B3FA0]/20"
+          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
+          animate={{
+            y: [0, -30, 0, 20, 0],
+            x: [0, 15, -10, 5, 0],
+            opacity: [0.2, 0.5, 0.3, 0.6, 0.2],
+          }}
+          transition={{ duration: p.duration, repeat: Infinity, delay: p.delay, ease: "easeInOut" }}
+        />
+      ))}
+    </div>
+  );
+};
+
+/* ── Background grid ── */
+const AnimatedGrid = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.04]">
+    <div
+      className="absolute inset-0"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(107,63,160,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(107,63,160,0.5) 1px, transparent 1px)",
+        backgroundSize: "60px 60px",
+      }}
+    />
+  </div>
+);
+
+/* ── Sound waves ── */
+const SoundWaves = ({ speaking }: { speaking: boolean }) => (
+  <>
+    {[0, 1, 2, 3].map((i) => (
+      <motion.div
+        key={i}
+        className="absolute rounded-full border"
+        style={{
+          width: 160,
+          height: 160,
+          borderColor: speaking ? "rgba(107,63,160,0.3)" : "rgba(155,107,138,0.2)",
+        }}
+        animate={{
+          scale: [1, 2.2 + i * 0.3],
+          opacity: [0.6, 0],
+        }}
+        transition={{
+          duration: 1.8,
+          repeat: Infinity,
+          delay: i * 0.4,
+          ease: "easeOut",
+        }}
+      />
+    ))}
+  </>
+);
+
+/* ── Orbiting ring ── */
+const OrbitRing = ({ size, duration, reverse, color }: { size: number; duration: number; reverse?: boolean; color: string }) => (
+  <motion.div
+    className="absolute rounded-full"
+    style={{
+      width: size,
+      height: size,
+      border: `1px solid transparent`,
+      backgroundImage: `conic-gradient(from 0deg, transparent 0%, ${color} 30%, transparent 60%)`,
+      WebkitMaskImage: "radial-gradient(transparent 68%, black 70%, black 100%)",
+      maskImage: "radial-gradient(transparent 68%, black 70%, black 100%)",
+    }}
+    animate={{ rotate: reverse ? -360 : 360 }}
+    transition={{ duration, repeat: Infinity, ease: "linear" }}
+  />
+);
+
+/* ── Feature pills ── */
+const featurePills = [
+  { pl: "Rozmowa w przeglądarce", en: "Browser-based call" },
+  { pl: "Bez numeru telefonu", en: "No phone number needed" },
+  { pl: "AI w czasie rzeczywistym", en: "Real-time AI" },
+];
+
+const FeaturePills = () => {
+  const { i18n } = useTranslation();
+  const isPl = i18n.language?.startsWith("pl");
+
+  return (
+    <motion.div
+      className="flex flex-wrap justify-center gap-3 mt-10"
+      initial="hidden"
+      animate="visible"
+      variants={{ visible: { transition: { staggerChildren: 0.15, delayChildren: 0.8 } } }}
+    >
+      {featurePills.map((pill, i) => (
+        <motion.span
+          key={i}
+          className="text-xs font-medium text-white/50 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-sm"
+          variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+          transition={{ duration: 0.5 }}
+        >
+          {isPl ? pill.pl : pill.en}
+        </motion.span>
+      ))}
+    </motion.div>
+  );
+};
+
+/* ── Main page ── */
 const DemoAgentPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -28,19 +148,15 @@ const DemoAgentPage = () => {
 
   const startCall = useCallback(async () => {
     setCallStatus("connecting");
-
     try {
       const { data, error } = await supabase.functions.invoke("create-retell-web-call", {
         body: { agent_id: AGENT_ID },
       });
-
       if (error || !data?.access_token) {
         throw new Error(error?.message || "Brak access_token");
       }
-
       const client = new RetellWebClient();
       retellClientRef.current = client;
-
       client.on("call_started", () => setCallStatus("active"));
       client.on("call_ended", () => setCallStatus("ended"));
       client.on("agent_start_talking", () => setAgentSpeaking(true));
@@ -50,7 +166,6 @@ const DemoAgentPage = () => {
         setCallStatus("error");
         toast.error(t("demoAgent.errorOccurred"));
       });
-
       await client.startCall({ accessToken: data.access_token });
     } catch (err) {
       console.error("Start call error:", err);
@@ -69,136 +184,241 @@ const DemoAgentPage = () => {
     setAgentSpeaking(false);
   }, []);
 
+  const isActive = callStatus === "active";
+  const glowColor =
+    callStatus === "error"
+      ? "rgba(217,79,61,0.25)"
+      : isActive && agentSpeaking
+        ? "rgba(107,63,160,0.35)"
+        : isActive
+          ? "rgba(155,107,138,0.25)"
+          : callStatus === "ended"
+            ? "rgba(16,185,129,0.2)"
+            : "rgba(61,32,102,0.15)";
+
   return (
-    <div className="min-h-screen bg-[#F5F3FA] flex flex-col items-center justify-center px-4 py-12">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden"
+      style={{ background: "linear-gradient(180deg, #0F0A1A 0%, #1E1B2E 100%)" }}
+    >
+      <AnimatedGrid />
+      <FloatingParticles />
+
+      {/* Central glow */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          width: 600,
+          height: 600,
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
+          transition: "background 0.8s ease",
+        }}
+      />
+
       {/* Back button */}
       <motion.div
-        className="absolute top-6 left-6"
+        className="absolute top-6 left-6 z-20"
         initial={{ opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 text-[#5A5770]">
+        <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 text-white/50 hover:text-white/80 hover:bg-white/5">
           <ArrowLeft className="w-4 h-4" />
           {t("demoAgent.back")}
         </Button>
       </motion.div>
 
+      {/* Header */}
       <motion.div
-        className="text-center mb-8 max-w-xl"
+        className="text-center mb-12 max-w-xl relative z-10"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        <span className="text-[#9B6B8A] uppercase tracking-widest text-sm font-semibold mb-3 block">
+        <span
+          className="uppercase tracking-[0.2em] text-sm font-semibold mb-4 block"
+          style={{
+            backgroundImage: "linear-gradient(135deg, #9B6B8A, #6B3FA0)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
           {t("demoAgent.label")}
         </span>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#1E1B2E] tracking-tight mb-3">
+        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 leading-[1.1]">
           {t("demoAgent.title")}
         </h1>
-        <p className="text-[#5A5770] text-base leading-relaxed">
+        <p className="text-white/50 text-base leading-relaxed max-w-md mx-auto">
           {t("demoAgent.description")}
         </p>
       </motion.div>
 
+      {/* Orb area */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+        className="relative z-10 flex flex-col items-center"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.2 }}
       >
-        <Card className="w-full max-w-md rounded-[16px] border border-[#E8E4F0] shadow-md bg-white">
-          <CardContent className="p-8 flex flex-col items-center gap-6">
-            {/* Avatar / visualizer */}
-            <div className="relative flex items-center justify-center">
-              <AnimatePresence mode="wait">
-                {callStatus === "active" && agentSpeaking ? (
-                  <motion.div
-                    key="speaking"
-                    className="absolute w-28 h-28 rounded-full bg-[#3D2066]/10"
-                    animate={{ scale: [1, 1.3, 1] }}
-                    transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                ) : callStatus === "active" ? (
-                  <motion.div
-                    key="listening"
-                    className="absolute w-28 h-28 rounded-full bg-[#9B6B8A]/10"
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                ) : null}
-              </AnimatePresence>
+        {/* Orbiting rings */}
+        <div className="relative flex items-center justify-center" style={{ width: 240, height: 240 }}>
+          <OrbitRing
+            size={220}
+            duration={callStatus === "connecting" ? 3 : 8}
+            color="rgba(107,63,160,0.4)"
+          />
+          <OrbitRing
+            size={200}
+            duration={callStatus === "connecting" ? 4 : 12}
+            reverse
+            color="rgba(155,107,138,0.3)"
+          />
 
-              <div className="relative z-10 w-20 h-20 rounded-full bg-gradient-to-br from-[#3D2066] to-[#6B3FA0] flex items-center justify-center shadow-lg">
-                {callStatus === "active" ? (
-                  <Mic className="w-8 h-8 text-white" />
-                ) : (
-                  <Bot className="w-8 h-8 text-white" />
-                )}
-              </div>
+          {/* Sound waves (active only) */}
+          {isActive && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <SoundWaves speaking={agentSpeaking} />
             </div>
+          )}
 
-            {/* Status text */}
-            <p className="text-sm font-medium text-[#5A5770]">
+          {/* Main orb */}
+          <motion.div
+            className="absolute rounded-full flex items-center justify-center"
+            style={{
+              width: 160,
+              height: 160,
+              background: "linear-gradient(135deg, #3D2066, #6B3FA0)",
+              boxShadow: `0 0 60px ${glowColor}, inset 0 1px 1px rgba(255,255,255,0.1)`,
+              border: "1px solid rgba(255,255,255,0.1)",
+              transition: "box-shadow 0.8s ease",
+            }}
+            animate={
+              callStatus === "idle"
+                ? { scale: [1, 1.04, 1] }
+                : callStatus === "connecting"
+                  ? { scale: [1, 1.08, 1] }
+                  : isActive && agentSpeaking
+                    ? { scale: [1, 1.06, 1] }
+                    : isActive
+                      ? { scale: [1, 1.02, 1] }
+                      : {}
+            }
+            transition={{
+              duration: callStatus === "connecting" ? 0.8 : 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          >
+            {isActive ? (
+              <Mic className="w-10 h-10 text-white/90" />
+            ) : (
+              <Bot className="w-10 h-10 text-white/90" />
+            )}
+          </motion.div>
+        </div>
+
+        {/* Status text */}
+        <div className="h-8 mt-6 flex items-center justify-center">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={callStatus + (agentSpeaking ? "s" : "l")}
+              className="text-sm font-medium text-white/60"
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.3 }}
+            >
               {callStatus === "idle" && t("demoAgent.statusIdle")}
               {callStatus === "connecting" && t("demoAgent.statusConnecting")}
               {callStatus === "active" && (agentSpeaking ? t("demoAgent.statusAgentSpeaking") : t("demoAgent.statusListening"))}
               {callStatus === "ended" && t("demoAgent.statusEnded")}
               {callStatus === "error" && t("demoAgent.statusError")}
-            </p>
+            </motion.p>
+          </AnimatePresence>
+        </div>
 
-            {/* Action buttons */}
+        {/* Action buttons */}
+        <div className="mt-8 w-full max-w-xs">
+          <AnimatePresence mode="wait">
             {callStatus === "idle" && (
-              <Button
-                onClick={startCall}
-                className="w-full bg-gradient-to-r from-[#3D2066] to-[#6B3FA0] text-white rounded-[12px] px-8 py-4 font-semibold text-base hover:opacity-90 transition-opacity"
-                size="lg"
-              >
-                <Phone className="w-5 h-5 mr-2" />
-                {t("demoAgent.startCall")}
-              </Button>
+              <motion.div key="idle-btn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                {/* Rotating border wrapper */}
+                <div className="relative group rounded-[14px] p-[2px] overflow-hidden">
+                  <div
+                    className="absolute inset-0 animate-spin"
+                    style={{
+                      background: "conic-gradient(from 0deg, #3D2066, #6B3FA0, #9B6B8A, #6B3FA0, #3D2066)",
+                      animationDuration: "4s",
+                    }}
+                  />
+                  <Button
+                    onClick={startCall}
+                    className="relative w-full bg-[#3D2066] text-white rounded-[12px] px-8 py-5 font-semibold text-base hover:bg-[#4E2A85] transition-all z-10"
+                    size="lg"
+                  >
+                    <motion.span
+                      className="inline-flex mr-2"
+                      animate={{ rotate: [0, -10, 10, -10, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                    >
+                      <Phone className="w-5 h-5" />
+                    </motion.span>
+                    {t("demoAgent.startCall")}
+                  </Button>
+                </div>
+              </motion.div>
             )}
 
             {callStatus === "connecting" && (
-              <Button disabled className="w-full rounded-[12px] px-8 py-4" size="lg">
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                {t("demoAgent.statusConnecting")}
-              </Button>
+              <motion.div key="connect-btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <Button disabled className="w-full rounded-[12px] px-8 py-5 bg-white/10 text-white/60 border-0" size="lg">
+                  <div className="w-5 h-5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin mr-2" />
+                  {t("demoAgent.statusConnecting")}
+                </Button>
+              </motion.div>
             )}
 
             {callStatus === "active" && (
-              <Button
-                onClick={endCall}
-                variant="destructive"
-                className="w-full rounded-[12px] px-8 py-4 font-semibold text-base"
-                size="lg"
-              >
-                <PhoneOff className="w-5 h-5 mr-2" />
-                {t("demoAgent.endCall")}
-              </Button>
+              <motion.div key="active-btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <Button
+                  onClick={endCall}
+                  className="w-full rounded-[12px] px-8 py-5 font-semibold text-base bg-[#D94F3D] hover:bg-[#c4402f] text-white border-0"
+                  size="lg"
+                >
+                  <PhoneOff className="w-5 h-5 mr-2" />
+                  {t("demoAgent.endCall")}
+                </Button>
+              </motion.div>
             )}
 
             {(callStatus === "ended" || callStatus === "error") && (
-              <div className="flex flex-col gap-3 w-full">
+              <motion.div key="end-btns" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col gap-3">
                 <Button
                   onClick={resetCall}
-                  className="w-full bg-gradient-to-r from-[#3D2066] to-[#6B3FA0] text-white rounded-[12px] px-8 py-4 font-semibold"
+                  className="w-full bg-gradient-to-r from-[#3D2066] to-[#6B3FA0] text-white rounded-[12px] px-8 py-5 font-semibold border-0"
                   size="lg"
                 >
                   <Phone className="w-5 h-5 mr-2" />
                   {t("demoAgent.tryAgain")}
                 </Button>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   onClick={() => navigate("/")}
-                  className="w-full rounded-[12px]"
+                  className="w-full rounded-[12px] text-white/50 hover:text-white/80 hover:bg-white/5"
                 >
                   {t("demoAgent.backToHome")}
                 </Button>
-              </div>
+              </motion.div>
             )}
-          </CardContent>
-        </Card>
+          </AnimatePresence>
+        </div>
       </motion.div>
+
+      {/* Feature pills */}
+      <FeaturePills />
     </div>
   );
 };
