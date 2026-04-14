@@ -2691,6 +2691,18 @@
       "referral": "Referrals & Reviews",
       "autopilot": "AI Autopilot",
       "clientApp": "Client App"
+    },
+    "adLanding": {
+      "label": "Next-gen booking experience",
+      "headline1": "This is the future of",
+      "headline2": "online booking",
+      "subtitle": "Try the widget below and see how your clients will book appointments — with animations, video, and a mobile-app experience.",
+      "iframeTitle": "Demo booking widget",
+      "ctaInfo": "After booking, talk to our AI agent — exactly how it would call your client after scheduling an appointment.",
+      "ctaButton": "Talk to AI agent",
+      "pill1": "In-browser",
+      "pill2": "No installation",
+      "pill3": "Real-time AI"
     }
   },
   "demoAgent": {
@@ -2709,17 +2721,5 @@
     "statusEnded": "Conversation ended",
     "statusError": "Connection error",
     "errorOccurred": "Could not connect to agent. Please try again."
-  },
-  "adLanding": {
-    "label": "Next-gen booking experience",
-    "headline1": "This is the future of",
-    "headline2": "online booking",
-    "subtitle": "Try the widget below and see how your clients will book appointments — with animations, video, and a mobile-app experience.",
-    "iframeTitle": "Demo booking widget",
-    "ctaInfo": "After booking, talk to our AI agent — exactly how it would call your client after scheduling an appointment.",
-    "ctaButton": "Talk to AI agent",
-    "pill1": "In-browser",
-    "pill2": "No installation",
-    "pill3": "Real-time AI"
   }
 }
