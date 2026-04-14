@@ -83,6 +83,7 @@ const App = () => {
             <Route path="/join/:slug" element={<JoinSalonPage />} />
             <Route path="/install" element={<InstallPage />} />
             <Route path="/demo-agent" element={<DemoAgentPage />} />
+            <Route path="/ad" element={<AdLandingPage />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={adminMode ? <AuthPage /> : <NotFound />} />
