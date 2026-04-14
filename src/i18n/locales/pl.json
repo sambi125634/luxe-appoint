@@ -2709,5 +2709,17 @@
     "statusEnded": "Rozmowa zakończona",
     "statusError": "Wystąpił błąd połączenia",
     "errorOccurred": "Nie udało się połączyć z agentem. Spróbuj ponownie."
+  },
+  "adLanding": {
+    "label": "Rezerwacja nowej generacji",
+    "headline1": "Tak wygląda przyszłość",
+    "headline2": "rezerwacji online",
+    "subtitle": "Przeklikaj widget poniżej i zobacz, jak Twoje klientki będą umawiać się na wizyty — z animacjami, wideo i doświadczeniem aplikacji mobilnej.",
+    "iframeTitle": "Widget rezerwacji demo",
+    "ctaInfo": "Po rezerwacji porozmawiaj z naszym agentem AI — dokładnie tak, jak zadzwoniłby do Twojej klientki po umówieniu wizyty.",
+    "ctaButton": "Porozmawiaj z agentem AI",
+    "pill1": "W przeglądarce",
+    "pill2": "Bez instalacji",
+    "pill3": "AI w czasie rzeczywistym"
   }
 }
