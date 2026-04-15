@@ -1,48 +1,32 @@
 
 
-# Plan: Trzy wizualne stany agenta AI z unikalnymi kolorami i kształtem fal
+# Plan: Większy widget + więcej animacji tła na /ad
 
-## Cel
-Rozróżnić wizualnie 3 stany rozmowy z agentem: **Słucha** (listening), **Przetwarza** (connecting/thinking), **Mówi** (speaking) — każdy z inną paletą kolorów, dynamiką fal i kształtem, zachowując kolorystykę brandu.
+## 1. Większy widget — nowe rozmiary
 
-## Paleta kolorów per stan
+Obecne rozmiary phone frame są za małe (240px mobile, 280px tablet, 300px desktop). Zwiększam znacząco:
 
-```text
-┌─────────────────┬────────────────────────────────┬──────────────┐
-│ Stan            │ Kolory fal                     │ Efekt        │
-├─────────────────┼────────────────────────────────┼──────────────┤
-│ Słucha          │ #9B6B8A → #B87D5E (Mauve→Bronze)│ Spokojne,    │
-│ (listening)     │ ciepłe, miękkie fale            │ wolne pulsy  │
-├─────────────────┼────────────────────────────────┼──────────────┤
-│ Przetwarza      │ #6B3FA0 → #3D2066 (Violet)     │ Rotujące,    │
-│ (processing)    │ + subtle shimmer                │ geometryczne │
-├─────────────────┼────────────────────────────────┼──────────────┤
-│ Mówi            │ #3D2066 → #9B6B8A → #10B981    │ Energetyczne,│
-│ (speaking)      │ (Deep Purple→Mauve→Success)     │ duża amplit. │
-└─────────────────┴────────────────────────────────┴──────────────┘
-```
+| Breakpoint | Obecny | Nowy |
+|---|---|---|
+| Mobile (<768px) | 240px | **320px** |
+| Tablet (768px+) | 280px | **360px** |
+| Desktop (1024px+) | 300px | **400px** |
 
-## Zmiany w kodzie
+Zmiana `max-w` sceny z `480px/680px/800px` na `520px/740px/900px` aby pomieścić większy phone + floating cards.
 
-### 1. `VoiceWaves.tsx` — pełna przebudowa
+Rounded na phone frame zmniejszę proporcjonalnie (z 44px na 40px) żeby nie wyglądał jak balon.
 
-- **Nowy prop**: `agentState: "idle" | "listening" | "processing" | "speaking"` zamiast osobnych booleanów
-- **3 unikalne profile fal**:
-  - **Listening**: 4 fale, niska amplituda (2-4px), wolna prędkość, kształt bliższy kołu, ciepłe tony mauve/bronze, delikatne wypełnienie wewnętrznych pierścieni
-  - **Processing**: 6 fal, średnia amplituda, szybka rotacja (efekt "myślenia"), ostre kształty (wyższa częstotliwość sinusa), violet z shimmerem — co 3. fala lekko jaśniejsza, pulsujący glow centralny
-  - **Speaking**: 5 fal, duża amplituda (10-20px), zmienna prędkość zsynchronizowana z energią, gradient purple→mauve→emerald na zewnętrznych falach, grubsze linie (2.5px), intensywny radialny glow w centrum
-- **Płynne przejścia**: Interpolacja kolorów i amplitud przez `lerp` z targetem per stan (nie instant switch)
-- **Ulepszony kształt**: Dodanie 3. harmonicznej sinusa dla bardziej organicznego, imponującego kształtu fal
-- **Center glow**: Inny kolor radialnego gradientu per stan
+## 2. Animacje tła — więcej i widoczne na mobile
 
-### 2. `DemoAgentPage.tsx` — adaptacja propsów
+Obecne 3 statyczne radial-gradienty są zbyt subtelne. Zamieniam na:
 
-- Zamiana `speaking={agentSpeaking} active={isActive} connecting={...}` na pojedynczy `agentState`
-- Mapowanie: `connecting` → `"processing"`, `active && speaking` → `"speaking"`, `active && !speaking` → `"listening"`, else → `"idle"`
-- Aktualizacja `glowColor` tła strony aby odpowiadał nowej palecie per stan
-- Aktualizacja koloru/gradientu centralnej ikony mikrofonu per stan
+- **5-6 animated gradient orbs** z `framer-motion` (powolny ruch x/y, looping)
+- Zwiększona opacity (0.09→0.14 violet, 0.07→0.12 pink, dodatkowe orbs gold/teal)
+- **Żadnego `hidden md:block`** — wszystkie animacje widoczne na mobile
+- Dodanie subtynelnego `animate-pulse` z różnymi `duration` (8s, 12s, 15s) dla organicznego ruchu
+- Dodatkowy orb centralny za phone frame (glow effect wzmocniony)
 
-### Pliki do edycji
-1. `src/components/demo-agent/VoiceWaves.tsx`
-2. `src/pages/DemoAgentPage.tsx`
+## Pliki do edycji
+
+1. **`src/pages/AdLandingPage.tsx`** — nowe rozmiary phone, animowane tło z motion divami
 
