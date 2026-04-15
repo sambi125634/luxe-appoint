@@ -1,63 +1,48 @@
 
 
-# Plan: Landing page reklamowy `/ad` z widgetem rezerwacji + przekierowanie do agenta AI
+# Plan: Trzy wizualne stany agenta AI z unikalnymi kolorami i kształtem fal
 
 ## Cel
-Dedykowany landing page pod ruch z reklam. Przekaz: "Zobacz jak wygląda rewolucyjna rezerwacja online" → użytkownik przeklika widget demo → po zakończeniu rezerwacji zostaje przekierowany na `/demo-agent` aby porozmawiać z agentem AI.
+Rozróżnić wizualnie 3 stany rozmowy z agentem: **Słucha** (listening), **Przetwarza** (connecting/thinking), **Mówi** (speaking) — każdy z inną paletą kolorów, dynamiką fal i kształtem, zachowując kolorystykę brandu.
 
-## Struktura strony
+## Paleta kolorów per stan
 
 ```text
-┌─────────────────────────────────────┐
-│  Headline + subheadline             │
-│  (krótki, chwytliwy, 2-3 linijki)  │
-├─────────────────────────────────────┤
-│                                     │
-│   Duży widget rezerwacji (iframe)   │
-│   /s/demo-salon                     │
-│   ~70vh, wycentrowany              │
-│   w ramce iPhone z glow            │
-│                                     │
-├─────────────────────────────────────┤
-│  Info: "Po rezerwacji zadzwoni AI"  │
-│  + 2-3 feature pills               │
-│  + CTA backup → /demo-agent        │
-└─────────────────────────────────────┘
+┌─────────────────┬────────────────────────────────┬──────────────┐
+│ Stan            │ Kolory fal                     │ Efekt        │
+├─────────────────┼────────────────────────────────┼──────────────┤
+│ Słucha          │ #9B6B8A → #B87D5E (Mauve→Bronze)│ Spokojne,    │
+│ (listening)     │ ciepłe, miękkie fale            │ wolne pulsy  │
+├─────────────────┼────────────────────────────────┼──────────────┤
+│ Przetwarza      │ #6B3FA0 → #3D2066 (Violet)     │ Rotujące,    │
+│ (processing)    │ + subtle shimmer                │ geometryczne │
+├─────────────────┼────────────────────────────────┼──────────────┤
+│ Mówi            │ #3D2066 → #9B6B8A → #10B981    │ Energetyczne,│
+│ (speaking)      │ (Deep Purple→Mauve→Success)     │ duża amplit. │
+└─────────────────┴────────────────────────────────┴──────────────┘
 ```
 
-## Kluczowe elementy
+## Zmiany w kodzie
 
-### 1. Nagłówek
-- Krótki, bold, serif (Cormorant Garamond-style)
-- Np. "Tak wygląda przyszłość rezerwacji online"
-- Podtytuł: zachęta do przeklikania widgetu
-- i18n: klucze `landing.adLanding.*` w pl.json + en.json
+### 1. `VoiceWaves.tsx` — pełna przebudowa
 
-### 2. Widget rezerwacji
-- Iframe `/s/demo-salon` — ten sam co na głównym landing page
-- Duży rozmiar: ~70vh wysokości, bez ramki iPhone (lub z nią — ale większy niż na głównej stronie)
-- Wycentrowany, z subtlenym glow w tle
+- **Nowy prop**: `agentState: "idle" | "listening" | "processing" | "speaking"` zamiast osobnych booleanów
+- **3 unikalne profile fal**:
+  - **Listening**: 4 fale, niska amplituda (2-4px), wolna prędkość, kształt bliższy kołu, ciepłe tony mauve/bronze, delikatne wypełnienie wewnętrznych pierścieni
+  - **Processing**: 6 fal, średnia amplituda, szybka rotacja (efekt "myślenia"), ostre kształty (wyższa częstotliwość sinusa), violet z shimmerem — co 3. fala lekko jaśniejsza, pulsujący glow centralny
+  - **Speaking**: 5 fal, duża amplituda (10-20px), zmienna prędkość zsynchronizowana z energią, gradient purple→mauve→emerald na zewnętrznych falach, grubsze linie (2.5px), intensywny radialny glow w centrum
+- **Płynne przejścia**: Interpolacja kolorów i amplitud przez `lerp` z targetem per stan (nie instant switch)
+- **Ulepszony kształt**: Dodanie 3. harmonicznej sinusa dla bardziej organicznego, imponującego kształtu fal
+- **Center glow**: Inny kolor radialnego gradientu per stan
 
-### 3. Przekierowanie po rezerwacji
-- Po zakończeniu bookingu w widżecie, użytkownik zobaczy info "Teraz porozmawiaj z naszym AI" + przycisk prowadzący na `/demo-agent`
-- Alternatywnie: CTA "Porozmawiaj z agentem" widoczny pod widgetem od razu
+### 2. `DemoAgentPage.tsx` — adaptacja propsów
 
-### 4. Tło i styl
-- Ciemne tło (czarne/deep purple) — jak sekcja InteractivePhoneMockup
-- Minimalistyczny layout — zero rozpraszaczy, focus na widget
-- Framer-motion fade-in animations
+- Zamiana `speaking={agentSpeaking} active={isActive} connecting={...}` na pojedynczy `agentState`
+- Mapowanie: `connecting` → `"processing"`, `active && speaking` → `"speaking"`, `active && !speaking` → `"listening"`, else → `"idle"`
+- Aktualizacja `glowColor` tła strony aby odpowiadał nowej palecie per stan
+- Aktualizacja koloru/gradientu centralnej ikony mikrofonu per stan
 
-## Pliki do utworzenia/zmiany
-
-1. **`src/pages/AdLandingPage.tsx`** — nowa strona
-2. **`src/App.tsx`** — dodanie trasy `/ad`
-3. **`src/i18n/locales/pl.json`** — klucze `landing.adLanding`
-4. **`src/i18n/locales/en.json`** — klucze `landing.adLanding`
-
-## Pytanie do Ciebie
-
-Muszę doprecyzować jedną rzecz przed implementacją:
-
-- Czy widget ma być wyświetlony w ramce telefonu (jak na głównym LP) czy bez ramki, bezpośrednio jako duży element na stronie?
-- Czy pod widgetem ma być od razu przycisk "Porozmawiaj z AI" czy dopiero po zakończeniu rezerwacji?
+### Pliki do edycji
+1. `src/components/demo-agent/VoiceWaves.tsx`
+2. `src/pages/DemoAgentPage.tsx`
 
