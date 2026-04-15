@@ -247,11 +247,7 @@ const DemoAgentPage = () => {
       >
         {/* Voice Waves */}
         <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
-          <VoiceWaves
-            speaking={agentSpeaking}
-            active={isActive}
-            connecting={callStatus === "connecting"}
-          />
+          <VoiceWaves agentState={agentState} />
 
           {/* Center icon overlay */}
           <motion.div
