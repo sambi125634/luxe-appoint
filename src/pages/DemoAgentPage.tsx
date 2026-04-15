@@ -97,12 +97,23 @@ const DemoAgentPage = () => {
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const retellClientRef = useRef<RetellWebClient | null>(null);
+  const calculatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
       retellClientRef.current?.stopCall();
     };
   }, []);
+
+  // Auto-scroll to calculator when call ends
+  useEffect(() => {
+    if (callStatus === "ended") {
+      const timer = setTimeout(() => {
+        calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [callStatus]);
 
   const startCall = useCallback(async () => {
     setCallStatus("connecting");
@@ -361,7 +372,9 @@ const DemoAgentPage = () => {
       </div>
 
       {/* Savings Calculator */}
-      <SavingsCalculator />
+      <div ref={calculatorRef}>
+        <SavingsCalculator />
+      </div>
 
       {/* Bottom padding */}
       <div className="h-16" />
