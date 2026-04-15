@@ -1,12 +1,14 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, PhoneOff, Mic, Bot, ArrowLeft } from "lucide-react";
+import { Phone, PhoneOff, Mic, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { RetellWebClient } from "retell-client-js-sdk";
 import { useTranslation } from "react-i18next";
+import VoiceWaves from "@/components/demo-agent/VoiceWaves";
+import SavingsCalculator from "@/components/demo-agent/SavingsCalculator";
 
 type CallStatus = "idle" | "connecting" | "active" | "ended" | "error";
 
@@ -54,50 +56,6 @@ const AnimatedGrid = () => (
       }}
     />
   </div>
-);
-
-/* ── Sound waves ── */
-const SoundWaves = ({ speaking }: { speaking: boolean }) => (
-  <>
-    {[0, 1, 2, 3].map((i) => (
-      <motion.div
-        key={i}
-        className="absolute rounded-full border"
-        style={{
-          width: 160,
-          height: 160,
-          borderColor: speaking ? "rgba(107,63,160,0.3)" : "rgba(155,107,138,0.2)",
-        }}
-        animate={{
-          scale: [1, 2.2 + i * 0.3],
-          opacity: [0.6, 0],
-        }}
-        transition={{
-          duration: 1.8,
-          repeat: Infinity,
-          delay: i * 0.4,
-          ease: "easeOut",
-        }}
-      />
-    ))}
-  </>
-);
-
-/* ── Orbiting ring ── */
-const OrbitRing = ({ size, duration, reverse, color }: { size: number; duration: number; reverse?: boolean; color: string }) => (
-  <motion.div
-    className="absolute rounded-full"
-    style={{
-      width: size,
-      height: size,
-      border: `1px solid transparent`,
-      backgroundImage: `conic-gradient(from 0deg, transparent 0%, ${color} 30%, transparent 60%)`,
-      WebkitMaskImage: "radial-gradient(transparent 68%, black 70%, black 100%)",
-      maskImage: "radial-gradient(transparent 68%, black 70%, black 100%)",
-    }}
-    animate={{ rotate: reverse ? -360 : 360 }}
-    transition={{ duration, repeat: Infinity, ease: "linear" }}
-  />
 );
 
 /* ── Feature pills ── */
@@ -198,8 +156,8 @@ const DemoAgentPage = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #0F0A1A 0%, #1E1B2E 100%)" }}
+      className="min-h-screen flex flex-col items-center px-4 py-12 relative overflow-hidden"
+      style={{ background: "linear-gradient(180deg, #0F0A1A 0%, #1E1B2E 50%, #08080d 100%)" }}
     >
       <AnimatedGrid />
       <FloatingParticles />
@@ -210,7 +168,7 @@ const DemoAgentPage = () => {
         style={{
           width: 600,
           height: 600,
-          top: "50%",
+          top: "30%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           background: `radial-gradient(circle, ${glowColor} 0%, transparent 70%)`,
@@ -233,7 +191,7 @@ const DemoAgentPage = () => {
 
       {/* Header */}
       <motion.div
-        className="text-center mb-12 max-w-xl relative z-10"
+        className="text-center mb-8 max-w-xl relative z-10 mt-8"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -256,72 +214,50 @@ const DemoAgentPage = () => {
         </p>
       </motion.div>
 
-      {/* Orb area */}
+      {/* Wave + controls area */}
       <motion.div
         className="relative z-10 flex flex-col items-center"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.7, delay: 0.2 }}
       >
-        {/* Orbiting rings */}
-        <div className="relative flex items-center justify-center" style={{ width: 240, height: 240 }}>
-          <OrbitRing
-            size={220}
-            duration={callStatus === "connecting" ? 3 : 8}
-            color="rgba(107,63,160,0.4)"
-          />
-          <OrbitRing
-            size={200}
-            duration={callStatus === "connecting" ? 4 : 12}
-            reverse
-            color="rgba(155,107,138,0.3)"
+        {/* Voice Waves */}
+        <div className="relative flex items-center justify-center" style={{ width: 280, height: 280 }}>
+          <VoiceWaves
+            speaking={agentSpeaking}
+            active={isActive}
+            connecting={callStatus === "connecting"}
           />
 
-          {/* Sound waves (active only) */}
-          {isActive && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <SoundWaves speaking={agentSpeaking} />
-            </div>
-          )}
-
-          {/* Main orb */}
+          {/* Center icon overlay */}
           <motion.div
             className="absolute rounded-full flex items-center justify-center"
             style={{
-              width: 160,
-              height: 160,
-              background: "linear-gradient(135deg, #3D2066, #6B3FA0)",
-              boxShadow: `0 0 60px ${glowColor}, inset 0 1px 1px rgba(255,255,255,0.1)`,
+              width: 80,
+              height: 80,
+              background: "linear-gradient(135deg, rgba(61,32,102,0.8), rgba(107,63,160,0.8))",
+              backdropFilter: "blur(8px)",
               border: "1px solid rgba(255,255,255,0.1)",
-              transition: "box-shadow 0.8s ease",
             }}
             animate={
-              callStatus === "idle"
-                ? { scale: [1, 1.04, 1] }
-                : callStatus === "connecting"
-                  ? { scale: [1, 1.08, 1] }
-                  : isActive && agentSpeaking
-                    ? { scale: [1, 1.06, 1] }
-                    : isActive
-                      ? { scale: [1, 1.02, 1] }
-                      : {}
+              callStatus === "connecting"
+                ? { scale: [1, 1.08, 1] }
+                : isActive && agentSpeaking
+                  ? { scale: [1, 1.1, 1] }
+                  : { scale: [1, 1.03, 1] }
             }
             transition={{
-              duration: callStatus === "connecting" ? 0.8 : 2.5,
+              duration: callStatus === "connecting" ? 0.8 : isActive && agentSpeaking ? 1.2 : 3,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           >
-            {isActive ? (
-              <Mic className="w-10 h-10 text-white/90" />
-            ) : (
-              <Bot className="w-10 h-10 text-white/90" />
-            )}
+            <Mic className="w-7 h-7 text-white/90" />
           </motion.div>
         </div>
 
         {/* Status text */}
-        <div className="h-8 mt-6 flex items-center justify-center">
+        <div className="h-8 mt-4 flex items-center justify-center">
           <AnimatePresence mode="wait">
             <motion.p
               key={callStatus + (agentSpeaking ? "s" : "l")}
@@ -341,11 +277,10 @@ const DemoAgentPage = () => {
         </div>
 
         {/* Action buttons */}
-        <div className="mt-8 w-full max-w-xs">
+        <div className="mt-6 w-full max-w-xs">
           <AnimatePresence mode="wait">
             {callStatus === "idle" && (
               <motion.div key="idle-btn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-                {/* Rotating border wrapper */}
                 <div className="relative group rounded-[14px] p-[2px] overflow-hidden">
                   <div
                     className="absolute inset-0 animate-spin"
@@ -419,6 +354,17 @@ const DemoAgentPage = () => {
 
       {/* Feature pills */}
       <FeaturePills />
+
+      {/* Separator */}
+      <div className="w-full max-w-[680px] mx-auto mt-20 mb-16 relative z-10">
+        <div className="h-px bg-gradient-to-r from-transparent via-[rgba(192,132,252,0.2)] to-transparent" />
+      </div>
+
+      {/* Savings Calculator */}
+      <SavingsCalculator />
+
+      {/* Bottom padding */}
+      <div className="h-16" />
     </div>
   );
 };
