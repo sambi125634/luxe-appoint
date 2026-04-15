@@ -97,6 +97,7 @@ const DemoAgentPage = () => {
   const [callStatus, setCallStatus] = useState<CallStatus>("idle");
   const [agentSpeaking, setAgentSpeaking] = useState(false);
   const retellClientRef = useRef<RetellWebClient | null>(null);
+  const calculatorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
