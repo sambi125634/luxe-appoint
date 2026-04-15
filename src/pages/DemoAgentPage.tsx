@@ -255,19 +255,29 @@ const DemoAgentPage = () => {
             style={{
               width: 80,
               height: 80,
-              background: "linear-gradient(135deg, rgba(61,32,102,0.8), rgba(107,63,160,0.8))",
+              background:
+                agentState === "listening"
+                  ? "linear-gradient(135deg, rgba(155,107,138,0.85), rgba(184,125,94,0.8))"
+                  : agentState === "processing"
+                    ? "linear-gradient(135deg, rgba(107,63,160,0.85), rgba(61,32,102,0.9))"
+                    : agentState === "speaking"
+                      ? "linear-gradient(135deg, rgba(61,32,102,0.85), rgba(16,185,129,0.7))"
+                      : "linear-gradient(135deg, rgba(61,32,102,0.8), rgba(107,63,160,0.8))",
               backdropFilter: "blur(8px)",
               border: "1px solid rgba(255,255,255,0.1)",
+              transition: "background 0.6s ease",
             }}
             animate={
-              callStatus === "connecting"
+              agentState === "processing"
                 ? { scale: [1, 1.08, 1] }
-                : isActive && agentSpeaking
-                  ? { scale: [1, 1.1, 1] }
-                  : { scale: [1, 1.03, 1] }
+                : agentState === "speaking"
+                  ? { scale: [1, 1.12, 1] }
+                  : agentState === "listening"
+                    ? { scale: [1, 1.05, 1] }
+                    : { scale: [1, 1.03, 1] }
             }
             transition={{
-              duration: callStatus === "connecting" ? 0.8 : isActive && agentSpeaking ? 1.2 : 3,
+              duration: agentState === "processing" ? 0.8 : agentState === "speaking" ? 1.2 : 3,
               repeat: Infinity,
               ease: "easeInOut",
             }}
