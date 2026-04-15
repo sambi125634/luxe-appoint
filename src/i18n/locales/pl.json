@@ -2707,8 +2707,8 @@
   },
   "demoAgent": {
     "label": "Asystent AI",
-    "title": "Twoje klientki właśnie \nprzestały czekać na oddzwonienie.",
-    "description": "Kliknij przycisk poniżej, aby rozpocząć rozmowę głosową z naszym inteligentnym asystentem. \nSprawdź jak brzmi zanim zaczniesz tracić klientki.",
+    "title": "Twoje klientki przestały czekać. Ty przestałaś tracić wizyty.",
+    "description": "Kliknij przycisk poniżej, aby rozpocząć rozmowę głosową z naszym inteligentnym asystentem.\nSprawdź jak brzmi i przestań tracić klientki.",
     "back": "Wróć",
     "startCall": "Rozpocznij rozmowę",
     "endCall": "Zakończ rozmowę",
