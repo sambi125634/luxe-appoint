@@ -105,6 +105,16 @@ const DemoAgentPage = () => {
     };
   }, []);
 
+  // Auto-scroll to calculator when call ends
+  useEffect(() => {
+    if (callStatus === "ended") {
+      const timer = setTimeout(() => {
+        calculatorRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [callStatus]);
+
   const startCall = useCallback(async () => {
     setCallStatus("connecting");
     try {
