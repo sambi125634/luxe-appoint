@@ -372,7 +372,9 @@ const DemoAgentPage = () => {
       </div>
 
       {/* Savings Calculator */}
-      <SavingsCalculator />
+      <div ref={calculatorRef}>
+        <SavingsCalculator />
+      </div>
 
       {/* Bottom padding */}
       <div className="h-16" />
