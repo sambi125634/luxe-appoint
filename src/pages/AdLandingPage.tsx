@@ -3,9 +3,9 @@ import { motion } from "framer-motion";
 
 const IFRAME_W = 390;
 const IFRAME_H = 844;
-const PHONE_W_MOBILE = 240;
-const PHONE_W_TABLET = 280;
-const PHONE_W_DESKTOP = 300;
+const PHONE_W_MOBILE = 320;
+const PHONE_W_TABLET = 360;
+const PHONE_W_DESKTOP = 400;
 
 const FloatingCard = ({
   position,
@@ -39,20 +39,55 @@ const FloatingCard = ({
   </motion.div>
 );
 
+const orbVariants = [
+  { x: ["-10%", "5%", "-10%"], y: ["-20%", "-15%", "-20%"], dur: 20 },
+  { x: ["60%", "50%", "60%"], y: ["70%", "80%", "70%"], dur: 25 },
+  { x: ["25%", "35%", "25%"], y: ["30%", "45%", "30%"], dur: 22 },
+  { x: ["70%", "60%", "70%"], y: ["10%", "20%", "10%"], dur: 18 },
+  { x: ["40%", "50%", "40%"], y: ["50%", "40%", "50%"], dur: 24 },
+  { x: ["5%", "15%", "5%"], y: ["60%", "70%", "60%"], dur: 28 },
+];
+
+const orbStyles = [
+  { w: "70%", h: "70%", bg: "radial-gradient(ellipse, rgba(192,132,252,0.14) 0%, transparent 65%)" },
+  { w: "55%", h: "55%", bg: "radial-gradient(ellipse, rgba(232,121,160,0.12) 0%, transparent 65%)" },
+  { w: "45%", h: "45%", bg: "radial-gradient(ellipse, rgba(240,192,96,0.08) 0%, transparent 65%)" },
+  { w: "50%", h: "50%", bg: "radial-gradient(ellipse, rgba(192,132,252,0.10) 0%, transparent 60%)" },
+  { w: "40%", h: "40%", bg: "radial-gradient(ellipse, rgba(232,121,160,0.09) 0%, transparent 60%)" },
+  { w: "35%", h: "35%", bg: "radial-gradient(ellipse, rgba(168,85,247,0.07) 0%, transparent 65%)" },
+];
+
 const AdLandingPage = () => {
   const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-[#06060b] font-sans text-[#f4f0ff] overflow-x-hidden relative">
-      {/* Ambient backgrounds */}
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-[radial-gradient(ellipse,rgba(192,132,252,0.09)_0%,transparent_65%)]" />
-        <div className="absolute -bottom-[15%] -right-[5%] w-[55%] h-[55%] bg-[radial-gradient(ellipse,rgba(232,121,160,0.07)_0%,transparent_65%)]" />
-        <div className="absolute top-[40%] left-[30%] w-[40%] h-[40%] bg-[radial-gradient(ellipse,rgba(240,192,96,0.04)_0%,transparent_65%)]" />
+      {/* Animated ambient orbs */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {orbVariants.map((orb, i) => (
+          <motion.div
+            key={i}
+            className="absolute"
+            style={{
+              width: orbStyles[i].w,
+              height: orbStyles[i].h,
+              background: orbStyles[i].bg,
+            }}
+            animate={{
+              left: orb.x,
+              top: orb.y,
+            }}
+            transition={{
+              duration: orb.dur,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
       {/* Page content */}
-      <div className="relative z-[1] flex flex-col items-center px-6 py-12 md:px-8 md:py-16 gap-12">
+      <div className="relative z-[1] flex flex-col items-center px-4 py-10 md:px-8 md:py-16 gap-10 md:gap-12">
 
         {/* ── HERO TEXT ── */}
         <motion.div
@@ -120,7 +155,7 @@ const AdLandingPage = () => {
 
         {/* ── MOCKUP SCENE ── */}
         <motion.div
-          className="relative w-full max-w-[480px] md:max-w-[680px] lg:max-w-[800px] flex justify-center items-center"
+          className="relative w-full max-w-[520px] md:max-w-[740px] lg:max-w-[900px] flex justify-center items-center"
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.4 }}
@@ -128,7 +163,7 @@ const AdLandingPage = () => {
           {/* Floating cards — hidden on mobile */}
           <div className="hidden md:block">
             <FloatingCard
-              position="left-4 lg:left-16 top-[18%]"
+              position="left-0 lg:left-12 top-[18%]"
               icon="✓"
               iconBg="bg-[rgba(192,132,252,0.2)]"
               label="Wizyta potwierdzona"
@@ -136,7 +171,7 @@ const AdLandingPage = () => {
               delay={0}
             />
             <FloatingCard
-              position="right-4 lg:right-16 top-[42%]"
+              position="right-0 lg:right-12 top-[42%]"
               icon="↑"
               iconBg="bg-[rgba(232,121,160,0.2)]"
               label="No-shows zredukowane"
@@ -145,7 +180,7 @@ const AdLandingPage = () => {
               delay={2}
             />
             <FloatingCard
-              position="left-[5%] bottom-[12%]"
+              position="left-[3%] bottom-[10%]"
               icon="💰"
               iconBg="bg-[rgba(240,192,96,0.2)]"
               label="Oszczędność / rok"
@@ -156,9 +191,9 @@ const AdLandingPage = () => {
           </div>
 
           {/* Phone frame */}
-          <div className="relative z-[3] w-[240px] md:w-[280px] lg:w-[300px] shrink-0">
-            {/* Screen glow */}
-            <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[160%] h-[60%] bg-[radial-gradient(ellipse,rgba(192,132,252,0.08)_0%,transparent_70%)] pointer-events-none z-[1]" />
+          <div className="relative z-[3] w-[320px] md:w-[360px] lg:w-[400px] shrink-0">
+            {/* Screen glow — enhanced */}
+            <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[180%] h-[70%] bg-[radial-gradient(ellipse,rgba(192,132,252,0.12)_0%,transparent_70%)] pointer-events-none z-[1]" />
 
             {/* Side buttons */}
             <div className="absolute -right-[3px] top-[28%] w-[3px] h-[50px] bg-gradient-to-b from-[#2a2040] to-[#1a1030] rounded-r-sm" />
@@ -168,14 +203,14 @@ const AdLandingPage = () => {
 
             {/* Outer shell */}
             <div
-              className="bg-gradient-to-br from-[#2a2040] via-[#0f0c1a] to-[#1a1030] rounded-[44px] p-2.5"
+              className="bg-gradient-to-br from-[#2a2040] via-[#0f0c1a] to-[#1a1030] rounded-[40px] p-2.5"
               style={{
                 boxShadow:
                   "0 0 0 1px rgba(192,132,252,0.25), 0 0 60px rgba(192,132,252,0.12), 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)",
               }}
             >
               {/* Inner */}
-              <div className="bg-[#0a0812] rounded-[36px] overflow-hidden relative">
+              <div className="bg-[#0a0812] rounded-[33px] overflow-hidden relative">
                 {/* Notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90px] h-[26px] bg-[#0a0812] rounded-b-[18px] z-10 flex items-center justify-center gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#1a1a2e] border border-white/[0.07]" />
