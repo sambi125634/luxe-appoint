@@ -154,16 +154,29 @@ const DemoAgentPage = () => {
   }, []);
 
   const isActive = callStatus === "active";
+
+  // Map to agentState for VoiceWaves
+  const agentState: "idle" | "listening" | "processing" | "speaking" =
+    callStatus === "connecting"
+      ? "processing"
+      : isActive && agentSpeaking
+        ? "speaking"
+        : isActive
+          ? "listening"
+          : "idle";
+
   const glowColor =
     callStatus === "error"
       ? "rgba(217,79,61,0.25)"
-      : isActive && agentSpeaking
+      : agentState === "speaking"
         ? "rgba(107,63,160,0.35)"
-        : isActive
+        : agentState === "listening"
           ? "rgba(155,107,138,0.25)"
-          : callStatus === "ended"
-            ? "rgba(16,185,129,0.2)"
-            : "rgba(61,32,102,0.15)";
+          : agentState === "processing"
+            ? "rgba(107,63,160,0.2)"
+            : callStatus === "ended"
+              ? "rgba(16,185,129,0.2)"
+              : "rgba(61,32,102,0.15)";
 
   return (
     <div
