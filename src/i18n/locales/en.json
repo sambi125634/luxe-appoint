@@ -2693,16 +2693,14 @@
       "clientApp": "Client App"
     },
     "adLanding": {
-      "label": "Next-gen booking experience",
-      "headline1": "This is the future of",
-      "headline2": "online booking",
-      "subtitle": "Try the widget below and see how your clients will book appointments — with animations, video, and a mobile-app experience.",
+      "label": "Book a demo appointment",
+      "headline1": "Book your appointment below.",
+      "subtitle": "Right after booking, our AI assistant will call you — exactly how it would call every client of your salon.\n\nOn the next page, you'll see how much your salon loses every year without this system.",
       "iframeTitle": "Demo booking widget",
-      "ctaInfo": "After booking, talk to our AI agent — exactly how it would call your client after scheduling an appointment.",
-      "ctaButton": "Talk to AI agent",
-      "pill1": "In-browser",
-      "pill2": "No installation",
-      "pill3": "Real-time AI"
+      "ctaInfo": "✦ Enter real details — our AI assistant will call you to confirm the booking",
+      "pill1": "No app needed",
+      "pill2": "Online deposits",
+      "pill3": "AI confirms appointments"
     }
   },
   "demoAgent": {
