@@ -230,7 +230,7 @@ const DemoAgentPage = () => {
         >
           {t("demoAgent.label")}
         </span>
-        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 leading-[1.1] whitespace-pre-line">
+        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-2 leading-[1.1] whitespace-pre-line">
           {t("demoAgent.title")}
         </h1>
         <p className="text-white/50 text-base leading-relaxed max-w-md mx-auto whitespace-pre-line">
