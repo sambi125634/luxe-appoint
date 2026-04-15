@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { Phone, Globe, Sparkles, Bot } from "lucide-react";
+import { Shield, CreditCard, Bot, Sparkles } from "lucide-react";
 
 const IFRAME_W = 390;
 const IFRAME_H = 844;
@@ -70,15 +69,12 @@ const AdLandingPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
         >
-          {t("landing.adLanding.headline1")}{" "}
-          <span className="bg-gradient-to-r from-[#9B6B8A] to-[#6B3FA0] bg-clip-text text-transparent">
-            {t("landing.adLanding.headline2")}
-          </span>
+          {t("landing.adLanding.headline1")}
         </motion.h1>
 
-        {/* Subtitle */}
+        {/* Subtitle — Brunson bait */}
         <motion.p
-          className="text-white/50 text-base md:text-lg max-w-xl text-center mb-10 md:mb-14"
+          className="text-white/50 text-base md:text-lg max-w-xl text-center mb-10 md:mb-14 whitespace-pre-line"
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.25 }}
@@ -88,7 +84,7 @@ const AdLandingPage = () => {
 
         {/* Phone frame with widget */}
         <motion.div
-          className="relative mb-10 md:mb-14"
+          className="relative mb-6"
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.35 }}
@@ -132,38 +128,22 @@ const AdLandingPage = () => {
           </div>
         </motion.div>
 
-        {/* Info + CTA section */}
-        <motion.div
-          className="flex flex-col items-center gap-6 max-w-lg"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+        {/* Hint under widget */}
+        <motion.p
+          className="text-white/40 text-sm text-center max-w-sm mb-10 md:mb-14"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.1 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <p className="text-white/60 text-center text-sm md:text-base leading-relaxed">
-            {t("landing.adLanding.ctaInfo")}
-          </p>
-
-          <Link
-            to="/demo-agent"
-            className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-2xl font-semibold text-white text-base md:text-lg overflow-hidden transition-transform duration-200 hover:scale-[1.02]"
-          >
-            {/* Animated gradient border */}
-            <span className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#3D2066] via-[#6B3FA0] to-[#9B6B8A] p-[2px]">
-              <span className="block w-full h-full rounded-[14px] bg-[#0A0612]" />
-            </span>
-            <span className="relative flex items-center gap-3">
-              <Bot className="w-5 h-5 text-[#9B6B8A]" />
-              {t("landing.adLanding.ctaButton")}
-            </span>
-          </Link>
-        </motion.div>
+          {t("landing.adLanding.ctaInfo")}
+        </motion.p>
 
         {/* Feature pills */}
-        <div className="flex flex-wrap justify-center gap-3 mt-10 md:mt-14">
-          <FeaturePill icon={Globe} text={t("landing.adLanding.pill1")} delay={0.1} />
-          <FeaturePill icon={Phone} text={t("landing.adLanding.pill2")} delay={0.2} />
-          <FeaturePill icon={Sparkles} text={t("landing.adLanding.pill3")} delay={0.3} />
+        <div className="flex flex-wrap justify-center gap-3">
+          <FeaturePill icon={Shield} text={t("landing.adLanding.pill1")} delay={0.1} />
+          <FeaturePill icon={CreditCard} text={t("landing.adLanding.pill2")} delay={0.2} />
+          <FeaturePill icon={Bot} text={t("landing.adLanding.pill3")} delay={0.3} />
         </div>
       </div>
     </div>

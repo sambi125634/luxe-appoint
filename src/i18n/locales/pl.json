@@ -2693,16 +2693,14 @@
       "clientApp": "Aplikacja Klientki"
     },
     "adLanding": {
-      "label": "Rezerwacja nowej generacji",
-      "headline1": "Tak wygląda przyszłość",
-      "headline2": "rezerwacji online",
-      "subtitle": "Przeklikaj widget poniżej i zobacz, jak Twoje klientki będą umawiać się na wizyty — z animacjami, wideo i doświadczeniem aplikacji mobilnej.",
+      "label": "Zarezerwuj wizytę demo",
+      "headline1": "Zarezerwuj wizytę poniżej.",
+      "subtitle": "Zaraz po rezerwacji zadzwoni do Ciebie nasz asystent AI — dokładnie tak, jak zadzwoni do każdej klientki Twojego salonu.\n\nA na kolejnej stronie zobaczysz, ile Twój salon traci każdego roku bez tego systemu.",
       "iframeTitle": "Widget rezerwacji demo",
-      "ctaInfo": "Po rezerwacji porozmawiaj z naszym agentem AI — dokładnie tak, jak zadzwoniłby do Twojej klientki po umówieniu wizyty.",
-      "ctaButton": "Porozmawiaj z agentem AI",
-      "pill1": "W przeglądarce",
-      "pill2": "Bez instalacji",
-      "pill3": "AI w czasie rzeczywistym"
+      "ctaInfo": "✦ Podaj prawdziwe dane — nasz asystent AI zadzwoni do Ciebie, aby potwierdzić rezerwację",
+      "pill1": "Bez aplikacji",
+      "pill2": "Zaliczki online",
+      "pill3": "AI potwierdza wizyty"
     }
   },
   "demoAgent": {
