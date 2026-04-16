@@ -595,9 +595,9 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
             >
               <Badge 
                 variant="secondary" 
-                className="px-4 py-1.5 text-xs font-medium bg-white/80 dark:bg-black/40 backdrop-blur-md border-pink-200/50 dark:border-pink-800/50 shadow-lg"
+                className="px-4 py-1.5 text-xs font-medium bg-white/80 dark:bg-black/40 backdrop-blur-md border-[#b5737a]/30 dark:border-[#b5737a]/50 shadow-lg"
               >
-                <Heart className="w-3 h-3 mr-1.5 text-pink-500 fill-pink-500" />
+                <Heart className="w-3 h-3 mr-1.5 text-[#b5737a] fill-[#b5737a]" />
                 Rezerwacja online 24/7
               </Badge>
             </div>
@@ -607,8 +607,8 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               style={{ animationDelay: '0.4s' }}
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-violet-500 rounded-full blur-2xl opacity-40 scale-150 animate-pulse" />
-                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-pink-400 via-rose-400 to-violet-500 flex items-center justify-center shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-[#c8956b] to-[#b5737a] rounded-full blur-2xl opacity-40 scale-150 animate-pulse" />
+                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-[#c8956b] via-[#b5737a] to-[#8b6070] flex items-center justify-center shadow-2xl">
                   <Sparkles className="w-12 h-12 text-white drop-shadow-lg" />
                 </div>
               </div>
@@ -618,7 +618,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               className="text-center mb-6 animate-fade-in"
               style={{ animationDelay: '0.6s' }}
             >
-              <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-gray-900 via-pink-900 to-violet-900 dark:from-white dark:via-pink-100 dark:to-violet-100 bg-clip-text text-transparent leading-tight">
+              <h1 className="text-4xl sm:text-5xl font-serif font-bold mb-4 bg-gradient-to-r from-[#2c2420] via-[#b5737a] to-[#8b6070] dark:from-white dark:via-[#d4909a] dark:to-[#c8956b] bg-clip-text text-transparent leading-tight">
                 {widgetConfig?.theme?.headerText || "Zarezerwuj wizytę"}
               </h1>
               <p className="text-lg text-muted-foreground/80 max-w-sm mx-auto leading-relaxed">
@@ -637,7 +637,7 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               ].map((step, index) => (
                 <div key={index} className="flex flex-col items-center gap-2">
                   <div className="w-12 h-12 rounded-2xl bg-white/60 dark:bg-white/10 backdrop-blur-sm border border-white/50 dark:border-white/20 flex items-center justify-center shadow-lg transition-transform hover:scale-110 hover:-rotate-3">
-                    <step.icon className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                    <step.icon className="w-5 h-5 text-[#b5737a] dark:text-[#d4909a]" />
                   </div>
                   <span className="text-xs font-medium text-muted-foreground">{step.label}</span>
                 </div>
