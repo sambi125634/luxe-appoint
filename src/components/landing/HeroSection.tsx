@@ -13,11 +13,11 @@ const HeroSection = ({ onScrollToForm }: HeroSectionProps) => {
   return (
     <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-deep/20 via-background to-burgundy/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-deep/20 via-background to-terra/10" />
       
       {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-gold/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-violet-deep/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-rose-deep/20 rounded-full blur-3xl animate-pulse" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-gold/5 to-burgundy/5 rounded-full blur-3xl" />
       
       <div className="container mx-auto px-4 py-16 relative z-10">
