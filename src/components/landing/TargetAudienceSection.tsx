@@ -28,7 +28,7 @@ const TargetAudienceSection = () => {
               key={index}
               className="glass-card p-6 text-center hover-lift transition-all duration-300 group cursor-default"
             >
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gold/20 to-violet-deep/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-gold/20 to-rose-deep/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                 <audience.icon className="w-7 h-7 text-gold" />
               </div>
               <span className="text-sm font-medium text-foreground">

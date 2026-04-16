@@ -22,16 +22,16 @@ const features = [
     title: "Inteligentny Asystent Grafiku",
     description:
       'Masz lukę między 13:00 a 15:00? AI automatycznie sugeruje ten termin klientkom jako „rekomendowany". Twój kalendarz wypełnia się sam — bez pustych godzin, bez strat.',
-    accent: "from-violet-500/20 to-violet-500/5",
-    iconColor: "text-violet-500",
+    accent: "from-terra/20 to-terra/5",
+    iconColor: "text-terra",
   },
   {
     icon: Video,
     title: "Wideo-prezentacje usług",
     description:
       "Klientka widzi Twoją usługę w akcji zanim zarezerwuje. Krótkie wideo w kalendarzu i aplikacji mobilnej buduje zaufanie i zwiększa konwersję rezerwacji nawet o 40%.",
-    accent: "from-pink-500/20 to-pink-500/5",
-    iconColor: "text-pink-500",
+    accent: "from-rose/20 to-rose/5",
+    iconColor: "text-rose",
   },
   {
     icon: FlaskConical,

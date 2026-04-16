@@ -3,12 +3,12 @@ const CalendarMockup = () => {
   const hours = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00"];
   
   const appointments = [
-    { day: 0, hour: 0, duration: 2, name: "Anna K.", color: "bg-violet-deep/80" },
-    { day: 1, hour: 1, duration: 1, name: "Maria W.", color: "bg-burgundy/80" },
+    { day: 0, hour: 0, duration: 2, name: "Anna K.", color: "bg-rose-deep/80" },
+    { day: 1, hour: 1, duration: 1, name: "Maria W.", color: "bg-terra/80" },
     { day: 2, hour: 0, duration: 3, name: "Ewa S.", color: "bg-gold/80" },
     { day: 2, hour: 4, duration: 2, name: "Kasia M.", color: "bg-emerald-500/80" },
-    { day: 3, hour: 2, duration: 2, name: "Zofia P.", color: "bg-violet-deep/80" },
-    { day: 4, hour: 0, duration: 1, name: "Maja L.", color: "bg-burgundy/80" },
+    { day: 3, hour: 2, duration: 2, name: "Zofia P.", color: "bg-rose-deep/80" },
+    { day: 4, hour: 0, duration: 1, name: "Maja L.", color: "bg-terra/80" },
     { day: 4, hour: 3, duration: 2, name: "Ola T.", color: "bg-gold/80" },
     { day: 5, hour: 1, duration: 2, name: "Iza K.", color: "bg-emerald-500/80" },
   ];

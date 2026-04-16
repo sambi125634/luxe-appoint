@@ -16,7 +16,7 @@ const BookingMockup = () => {
             <div 
               className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium animate-scale-in ${
                 step === 1 
-                  ? "bg-gradient-to-r from-violet-deep to-burgundy text-white" 
+                  ? "bg-gradient-to-r from-rose-deep to-terra text-white" 
                   : "bg-muted text-muted-foreground"
               }`}
               style={{ animationDelay: `${i * 100}ms` }}
@@ -36,8 +36,8 @@ const BookingMockup = () => {
         {services.map((service, i) => (
           <div 
             key={i}
-            className={`glass-card rounded-xl p-3 cursor-pointer transition-all animate-fade-in hover:border-violet-deep/50 ${
-              i === 0 ? "border-2 border-violet-deep ring-2 ring-violet-deep/20" : "border border-border/50"
+            className={`glass-card rounded-xl p-3 cursor-pointer transition-all animate-fade-in hover:border-rose-deep/50 ${
+              i === 0 ? "border-2 border-rose-deep ring-2 ring-rose-deep/20" : "border border-border/50"
             }`}
             style={{ animationDelay: `${(i + 4) * 100}ms` }}
           >
@@ -62,7 +62,7 @@ const BookingMockup = () => {
               </div>
             </div>
             {i === 0 && (
-              <div className="absolute -right-1 -top-1 w-4 h-4 bg-violet-deep rounded-full flex items-center justify-center">
+              <div className="absolute -right-1 -top-1 w-4 h-4 bg-rose-deep rounded-full flex items-center justify-center">
                 <Check className="w-2.5 h-2.5 text-white" />
               </div>
             )}
@@ -72,7 +72,7 @@ const BookingMockup = () => {
 
       {/* CTA Button */}
       <button 
-        className="w-full mt-4 py-2.5 bg-gradient-to-r from-violet-deep to-burgundy text-white rounded-xl text-sm font-medium shadow-lg shadow-violet-deep/25 animate-fade-in"
+        className="w-full mt-4 py-2.5 bg-gradient-to-r from-rose-deep to-terra text-white rounded-xl text-sm font-medium shadow-lg shadow-rose-deep/25 animate-fade-in"
         style={{ animationDelay: '700ms' }}
       >
         Dalej →

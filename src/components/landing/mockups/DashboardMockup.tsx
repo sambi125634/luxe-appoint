@@ -6,7 +6,7 @@ const DashboardMockup = () => {
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-3 mb-4">
         {[
-          { icon: Calendar, label: "Dziś", value: "12", color: "text-violet-deep" },
+          { icon: Calendar, label: "Dziś", value: "12", color: "text-rose-deep" },
           { icon: DollarSign, label: "Przychód", value: "2,450 zł", color: "text-emerald-500" },
           { icon: Users, label: "Klientki", value: "847", color: "text-burgundy" },
           { icon: TrendingUp, label: "Wzrost", value: "+18%", color: "text-gold" },
@@ -28,7 +28,7 @@ const DashboardMockup = () => {
         <h3 className="text-sm font-semibold text-foreground mb-2">Dzisiejsze wizyty</h3>
         <div className="space-y-2">
           {[
-            { time: "09:00", name: "Anna K.", service: "Manicure", color: "bg-violet-deep/20 border-violet-deep" },
+            { time: "09:00", name: "Anna K.", service: "Manicure", color: "bg-rose-deep/20 border-rose-deep" },
             { time: "10:30", name: "Maria W.", service: "Pedicure", color: "bg-burgundy/20 border-burgundy" },
             { time: "12:00", name: "Ewa S.", service: "Makijaż", color: "bg-gold/20 border-gold" },
           ].map((apt, i) => (

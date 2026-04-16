@@ -10,9 +10,9 @@ import {
 } from "lucide-react";
 
 const ACCENT_CLASSES: Record<string, { bg: string; text: string; border: string; badgeBg: string; metricText: string }> = {
-  violet: { bg: "bg-violet-100", text: "text-violet-600", border: "hover:border-violet-200", badgeBg: "bg-violet-50 text-violet-600 border-violet-200", metricText: "text-violet-600" },
+  violet: { bg: "bg-rose-light/30", text: "text-rose-deep", border: "hover:border-rose-light", badgeBg: "bg-rose-light/20 text-rose-deep border-rose-light", metricText: "text-rose-deep" },
   orange: { bg: "bg-orange-100", text: "text-orange-600", border: "hover:border-orange-200", badgeBg: "bg-orange-50 text-orange-600 border-orange-200", metricText: "text-orange-600" },
-  pink: { bg: "bg-pink-100", text: "text-pink-600", border: "hover:border-pink-200", badgeBg: "bg-pink-50 text-pink-600 border-pink-200", metricText: "text-pink-600" },
+  pink: { bg: "bg-rose-light/20", text: "text-rose", border: "hover:border-rose-light", badgeBg: "bg-rose-light/20 text-rose border-rose-light", metricText: "text-rose" },
   green: { bg: "bg-emerald-100", text: "text-emerald-600", border: "hover:border-emerald-200", badgeBg: "bg-emerald-50 text-emerald-600 border-emerald-200", metricText: "text-emerald-600" },
   blue: { bg: "bg-blue-100", text: "text-blue-600", border: "hover:border-blue-200", badgeBg: "bg-blue-50 text-blue-600 border-blue-200", metricText: "text-blue-600" },
   teal: { bg: "bg-teal-100", text: "text-teal-600", border: "hover:border-teal-200", badgeBg: "bg-teal-50 text-teal-600 border-teal-200", metricText: "text-teal-600" },
@@ -103,9 +103,9 @@ export function UniqueFeaturesTabs() {
   return (
     <div className="py-16 md:py-20 lg:py-28">
       <motion.div className="text-center mb-12" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 rounded-full px-4 py-1.5 mb-6">
-          <Sparkles className="w-4 h-4 text-violet-500" />
-          <span className="text-sm font-medium text-violet-600">{t("landing.features.badge")}</span>
+        <div className="inline-flex items-center gap-2 bg-rose-light/20 border border-rose-light/40 rounded-full px-4 py-1.5 mb-6">
+          <Sparkles className="w-4 h-4 text-rose" />
+          <span className="text-sm font-medium text-rose-deep">{t("landing.features.badge")}</span>
         </div>
         <h2 className="text-2xl md:text-4xl lg:text-[42px] font-bold leading-tight mb-4">
           <span className="text-primary">{t("landing.features.title1")}</span> {t("landing.features.title2")}

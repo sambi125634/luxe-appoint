@@ -12,7 +12,7 @@ export const NewFinalCTASection = ({ onScrollToForm }: NewFinalCTASectionProps) 
 
   return (
     <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-pink-500/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-rose/10" />
 
       <div className="relative z-10 container max-w-3xl mx-auto px-4 text-center">
         <motion.h2

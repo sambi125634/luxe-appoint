@@ -89,7 +89,7 @@ const LeadFormSection = () => {
   if (isSubmitted) {
     return (
       <section id="lead-form" className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-violet-deep/10 via-background to-gold/10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-deep/10 via-background to-gold/10" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-xl mx-auto text-center glass-card-elevated p-12 rounded-2xl">
             <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
@@ -111,7 +111,7 @@ const LeadFormSection = () => {
 
   return (
     <section id="lead-form" className="py-20 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-deep/10 via-background to-gold/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-deep/10 via-background to-gold/10" />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-2xl mx-auto">
@@ -290,7 +290,7 @@ const LeadFormSection = () => {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white py-6 text-lg"
+                      className="w-full bg-gradient-to-r from-rose-deep to-terra hover:opacity-90 text-white py-6 text-lg"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (

@@ -21,8 +21,8 @@ const features = [
     description: "23% Twoich klientek to lojalne fanki, które nigdy nie zostawiły opinii. System je znajduje i wysyła spersonalizowaną wiadomość z prośbą o polecenie lub recenzję Google. Ty nie robisz nic. One robią resztę.",
     stat: "+23%",
     statLabel: "opinii Google bez Twojego udziału",
-    color: "from-pink-500 to-rose-600",
-    bgColor: "bg-pink-500/10",
+    color: "from-rose to-rose-deep",
+    bgColor: "bg-rose/10",
   },
   {
     id: "smart-gap",
@@ -32,8 +32,8 @@ const features = [
     description: "30-minutowa luka między 14:00 a 14:30? System sprawdza bazę klientek, znajduje te które lubią usługi ekspresowe i wysyła im ofertę last-minute. Luka = stracone pieniądze. AI ją zamyka za Ciebie.",
     stat: "+23%",
     statLabel: "więcej rezerwacji w \"martwych\" godzinach",
-    color: "from-violet-500 to-purple-600",
-    bgColor: "bg-violet-500/10",
+    color: "from-terra to-secondary",
+    bgColor: "bg-terra/10",
   },
   {
     id: "true-profit",
@@ -76,8 +76,8 @@ const features = [
     description: "System automatycznie dzieli Twoje klientki na grupy: nowe, powracające, VIP, zagrożone odejściem. Tworzy gotowe segmenty do Facebook Ads. Zero ręcznej pracy — Pixel robi resztę.",
     stat: "ROI",
     statLabel: "z reklam wreszcie mierzalny",
-    color: "from-purple-500 to-pink-600",
-    bgColor: "bg-purple-500/10",
+    color: "from-rose-deep to-rose",
+    bgColor: "bg-rose/10",
   },
 ];
 

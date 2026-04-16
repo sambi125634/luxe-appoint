@@ -32,14 +32,14 @@ const AuroraBackground = ({ className = "", variant = "violet" }: AuroraBackgrou
 
     const colors = variant === "violet"
       ? [
-          [124, 58, 237, 0.08],   // violet
-          [219, 39, 119, 0.06],   // pink
-          [196, 181, 253, 0.05],  // lavender
+          [200, 149, 107, 0.08],   // terra
+          [181, 115, 122, 0.06],   // rose
+          [200, 168, 107, 0.05],   // gold
         ]
       : [
-          [217, 168, 67, 0.06],   // gold
-          [219, 39, 119, 0.05],   // pink
-          [124, 58, 237, 0.04],   // violet
+          [200, 168, 107, 0.06],   // gold
+          [181, 115, 122, 0.05],   // rose
+          [200, 149, 107, 0.04],   // terra
         ];
 
     const blobs = colors.map((c, i) => ({

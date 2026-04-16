@@ -55,7 +55,7 @@ const SolutionSection = () => {
               className="glass-card border-gold/20 hover:border-gold/40 transition-all duration-300 hover-lift group"
             >
               <CardContent className="p-6">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-deep/20 to-gold/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-deep/20 to-gold/20 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <solution.icon className="w-7 h-7 text-gold" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">

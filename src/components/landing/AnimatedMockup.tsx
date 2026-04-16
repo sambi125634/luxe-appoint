@@ -11,7 +11,7 @@ const screens = [
     label: "Dashboard", 
     icon: LayoutDashboard, 
     component: DashboardMockup,
-    gradient: "from-violet-deep to-burgundy"
+    gradient: "from-rose-deep to-terra"
   },
   { 
     id: "calendar", 
@@ -32,7 +32,7 @@ const screens = [
     label: "Rezerwacja", 
     icon: Sparkles, 
     component: BookingMockup,
-    gradient: "from-emerald-500 to-violet-deep"
+    gradient: "from-emerald-500 to-rose-deep"
   },
 ];
 
@@ -151,7 +151,7 @@ const AnimatedMockup = () => {
             onClick={() => handleScreenClick(index)}
             className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 ${
               index === activeIndex
-                ? `bg-gradient-to-r ${screen.gradient} text-white shadow-lg shadow-violet-deep/20`
+                ? `bg-gradient-to-r ${screen.gradient} text-white shadow-lg shadow-rose-deep/20`
                 : "bg-muted/50 text-muted-foreground hover:bg-muted"
             }`}
           >
@@ -171,7 +171,7 @@ const AnimatedMockup = () => {
               style={{ width: "40px" }}
             >
               <div
-                className={`h-full bg-gradient-to-r from-violet-deep to-burgundy transition-all duration-300 ${
+                className={`h-full bg-gradient-to-r from-rose-deep to-terra transition-all duration-300 ${
                   index === activeIndex ? "animate-progress" : index < activeIndex ? "w-full" : "w-0"
                 }`}
               />

@@ -221,9 +221,9 @@ const ServicesMockupPreview = () => (
     </div>
     <div className="p-4 space-y-3">
       {[
-        { name: "Manicure hybrydowy", price: "120 zł", duration: "60 min", color: "bg-pink-500" },
-        { name: "Pedicure SPA", price: "150 zł", duration: "90 min", color: "bg-purple-500" },
-        { name: "Brwi i rzęsy", price: "80 zł", duration: "45 min", color: "bg-indigo-500" },
+        { name: "Manicure hybrydowy", price: "120 zł", duration: "60 min", color: "bg-rose" },
+        { name: "Pedicure SPA", price: "150 zł", duration: "90 min", color: "bg-terra" },
+        { name: "Brwi i rzęsy", price: "80 zł", duration: "45 min", color: "bg-gold" },
       ].map((service, i) => (
         <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border/50">
           <div className={cn("w-3 h-12 rounded-full", service.color)} />
@@ -346,9 +346,9 @@ const WidgetsMockupPreview = () => (
     </div>
     <div className="p-4 space-y-3">
       {[
-        { name: "Black Friday -30%", conversions: 45, color: "bg-purple-500" },
-        { name: "Instagram Stories", conversions: 23, color: "bg-pink-500" },
-        { name: "Strona główna", conversions: 78, color: "bg-blue-500" },
+        { name: "Black Friday -30%", conversions: 45, color: "bg-terra" },
+        { name: "Instagram Stories", conversions: 23, color: "bg-rose" },
+        { name: "Strona główna", conversions: 78, color: "bg-gold" },
       ].map((widget, i) => (
         <div key={i} className="flex items-center gap-3 p-3 rounded-lg border border-border/50">
           <div className={cn("w-3 h-10 rounded-full", widget.color)} />
@@ -374,7 +374,7 @@ const AIAutopilotMockupPreview = () => (
     </div>
     <div className="p-4 space-y-3">
       {[
-        { action: "Wypełniono lukę 14:00–15:00", client: "Anna K.", time: "2 min temu", color: "bg-violet-500" },
+        { action: "Wypełniono lukę 14:00–15:00", client: "Anna K.", time: "2 min temu", color: "bg-rose" },
         { action: "Wysłano przypomnienie", client: "Maria N.", time: "15 min temu", color: "bg-emerald-500" },
         { action: "Wykryto ryzyko odejścia", client: "Kasia W.", time: "1h temu", color: "bg-amber-500" },
       ].map((item, i) => (
