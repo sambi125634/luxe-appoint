@@ -6,7 +6,7 @@ interface VoiceWavesProps {
   agentState: AgentState;
 }
 
-/* Color profiles per state */
+/* Color profiles per state — warm palette */
 interface ColorProfile {
   inner: [number, number, number];
   outer: [number, number, number];
@@ -23,9 +23,9 @@ interface ColorProfile {
 
 const PROFILES: Record<AgentState, ColorProfile> = {
   idle: {
-    inner: [107, 63, 160],
-    outer: [155, 107, 138],
-    glow: [61, 32, 102],
+    inner: [200, 149, 107],   // terra #c8956b
+    outer: [181, 115, 122],   // rose #b5737a
+    glow: [200, 149, 107],
     glowAlpha: 0.08,
     waveCount: 4,
     baseAmplitude: 2,
@@ -36,9 +36,9 @@ const PROFILES: Record<AgentState, ColorProfile> = {
     fillAlpha: 0.05,
   },
   listening: {
-    inner: [155, 107, 138],   // #9B6B8A mauve
-    outer: [184, 125, 94],    // #B87D5E bronze
-    glow: [155, 107, 138],
+    inner: [200, 149, 107],   // terra
+    outer: [200, 168, 107],   // gold #c8a86b
+    glow: [200, 149, 107],
     glowAlpha: 0.18,
     waveCount: 4,
     baseAmplitude: 3,
@@ -49,9 +49,9 @@ const PROFILES: Record<AgentState, ColorProfile> = {
     fillAlpha: 0.06,
   },
   processing: {
-    inner: [107, 63, 160],    // #6B3FA0
-    outer: [61, 32, 102],     // #3D2066
-    glow: [107, 63, 160],
+    inner: [181, 115, 122],   // rose
+    outer: [139, 96, 112],    // darker rose #8b6070
+    glow: [181, 115, 122],
     glowAlpha: 0.25,
     waveCount: 6,
     baseAmplitude: 4,
@@ -62,9 +62,9 @@ const PROFILES: Record<AgentState, ColorProfile> = {
     fillAlpha: 0.04,
   },
   speaking: {
-    inner: [61, 32, 102],     // #3D2066
-    outer: [16, 185, 129],    // #10B981
-    glow: [107, 63, 160],
+    inner: [181, 115, 122],   // rose
+    outer: [106, 158, 106],   // green #6a9e6a
+    glow: [200, 149, 107],
     glowAlpha: 0.3,
     waveCount: 5,
     baseAmplitude: 8,
@@ -84,15 +84,11 @@ function lerpColor(a: [number, number, number], b: [number, number, number], t: 
   return [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
 }
 
-/**
- * Canvas-based concentric wave animation with 3 distinct visual states.
- */
 const VoiceWaves = ({ agentState }: VoiceWavesProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stateRef = useRef(agentState);
   stateRef.current = agentState;
 
-  // Smooth interpolation state
   const currentRef = useRef({
     inner: [...PROFILES.idle.inner] as [number, number, number],
     outer: [...PROFILES.idle.outer] as [number, number, number],
@@ -126,7 +122,6 @@ const VoiceWaves = ({ agentState }: VoiceWavesProps) => {
     const target = PROFILES[state];
     const cur = currentRef.current;
 
-    // Smooth lerp towards target (≈60fps → t=0.06 per frame)
     const t = 0.06;
     cur.inner = lerpColor(cur.inner, target.inner, t);
     cur.outer = lerpColor(cur.outer, target.outer, t);
@@ -152,10 +147,7 @@ const VoiceWaves = ({ agentState }: VoiceWavesProps) => {
       const amplitude = cur.baseAmplitude + i * cur.amplitudeGrowth;
       const speed = cur.speed + (state === "speaking" ? i * 0.3 : 0);
 
-      // Alpha: inner waves more visible
       const alpha = Math.max(0.04, (state === "speaking" ? 0.45 : 0.3) - progress * 0.22);
-
-      // Processing shimmer: every 3rd wave brighter
       const shimmer = state === "processing" && i % 3 === 0 ? 1.4 : 1;
 
       const points = 128;
@@ -165,12 +157,10 @@ const VoiceWaves = ({ agentState }: VoiceWavesProps) => {
         const angle = (j / points) * Math.PI * 2;
         const f = cur.freq + i;
 
-        // 3 harmonics for organic shape
         const h1 = Math.sin(angle * f + now * speed) * amplitude * 0.55;
         const h2 = Math.sin(angle * (f + 3) - now * speed * 0.7) * amplitude * 0.3;
         const h3 = Math.sin(angle * (f * 2 + 1) + now * speed * 0.4) * amplitude * 0.15;
 
-        // Processing: add rotation offset
         const rotationOffset = state === "processing" ? now * 0.5 : 0;
         const r = radius + h1 + h2 + h3;
         const x = cx + Math.cos(angle + rotationOffset) * r;
@@ -182,14 +172,12 @@ const VoiceWaves = ({ agentState }: VoiceWavesProps) => {
 
       ctx.closePath();
 
-      // Color mix: inner → outer based on progress
-      // Speaking: add emerald on outer rings
       let color: [number, number, number];
       if (state === "speaking" && progress > 0.5) {
-        const mauveMiddle: [number, number, number] = [155, 107, 138];
-        const emeraldOuter: [number, number, number] = [16, 185, 129];
+        const roseMiddle: [number, number, number] = [181, 115, 122];
+        const greenOuter: [number, number, number] = [106, 158, 106];
         const outerT = (progress - 0.5) * 2;
-        color = lerpColor(mauveMiddle, emeraldOuter, outerT);
+        color = lerpColor(roseMiddle, greenOuter, outerT);
       } else {
         color = lerpColor(cur.inner, cur.outer, progress);
       }
@@ -199,14 +187,12 @@ const VoiceWaves = ({ agentState }: VoiceWavesProps) => {
       ctx.lineWidth = cur.lineWidth;
       ctx.stroke();
 
-      // Fill inner rings
       if (i < 2) {
         ctx.fillStyle = `rgba(${Math.round(r)},${Math.round(g)},${Math.round(b)},${cur.fillAlpha})`;
         ctx.fill();
       }
     }
 
-    // Center glow
     const [gr, gg, gb] = cur.glow;
     const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, baseRadius);
     grad.addColorStop(0, `rgba(${Math.round(gr)},${Math.round(gg)},${Math.round(gb)},${cur.glowAlpha})`);

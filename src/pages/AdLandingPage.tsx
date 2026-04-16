@@ -25,20 +25,24 @@ const FloatingCard = ({
   delay?: number;
 }) => (
   <motion.div
-    className={`absolute z-[2] flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] backdrop-blur-xl px-4 py-3 ${position}`}
-    animate={{ y: [0, -10, 0] }}
+    className={`absolute z-[2] flex items-center gap-3 rounded-[14px] border border-[rgba(180,150,120,0.18)] bg-white px-4 py-3 ${position}`}
+    style={{
+      boxShadow: "0 4px 20px rgba(180,150,120,0.12), 0 1px 0 rgba(255,255,255,0.8) inset",
+    }}
+    animate={{ y: [0, -8, 0] }}
     transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay }}
   >
     <div className={`w-9 h-9 rounded-[10px] flex items-center justify-center text-base shrink-0 ${iconBg}`}>
       {icon}
     </div>
     <div className="flex flex-col gap-0.5">
-      <span className="text-[0.68rem] text-white/40 whitespace-nowrap">{label}</span>
-      <span className={`text-[0.82rem] font-medium text-white whitespace-nowrap ${valueClass}`}>{value}</span>
+      <span className="text-[0.63rem] text-[rgba(44,36,32,0.45)] whitespace-nowrap">{label}</span>
+      <span className={`text-[0.82rem] font-medium text-[#2c2420] whitespace-nowrap ${valueClass}`}>{value}</span>
     </div>
   </motion.div>
 );
 
+/* Ambient blobs — warm tones */
 const orbVariants = [
   { x: ["-10%", "5%", "-10%"], y: ["-20%", "-15%", "-20%"], dur: 20 },
   { x: ["60%", "50%", "60%"], y: ["70%", "80%", "70%"], dur: 25 },
@@ -49,45 +53,111 @@ const orbVariants = [
 ];
 
 const orbStyles = [
-  { w: "70%", h: "70%", bg: "radial-gradient(ellipse, rgba(192,132,252,0.14) 0%, transparent 65%)" },
-  { w: "55%", h: "55%", bg: "radial-gradient(ellipse, rgba(232,121,160,0.12) 0%, transparent 65%)" },
-  { w: "45%", h: "45%", bg: "radial-gradient(ellipse, rgba(240,192,96,0.08) 0%, transparent 65%)" },
-  { w: "50%", h: "50%", bg: "radial-gradient(ellipse, rgba(192,132,252,0.10) 0%, transparent 60%)" },
-  { w: "40%", h: "40%", bg: "radial-gradient(ellipse, rgba(232,121,160,0.09) 0%, transparent 60%)" },
-  { w: "35%", h: "35%", bg: "radial-gradient(ellipse, rgba(168,85,247,0.07) 0%, transparent 65%)" },
+  { w: "70%", h: "70%", bg: "radial-gradient(ellipse, rgba(181,115,122,0.10) 0%, transparent 65%)" },
+  { w: "55%", h: "55%", bg: "radial-gradient(ellipse, rgba(200,149,107,0.09) 0%, transparent 65%)" },
+  { w: "45%", h: "45%", bg: "radial-gradient(ellipse, rgba(200,168,107,0.06) 0%, transparent 65%)" },
+  { w: "50%", h: "50%", bg: "radial-gradient(ellipse, rgba(181,115,122,0.08) 0%, transparent 60%)" },
+  { w: "40%", h: "40%", bg: "radial-gradient(ellipse, rgba(200,149,107,0.07) 0%, transparent 60%)" },
+  { w: "35%", h: "35%", bg: "radial-gradient(ellipse, rgba(212,144,154,0.06) 0%, transparent 65%)" },
 ];
+
+/* Rising particles */
+const Particles = () => (
+  <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    {Array.from({ length: 12 }).map((_, i) => (
+      <motion.div
+        key={`ptcl-${i}`}
+        className="absolute rounded-full"
+        style={{
+          width: 3 + Math.random() * 3,
+          height: 3 + Math.random() * 3,
+          left: `${8 + Math.random() * 84}%`,
+          bottom: `-${Math.random() * 5}%`,
+          background: i % 2 === 0 ? "rgba(181,115,122,0.25)" : "rgba(200,149,107,0.2)",
+        }}
+        animate={{
+          y: [0, -window.innerHeight * 0.8],
+          opacity: [0, 0.6, 0.6, 0],
+          scale: [0.5, 1],
+        }}
+        transition={{
+          duration: 14 + Math.random() * 10,
+          repeat: Infinity,
+          delay: Math.random() * 10,
+          ease: "linear",
+        }}
+      />
+    ))}
+  </div>
+);
+
+/* Expanding ring */
+const OrbRings = () => (
+  <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+    {[0, 4, 8].map((delay) => (
+      <motion.div
+        key={delay}
+        className="absolute top-1/2 left-1/2 rounded-full border border-[rgba(181,115,122,0.12)]"
+        style={{ width: 200, height: 200 }}
+        animate={{
+          scale: [0.3, 2.5],
+          opacity: [0.4, 0],
+          x: "-50%",
+          y: "-50%",
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          delay,
+          ease: "easeOut",
+        }}
+      />
+    ))}
+  </div>
+);
 
 const AdLandingPage = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-[#06060b] font-sans text-[#f4f0ff] overflow-x-hidden relative">
+    <div
+      className="min-h-screen font-sans overflow-x-hidden relative"
+      style={{ background: "#faf7f2", color: "#2c2420" }}
+    >
+      {/* Dot grid */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          backgroundImage: "radial-gradient(circle, rgba(180,150,120,0.2) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+          maskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%)",
+          WebkitMaskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%)",
+        }}
+      />
+
       {/* Animated ambient orbs */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {orbVariants.map((orb, i) => (
           <motion.div
             key={i}
-            className="absolute"
+            className="absolute rounded-full"
             style={{
               width: orbStyles[i].w,
               height: orbStyles[i].h,
               background: orbStyles[i].bg,
+              filter: "blur(70px)",
             }}
-            animate={{
-              left: orb.x,
-              top: orb.y,
-            }}
-            transition={{
-              duration: orb.dur,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
+            animate={{ left: orb.x, top: orb.y }}
+            transition={{ duration: orb.dur, repeat: Infinity, ease: "easeInOut" }}
           />
         ))}
       </div>
 
+      <Particles />
+      <OrbRings />
+
       {/* Page content */}
-      <div className="relative z-[1] flex flex-col items-center px-4 py-10 md:px-8 md:py-16 gap-10 md:gap-12">
+      <div className="relative z-[1] flex flex-col items-center px-4 py-12 md:px-8 md:py-20 gap-10 md:gap-12">
 
         {/* ── HERO TEXT ── */}
         <motion.div
@@ -98,30 +168,34 @@ const AdLandingPage = () => {
         >
           {/* Eyebrow */}
           <motion.div
-            className="inline-flex items-center gap-2 border border-[rgba(192,132,252,0.3)] bg-[rgba(192,132,252,0.07)] text-[#c084fc] text-[0.68rem] font-medium tracking-[0.16em] uppercase px-4 py-1.5 rounded-full mb-6"
+            className="inline-flex items-center gap-2 border border-[rgba(181,115,122,0.35)] bg-[rgba(181,115,122,0.06)] text-[#b5737a] text-[0.68rem] font-medium tracking-[0.16em] uppercase px-4 py-1.5 rounded-full mb-6"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="w-1.5 h-1.5 rounded-full bg-[#c084fc] animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-[#d4909a] animate-pulse" />
             {t("landing.adLanding.label")}
           </motion.div>
 
           {/* Headline */}
           <motion.h1
-            className="font-serif text-[clamp(2.4rem,7vw,4rem)] leading-[1.08] tracking-[-0.01em] mb-5"
+            className="font-serif text-[clamp(2.2rem,7vw,3.8rem)] font-light leading-[1.08] tracking-[0.01em] mb-5 text-[#2c2420]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1 }}
           >
             Koniec z formularzami.{"\n"}
-            Koniec z <em className="italic bg-gradient-to-r from-[#c084fc] to-[#e879a0] bg-clip-text text-transparent">no-shows.</em>{"\n"}
+            Koniec z{" "}
+            <em className="italic font-normal bg-gradient-to-r from-[#c8956b] to-[#b5737a] bg-clip-text text-transparent">
+              no-shows.
+            </em>
+            {"\n"}
             Zaczyna się era AI.
           </motion.h1>
 
           {/* Subtitle */}
           <motion.p
-            className="text-white/40 text-base font-light leading-[1.7] max-w-[480px] mx-auto mb-8"
+            className="text-[rgba(44,36,32,0.45)] text-[0.97rem] font-light leading-[1.75] max-w-[480px] mx-auto mb-8"
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.25 }}
@@ -144,9 +218,10 @@ const AdLandingPage = () => {
             ].map((text) => (
               <div
                 key={text}
-                className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.08] rounded-full px-3.5 py-1.5 text-[0.75rem] text-white/40"
+                className="flex items-center gap-1.5 bg-white border border-[rgba(180,150,120,0.18)] rounded-full px-3.5 py-1.5 text-[0.73rem] text-[rgba(44,36,32,0.45)]"
+                style={{ boxShadow: "0 1px 4px rgba(180,150,120,0.1)" }}
               >
-                <span className="w-3.5 h-3.5 rounded-full bg-gradient-to-br from-[#c084fc] to-[#e879a0] shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-br from-[#c8956b] to-[#b5737a] shrink-0" />
                 {text}
               </div>
             ))}
@@ -155,7 +230,7 @@ const AdLandingPage = () => {
 
         {/* ── MOCKUP SCENE ── */}
         <motion.div
-          className="relative w-full max-w-[520px] md:max-w-[740px] lg:max-w-[900px] flex justify-center items-center"
+          className="relative w-full max-w-[540px] md:max-w-[740px] lg:max-w-[900px] flex justify-center items-center py-10"
           initial={{ opacity: 0, y: 40, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.9, delay: 0.4 }}
@@ -163,58 +238,62 @@ const AdLandingPage = () => {
           {/* Floating cards — hidden on mobile */}
           <div className="hidden md:block">
             <FloatingCard
-              position="left-0 lg:left-12 top-[18%]"
+              position="left-0 lg:left-12 top-[16%]"
               icon="✓"
-              iconBg="bg-[rgba(192,132,252,0.2)]"
+              iconBg="bg-[rgba(181,115,122,0.1)]"
               label="Wizyta potwierdzona"
               value="Karolina W."
               delay={0}
             />
             <FloatingCard
-              position="right-0 lg:right-12 top-[42%]"
+              position="right-0 lg:right-12 top-[44%]"
               icon="↑"
-              iconBg="bg-[rgba(232,121,160,0.2)]"
+              iconBg="bg-[rgba(200,149,107,0.1)]"
               label="No-shows zredukowane"
               value="-40%"
-              valueClass="text-[#4ade80]"
+              valueClass="text-[#6a9e6a]"
               delay={2}
             />
             <FloatingCard
-              position="left-[3%] bottom-[10%]"
-              icon="💰"
-              iconBg="bg-[rgba(240,192,96,0.2)]"
+              position="left-1/2 -translate-x-1/2 bottom-[6%]"
+              icon="✦"
+              iconBg="bg-[rgba(200,168,107,0.1)]"
               label="Oszczędność / rok"
               value="+67 200 zł"
-              valueClass="text-[#c084fc]"
+              valueClass="text-[#b5737a]"
               delay={4}
             />
           </div>
 
           {/* Phone frame */}
           <div className="relative z-[3] w-[320px] md:w-[360px] lg:w-[400px] shrink-0">
-            {/* Screen glow — enhanced */}
-            <div className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[180%] h-[70%] bg-[radial-gradient(ellipse,rgba(192,132,252,0.12)_0%,transparent_70%)] pointer-events-none z-[1]" />
+            {/* Screen glow */}
+            <div
+              className="absolute -top-[30%] left-1/2 -translate-x-1/2 w-[160%] h-[60%] pointer-events-none z-[1]"
+              style={{ background: "radial-gradient(ellipse, rgba(181,115,122,0.06) 0%, transparent 70%)" }}
+            />
 
             {/* Side buttons */}
-            <div className="absolute -right-[3px] top-[28%] w-[3px] h-[50px] bg-gradient-to-b from-[#2a2040] to-[#1a1030] rounded-r-sm" />
-            <div className="absolute -left-[3px] top-[20%] w-[3px] h-[26px] bg-gradient-to-b from-[#2a2040] to-[#1a1030] rounded-l-sm" />
-            <div className="absolute -left-[3px] top-[33%] w-[3px] h-[40px] bg-gradient-to-b from-[#2a2040] to-[#1a1030] rounded-l-sm" />
-            <div className="absolute -left-[3px] top-[46%] w-[3px] h-[40px] bg-gradient-to-b from-[#2a2040] to-[#1a1030] rounded-l-sm" />
+            <div className="absolute -right-[3px] top-[26%] w-[3px] h-[55px] bg-gradient-to-b from-[#ede6da] to-[#d8cfc4] rounded-r-sm" />
+            <div className="absolute -left-[3px] top-[18%] w-[3px] h-[28px] bg-gradient-to-b from-[#ede6da] to-[#d8cfc4] rounded-l-sm" />
+            <div className="absolute -left-[3px] top-[30%] w-[3px] h-[44px] bg-gradient-to-b from-[#ede6da] to-[#d8cfc4] rounded-l-sm" />
+            <div className="absolute -left-[3px] top-[44%] w-[3px] h-[44px] bg-gradient-to-b from-[#ede6da] to-[#d8cfc4] rounded-l-sm" />
 
-            {/* Outer shell */}
+            {/* Outer shell — warm beige */}
             <div
-              className="bg-gradient-to-br from-[#2a2040] via-[#0f0c1a] to-[#1a1030] rounded-[40px] p-2.5"
+              className="rounded-[48px] p-2.5"
               style={{
+                background: "linear-gradient(160deg, #ede6da 0%, #f8f4ee 50%, #e8dfd2 100%)",
                 boxShadow:
-                  "0 0 0 1px rgba(192,132,252,0.25), 0 0 60px rgba(192,132,252,0.12), 0 40px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1)",
+                  "0 0 0 1px rgba(181,115,122,0.2), 0 0 60px rgba(181,115,122,0.08), 0 40px 80px rgba(180,150,120,0.2), inset 0 1px 0 rgba(255,255,255,0.9)",
               }}
             >
               {/* Inner */}
-              <div className="bg-[#0a0812] rounded-[33px] overflow-hidden relative">
+              <div className="bg-[#fdfaf6] rounded-[40px] overflow-hidden relative">
                 {/* Notch */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90px] h-[26px] bg-[#0a0812] rounded-b-[18px] z-10 flex items-center justify-center gap-1.5">
-                  <div className="w-2.5 h-2.5 rounded-full bg-[#1a1a2e] border border-white/[0.07]" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-[rgba(192,132,252,0.5)] animate-pulse" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[100px] h-[28px] bg-[#fdfaf6] rounded-b-[20px] z-10 flex items-center justify-center gap-1.5">
+                  <div className="w-[11px] h-[11px] rounded-full bg-[#ede6da] border border-[rgba(180,150,120,0.2)]" />
+                  <div className="w-[7px] h-[7px] rounded-full bg-[rgba(181,115,122,0.6)] animate-pulse" />
                 </div>
 
                 {/* Iframe — actual widget */}
@@ -251,7 +330,7 @@ const AdLandingPage = () => {
 
         {/* ── BAIT BELOW MOCKUP ── */}
         <motion.div
-          className="max-w-[480px] text-center"
+          className="max-w-[500px] text-center"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -259,26 +338,26 @@ const AdLandingPage = () => {
         >
           {/* Divider with icon */}
           <div className="flex items-center gap-3 justify-center mb-5">
-            <div className="flex-1 max-w-[60px] h-px bg-white/[0.08]" />
-            <div className="w-8 h-8 rounded-full bg-[rgba(192,132,252,0.12)] border border-[rgba(192,132,252,0.25)] flex items-center justify-center text-sm">
-              🤖
+            <div className="flex-1 max-w-[70px] h-px bg-[rgba(180,150,120,0.32)]" />
+            <div className="w-[34px] h-[34px] rounded-full bg-[rgba(181,115,122,0.08)] border border-[rgba(181,115,122,0.22)] flex items-center justify-center text-[15px]">
+              🤍
             </div>
-            <div className="flex-1 max-w-[60px] h-px bg-white/[0.08]" />
+            <div className="flex-1 max-w-[70px] h-px bg-[rgba(180,150,120,0.32)]" />
           </div>
 
-          <p className="text-[0.85rem] text-white/40 leading-[1.65]">
-            <strong className="text-white font-medium">Podaj swoje dane jako właściciel salonu.</strong>
+          <p className="text-[0.86rem] text-[rgba(44,36,32,0.45)] leading-[1.75]">
+            <strong className="text-[#2c2420] font-medium">Podaj swoje dane jako właściciel salonu.</strong>
             <br /><br />
             Zaraz po rezerwacji zadzwoni do Ciebie nasz asystent AI —{"\n"}
             dokładnie tak jak zadzwoni do każdej klientki Twojego salonu.
             <br /><br />
-            <strong className="text-white font-medium">Na kolejnej stronie zobaczysz{"\n"}ile Twój salon traci każdego roku bez tego systemu.</strong>
+            <strong className="text-[#2c2420] font-medium">Na kolejnej stronie zobaczysz{"\n"}ile Twój salon traci każdego roku bez tego systemu.</strong>
           </p>
 
           {/* Bouncing arrow */}
-          <div className="mt-4 flex flex-col items-center gap-1 animate-bounce">
-            <span className="block w-px h-6 bg-gradient-to-b from-[rgba(192,132,252,0.6)] to-transparent" />
-            <span className="block w-2 h-2 border-r border-b border-[rgba(192,132,252,0.5)] rotate-45 -mt-2" />
+          <div className="mt-5 flex flex-col items-center animate-bounce">
+            <span className="block w-px h-7 bg-gradient-to-b from-[rgba(181,115,122,0.5)] to-transparent" />
+            <span className="block w-2 h-2 border-r border-b border-[rgba(181,115,122,0.45)] rotate-45 -mt-[5px]" />
           </div>
         </motion.div>
       </div>
