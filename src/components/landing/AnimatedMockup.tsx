@@ -11,7 +11,7 @@ const screens = [
     label: "Dashboard", 
     icon: LayoutDashboard, 
     component: DashboardMockup,
-    gradient: "from-violet-deep to-burgundy"
+    gradient: "from-rose-deep to-terra"
   },
   { 
     id: "calendar", 
@@ -32,7 +32,7 @@ const screens = [
     label: "Rezerwacja", 
     icon: Sparkles, 
     component: BookingMockup,
-    gradient: "from-emerald-500 to-violet-deep"
+    gradient: "from-emerald-500 to-rose-deep"
   },
 ];
 
