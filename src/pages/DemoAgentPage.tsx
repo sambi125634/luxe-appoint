@@ -14,7 +14,7 @@ type CallStatus = "idle" | "connecting" | "active" | "ended" | "error";
 
 const AGENT_ID = "agent_97d146912ae36f5c916710204c";
 
-/* ── Floating particles ── */
+/* ── Floating particles — warm tones ── */
 const FloatingParticles = () => {
   const particles = Array.from({ length: 7 }, (_, i) => ({
     id: i,
@@ -30,8 +30,14 @@ const FloatingParticles = () => {
       {particles.map((p) => (
         <motion.div
           key={p.id}
-          className="absolute rounded-full bg-[#6B3FA0]/20"
-          style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.size, height: p.size }}
+          className="absolute rounded-full"
+          style={{
+            left: `${p.x}%`,
+            top: `${p.y}%`,
+            width: p.size,
+            height: p.size,
+            background: p.id % 2 === 0 ? "rgba(181,115,122,0.18)" : "rgba(200,149,107,0.15)",
+          }}
           animate={{
             y: [0, -30, 0, 20, 0],
             x: [0, 15, -10, 5, 0],
@@ -44,18 +50,18 @@ const FloatingParticles = () => {
   );
 };
 
-/* ── Background grid ── */
-const AnimatedGrid = () => (
-  <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-[0.04]">
-    <div
-      className="absolute inset-0"
-      style={{
-        backgroundImage:
-          "linear-gradient(rgba(107,63,160,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(107,63,160,0.5) 1px, transparent 1px)",
-        backgroundSize: "60px 60px",
-      }}
-    />
-  </div>
+/* ── Dot grid background ── */
+const DotGrid = () => (
+  <div
+    className="absolute inset-0 overflow-hidden pointer-events-none"
+    style={{
+      backgroundImage: "radial-gradient(circle, rgba(180,150,120,0.18) 1px, transparent 1px)",
+      backgroundSize: "28px 28px",
+      maskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%)",
+      WebkitMaskImage: "radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%)",
+      opacity: 0.6,
+    }}
+  />
 );
 
 /* ── Feature pills ── */
@@ -79,7 +85,7 @@ const FeaturePills = () => {
       {featurePills.map((pill, i) => (
         <motion.span
           key={i}
-          className="text-xs font-medium text-white/50 border border-white/10 rounded-full px-4 py-1.5 backdrop-blur-sm"
+          className="text-xs font-medium text-[rgba(44,36,32,0.45)] border border-[rgba(180,150,120,0.25)] bg-white/60 backdrop-blur-sm rounded-full px-4 py-1.5"
           variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
           transition={{ duration: 0.5 }}
         >
@@ -105,7 +111,6 @@ const DemoAgentPage = () => {
     };
   }, []);
 
-  // Auto-scroll to calculator when call ends
   useEffect(() => {
     if (callStatus === "ended") {
       const timer = setTimeout(() => {
@@ -155,7 +160,6 @@ const DemoAgentPage = () => {
 
   const isActive = callStatus === "active";
 
-  // Map to agentState for VoiceWaves
   const agentState: "idle" | "listening" | "processing" | "speaking" =
     callStatus === "connecting"
       ? "processing"
@@ -167,23 +171,23 @@ const DemoAgentPage = () => {
 
   const glowColor =
     callStatus === "error"
-      ? "rgba(217,79,61,0.25)"
+      ? "rgba(217,79,61,0.15)"
       : agentState === "speaking"
-        ? "rgba(107,63,160,0.35)"
+        ? "rgba(181,115,122,0.20)"
         : agentState === "listening"
-          ? "rgba(155,107,138,0.25)"
+          ? "rgba(200,149,107,0.15)"
           : agentState === "processing"
-            ? "rgba(107,63,160,0.2)"
+            ? "rgba(181,115,122,0.12)"
             : callStatus === "ended"
-              ? "rgba(16,185,129,0.2)"
-              : "rgba(61,32,102,0.15)";
+              ? "rgba(106,158,106,0.12)"
+              : "rgba(181,115,122,0.08)";
 
   return (
     <div
       className="min-h-screen flex flex-col items-center px-4 py-12 relative overflow-hidden"
-      style={{ background: "linear-gradient(180deg, #0F0A1A 0%, #1E1B2E 50%, #08080d 100%)" }}
+      style={{ background: "linear-gradient(180deg, #faf7f2 0%, #f4efe6 50%, #faf7f2 100%)" }}
     >
-      <AnimatedGrid />
+      <DotGrid />
       <FloatingParticles />
 
       {/* Central glow */}
@@ -207,7 +211,11 @@ const DemoAgentPage = () => {
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Button variant="ghost" onClick={() => navigate(-1)} className="gap-2 text-white/50 hover:text-white/80 hover:bg-white/5">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="gap-2 text-[rgba(44,36,32,0.45)] hover:text-[#2c2420] hover:bg-[rgba(181,115,122,0.06)]"
+        >
           <ArrowLeft className="w-4 h-4" />
           {t("demoAgent.back")}
         </Button>
@@ -223,17 +231,17 @@ const DemoAgentPage = () => {
         <span
           className="uppercase tracking-[0.2em] text-sm font-semibold mb-4 block"
           style={{
-            backgroundImage: "linear-gradient(135deg, #9B6B8A, #6B3FA0)",
+            backgroundImage: "linear-gradient(135deg, #b5737a, #c8956b)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
           }}
         >
           {t("demoAgent.label")}
         </span>
-        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-2 leading-[1.1] whitespace-pre-line">
+        <h1 className="text-4xl md:text-5xl font-bold text-[#2c2420] tracking-tight mb-2 leading-[1.1] whitespace-pre-line font-serif">
           {t("demoAgent.title")}
         </h1>
-        <p className="text-white/50 text-base leading-relaxed max-w-md mx-auto whitespace-pre-line">
+        <p className="text-[rgba(44,36,32,0.45)] text-base leading-relaxed max-w-md mx-auto whitespace-pre-line">
           {t("demoAgent.description")}
         </p>
       </motion.div>
@@ -257,14 +265,15 @@ const DemoAgentPage = () => {
               height: 80,
               background:
                 agentState === "listening"
-                  ? "linear-gradient(135deg, rgba(155,107,138,0.85), rgba(184,125,94,0.8))"
+                  ? "linear-gradient(135deg, rgba(200,149,107,0.85), rgba(181,115,122,0.8))"
                   : agentState === "processing"
-                    ? "linear-gradient(135deg, rgba(107,63,160,0.85), rgba(61,32,102,0.9))"
+                    ? "linear-gradient(135deg, rgba(181,115,122,0.85), rgba(139,96,112,0.9))"
                     : agentState === "speaking"
-                      ? "linear-gradient(135deg, rgba(61,32,102,0.85), rgba(16,185,129,0.7))"
-                      : "linear-gradient(135deg, rgba(61,32,102,0.8), rgba(107,63,160,0.8))",
+                      ? "linear-gradient(135deg, rgba(181,115,122,0.85), rgba(106,158,106,0.7))"
+                      : "linear-gradient(135deg, rgba(200,149,107,0.8), rgba(181,115,122,0.8))",
               backdropFilter: "blur(8px)",
-              border: "1px solid rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.3)",
+              boxShadow: "0 4px 20px rgba(181,115,122,0.2)",
               transition: "background 0.6s ease",
             }}
             animate={
@@ -291,7 +300,7 @@ const DemoAgentPage = () => {
           <AnimatePresence mode="wait">
             <motion.p
               key={callStatus + (agentSpeaking ? "s" : "l")}
-              className="text-sm font-medium text-white/60"
+              className="text-sm font-medium text-[rgba(44,36,32,0.45)]"
               initial={{ opacity: 0, y: 5 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -5 }}
@@ -315,13 +324,14 @@ const DemoAgentPage = () => {
                   <div
                     className="absolute inset-0 animate-spin"
                     style={{
-                      background: "conic-gradient(from 0deg, #3D2066, #6B3FA0, #9B6B8A, #6B3FA0, #3D2066)",
+                      background: "conic-gradient(from 0deg, #c8956b, #b5737a, #d4909a, #b5737a, #c8956b)",
                       animationDuration: "4s",
                     }}
                   />
                   <Button
                     onClick={startCall}
-                    className="relative w-full bg-[#3D2066] text-white rounded-[12px] px-8 py-5 font-semibold text-base hover:bg-[#4E2A85] transition-all z-10"
+                    className="relative w-full text-white rounded-[12px] px-8 py-5 font-semibold text-base transition-all z-10"
+                    style={{ background: "linear-gradient(135deg, #c8956b, #b5737a)" }}
                     size="lg"
                   >
                     <motion.span
@@ -339,8 +349,8 @@ const DemoAgentPage = () => {
 
             {callStatus === "connecting" && (
               <motion.div key="connect-btn" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                <Button disabled className="w-full rounded-[12px] px-8 py-5 bg-white/10 text-white/60 border-0" size="lg">
-                  <div className="w-5 h-5 border-2 border-white/20 border-t-white/70 rounded-full animate-spin mr-2" />
+                <Button disabled className="w-full rounded-[12px] px-8 py-5 bg-[rgba(181,115,122,0.1)] text-[rgba(44,36,32,0.45)] border border-[rgba(180,150,120,0.18)]" size="lg">
+                  <div className="w-5 h-5 border-2 border-[rgba(181,115,122,0.2)] border-t-[rgba(181,115,122,0.7)] rounded-full animate-spin mr-2" />
                   {t("demoAgent.statusConnecting")}
                 </Button>
               </motion.div>
@@ -363,7 +373,8 @@ const DemoAgentPage = () => {
               <motion.div key="end-btns" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col gap-3">
                 <Button
                   onClick={resetCall}
-                  className="w-full bg-gradient-to-r from-[#3D2066] to-[#6B3FA0] text-white rounded-[12px] px-8 py-5 font-semibold border-0"
+                  className="w-full text-white rounded-[12px] px-8 py-5 font-semibold border-0"
+                  style={{ background: "linear-gradient(135deg, #c8956b, #b5737a)" }}
                   size="lg"
                 >
                   <Phone className="w-5 h-5 mr-2" />
@@ -372,7 +383,7 @@ const DemoAgentPage = () => {
                 <Button
                   variant="ghost"
                   onClick={() => navigate("/")}
-                  className="w-full rounded-[12px] text-white/50 hover:text-white/80 hover:bg-white/5"
+                  className="w-full rounded-[12px] text-[rgba(44,36,32,0.45)] hover:text-[#2c2420] hover:bg-[rgba(181,115,122,0.06)]"
                 >
                   {t("demoAgent.backToHome")}
                 </Button>
@@ -387,7 +398,7 @@ const DemoAgentPage = () => {
 
       {/* Separator */}
       <div className="w-full max-w-[680px] mx-auto mt-20 mb-16 relative z-10">
-        <div className="h-px bg-gradient-to-r from-transparent via-[rgba(192,132,252,0.2)] to-transparent" />
+        <div className="h-px bg-gradient-to-r from-transparent via-[rgba(181,115,122,0.25)] to-transparent" />
       </div>
 
       {/* Savings Calculator */}

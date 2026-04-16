@@ -46,11 +46,11 @@ const CalcSlider = ({
         className="w-full h-1 rounded-full appearance-none cursor-pointer
           [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-[22px] [&::-webkit-slider-thumb]:h-[22px]
           [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white
-          [&::-webkit-slider-thumb]:shadow-[0_0_0_3px_rgba(192,132,252,0.38),0_2px_8px_rgba(0,0,0,0.45)]
+          [&::-webkit-slider-thumb]:shadow-[0_0_0_3px_rgba(181,115,122,0.35),0_2px_8px_rgba(0,0,0,0.15)]
           [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:transition-shadow
-          hover:[&::-webkit-slider-thumb]:shadow-[0_0_0_5px_rgba(192,132,252,0.28),0_2px_14px_rgba(0,0,0,0.5)]"
+          hover:[&::-webkit-slider-thumb]:shadow-[0_0_0_5px_rgba(181,115,122,0.22),0_2px_14px_rgba(0,0,0,0.2)]"
         style={{
-          background: `linear-gradient(90deg, rgba(192,132,252,0.5) 0%, rgba(232,121,160,0.5) ${pct}%, rgba(255,255,255,0.06) ${pct}%)`,
+          background: `linear-gradient(90deg, rgba(200,149,107,0.5) 0%, rgba(181,115,122,0.5) ${pct}%, rgba(180,150,120,0.12) ${pct}%)`,
         }}
       />
       <div className="flex justify-between mt-1.5">
@@ -74,12 +74,12 @@ const BarRow = ({
   type: "loss" | "ai";
 }) => {
   const pct = maxVal > 0 ? Math.min((value / maxVal) * 100, 100) : 0;
-  const color = type === "loss" ? "rgba(248,113,113,0.55)" : "linear-gradient(135deg, #c084fc, #e879a0)";
+  const color = type === "loss" ? "rgba(217,79,61,0.45)" : "linear-gradient(135deg, #c8956b, #b5737a)";
 
   return (
     <div className="flex items-center gap-3 mb-2.5 last:mb-0">
       <span className="text-[0.72rem] text-[var(--calc-muted)] w-[100px] shrink-0">{label}</span>
-      <div className="flex-1 h-2 bg-white/[0.045] rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-[rgba(180,150,120,0.08)] rounded-full overflow-hidden">
         <motion.div
           className="h-full rounded-full"
           style={{ background: color }}
@@ -89,7 +89,7 @@ const BarRow = ({
           transition={{ duration: 0.7, ease: [0.34, 1.56, 0.64, 1] }}
         />
       </div>
-      <span className={`text-[0.72rem] font-medium w-[78px] text-right shrink-0 ${type === "loss" ? "text-[#f87171]" : "text-[#4ade80]"}`}>
+      <span className={`text-[0.72rem] font-medium w-[78px] text-right shrink-0 ${type === "loss" ? "text-[#D94F3D]" : "text-[#6a9e6a]"}`}>
         {value.toLocaleString("pl-PL")} zł
       </span>
     </div>
@@ -111,10 +111,9 @@ const SavingsCalculator = () => {
     const noshowLossYear = Math.round(bookings * (noshowPct / 100) * avgValue * 12);
     const noshowRecovered = Math.round(noshowLossYear * 0.4);
 
-    // AI cost: ~0.74 PLN/min, ~2 min per call, bookings * 2 calls (confirmation + reminder)
     const aiCostYear = Math.round(bookings * 2 * 2 * 0.74 * 12);
     const totalLoss = receptionCostYear + noshowLossYear;
-    const beautyCost = aiCostYear + 149 * 12; // PRO plan
+    const beautyCost = aiCostYear + 149 * 12;
 
     return {
       receptionCostYear,
@@ -139,41 +138,45 @@ const SavingsCalculator = () => {
     <section
       className="w-full max-w-[680px] mx-auto relative z-10"
       style={{
-        "--calc-bg": "#08080d",
-        "--calc-surface": "#0f0f18",
-        "--calc-surface2": "#161622",
-        "--calc-border": "rgba(255,255,255,0.06)",
-        "--calc-accent": "#c084fc",
-        "--calc-text": "#f0eef8",
-        "--calc-muted": "rgba(240,238,248,0.42)",
-        "--calc-green": "#4ade80",
-        "--calc-red": "#f87171",
+        "--calc-bg": "#faf7f2",
+        "--calc-surface": "#ffffff",
+        "--calc-surface2": "#f4efe6",
+        "--calc-border": "rgba(180,150,120,0.18)",
+        "--calc-accent": "#b5737a",
+        "--calc-text": "#2c2420",
+        "--calc-muted": "rgba(44,36,32,0.45)",
+        "--calc-green": "#6a9e6a",
+        "--calc-red": "#D94F3D",
       } as React.CSSProperties}
     >
       {/* Hero */}
       <motion.div className="text-center mb-14" {...fadeIn}>
-        <span className="inline-block border border-[rgba(192,132,252,0.3)] bg-[rgba(192,132,252,0.08)] text-[var(--calc-accent)] text-[0.68rem] font-medium tracking-[0.16em] uppercase px-4 py-1.5 rounded-full mb-6">
+        <span className="inline-block border border-[rgba(181,115,122,0.35)] bg-[rgba(181,115,122,0.06)] text-[var(--calc-accent)] text-[0.68rem] font-medium tracking-[0.16em] uppercase px-4 py-1.5 rounded-full mb-6">
           ✦ Kalkulator Oszczędności
         </span>
-        <h2 className="font-serif text-[clamp(2rem,5.5vw,3.1rem)] leading-[1.13] tracking-[-0.01em] text-white mb-4">
+        <h2 className="font-serif text-[clamp(2rem,5.5vw,3.1rem)] leading-[1.13] tracking-[0.01em] text-[#2c2420] mb-4 font-light">
           Sprawdź ile Twój salon traci{" "}
           <br className="hidden md:block" />
           każdego roku — bo{" "}
-          <em className="italic bg-gradient-to-r from-[#c084fc] to-[#e879a0] bg-clip-text text-transparent">
+          <em className="italic bg-gradient-to-r from-[#c8956b] to-[#b5737a] bg-clip-text text-transparent font-normal">
             liczby nie kłamią
           </em>
         </h2>
         <p className="text-[var(--calc-muted)] text-[0.97rem] font-light max-w-[490px] mx-auto leading-relaxed">
           Właśnie rozmawiałaś z AI który mógłby pracować dla Twojego salonu 24/7.
           <br />
-          Teraz czas na <strong className="text-white font-medium">brutalną prawdę</strong> o tym co Cię to kosztuje —
+          Teraz czas na <strong className="text-[#2c2420] font-medium">brutalną prawdę</strong> o tym co Cię to kosztuje —
           każdego dnia gdy go nie masz.
         </p>
       </motion.div>
 
       {/* Card: Twój salon */}
-      <motion.div className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 mb-5 relative overflow-hidden" {...fadeIn}>
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(192,132,252,0.32)] to-transparent" />
+      <motion.div
+        className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 mb-5 relative overflow-hidden"
+        style={{ boxShadow: "0 4px 20px rgba(180,150,120,0.08)" }}
+        {...fadeIn}
+      >
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(181,115,122,0.25)] to-transparent" />
         <div className="text-[0.68rem] font-medium tracking-[0.13em] uppercase text-[var(--calc-muted)] mb-1 flex items-center gap-3 after:content-[''] after:flex-1 after:h-px after:bg-[var(--calc-border)]">
           Twój salon
         </div>
@@ -186,8 +189,12 @@ const SavingsCalculator = () => {
       </motion.div>
 
       {/* Card: Zespół recepcji */}
-      <motion.div className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 mb-5 relative overflow-hidden" {...fadeIn}>
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(192,132,252,0.32)] to-transparent" />
+      <motion.div
+        className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 mb-5 relative overflow-hidden"
+        style={{ boxShadow: "0 4px 20px rgba(180,150,120,0.08)" }}
+        {...fadeIn}
+      >
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(181,115,122,0.25)] to-transparent" />
         <div className="text-[0.68rem] font-medium tracking-[0.13em] uppercase text-[var(--calc-muted)] mb-1 flex items-center gap-3 after:content-[''] after:flex-1 after:h-px after:bg-[var(--calc-border)]">
           Twój zespół recepcji
         </div>
@@ -200,8 +207,12 @@ const SavingsCalculator = () => {
       </motion.div>
 
       {/* Card: No-shows */}
-      <motion.div className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 mb-5 relative overflow-hidden" {...fadeIn}>
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(192,132,252,0.32)] to-transparent" />
+      <motion.div
+        className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 mb-5 relative overflow-hidden"
+        style={{ boxShadow: "0 4px 20px rgba(180,150,120,0.08)" }}
+        {...fadeIn}
+      >
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[rgba(181,115,122,0.25)] to-transparent" />
         <div className="text-[0.68rem] font-medium tracking-[0.13em] uppercase text-[var(--calc-muted)] mb-1 flex items-center gap-3 after:content-[''] after:flex-1 after:h-px after:bg-[var(--calc-border)]">
           Cichy złodziej Twoich przychodów
         </div>
@@ -217,13 +228,17 @@ const SavingsCalculator = () => {
       </motion.div>
 
       {/* Results */}
-      <motion.div className="bg-[var(--calc-surface)] border border-[rgba(192,132,252,0.22)] rounded-[20px] overflow-hidden mb-5" {...fadeIn}>
+      <motion.div
+        className="bg-[var(--calc-surface)] border border-[rgba(181,115,122,0.22)] rounded-[20px] overflow-hidden mb-5"
+        style={{ boxShadow: "0 8px 30px rgba(181,115,122,0.08)" }}
+        {...fadeIn}
+      >
         {/* Hero result */}
-        <div className="bg-gradient-to-br from-[rgba(192,132,252,0.11)] to-[rgba(232,121,160,0.07)] p-6 md:px-10 md:py-8 border-b border-[rgba(192,132,252,0.12)]">
+        <div className="bg-gradient-to-br from-[rgba(181,115,122,0.08)] to-[rgba(200,149,107,0.05)] p-6 md:px-10 md:py-8 border-b border-[rgba(181,115,122,0.12)]">
           <p className="text-[0.66rem] font-medium tracking-[0.14em] uppercase text-[var(--calc-accent)] mb-2">
             Tyle traci Twój salon rocznie bez automatyzacji
           </p>
-          <p className="font-serif text-[clamp(3rem,10vw,5rem)] font-bold leading-none bg-gradient-to-r from-[#c084fc] to-[#e879a0] bg-clip-text text-transparent">
+          <p className="font-serif text-[clamp(3rem,10vw,5rem)] font-bold leading-none bg-gradient-to-r from-[#c8956b] to-[#b5737a] bg-clip-text text-transparent">
             {results.totalLoss.toLocaleString("pl-PL")} zł
           </p>
           <p className="text-[0.82rem] text-[var(--calc-muted)] mt-2">
@@ -234,7 +249,7 @@ const SavingsCalculator = () => {
         {/* 3-stat grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 border-t border-[var(--calc-border)]">
           <div className="p-5 border-r border-[var(--calc-border)] text-center">
-            <p className="font-serif text-xl font-bold text-[#f87171] mb-1 leading-none">
+            <p className="font-serif text-xl font-bold text-[#D94F3D] mb-1 leading-none">
               {results.receptionCostYear.toLocaleString("pl-PL")} zł
             </p>
             <p className="text-[0.67rem] text-[var(--calc-muted)] leading-snug">
@@ -242,7 +257,7 @@ const SavingsCalculator = () => {
             </p>
           </div>
           <div className="p-5 md:border-r border-[var(--calc-border)] text-center">
-            <p className="font-serif text-xl font-bold text-[#f87171] mb-1 leading-none">
+            <p className="font-serif text-xl font-bold text-[#D94F3D] mb-1 leading-none">
               {results.noshowLossYear.toLocaleString("pl-PL")} zł
             </p>
             <p className="text-[0.67rem] text-[var(--calc-muted)] leading-snug">
@@ -250,7 +265,7 @@ const SavingsCalculator = () => {
             </p>
           </div>
           <div className="p-5 text-center col-span-2 md:col-span-1 border-t md:border-t-0 border-[var(--calc-border)]">
-            <p className="font-serif text-xl font-bold text-[#4ade80] mb-1 leading-none">
+            <p className="font-serif text-xl font-bold text-[#6a9e6a] mb-1 leading-none">
               ~{results.beautyCost.toLocaleString("pl-PL")} zł
             </p>
             <p className="text-[0.67rem] text-[var(--calc-muted)] leading-snug">
@@ -272,11 +287,11 @@ const SavingsCalculator = () => {
 
       {/* Mid copy */}
       <motion.div className="text-center py-10 px-6" {...fadeIn}>
-        <h2 className="font-serif text-[clamp(1.5rem,4vw,2.1rem)] leading-[1.25] text-white mb-4">
+        <h2 className="font-serif text-[clamp(1.5rem,4vw,2.1rem)] leading-[1.25] text-[#2c2420] mb-4 font-light">
           To nie są oszczędności.<br />
           To Twoje pieniądze —<br />
           które już{" "}
-          <em className="italic bg-gradient-to-r from-[#c084fc] to-[#e879a0] bg-clip-text text-transparent">
+          <em className="italic bg-gradient-to-r from-[#c8956b] to-[#b5737a] bg-clip-text text-transparent font-normal">
             na Ciebie czekają.
           </em>
         </h2>
@@ -288,8 +303,12 @@ const SavingsCalculator = () => {
       </motion.div>
 
       {/* CTA */}
-      <motion.div className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 text-center relative overflow-hidden" {...fadeIn}>
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-[#c084fc] to-[#e879a0]" />
+      <motion.div
+        className="bg-[var(--calc-surface)] border border-[var(--calc-border)] rounded-[20px] p-6 md:p-9 text-center relative overflow-hidden"
+        style={{ boxShadow: "0 4px 20px rgba(180,150,120,0.08)" }}
+        {...fadeIn}
+      >
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-[#c8956b] to-[#b5737a]" />
         <p className="text-[var(--calc-muted)] text-[0.88rem] leading-relaxed max-w-[420px] mx-auto mb-6">
           Beauty Funnels AI dzwoni do każdej klientki automatycznie —
           zaraz po rezerwacji i dzień przed wizytą.
@@ -297,7 +316,11 @@ const SavingsCalculator = () => {
         </p>
         <button
           onClick={() => navigate("/")}
-          className="inline-flex items-center gap-2 bg-gradient-to-r from-[#c084fc] to-[#e879a0] text-white rounded-full px-9 py-4 font-medium text-[0.95rem] shadow-[0_8px_30px_rgba(192,132,252,0.22)] hover:opacity-90 hover:-translate-y-0.5 hover:shadow-[0_14px_42px_rgba(192,132,252,0.33)] transition-all"
+          className="inline-flex items-center gap-2 text-white rounded-full px-9 py-4 font-medium text-[0.95rem] hover:opacity-90 hover:-translate-y-0.5 transition-all"
+          style={{
+            background: "linear-gradient(135deg, #c8956b, #b5737a)",
+            boxShadow: "0 8px 30px rgba(181,115,122,0.22)",
+          }}
         >
           <Sparkles className="w-4 h-4" />
           Chcę odzyskać te pieniądze →
@@ -305,7 +328,7 @@ const SavingsCalculator = () => {
       </motion.div>
 
       {/* Footnote */}
-      <p className="text-center text-[0.65rem] text-white/[0.28] mt-6 leading-relaxed">
+      <p className="text-center text-[0.65rem] text-[rgba(44,36,32,0.22)] mt-6 leading-relaxed">
         Koszt etatu = stawka × 160h × liczba pracowników × 12 miesięcy.
         <br />
         Koszt AI obliczony na podstawie rzeczywistych stawek Retell AI + Twilio dla Polski (~0,74 zł/min).
