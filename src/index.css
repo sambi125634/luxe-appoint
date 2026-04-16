@@ -17,75 +17,82 @@
   :root {
     --font-serif: 'Cormorant Garamond', Georgia, serif;
     --font-sans: 'Inter', system-ui, sans-serif;
-    /* Luxury Beauty Palette */
-    --background: 40 33% 97%;
-    --foreground: 270 25% 15%;
+    /* Warm Beauty Palette */
+    --background: 33 53% 96%;
+    --foreground: 15 18% 15%;
 
-    --card: 40 30% 99%;
-    --card-foreground: 270 25% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 15 18% 15%;
 
-    --popover: 40 30% 99%;
-    --popover-foreground: 270 25% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 15 18% 15%;
 
-    /* Deep violet primary */
-    --primary: 270 45% 35%;
-    --primary-foreground: 40 30% 98%;
+    /* Rose primary */
+    --primary: 355 26% 58%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Burgundy secondary */
-    --secondary: 345 45% 40%;
-    --secondary-foreground: 40 30% 98%;
+    /* Terra secondary */
+    --secondary: 27 46% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    /* Ivory muted */
-    --muted: 40 25% 92%;
-    --muted-foreground: 270 15% 45%;
+    /* Warm ivory muted */
+    --muted: 37 35% 93%;
+    --muted-foreground: 15 12% 40%;
 
     /* Gold accent */
-    --accent: 45 70% 55%;
-    --accent-foreground: 270 25% 15%;
+    --accent: 39 46% 60%;
+    --accent-foreground: 15 18% 15%;
 
     --destructive: 0 72% 51%;
-    --destructive-foreground: 40 30% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 40 20% 88%;
-    --input: 40 20% 88%;
-    --ring: 270 45% 35%;
+    --border: 30 23% 82%;
+    --input: 30 23% 82%;
+    --ring: 355 26% 58%;
 
     --radius: 0.75rem;
 
-    /* Custom luxury tokens */
-    --violet: 270 45% 35%;
-    --violet-deep: 270 50% 30%;
-    --violet-light: 270 40% 55%;
-    --violet-dark: 270 50% 25%;
-    --burgundy: 345 45% 40%;
-    --burgundy-light: 345 40% 55%;
-    --gold: 45 70% 55%;
-    --gold-light: 45 60% 75%;
-    --ivory: 40 33% 97%;
-    --ivory-dark: 40 25% 92%;
+    /* Custom warm tokens */
+    --rose: 355 26% 58%;
+    --rose-deep: 336 17% 46%;
+    --rose-light: 354 42% 70%;
+    --terra: 27 46% 60%;
+    --terra-light: 27 40% 72%;
+    --gold: 39 46% 60%;
+    --gold-light: 39 40% 75%;
+    --ivory: 33 53% 96%;
+    --ivory-dark: 37 35% 93%;
+
+    /* Legacy aliases for compatibility */
+    --violet: 355 26% 58%;
+    --violet-deep: 336 17% 46%;
+    --violet-light: 354 42% 70%;
+    --violet-dark: 355 30% 50%;
+    --burgundy: 27 46% 60%;
+    --burgundy-light: 27 40% 72%;
 
     /* Glass effects */
-    --glass-bg: 40 30% 99% / 0.7;
-    --glass-border: 40 20% 88% / 0.5;
+    --glass-bg: 0 0% 100% / 0.7;
+    --glass-border: 30 23% 82% / 0.5;
 
     /* Shadows */
-    --shadow-soft: 0 4px 20px -4px hsl(270 45% 35% / 0.1);
-    --shadow-glow: 0 0 40px hsl(270 45% 35% / 0.15);
-    --shadow-gold: 0 4px 20px -4px hsl(45 70% 55% / 0.3);
+    --shadow-soft: 0 4px 20px -4px hsl(30 30% 50% / 0.12);
+    --shadow-glow: 0 0 40px hsl(355 26% 58% / 0.12);
+    --shadow-gold: 0 4px 20px -4px hsl(39 46% 60% / 0.3);
 
     /* Gradients */
-    --gradient-luxury: linear-gradient(135deg, hsl(270 45% 35%), hsl(345 45% 40%));
-    --gradient-gold: linear-gradient(135deg, hsl(45 70% 55%), hsl(45 60% 65%));
-    --gradient-glass: linear-gradient(135deg, hsl(40 30% 99% / 0.9), hsl(40 30% 99% / 0.6));
+    --gradient-luxury: linear-gradient(135deg, hsl(27 46% 60%), hsl(355 26% 58%));
+    --gradient-gold: linear-gradient(135deg, hsl(39 46% 60%), hsl(39 40% 70%));
+    --gradient-glass: linear-gradient(135deg, hsl(0 0% 100% / 0.9), hsl(0 0% 100% / 0.6));
 
-    --sidebar-background: 40 30% 99%;
-    --sidebar-foreground: 270 25% 15%;
-    --sidebar-primary: 270 45% 35%;
-    --sidebar-primary-foreground: 40 30% 98%;
-    --sidebar-accent: 40 25% 92%;
-    --sidebar-accent-foreground: 270 25% 15%;
-    --sidebar-border: 40 20% 88%;
-    --sidebar-ring: 270 45% 35%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 15 18% 15%;
+    --sidebar-primary: 355 26% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 37 35% 93%;
+    --sidebar-accent-foreground: 15 18% 15%;
+    --sidebar-border: 30 23% 82%;
+    --sidebar-ring: 355 26% 58%;
   }
 
   .dark {
