@@ -72,7 +72,7 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
             </a>
             <Button
               onClick={onScrollToForm}
-              className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
+              className="relative overflow-hidden bg-gradient-to-r from-rose-deep to-terra hover:opacity-90 text-white shadow-glow hover:shadow-[0_0_40px_hsl(var(--primary)/0.3)] transition-all duration-500 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
             >
               {t("nav.cta")}
             </Button>
@@ -116,7 +116,7 @@ const LandingNavbar = ({ onScrollToForm }: LandingNavbarProps) => {
               </a>
               <Button
                 onClick={() => { onScrollToForm(); setIsMobileMenuOpen(false); }}
-                className="relative overflow-hidden bg-gradient-to-r from-violet-deep to-burgundy hover:opacity-90 text-white w-full mt-2 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
+                className="relative overflow-hidden bg-gradient-to-r from-rose-deep to-terra hover:opacity-90 text-white w-full mt-2 after:absolute after:inset-0 after:translate-x-[-100%] after:bg-gradient-to-r after:from-transparent after:via-white/20 after:to-transparent hover:after:translate-x-[100%] after:transition-transform after:duration-700"
               >
                 {t("nav.cta")}
               </Button>
