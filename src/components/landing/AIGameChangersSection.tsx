@@ -76,8 +76,8 @@ const features = [
     description: "System automatycznie dzieli Twoje klientki na grupy: nowe, powracające, VIP, zagrożone odejściem. Tworzy gotowe segmenty do Facebook Ads. Zero ręcznej pracy — Pixel robi resztę.",
     stat: "ROI",
     statLabel: "z reklam wreszcie mierzalny",
-    color: "from-purple-500 to-pink-600",
-    bgColor: "bg-purple-500/10",
+    color: "from-rose-deep to-rose",
+    bgColor: "bg-rose/10",
   },
 ];
 
