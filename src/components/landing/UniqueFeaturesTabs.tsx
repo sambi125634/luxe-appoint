@@ -103,9 +103,9 @@ export function UniqueFeaturesTabs() {
   return (
     <div className="py-16 md:py-20 lg:py-28">
       <motion.div className="text-center mb-12" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-        <div className="inline-flex items-center gap-2 bg-violet-50 border border-violet-100 rounded-full px-4 py-1.5 mb-6">
-          <Sparkles className="w-4 h-4 text-violet-500" />
-          <span className="text-sm font-medium text-violet-600">{t("landing.features.badge")}</span>
+        <div className="inline-flex items-center gap-2 bg-rose-light/20 border border-rose-light/40 rounded-full px-4 py-1.5 mb-6">
+          <Sparkles className="w-4 h-4 text-rose" />
+          <span className="text-sm font-medium text-rose-deep">{t("landing.features.badge")}</span>
         </div>
         <h2 className="text-2xl md:text-4xl lg:text-[42px] font-bold leading-tight mb-4">
           <span className="text-primary">{t("landing.features.title1")}</span> {t("landing.features.title2")}
