@@ -649,12 +649,12 @@ export function BookingWidget({ widgetConfig, salonId: propSalonId, onStepChange
               style={{ animationDelay: '1s' }}
             >
               <div className="relative group">
-                <div className="absolute -inset-4 bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 rounded-3xl opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-500 animate-pulse" />
-                <div className="absolute -inset-2 bg-gradient-to-r from-violet-500 via-pink-500 to-rose-500 rounded-3xl opacity-20 blur-xl group-hover:opacity-40 transition-all duration-500 animate-pulse" style={{ animationDelay: '0.5s' }} />
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#c8956b] via-[#b5737a] to-[#8b6070] rounded-3xl opacity-30 blur-2xl group-hover:opacity-50 transition-all duration-500 animate-pulse" />
+                <div className="absolute -inset-2 bg-gradient-to-r from-[#b5737a] via-[#c8956b] to-[#c8a86b] rounded-3xl opacity-20 blur-xl group-hover:opacity-40 transition-all duration-500 animate-pulse" style={{ animationDelay: '0.5s' }} />
                 
                 <Button 
                   onClick={handleStartBooking}
-                  className="relative overflow-hidden px-16 py-7 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-pink-500 via-rose-500 to-violet-500 hover:from-pink-400 hover:via-rose-400 hover:to-violet-400 text-white shadow-2xl shadow-pink-500/40 transition-all duration-500 hover:scale-110 hover:shadow-pink-500/60 border-2 border-white/20"
+                  className="relative overflow-hidden px-16 py-7 text-xl sm:text-2xl font-bold rounded-3xl bg-gradient-to-r from-[#c8956b] via-[#b5737a] to-[#8b6070] hover:from-[#d4a07a] hover:via-[#c0828a] hover:to-[#9b7080] text-white shadow-2xl shadow-[#b5737a]/40 transition-all duration-500 hover:scale-110 hover:shadow-[#b5737a]/60 border-2 border-white/20"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out" />
                   
