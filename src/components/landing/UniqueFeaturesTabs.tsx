@@ -10,9 +10,9 @@ import {
 } from "lucide-react";
 
 const ACCENT_CLASSES: Record<string, { bg: string; text: string; border: string; badgeBg: string; metricText: string }> = {
-  violet: { bg: "bg-violet-100", text: "text-violet-600", border: "hover:border-violet-200", badgeBg: "bg-violet-50 text-violet-600 border-violet-200", metricText: "text-violet-600" },
+  violet: { bg: "bg-rose-light/30", text: "text-rose-deep", border: "hover:border-rose-light", badgeBg: "bg-rose-light/20 text-rose-deep border-rose-light", metricText: "text-rose-deep" },
   orange: { bg: "bg-orange-100", text: "text-orange-600", border: "hover:border-orange-200", badgeBg: "bg-orange-50 text-orange-600 border-orange-200", metricText: "text-orange-600" },
-  pink: { bg: "bg-pink-100", text: "text-pink-600", border: "hover:border-pink-200", badgeBg: "bg-pink-50 text-pink-600 border-pink-200", metricText: "text-pink-600" },
+  pink: { bg: "bg-rose-light/20", text: "text-rose", border: "hover:border-rose-light", badgeBg: "bg-rose-light/20 text-rose border-rose-light", metricText: "text-rose" },
   green: { bg: "bg-emerald-100", text: "text-emerald-600", border: "hover:border-emerald-200", badgeBg: "bg-emerald-50 text-emerald-600 border-emerald-200", metricText: "text-emerald-600" },
   blue: { bg: "bg-blue-100", text: "text-blue-600", border: "hover:border-blue-200", badgeBg: "bg-blue-50 text-blue-600 border-blue-200", metricText: "text-blue-600" },
   teal: { bg: "bg-teal-100", text: "text-teal-600", border: "hover:border-teal-200", badgeBg: "bg-teal-50 text-teal-600 border-teal-200", metricText: "text-teal-600" },
