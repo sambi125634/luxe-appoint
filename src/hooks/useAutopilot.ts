@@ -152,6 +152,25 @@ export function useToggleAutopilotPause() {
   });
 }
 
+// ---- Update Config ----
+
+export function useUpdateAutopilotConfig() {
+  const { salonId } = useSalonId();
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (updates: Partial<AutopilotConfig>) => {
+      if (!salonId) throw new Error("No salon");
+      const { error } = await supabase
+        .from("autopilot_config")
+        .update(updates)
+        .eq("salon_id", salonId);
+      if (error) throw error;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["autopilot-config"] }),
+  });
+}
+
 // ---- Demo hooks (mock data) ----
 
 export function useDemoAutopilotStats() {
