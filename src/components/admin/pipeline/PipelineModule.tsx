@@ -10,7 +10,6 @@ import {
   Kanban,
   BarChart3,
   GitBranch,
-  Settings,
   Sparkles,
   Route,
   Trophy
