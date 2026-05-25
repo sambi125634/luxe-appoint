@@ -8,6 +8,12 @@ import { SectionGuide } from "../SectionGuide";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
+import { toast } from "sonner";
+import {
+  useConversationContacts,
+  useConversationMessages,
+  useSendMessage,
+} from "@/hooks/useConversations";
 
 // Demo data - only shown in demo mode
 const DEMO_CONTACTS: Contact[] = [
@@ -169,8 +175,15 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
   const whatsappConfigured = settings.integrations.whatsapp?.enabled && !!settings.integrations.whatsapp?.apiKey;
   const hasAnyChannel = smsConfigured || whatsappConfigured;
 
-  const contacts = isDemo ? DEMO_CONTACTS : [];
-  const messages = isDemo ? DEMO_MESSAGES : {};
+  // Real data hooks (skipped in demo)
+  const { data: realContacts = [] } = useConversationContacts(!isDemo);
+  const { data: realMessages = [] } = useConversationMessages(
+    selectedContact?.id ?? null,
+    !isDemo,
+  );
+  const sendMessage = useSendMessage();
+
+  const contacts = isDemo ? DEMO_CONTACTS : realContacts;
 
   const filteredContacts = contacts.filter((contact) => {
     const fullName = `${contact.firstName} ${contact.lastName}`.toLowerCase();
@@ -183,11 +196,23 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
   });
 
   const handleSendMessage = (message: string, type: "SMS" | "Email" | "WhatsApp") => {
-    console.log("Sending message:", { message, type, to: selectedContact });
+    if (!selectedContact) return;
+    if (isDemo) {
+      toast.info("Tryb podglądu — wiadomość nie została wysłana");
+      return;
+    }
+    sendMessage.mutate(
+      { clientId: selectedContact.id, body: message, channel: type },
+      {
+        onSuccess: () => toast.success("Wiadomość zapisana"),
+        onError: (e: any) =>
+          toast.error("Nie udało się wysłać", { description: e?.message }),
+      },
+    );
   };
 
-  // Empty state for production mode — no channels configured
-  if (!isDemo && !hasAnyChannel) {
+  // Empty state for production mode — no channels configured AND no message history yet
+  if (!isDemo && !hasAnyChannel && realContacts.length === 0) {
     return (
       <div className="space-y-6">
         <SectionGuide sectionKey="conversations" />
@@ -254,7 +279,7 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
         {selectedContact ? (
           <ConversationView
             contact={selectedContact}
-            messages={messages[selectedContact.id] || []}
+            messages={isDemo ? (DEMO_MESSAGES[selectedContact.id] || []) : realMessages}
             onSendMessage={handleSendMessage}
             onBack={() => setSelectedContact(null)}
           />

@@ -574,6 +574,72 @@ export type Database = {
           },
         ]
       }
+      booking_widgets: {
+        Row: {
+          advanced_settings: Json | null
+          booking_count: number
+          created_at: string
+          description: string | null
+          form_fields: Json
+          id: string
+          is_active: boolean
+          name: string
+          prepayment: Json | null
+          promotion: Json | null
+          salon_id: string
+          service_ids: string[]
+          show_all_services: boolean
+          slug: string
+          steps: Json
+          theme: Json
+          type: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          advanced_settings?: Json | null
+          booking_count?: number
+          created_at?: string
+          description?: string | null
+          form_fields?: Json
+          id?: string
+          is_active?: boolean
+          name: string
+          prepayment?: Json | null
+          promotion?: Json | null
+          salon_id: string
+          service_ids?: string[]
+          show_all_services?: boolean
+          slug: string
+          steps?: Json
+          theme?: Json
+          type?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          advanced_settings?: Json | null
+          booking_count?: number
+          created_at?: string
+          description?: string | null
+          form_fields?: Json
+          id?: string
+          is_active?: boolean
+          name?: string
+          prepayment?: Json | null
+          promotion?: Json | null
+          salon_id?: string
+          service_ids?: string[]
+          show_all_services?: boolean
+          slug?: string
+          steps?: Json
+          theme?: Json
+          type?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: []
+      }
       client_communication_preferences: {
         Row: {
           client_id: string
@@ -1152,6 +1218,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      conversation_messages: {
+        Row: {
+          body: string
+          channel: string
+          client_id: string
+          created_at: string
+          direction: string
+          error_message: string | null
+          external_message_id: string | null
+          id: string
+          salon_id: string
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          body: string
+          channel?: string
+          client_id: string
+          created_at?: string
+          direction: string
+          error_message?: string | null
+          external_message_id?: string | null
+          id?: string
+          salon_id: string
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          client_id?: string
+          created_at?: string
+          direction?: string
+          error_message?: string | null
+          external_message_id?: string | null
+          id?: string
+          salon_id?: string
+          sent_at?: string
+          status?: string
+        }
+        Relationships: []
       }
       deletion_requests: {
         Row: {
