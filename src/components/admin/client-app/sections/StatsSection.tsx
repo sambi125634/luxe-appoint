@@ -17,21 +17,41 @@ export function StatsSection({ isDemo, salonId }: StatsSectionProps) {
     queryKey: ["client-app-stats", salonId],
     queryFn: async () => {
       if (!salonId) return null;
-      const [usersRes, reviewsRes, stampsRes] = await Promise.all([
+      const monthAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+      const [usersRes, reviewsRes, activeRes, bookingsRes, pushRes] = await Promise.all([
         supabase.from("client_salon_links").select("id", { count: "exact", head: true }).eq("salon_id", salonId),
         supabase.from("client_reviews").select("rating").eq("salon_id", salonId),
-        supabase.from("loyalty_stamps").select("id", { count: "exact", head: true }).eq("salon_id", salonId),
+        supabase.from("appointments").select("client_id", { count: "exact", head: true }).eq("salon_id", salonId).gte("start_time", monthAgo),
+        supabase.from("appointments").select("id", { count: "exact", head: true }).eq("salon_id", salonId).eq("source", "client_app"),
+        supabase.from("push_notification_history").select("recipients_count, opened_count").eq("salon_id", salonId),
       ]);
       const ratings = reviewsRes.data ?? [];
       const avgRating = ratings.length > 0 ? ratings.reduce((s, r) => s + r.rating, 0) / ratings.length : 0;
+      const pushRows = pushRes.data ?? [];
+      const totalRecipients = pushRows.reduce((s, r) => s + (r.recipients_count ?? 0), 0);
+      const totalOpened = pushRows.reduce((s, r) => s + (r.opened_count ?? 0), 0);
+      const openRate = totalRecipients > 0 ? Math.round((totalOpened / totalRecipients) * 100) : 0;
+
+      // VIP = clients with >= 5 completed appointments
+      const { data: vipAps } = await supabase
+        .from("appointments")
+        .select("client_id")
+        .eq("salon_id", salonId)
+        .eq("status", "completed");
+      const counts = new Map<string, number>();
+      (vipAps ?? []).forEach((a) => {
+        if (a.client_id) counts.set(a.client_id, (counts.get(a.client_id) ?? 0) + 1);
+      });
+      const vipClients = [...counts.values()].filter((n) => n >= 5).length;
+
       return {
         appUsers: usersRes.count ?? 0,
-        activeLastMonth: 0,
-        bookingsFromApp: 0,
+        activeLastMonth: activeRes.count ?? 0,
+        bookingsFromApp: bookingsRes.count ?? 0,
         avgRating: Math.round(avgRating * 10) / 10,
         totalReviews: ratings.length,
-        vipClients: 0,
-        pushOpenRate: 0,
+        vipClients,
+        pushOpenRate: openRate,
       };
     },
     enabled: !!salonId && !isDemo,
