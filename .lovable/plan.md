@@ -1,109 +1,76 @@
 
+# Audyt panelu Admin — pełna parytetowość z Demo
 
-# Plan: Migracja widgetu rezerwacji 1:1 do nowego projektu
+## Cel
+Realny panel admin (`/admin`) ma mieć **wszystkie funkcje** z panelu demo (`/demo`), działające na realnych danych z bazy zamiast mocków. Pakiety/gating zostawiamy na później — teraz parytet funkcjonalny.
 
-## Realna ocena sytuacji
+## Stan obecny (po przejrzeniu kodu)
+`AdminDashboard.tsx` i `DemoPage.tsx` renderują ten sam zestaw 17 modułów z tym samym sidebarem. Każdy moduł przyjmuje prop `isDemo`. Różnica:
+- **Demo** → `isDemo={true}` → moduły czytają dane z plików `*demo-data.ts` / mocków.
+- **Admin** → `isDemo` nie ustawiony → moduły mają używać hooków podpiętych do Supabase (`useSalonId`, `useClients`, `useServices`, `useStaffMembers`, `useAutopilot`, `useTrueProfit`, ...).
 
-Widget + edytor admin to **~7 200 linii kodu w 20 plikach** + zależności:
+Ryzyko: część modułów może mieć w trybie real "puste stany" zamiast działającej logiki (formularze bez mutacji, akcje bez wywołań edge functions, panele AI bez podpięcia, brak realtime, brak walidacji konfliktów, brak importu/exportu, itd).
+
+## Sposób pracy
+**Moduł-po-module, audyt + naprawa od razu**, w jednej rundzie na moduł:
+1. Otwieram moduł w kodzie + porównuję ścieżkę demo vs real.
+2. Spisuję krótko: ✅ działa / ⚠️ częściowo / ❌ brak.
+3. Naprawiam braki w tej samej turze (RLS + edge fn jeśli trzeba).
+4. Krótki raport co zmienione, zanim ruszam do następnego.
+
+## Kolejność modułów (wg priorytetu operacyjnego)
 
 ```text
-src/components/booking/          (13 plików, ~3 540 linii)
-  BookingWidget.tsx               863 linii
-  ServiceSelection.tsx            716 linii
-  DateTimeSelection.tsx           583 linii
-  BookingConfirmation.tsx         445 linii
-  + 9 innych (PaymentStep, ClientForm, SakuraBackground, Confetti, etc.)
+Faza 1 — Fundament dzienny
+  1. Dashboard (home)         — KPI, dzisiejsze wizyty, alerty
+  2. Kalendarz (calendar)     — Day View, drag&drop, modal wizyty, konflikty
+  3. Klienci (clients)        — CRM, tagi, segmentacja, import CSV
+  4. Usługi (services)        — warianty, recepty, media
+  5. Personel (staff)         — zaproszenia, uprawnienia, godziny pracy
 
-src/components/admin/widgets/    (7 plików, ~3 030 linii)
-  WidgetEditor.tsx              1 406 linii
-  WidgetsManagement.tsx           421 linii
-  PromotionsManager.tsx           417 linii
-  EmbedCodeModal.tsx              278 linii
-  types.ts                        271 linii
-  InstagramLinkGenerator.tsx      234 linii
+Faza 2 — Lejek i rezerwacje
+  6. Widgety (widgets)        — edytor, embed, social proof, analytics
+  7. Konwersacje (conversations)
+  8. Ścieżka Klientki (pipeline) — 11-step Kanban
+  9. Konsultacje (consultation)  — szablony, wysyłka, podpisy
 
-Zależności:
-  src/hooks/useConflictCheck.ts
-  src/lib/phone-validation.ts
-  src/pages/BookingPage.tsx
-  supabase/functions/check-appointment-conflict/
-  supabase/functions/create-payment-p24/  (jeśli chcesz przedpłaty)
-  + tabele DB: services, staff_members, appointments, salons, salon_settings
+Faza 3 — Pieniądze i raporty
+ 10. Księgowość (accounting)  — True Profit, raporty miesięczne
+ 11. Produkty (products)      — magazyn, skaner faktur AI, ruchy
+
+Faza 4 — Automatyzacje (USP)
+ 12. Retencja (retention)     — sekwencje 45/60/75/90, kolejka
+ 13. AI Autopilot (autopilot) — 16 funkcji, config, historia
+ 14. Polecenia (referral)     — kody, leaderboard, Google Reviews
+
+Faza 5 — System
+ 15. Aplikacja Klientki (client-app) — branding, lojalność, deletion requests
+ 16. Ustawienia (settings)    — integracje, GC, P24, email, push, RODO
+ 17. Pomoc & AI (support)     — chatbot Gemini, ticketing
 ```
 
-**Wklejanie tego jako prompt ChatGPT nie zadziała** — przekroczy limity, pogubi importy, a typy z bazy danych (Supabase types.ts) nie będą pasować. AI w nowym projekcie i tak wygeneruje "podobne", nie "identyczne".
+## Co sprawdzam w każdym module (checklist)
+- **Dane**: czy hooki czytają z bazy po `salonId` (nie z mocków)
+- **Mutacje**: czy CRUD wywołuje Supabase / edge function
+- **RLS**: czy polityki pozwalają na operację (admin/staff)
+- **Loading & empty states**: skeleton + sensowny pusty stan + CTA
+- **Walidacje**: Zod / formularze przed submit
+- **Realtime / refetch**: po mutacji UI się odświeża
+- **Edge functions**: czy są podpięte i deployowane (logi)
+- **Demo guard**: czy demo NIE łamie się gdy real moduł czyta DB
 
-## Rekomendacja: użyj wbudowanego Cross-Project Copy
+## Format raportu po module
+Po każdym module dostaniesz:
+- 🔍 **Audit**: co zastane, co brakowało
+- 🛠️ **Fix**: pliki zmienione, migracje, edge fn
+- ✅ **Verified**: jak sprawdziłem że działa (logi/DB/preview)
+- ➡️ **Next**: czy ruszamy do kolejnego, czy trzeba decyzji od Ciebie
 
-Lovable ma narzędzie, które przenosi pliki **1:1 między projektami w tym samym workspace** — bez zmian, bez interpretacji AI. To najszybszy i najbardziej niezawodny sposób.
+## Czego NIE robimy teraz (poza zakresem)
+- Pakiety FREE/PRO/ELITE i gating (osobna faza po parytecie)
+- Refaktor wizualny / kosmetyka (osobna runda po parytecie)
+- Nowe funkcje nieobecne w demo
+- Zmiana sidebar/nawigacji
 
-### Krok 1: Powiedz mi nazwę nowego projektu
-
-W odpowiedzi napisz dokładną nazwę projektu (tę widoczną w sidebarze Lovable po lewej). Przykład: `beauty-funnels-leadgen`.
-
-### Krok 2: Ja automatycznie przenoszę wszystko (1 sesja)
-
-Po Twojej odpowiedzi wykonam — w trybie default — następujące akcje cross-project:
-
-**A. Frontend (20 plików):**
-- Cały folder `src/components/booking/` (13 plików)
-- Cały folder `src/components/admin/widgets/` (7 plików)
-- `src/hooks/useConflictCheck.ts`
-- `src/hooks/use-toast.ts` (jeśli brak)
-- `src/lib/phone-validation.ts`
-- `src/pages/BookingPage.tsx` (publiczny widget na `/s/:slug`)
-
-**B. Backend (Supabase migration):**
-Wygeneruję migrację SQL tworzącą uproszczone tabele potrzebne TYLKO widgetowi:
-- `services` (id, name, duration, price, category, thumbnail_url)
-- `staff_members` (id, name, role)
-- `appointments` (id, service_id, staff_id, start_time, status, client data)
-- `salons` (id, name, slug, settings JSONB)
-- `widget_configs` (id, salon_id, name, slug, theme JSONB, services[], steps JSONB)
-- RLS policies dla pojedynczego owner
-
-**C. Edge Function:**
-- `check-appointment-conflict` (zapobieganie podwójnym rezerwacjom)
-
-**D. Routing w nowym projekcie:**
-- `/s/:slug` → publiczny widget
-- `/admin/widgets` → WidgetsManagement (lista + edytor)
-
-**E. Konfiguracja:**
-- shadcn/ui components (Button, Badge, Dialog, Tabs, Input, Switch, Select, Calendar, Popover) — jeśli których brakuje
-- Dependencies: `framer-motion`, `@tanstack/react-query`, `date-fns`, `lucide-react`
-- Tokeny CSS (warm light: rose/terra/gold) — już skopiowane wcześniej
-
-### Krok 3: Adaptacja do single-tenant
-
-Obecny widget zakłada multi-tenant (`salon_id`). W nowym projekcie (Twój osobisty CRM) jest TYLKO jeden salon — Ty. Po skopiowaniu wykonam minimalne zmiany:
-- Usunąć logikę przełączania między salonami
-- Hardcoded `DEFAULT_SALON_ID` lub auto-wybór pierwszego salonu
-- Uproszczony onboarding (jeden klik = utworzenie salonu)
-
-## Co NIE jest przenoszone (świadomie)
-
-Te elementy zostawiamy w obecnym projekcie — nie są potrzebne w lejku:
-- Multi-tenant RLS (`isDemo` guards)
-- AI Slot Scoring, Risk Score, Pricing Optimizer
-- Loyalty stamps, retention, beauty rhythms
-- Inventory, recipes, true profit
-- Client app (`/app/*`)
-- Onboarding wizard
-- Subscription gating
-
-## Czego potrzebuję od Ciebie TERAZ
-
-**Tylko jedna informacja**: nazwa nowego projektu Lovable (taka jaka pojawia się w sidebarze).
-
-Po Twojej odpowiedzi — w jednej sesji w trybie default — przenoszę wszystkie 20 plików + tworzę migrację DB + edge function + routing. Effekt: identyczny widget i identyczny edytor admin w nowym projekcie.
-
-## Backup plan jeśli cross-project nie zadziała
-
-Jeśli z jakiegoś powodu nowy projekt nie jest w tym samym workspace (cross-project działa tylko wewnątrz workspace), alternatywą jest:
-1. Ja generuję ZIP z 20 plikami + SQL + instrukcje
-2. Ty wgrywasz pliki ręcznie w nowym projekcie przez Lovable file uploader
-3. Wklejasz SQL do migration tool
-
-Ale **najpierw spróbujmy cross-project** — to pełna automatyzacja.
-
+## Start
+Po Twoim "ok" zaczynam od **#1 Dashboard (home)** — otwieram `DashboardHome.tsx`, porównuję ścieżki demo vs real, raportuję i poprawiam.
