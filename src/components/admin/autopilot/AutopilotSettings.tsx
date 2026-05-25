@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useAutopilotConfig, useUpdateAutopilotConfig } from "@/hooks/useAutopilot";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AutopilotSettingsProps {
   isDemo?: boolean;
