@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Camera, Upload, Trash2, ImagePlus } from "lucide-react";
 import { DEMO_GALLERY } from "../demo/demoData";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -25,6 +25,9 @@ const CATEGORIES = [
 
 export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
   const [activeCategory, setActiveCategory] = useState("all");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: liveGallery, isLoading } = useQuery({
     queryKey: ["admin-salon-gallery", salonId],
@@ -47,9 +50,48 @@ export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
 
   const handleUpload = () => {
     if (isDemo) {
-      toast.info("W trybie demo dodaj zdjęcia gdy klientki dołączą — lub dodaj je już teraz!");
-    } else {
-      toast.info("Upload zdjęć wkrótce dostępny");
+      toast.info("Upload aktywny w trybie produkcyjnym");
+      return;
+    }
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !salonId) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const path = `${salonId}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("salon-gallery").upload(path, file, { upsert: false });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("salon-gallery").getPublicUrl(path);
+      const category = activeCategory === "all" ? "portfolio" : activeCategory;
+      const { error: insErr } = await supabase.from("salon_gallery").insert({
+        salon_id: salonId,
+        image_url: pub.publicUrl,
+        category,
+        display_order: normalizedGallery.length,
+      });
+      if (insErr) throw insErr;
+      queryClient.invalidateQueries({ queryKey: ["admin-salon-gallery", salonId] });
+      toast.success("Zdjęcie dodane ✓");
+    } catch (err) {
+      console.error(err);
+      toast.error("Błąd uploadu zdjęcia");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDelete = async (photoId: string) => {
+    if (isDemo) return;
+    const { error } = await supabase.from("salon_gallery").delete().eq("id", photoId);
+    if (error) toast.error("Nie udało się usunąć");
+    else {
+      queryClient.invalidateQueries({ queryKey: ["admin-salon-gallery", salonId] });
+      toast.success("Zdjęcie usunięte");
     }
   };
 
@@ -68,6 +110,13 @@ export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileSelected}
+        />
         <Tabs value={activeCategory} onValueChange={setActiveCategory}>
           <TabsList>
             {CATEGORIES.map((c) => (
@@ -110,7 +159,7 @@ export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
                   {CATEGORIES.find((c) => c.value === photo.category)?.label}
                 </Badge>
                 <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                  <Button variant="destructive" size="icon" className="w-8 h-8">
+                  <Button variant="destructive" size="icon" className="w-8 h-8" onClick={() => handleDelete(photo.id)} disabled={isDemo}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
@@ -124,10 +173,11 @@ export function GallerySection({ isDemo, salonId }: GallerySectionProps) {
 
             <button
               onClick={handleUpload}
-              className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+              disabled={uploading}
+              className="aspect-square rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors disabled:opacity-50"
             >
               <Upload className="w-6 h-6" />
-              <span className="text-xs">Dodaj zdjęcie</span>
+              <span className="text-xs">{uploading ? "Wysyłanie..." : "Dodaj zdjęcie"}</span>
             </button>
           </div>
         )}
