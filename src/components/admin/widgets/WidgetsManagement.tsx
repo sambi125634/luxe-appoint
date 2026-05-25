@@ -32,6 +32,11 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
+import {
+  useBookingWidgets,
+  useUpsertBookingWidget,
+  useDeleteBookingWidget,
+} from "@/hooks/useBookingWidgets";
 import { BookingWidget, mockWidgets, mockPromotions, WidgetPromotion, defaultWidgetTheme, defaultFormFields, defaultWidgetSteps } from "./types";
 import { EmbedCodeModal } from "./EmbedCodeModal";
 import { WidgetEditor } from "./WidgetEditor";
@@ -70,6 +75,10 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
     enabled: !!salonId && !isDemo,
   });
 
+  const { data: realWidgets = [] } = useBookingWidgets(!isDemo);
+  const upsertWidget = useUpsertBookingWidget();
+  const deleteWidget = useDeleteBookingWidget();
+
   const [widgets, setWidgets] = useState<BookingWidget[]>(isDemo ? mockWidgets : []);
   const [promotions, setPromotions] = useState<WidgetPromotion[]>(isDemo ? mockPromotions : []);
   const [activeTab, setActiveTab] = useState("widgets");
@@ -78,11 +87,15 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [embedWidget, setEmbedWidget] = useState<BookingWidget | null>(null);
 
-  // Build main widget from salon data when not demo
+  // Sync real widgets into local state + auto-bootstrap "main" widget on first load
   useEffect(() => {
-    if (!isDemo && salonData && widgets.length === 0) {
+    if (isDemo) return;
+    setWidgets(realWidgets);
+
+    // If no widgets exist for this salon yet, auto-create the main widget
+    if (salonData && realWidgets.length === 0 && !upsertWidget.isPending) {
       const mainWidget: BookingWidget = {
-        id: "main",
+        id: "new-main",
         name: "Główny widget rezerwacji",
         slug: salonData.slug,
         description: "Domyślny widget rezerwacji ze wszystkimi usługami",
@@ -102,9 +115,9 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
         viewCount: 0,
         bookingCount: 0,
       };
-      setWidgets([mainWidget]);
+      upsertWidget.mutate(mainWidget);
     }
-  }, [salonData, isDemo]);
+  }, [isDemo, realWidgets, salonData]);
 
   const getDemoOrRealUrl = (widget: BookingWidget) => {
     if (isDemo) {
@@ -137,14 +150,24 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
   };
 
   const handleSaveWidget = (widget: BookingWidget) => {
-    if (selectedWidget) {
-      setWidgets(widgets.map(w => w.id === widget.id ? widget : w));
-      toast.success("Widget zaktualizowany");
-    } else {
-      setWidgets([...widgets, { ...widget, id: Date.now().toString() }]);
-      toast.success("Widget utworzony");
+    if (isDemo) {
+      // Demo mode: local state only
+      if (selectedWidget) {
+        setWidgets(widgets.map(w => w.id === widget.id ? widget : w));
+      } else {
+        setWidgets([...widgets, { ...widget, id: Date.now().toString() }]);
+      }
+      toast.success(selectedWidget ? "Widget zaktualizowany" : "Widget utworzony");
+      setIsEditorOpen(false);
+      return;
     }
-    setIsEditorOpen(false);
+    upsertWidget.mutate(widget, {
+      onSuccess: () => {
+        toast.success(selectedWidget ? "Widget zaktualizowany" : "Widget utworzony");
+        setIsEditorOpen(false);
+      },
+      onError: (e: any) => toast.error("Nie udało się zapisać widgetu", { description: e?.message }),
+    });
   };
 
   const handleDeleteWidget = (widget: BookingWidget) => {
@@ -152,8 +175,15 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
       toast.error("Nie można usunąć głównego widgetu");
       return;
     }
-    setWidgets(widgets.filter(w => w.id !== widget.id));
-    toast.success("Widget usunięty");
+    if (isDemo) {
+      setWidgets(widgets.filter(w => w.id !== widget.id));
+      toast.success("Widget usunięty");
+      return;
+    }
+    deleteWidget.mutate(widget.id, {
+      onSuccess: () => toast.success("Widget usunięty"),
+      onError: (e: any) => toast.error("Nie udało się usunąć", { description: e?.message }),
+    });
   };
 
   const handlePreview = (widget: BookingWidget) => {
