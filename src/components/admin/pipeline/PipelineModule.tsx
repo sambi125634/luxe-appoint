@@ -30,6 +30,7 @@ import {
   defaultPipelineStages,
   mockPipelineContacts
 } from "./types";
+import { usePipelineContacts } from "@/hooks/usePipelineContacts";
 
 interface PipelineModuleProps {
   isDemo?: boolean;
@@ -37,7 +38,13 @@ interface PipelineModuleProps {
 
 export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   const { t } = useTranslation();
+  const { data: realContacts = [], isLoading } = usePipelineContacts(!isDemo);
   const [contacts, setContacts] = useState<PipelineContact[]>(isDemo ? mockPipelineContacts : []);
+
+  // Sync real data into local state once loaded (allows local drag overrides)
+  useEffect(() => {
+    if (!isDemo) setContacts(realContacts);
+  }, [isDemo, realContacts]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dragOverStage, setDragOverStage] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<PipelineContact | null>(null);
@@ -201,7 +208,7 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
   };
 
   // Empty state for production mode
-  if (!isDemo && contacts.length === 0) {
+  if (!isDemo && !isLoading && contacts.length === 0) {
     return (
       <div className="space-y-6">
         <SectionGuide sectionKey="pipeline" />
@@ -210,14 +217,10 @@ export function PipelineModule({ isDemo = false }: PipelineModuleProps) {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
               <Route className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-serif text-xl font-semibold mb-2">Ścieżka Klientki wymaga konfiguracji</h3>
+            <h3 className="font-serif text-xl font-semibold mb-2">Brak klientek w ścieżce</h3>
             <p className="text-muted-foreground text-sm mb-4">
-              Ścieżka Klientki automatycznie śledzi postęp klientek przez etapy zabiegów. Skonfiguruj integrację w ustawieniach, aby aktywować ten moduł.
+              Ścieżka Klientki automatycznie śledzi postęp Twoich klientek po pierwszej rezerwacji. Gdy tylko pojawi się pierwsza wizyta — pojawi się tutaj.
             </p>
-            <Button variant="outline" className="gap-2">
-              <Settings className="w-4 h-4" />
-              Przejdź do Ustawień → Integracje
-            </Button>
           </div>
         </div>
       </div>
