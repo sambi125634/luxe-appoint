@@ -21,7 +21,19 @@ export function StatsSection({ isDemo, salonId }: StatsSectionProps) {
       const usersRes = await supabase.from("client_salon_links").select("id", { count: "exact", head: true }).eq("salon_id", salonId);
       const reviewsRes = await supabase.from("client_reviews").select("rating").eq("salon_id", salonId);
       const activeRes = await supabase.from("appointments").select("client_id", { count: "exact", head: true }).eq("salon_id", salonId).gte("start_time", monthAgo);
-      const bookingsRes = await supabase.from("appointments").select("id", { count: "exact", head: true }).eq("salon_id", salonId).eq("source", "client_app");
+      // Bookings from app: count distinct clients linked to the salon that have any appointment
+      const linkedUserRes = await supabase.from("client_salon_links").select("user_id").eq("salon_id", salonId);
+      const linkedEmails = await supabase.from("profiles").select("email").in("id", (linkedUserRes.data ?? []).map((l) => l.user_id));
+      const emails = (linkedEmails.data ?? []).map((p) => p.email).filter(Boolean) as string[];
+      let bookingsCount = 0;
+      if (emails.length > 0) {
+        const linkedClients = await supabase.from("clients").select("id").eq("salon_id", salonId).in("email", emails);
+        const ids = (linkedClients.data ?? []).map((c) => c.id);
+        if (ids.length > 0) {
+          const apsCount = await supabase.from("appointments").select("id", { count: "exact", head: true }).eq("salon_id", salonId).in("client_id", ids);
+          bookingsCount = apsCount.count ?? 0;
+        }
+      }
       const pushRes = await supabase.from("push_notification_history").select("recipients_count, opened_count").eq("salon_id", salonId);
       const ratings = reviewsRes.data ?? [];
       const avgRating = ratings.length > 0 ? ratings.reduce((s, r) => s + r.rating, 0) / ratings.length : 0;
@@ -45,7 +57,7 @@ export function StatsSection({ isDemo, salonId }: StatsSectionProps) {
       return {
         appUsers: usersRes.count ?? 0,
         activeLastMonth: activeRes.count ?? 0,
-        bookingsFromApp: bookingsRes.count ?? 0,
+        bookingsFromApp: bookingsCount,
         avgRating: Math.round(avgRating * 10) / 10,
         totalReviews: ratings.length,
         vipClients,
