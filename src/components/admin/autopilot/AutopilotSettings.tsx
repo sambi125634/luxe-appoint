@@ -77,11 +77,11 @@ export function AutopilotSettings({ isDemo }: AutopilotSettingsProps) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs mb-1 block">Od</Label>
-            <Input type="time" defaultValue="22:00" className="text-sm" />
+            <Input type="time" value={quietStart} onChange={(e) => setQuietStart(e.target.value)} className="text-sm" />
           </div>
           <div>
             <Label className="text-xs mb-1 block">Do</Label>
-            <Input type="time" defaultValue="07:00" className="text-sm" />
+            <Input type="time" value={quietEnd} onChange={(e) => setQuietEnd(e.target.value)} className="text-sm" />
           </div>
         </div>
       </div>
@@ -91,10 +91,19 @@ export function AutopilotSettings({ isDemo }: AutopilotSettingsProps) {
         <h3 className="font-semibold text-sm">Limit wiadomości</h3>
         <p className="text-xs text-muted-foreground">Maksymalna liczba wiadomości do jednej klientki</p>
         <div className="flex items-center gap-3">
-          <Input type="number" defaultValue="2" className="w-20 text-sm" min={1} max={5} />
-          <span className="text-sm text-muted-foreground">wiadomości na</span>
-          <Input type="number" defaultValue="7" className="w-20 text-sm" min={1} />
-          <span className="text-sm text-muted-foreground">dni</span>
+          <Input type="number" value={maxMessages} onChange={(e) => setMaxMessages(e.target.value)} className="w-20 text-sm" min={1} max={10} />
+          <span className="text-sm text-muted-foreground">wiadomości na {maxMessages || 2} dni</span>
+        </div>
+      </div>
+
+      {/* AI Suggestions */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-sm">Sugestie AI</h3>
+            <p className="text-xs text-muted-foreground mt-1">Autopilot analizuje dane i sugeruje optymalne akcje</p>
+          </div>
+          <Switch checked={aiSuggestions} onCheckedChange={setAiSuggestions} />
         </div>
       </div>
 
