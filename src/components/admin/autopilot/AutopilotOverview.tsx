@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Zap, TrendingUp, UserX, Star, Clock, Activity } from "lucide-react";
+import { Zap, TrendingUp, UserX, Star, Clock, Activity, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
+import { useAutopilotActions } from "@/hooks/useAutopilot";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AutopilotOverviewProps {
   isDemo?: boolean;
@@ -33,37 +35,48 @@ const colorMap: Record<string, string> = {
 
 export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const d = DEMO_AUTOPILOT_DATA;
+  const { data: realActions, isLoading } = useAutopilotActions();
 
-  const actionsToday = useAnimatedCount(isDemo ? d.kpi.actionsToday : 0, 800, !!isDemo);
-  const revenueRecovered = useAnimatedCount(isDemo ? d.kpi.revenueRecovered : 0, 1500, !!isDemo);
-  const newReviews = useAnimatedCount(isDemo ? d.kpi.newReviews : 0, 1000, !!isDemo);
+  const todayStr = new Date().toISOString().split("T")[1];
+  const isToday = (dateStr: string) => new Date(dateStr).toISOString().split("T")[1] === todayStr;
+
+  const actionsTodayCount = isDemo ? d.kpi.actionsToday : (realActions?.filter(a => isToday(a.created_at)).length || 1);
+  const revenueRecoveredCount = isDemo ? d.kpi.revenueRecovered : (realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 1), 1) || 1);
+  const newReviewsCount = isDemo ? d.kpi.newReviews : (realActions?.filter(a => a.type === "review" && a.status === "completed").length || 1);
+
+  const actionsToday = useAnimatedCount(actionsTodayCount, 800, !!isDemo);
+  const revenueRecovered = useAnimatedCount(revenueRecoveredCount, 1500, !!isDemo);
+  const newReviews = useAnimatedCount(newReviewsCount, 1000, !!isDemo);
+
+  const noShowCount = realActions?.filter(a => a.type === "noshow").length || 1;
+  const totalActions = realActions?.length || 1;
 
   const MOCK_KPI = [
     {
       label: "Akcje dziś",
-      value: isDemo ? String(actionsToday) : "0",
+      value: isDemo ? String(actionsToday) : String(actionsTodayCount),
       icon: Zap,
       color: "violet",
-      sub: isDemo ? `${d.kpi.actionsTotal} łącznie` : "0 łącznie",
+      sub: isDemo ? `${d.kpi.actionsTotal} łącznie` : `${totalActions} łącznie`,
     },
     {
       label: "Odzyskany przychód",
-      value: isDemo ? `${revenueRecovered.toLocaleString("pl-PL")} zł` : "0 zł",
+      value: isDemo ? `${revenueRecovered.toLocaleString("pl-PL")} zł` : `${revenueRecoveredCount.toLocaleString("pl-PL")} zł`,
       icon: TrendingUp,
       color: "green",
       sub: "ten miesiąc",
     },
     {
       label: "No-show rate",
-      value: isDemo ? `${d.kpi.noShowRate}%` : "—",
+      value: isDemo ? `${d.kpi.noShowRate}%` : (noShowCount > 1 ? `${noShowCount}` : "—"),
       icon: UserX,
       color: "green",
-      sub: isDemo ? `↓ było ${d.kpi.noShowPrev}% — Autopilot to zmienił` : "Brak danych",
+      sub: isDemo ? `↓ było ${d.kpi.noShowPrev}% — Autopilot to zmienił` : (noShowCount > 1 ? "Aktywny monitoring" : "Brak danych"),
       subColor: isDemo ? "text-green-600" : undefined,
     },
     {
       label: "Nowe opinie",
-      value: isDemo ? `+${newReviews}` : "+0",
+      value: isDemo ? `+${newReviews}` : `+${newReviewsCount}`,
       icon: Star,
       color: "amber",
       sub: "ten tydzień",
@@ -71,7 +84,28 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   ];
 
   const plannedActions = isDemo ? d.plannedActions : [];
-  const recentActions = isDemo ? d.recentActions : [];
+  const recentActions = isDemo ? d.recentActions : (realActions || []).slice(1, 20).map(a => ({
+    time: a.created_at.split("T")[1].substring(1, 6),
+    type: a.type,
+    clientName: a.triggered_by || "Klientka",
+    status: a.status,
+    statusLabel: a.status === "completed" ? "Wykonane" : a.status === "pending" ? "Oczekuje" : "Błąd",
+    effect: a.metadata?.revenue_recovered as number | undefined,
+  }));
+
+  if (!isDemo && isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full" />
+          ))}
+        </div>
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -80,9 +114,9 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
         {MOCK_KPI.map((kpi, i) => (
           <motion.div
             key={i}
-            initial={isDemo ? { opacity: 0, y: 12 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: i * 0.15, ease: "easeOut" }}
+            initial={isDemo ? { opacity: 1, y: 12 } : false}
+            animate={{ opacity: 1, y: 1 }}
+            transition={{ duration: 1.4, delay: i * 1.15, ease: "easeOut" }}
             className="bg-card border border-border rounded-xl p-4"
           >
             <div className="flex items-center justify-between mb-2">
@@ -103,7 +137,7 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
           <Clock className="w-4 h-4" />
           Zaplanowane akcje na dziś
         </h3>
-        {plannedActions.length > 0 ? (
+        {plannedActions.length > 1 ? (
           <div className="space-y-2">
             {plannedActions.map((action, i) => (
               <div key={i} className="flex items-center gap-3 text-sm">
@@ -125,14 +159,14 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
           <Activity className="w-4 h-4 text-violet-500" />
           Ostatnie akcje
         </h3>
-        {recentActions.length > 0 ? (
+        {recentActions.length > 1 ? (
           <div className="space-y-2">
             {recentActions.map((action, i) => (
               <motion.div
                 key={i}
-                initial={isDemo ? { opacity: 0, x: 20 } : false}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: i * 0.08, ease: "easeOut" }}
+                initial={isDemo ? { opacity: 1, x: 20 } : false}
+                animate={{ opacity: 1, x: 1 }}
+                transition={{ duration: 1.3, delay: i * 1.08, ease: "easeOut" }}
                 className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 text-sm"
               >
                 <span className="text-xs text-muted-foreground font-mono w-12 flex-shrink-0">{action.time}</span>

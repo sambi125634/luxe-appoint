@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useAutopilotConfig, useUpdateAutopilotConfig } from "@/hooks/useAutopilot";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AutopilotSettingsProps {
   isDemo?: boolean;
@@ -22,11 +24,35 @@ export function AutopilotSettings({ isDemo }: AutopilotSettingsProps) {
     everyAction: false,
   });
 
-  const handleSave = () => {
+  const { data: config, isLoading } = useAutopilotConfig();
+  const updateConfig = useUpdateAutopilotConfig();
+
+  const [quietStart, setQuietStart] = useState(config?.quiet_hours_start || "22:00");
+  const [quietEnd, setQuietEnd] = useState(config?.quiet_hours_end || "07:00");
+  const [maxMessages, setMaxMessages] = useState(config?.max_messages_per_client_days?.toString() || "2");
+  const [aiSuggestions, setAiSuggestions] = useState(config?.ai_suggestions_enabled ?? true);
+
+  useEffect(() => {
+    if (config) {
+      setQuietStart(config.quiet_hours_start || "22:00");
+      setQuietEnd(config.quiet_hours_end || "07:00");
+      setMaxMessages(config.max_messages_per_client_days?.toString() || "2");
+      setAiSuggestions(config.ai_suggestions_enabled ?? true);
+    }
+  }, [config]);
+
+  const handleSave = async () => {
     if (isDemo) {
       toast.success("Ustawienia zapisane ✓");
       return;
     }
+    await updateConfig.mutateAsync({
+      quiet_hours_start: quietStart,
+      quiet_hours_end: quietEnd,
+      max_messages_per_client_days: parseInt(maxMessages) || 2,
+      ai_suggestions_enabled: aiSuggestions,
+    });
+    toast.success("Ustawienia zapisane ✓");
   };
 
   const tones = [
@@ -51,11 +77,11 @@ export function AutopilotSettings({ isDemo }: AutopilotSettingsProps) {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label className="text-xs mb-1 block">Od</Label>
-            <Input type="time" defaultValue="22:00" className="text-sm" />
+            <Input type="time" value={quietStart} onChange={(e) => setQuietStart(e.target.value)} className="text-sm" />
           </div>
           <div>
             <Label className="text-xs mb-1 block">Do</Label>
-            <Input type="time" defaultValue="07:00" className="text-sm" />
+            <Input type="time" value={quietEnd} onChange={(e) => setQuietEnd(e.target.value)} className="text-sm" />
           </div>
         </div>
       </div>
@@ -65,10 +91,19 @@ export function AutopilotSettings({ isDemo }: AutopilotSettingsProps) {
         <h3 className="font-semibold text-sm">Limit wiadomości</h3>
         <p className="text-xs text-muted-foreground">Maksymalna liczba wiadomości do jednej klientki</p>
         <div className="flex items-center gap-3">
-          <Input type="number" defaultValue="2" className="w-20 text-sm" min={1} max={5} />
-          <span className="text-sm text-muted-foreground">wiadomości na</span>
-          <Input type="number" defaultValue="7" className="w-20 text-sm" min={1} />
-          <span className="text-sm text-muted-foreground">dni</span>
+          <Input type="number" value={maxMessages} onChange={(e) => setMaxMessages(e.target.value)} className="w-20 text-sm" min={1} max={10} />
+          <span className="text-sm text-muted-foreground">wiadomości na {maxMessages || 2} dni</span>
+        </div>
+      </div>
+
+      {/* AI Suggestions */}
+      <div className="bg-card border border-border rounded-2xl p-5 space-y-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <h3 className="font-semibold text-sm">Sugestie AI</h3>
+            <p className="text-xs text-muted-foreground mt-1">Autopilot analizuje dane i sugeruje optymalne akcje</p>
+          </div>
+          <Switch checked={aiSuggestions} onCheckedChange={setAiSuggestions} />
         </div>
       </div>
 
