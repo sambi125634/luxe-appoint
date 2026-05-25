@@ -18,13 +18,11 @@ export function StatsSection({ isDemo, salonId }: StatsSectionProps) {
     queryFn: async () => {
       if (!salonId) return null;
       const monthAgo = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
-      const [usersRes, reviewsRes, activeRes, bookingsRes, pushRes] = await Promise.all([
-        supabase.from("client_salon_links").select("id", { count: "exact", head: true }).eq("salon_id", salonId),
-        supabase.from("client_reviews").select("rating").eq("salon_id", salonId),
-        supabase.from("appointments").select("client_id", { count: "exact", head: true }).eq("salon_id", salonId).gte("start_time", monthAgo),
-        supabase.from("appointments").select("id", { count: "exact", head: true }).eq("salon_id", salonId).eq("source", "client_app"),
-        supabase.from("push_notification_history").select("recipients_count, opened_count").eq("salon_id", salonId),
-      ]);
+      const usersRes = await supabase.from("client_salon_links").select("id", { count: "exact", head: true }).eq("salon_id", salonId);
+      const reviewsRes = await supabase.from("client_reviews").select("rating").eq("salon_id", salonId);
+      const activeRes = await supabase.from("appointments").select("client_id", { count: "exact", head: true }).eq("salon_id", salonId).gte("start_time", monthAgo);
+      const bookingsRes = await supabase.from("appointments").select("id", { count: "exact", head: true }).eq("salon_id", salonId).eq("source", "client_app");
+      const pushRes = await supabase.from("push_notification_history").select("recipients_count, opened_count").eq("salon_id", salonId);
       const ratings = reviewsRes.data ?? [];
       const avgRating = ratings.length > 0 ? ratings.reduce((s, r) => s + r.rating, 0) / ratings.length : 0;
       const pushRows = pushRes.data ?? [];
