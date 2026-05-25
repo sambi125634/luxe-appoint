@@ -3,7 +3,7 @@ import { Zap, TrendingUp, UserX, Star, Clock, Activity, Loader2 } from "lucide-r
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
-import { useAutopilotActions } from "@/hooks/useAutopilotActions";
+import { useAutopilotActions } from "@/hooks/useAutopilot";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface AutopilotOverviewProps {
