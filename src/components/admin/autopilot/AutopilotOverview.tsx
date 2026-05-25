@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Zap, TrendingUp, UserX, Star, Clock, Activity } from "lucide-react";
+import { Zap, TrendingUp, UserX, Star, Clock, Activity, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
+import { useAutopilotActions } from "@/hooks/useAutopilotActions";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface AutopilotOverviewProps {
   isDemo?: boolean;
