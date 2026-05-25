@@ -19,7 +19,7 @@ import { useStaffMembers } from "@/hooks/useStaffMembers";
 
 interface ScheduleTemplatesProps {
   isDemo?: boolean;
-  onApplyTemplate?: (staffId: string, templateId: string, startDate: string, endDate: string) => void;
+  onApplyTemplate?: (staffId: string, template: ScheduleTemplate, startDate: string, endDate: string) => Promise<void> | void;
 }
 
 export function ScheduleTemplates({ onApplyTemplate, isDemo = false }: ScheduleTemplatesProps) {
@@ -114,7 +114,7 @@ export function ScheduleTemplates({ onApplyTemplate, isDemo = false }: ScheduleT
 
   const applyTemplate = () => {
     if (selectedTemplateForApply && applyForm.staffId && applyForm.startDate && applyForm.endDate) {
-      onApplyTemplate?.(applyForm.staffId, selectedTemplateForApply.id, applyForm.startDate, applyForm.endDate);
+      onApplyTemplate?.(applyForm.staffId, selectedTemplateForApply, applyForm.startDate, applyForm.endDate);
       setIsApplyDialogOpen(false);
     }
   };

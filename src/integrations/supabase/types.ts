@@ -4113,6 +4113,45 @@ export type Database = {
           },
         ]
       }
+      working_hours_exceptions: {
+        Row: {
+          created_at: string
+          date: string
+          end_time: string
+          id: string
+          is_working: boolean
+          note: string | null
+          salon_id: string
+          staff_id: string
+          start_time: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          end_time: string
+          id?: string
+          is_working?: boolean
+          note?: string | null
+          salon_id: string
+          staff_id: string
+          start_time: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          end_time?: string
+          id?: string
+          is_working?: boolean
+          note?: string | null
+          salon_id?: string
+          staff_id?: string
+          start_time?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       staff_google_calendar_safe: {

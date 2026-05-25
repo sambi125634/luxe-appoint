@@ -30,6 +30,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { checkAppointmentConflict, formatConflictMessage } from "@/hooks/useConflictCheck";
+import type { ScheduleTemplate } from "./schedule/types";
+import { addDays, addWeeks, format as fmtDate, parseISO, startOfWeek, endOfWeek } from "date-fns";
 
 interface ScheduleManagementProps {
   isDemo?: boolean;
@@ -96,23 +98,154 @@ export function ScheduleManagement({ isDemo = false, salonSlug, onNavigate }: Sc
     }
   };
 
-  const handleApplyTemplate = async (staffId: string, templateId: string, startDate: string, endDate: string) => {
+  const handleApplyTemplate = async (staffId: string, template: ScheduleTemplate, startDate: string, endDate: string) => {
     if (isDemo) {
       toast({ title: "Tryb Demo", description: "Dane nie zostały zapisane" });
       return;
     }
-    // Template application would update working_hours — for now show confirmation
-    toast({ title: "Szablon zastosowany", description: "Godziny pracy zostały zaktualizowane" });
-    queryClient.invalidateQueries({ queryKey: ["working-hours"] });
+    if (!salonId) return;
+
+    try {
+      const start = parseISO(startDate);
+      const end = parseISO(endDate);
+      if (end < start) {
+        toast({ title: "Błąd", description: "Data końcowa musi być po dacie początkowej", variant: "destructive" });
+        return;
+      }
+
+      // Build exceptions for every day in the range based on template's day-of-week pattern
+      const rows: Array<{
+        salon_id: string;
+        staff_id: string;
+        date: string;
+        start_time: string;
+        end_time: string;
+        is_working: boolean;
+        note: string;
+      }> = [];
+
+      const dayMs = 24 * 60 * 60 * 1000;
+      const totalDays = Math.floor((end.getTime() - start.getTime()) / dayMs) + 1;
+      for (let i = 0; i < totalDays; i++) {
+        const d = addDays(start, i);
+        const dow = d.getDay();
+        const pattern = template.workingHours.find(h => h.dayOfWeek === dow);
+        if (!pattern) continue;
+        rows.push({
+          salon_id: salonId,
+          staff_id: staffId,
+          date: fmtDate(d, "yyyy-MM-dd"),
+          start_time: pattern.startTime,
+          end_time: pattern.endTime,
+          is_working: pattern.isWorking,
+          note: `Szablon: ${template.name}`,
+        });
+      }
+
+      if (rows.length === 0) {
+        toast({ title: "Brak danych", description: "Szablon nie zawiera żadnych dni", variant: "destructive" });
+        return;
+      }
+
+      const { error } = await supabase
+        .from("working_hours_exceptions")
+        .upsert(rows, { onConflict: "staff_id,date" });
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ["working-hours"] });
+      queryClient.invalidateQueries({ queryKey: ["working-hours-exceptions"] });
+      toast({
+        title: "Szablon zastosowany",
+        description: `Zapisano ${rows.length} dni grafiku dla wybranego pracownika`,
+      });
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Błąd", description: "Nie udało się zastosować szablonu", variant: "destructive" });
+    }
   };
 
-  const handleWeekDuplicate = async (staffIds: string[], sourceWeek: Date, targetWeeksCount: number, includeExceptions: boolean) => {
+  const handleWeekDuplicate = async (
+    staffIds: string[],
+    sourceWeek: Date,
+    targetWeeksCount: number,
+    includeExceptions: boolean,
+  ) => {
     if (isDemo) {
       toast({ title: "Tryb Demo", description: "Dane nie zostały zapisane" });
       return;
     }
-    toast({ title: "Grafik zduplikowany", description: `Skopiowano grafik na ${targetWeeksCount} tygodni` });
-    queryClient.invalidateQueries({ queryKey: ["working-hours"] });
+    if (!salonId) return;
+    if (staffIds.length === 0) {
+      toast({ title: "Brak personelu", description: "Wybierz przynajmniej jednego pracownika", variant: "destructive" });
+      return;
+    }
+
+    try {
+      const srcStart = startOfWeek(sourceWeek, { weekStartsOn: 1 });
+      const srcEnd = endOfWeek(sourceWeek, { weekStartsOn: 1 });
+
+      // Read source-week exceptions
+      const { data: src, error: readErr } = await supabase
+        .from("working_hours_exceptions")
+        .select("staff_id, date, start_time, end_time, is_working, note")
+        .eq("salon_id", salonId)
+        .in("staff_id", staffIds)
+        .gte("date", fmtDate(srcStart, "yyyy-MM-dd"))
+        .lte("date", fmtDate(srcEnd, "yyyy-MM-dd"));
+      if (readErr) throw readErr;
+
+      const sourceRows = (src ?? []).filter(r =>
+        includeExceptions ? true : r.is_working
+      );
+
+      if (sourceRows.length === 0) {
+        toast({
+          title: "Brak wyjątków",
+          description: "Tydzień źródłowy nie ma wyjątków grafiku do skopiowania. Cykliczny grafik pracownika i tak będzie obowiązywać.",
+        });
+        return;
+      }
+
+      const newRows: Array<{
+        salon_id: string;
+        staff_id: string;
+        date: string;
+        start_time: string;
+        end_time: string;
+        is_working: boolean;
+        note: string | null;
+      }> = [];
+
+      for (let w = 1; w <= targetWeeksCount; w++) {
+        for (const row of sourceRows) {
+          const newDate = addWeeks(parseISO(row.date as string), w);
+          newRows.push({
+            salon_id: salonId,
+            staff_id: row.staff_id as string,
+            date: fmtDate(newDate, "yyyy-MM-dd"),
+            start_time: row.start_time as string,
+            end_time: row.end_time as string,
+            is_working: row.is_working as boolean,
+            note: (row.note as string | null) ?? "Skopiowane z poprzedniego tygodnia",
+          });
+        }
+      }
+
+      const { error: upErr } = await supabase
+        .from("working_hours_exceptions")
+        .upsert(newRows, { onConflict: "staff_id,date" });
+      if (upErr) throw upErr;
+
+      queryClient.invalidateQueries({ queryKey: ["working-hours"] });
+      queryClient.invalidateQueries({ queryKey: ["working-hours-exceptions"] });
+      toast({
+        title: "Grafik zduplikowany",
+        description: `Skopiowano ${sourceRows.length} wpisów na ${targetWeeksCount} tygodni (łącznie ${newRows.length} wpisów)`,
+      });
+    } catch (err) {
+      console.error(err);
+      toast({ title: "Błąd", description: "Nie udało się zduplikować grafiku", variant: "destructive" });
+    }
   };
 
   return (
