@@ -1,60 +1,121 @@
-## Problem
 
-Sidebar w panelu admina pokazuje tylko 7 z ~20 modułów (brak: Widgety, Pracownicy, Usługi, Produkty, Księgowość, Ścieżka klientki, Retencja, Autopilot, Polecenia, Ustawienia). Dzieje się tak ponieważ `useStaffPermissions` zwraca `isOwner=false` gdy w tabeli `user_roles` brakuje wpisu dla użytkownika — a Twoje konto (`sambor191@wp.pl`) takiego wpisu nie ma, choć jest właścicielem salonu "anna".
+# Audyt gotowości produkcyjnej — rejestracja nowego użytkownika
 
-Identyczny problem dotyczy też innych historycznych kont (zweryfikowane w DB). Trigger `handle_new_user_role` nie zadziałał — prawdopodobnie konto powstało zanim trigger został dodany, albo wykonanie zawiodło cicho.
+Przeszedłem ścieżkę od kliknięcia "Zarejestruj się" do używania każdego modułu w panelu. Poniżej dokładny stan + ryzyka pogrupowane wg etapów. Na końcu lista poprawek do zrobienia *przed* oddaniem.
 
-## Plan naprawy
+---
 
-### 1. Migracja: backfill ról i wzmocnienie triggera
+## 1. Rejestracja (`/auth`)
 
-Jedna migracja wykonuje 3 rzeczy:
+**Stan:** Działa. Sprawdzone:
+- Walidacja zod (email, hasło ≥6, imię/nazwisko, telefon ≥9 znaków).
+- Wymagana zgoda RODO (checkbox blokuje submit).
+- `signUp` z metadanymi (first_name, last_name, phone).
+- Email confirmation screen po sukcesie.
+- Trigger `handle_new_user` tworzy profile, `handle_new_user_role` przypisuje `salon_owner` (wzmocniony w ostatniej migracji).
+- "Zapomniałam hasła" → `/reset-password` istnieje.
 
-**a) Backfill istniejących właścicieli** — dla każdego `salons.owner_id`, który nie ma wpisu w `user_roles`, dopisać rolę `salon_owner`. Naprawia Twoje konto + wszystkie inne dotknięte.
+**RYZYKA / luki:**
+1. **Brak normalizacji telefonu** — wpisany `500 600 700` zapisuje się surowo do `profiles.phone`. W całym kodzie używamy `normalizePolishPhone` do `+48XXXXXXXXX`. Przy wysyłce SMS/przypomnień to się rozjedzie.
+2. **Brak Google login** — workspace standard mówi "domyślnie Google + email". Aktualnie tylko email/password. Decyzja świadoma czy luka?
+3. **Email confirmation wymagany** — jeśli SMTP/Resend nie dostarczy maila (np. spam), użytkownik się zablokuje. Sprawdzić czy auth-email-hook jest skonfigurowany dla domeny `calendar.beauty-funnels.com`.
 
-```sql
-INSERT INTO public.user_roles (user_id, role)
-SELECT DISTINCT s.owner_id, 'salon_owner'::app_role
-FROM public.salons s
-WHERE s.owner_id IS NOT NULL
-  AND NOT EXISTS (
-    SELECT 1 FROM public.user_roles ur WHERE ur.user_id = s.owner_id
-  );
-```
+---
 
-**b) Sprzątanie stray `staff_members`** — usunąć fałszywe wpisy `staff_members` dla właścicieli (mój wpis `b4d5afaf-...` powstał automatycznie i mylił hook). Tylko dla user_id którzy są ownerami salonu i nie istnieje dla nich żaden członek personelu utworzony świadomie (brak `invited_by` lub identyczny user_id co salon owner).
+## 2. Onboarding (`/onboarding`, 7 kroków)
 
-```sql
-DELETE FROM public.staff_members sm
-WHERE EXISTS (
-  SELECT 1 FROM public.salons s 
-  WHERE s.owner_id = sm.user_id AND s.id = sm.salon_id
-);
-```
+**Stan:** Działa, z resume po `onboarding_step`. Sprawdzone:
+- Krok 0: tworzy `salons` row + `staff_members` (owner) + `working_hours` Pn-Pt 9-17.
+- Krok 1: AI scan profilu (opcjonalny) — jeśli pominięty, tworzy default services z `SERVICE_TEMPLATES` per typ salonu i przypisuje do owner staff.
+- Triggery: `handle_new_salon_tags` zasiewa 21 client_tags, `seed_default_product_categories` 10 kategorii produktów.
+- Końcowy krok ustawia `onboarding_completed=true`.
 
-**c) Wzmocnienie triggera `handle_new_user_role`** — przerobić funkcję na `SECURITY DEFINER` z `ON CONFLICT DO NOTHING`, dodać exception handler, żeby cichy fail nigdy nie powtórzył tego problemu.
+**RYZYKA / luki:**
+1. **Race condition w `handleSaveSalon`** — gdy onboarding tworzony pierwszy raz i URL podany, `setStep(1)` + `startAiScan()` jadą RÓWNOLEGLE z `setCreatedSalonId`. AI scan może wystartować bez salon_id. Nie blokujące, ale do sprawdzenia.
+2. **Default services** — jeśli AI scan jest użyty, `saveDefaultServices` NIE jest wywoływane (tylko gdy `hasUrls=false`). Czy AI scan wstawia services do DB? Trzeba zweryfikować — jeśli nie, użytkownik z URL-em może wylądować bez usług.
+3. **Brak walidacji telefonu** w polu Communication step (tu samo co w auth).
+4. **`onboarding_step` zapisuje step UI**, nie zawsze równa pozycji w `STEPS` — przy resume użytkownik może wylądować w innym miejscu niż przerwał.
 
-### 2. Po migracji
+---
 
-Wyloguj się i zaloguj ponownie — `useStaffPermissions` ma cache w react-query, świeży login odświeży session i zwróci `isOwner=true`. Sidebar pokaże wszystkie 20 modułów.
+## 3. Przekierowanie po loginie
 
-### 3. Weryfikacja
+**Stan:** OK. `resolveRedirect` w `AuthPage` wysyła:
+- super_admin → `/super-admin`
+- salon_owner + nie ma salonu / nie completed → `/onboarding`
+- salon_owner + completed → `/admin`
+- staff → `/admin`
+- client → `/app`
+- brak roli → `/onboarding`
 
-Sprawdzę zapytaniem czy każde `salons.owner_id` ma odpowiadający wpis `user_roles` z rolą `salon_owner` i czy żaden owner nie figuruje już w `staff_members`.
+**RYZYKA:** Po wzmocnieniu triggera nowi userzy zawsze dostają rolę. Stare konta załatane backfillem. OK.
 
-## Pliki / zmiany
+---
 
-- **1 nowa migracja**: `supabase/migrations/<timestamp>_fix_owner_roles_backfill.sql`
-- **Bez zmian w kodzie frontu** — logika `useStaffPermissions` jest poprawna; problem był wyłącznie po stronie danych + triggera
+## 4. Panel admina (`/admin`)
 
-## Co NIE jest zmieniane
+**Stan:** 20 modułów renderowanych przez `AdminSidebar` z filtrem `TAB_PERMISSION_MAP`. Owner (`isOwner=true`) widzi wszystko.
 
-- Architektura ról i uprawnień (`TAB_PERMISSION_MAP`, `OWNER_PERMISSIONS`) — działa zgodnie z założeniami
-- RLS policies — bez zmian
-- Logika sidebara — bez zmian
-- Inne moduły / komponenty admina
+Sprawdzone moduły i ich źródła danych:
+- Dashboard (Home) — `useSalonId` + queries na salon
+- Kalendarz — `appointments`, dnd, conflict check
+- Klienci — `useClients`, segmentacja
+- Konwersacje — `useConversations` (nowy hook)
+- Pipeline (Ścieżka klientki) — `usePipelineContacts`
+- Księgowość — `useTrueProfit`, raporty
+- Produkty — `useProducts`, recipes, scanner
+- Usługi — `useServices`
+- Personel — `useStaffMembers`
+- Widgety — `useBookingWidgets` (nowy hook)
+- Aplikacja Klientki — branding, lojalność
+- Retencja — `useRetention`
+- Konsultacje — modules/consultation
+- Polecenia — modules/referral
+- Autopilot — `useAutopilot`
+- Ustawienia, Pomoc
 
-## Ryzyka
+**RYZYKA / luki konkretne:**
+1. **Brak gatingu subskrypcji** — kod referuje `salon_subscriptions` (FREE/PRO/ELITE limits w pamięci projektu), ale tabela `salon_subscriptions` **nie istnieje** w DB. Każdy nowy user dostaje pełen dostęp jak ELITE. Albo dodać tabelę + middleware, albo świadomie zostawić (jeśli launch bez płatności).
+2. **Edge functions wymagają sekretów** — sprawdzone: `RESEND_API_KEY`, `LOVABLE_API_KEY`, `RETELL_API_KEY`, `ELEVENLABS_API_KEY`, `FIRECRAWL_API_KEY`, `VAPID_*` są ustawione. Brakuje natomiast: **`P24_*` (Przelewy24)** — moduł płatności prepay nie zadziała; **`SMSAPI_TOKEN`** — `send-sms-smsapi` padnie.
+3. **Demo flags** — wiele modułów przyjmuje `isDemo`. AdminDashboard wywołuje je BEZ `isDemo` (czyli `undefined` = false). To prawidłowe, ale moduły takie jak Retention dostają `isDemo={false}` jawnie a inne nie — niespójność, do unifikacji.
+4. **`ProductsModule`** w AdminDashboard wywoływany bez `isDemo` ale jego komponenty (`InvoiceAIScanner`, `RecipeEditorDrawer`) zakładają realny salonId — OK po wzmocnieniu `useSalonId`, ale warto przetestować z konkretnym nowym kontem.
+5. **Subdomeny** — admin.beauty-funnels.com forces `/` → `/auth`. `calendar.*` używana też do logowania (widać w auth-logs). Sprawdzić czy strategia routingu (mem://deployment/subdomain-routing-v2-final) jest faktycznie egzekwowana.
+6. **AutopilotStatusBar** — renderowany na każdym widoku, robi własne queries. Jeśli padnie, status bar pokaże błąd dla nowego usera bez danych.
 
-- **Usunięcie staff_members ownerów**: tylko gdy `staff_members.user_id == salons.owner_id` dla tego samego `salon_id` — bezpieczne, owner nie powinien siedzieć w swoim staff_members.
-- **Backfill ról**: `ON CONFLICT` nie potrzebny bo filtruje `NOT EXISTS`, ale dla bezpieczeństwa dorzucę.
+---
+
+## 5. Czego NIE sprawdziłem (do weryfikacji przed launchem)
+
+- Czy AI scan w onboardingu rzeczywiście wstawia services do DB (sprawdzić `ai-profile-scanner`).
+- Czy widget bookingowy działa dla nowego salonu od razu (czy ma slots, working_hours pokazują się).
+- Czy emails (booking confirmation, reminders) wychodzą — wymaga DNS verification dla domeny.
+- Czy nowy user widzi puste empty states (zamiast spinnerów w nieskończoność) we wszystkich 20 modułach.
+- Mobile admin (`/m/*`) — osobna aplikacja, nie przeszedłem.
+
+---
+
+## Plan napraw przed jutrem (priorytetowo)
+
+### KRYTYCZNE (must-fix)
+1. **Normalizacja telefonu w `AuthPage.handleSignup`** — wywołać `normalizePolishPhone(signupPhone)` przed wysłaniem do `signUp.options.data.phone`. Trigger `handle_new_user` zapisze już znormalizowany.
+2. **Weryfikacja, że AI scan wstawia services** — jeśli nie, dodać fallback `saveDefaultServices` po scan-ie (żeby user nigdy nie wylądował z 0 usług).
+3. **Decyzja o `salon_subscriptions`** — albo (a) dodać tabelę z defaultem PRO/ELITE dla nowych userów, albo (b) świadomie wyłączyć gating w kodzie, żeby uniknąć przyszłych konfliktów.
+
+### WAŻNE (should-fix)
+4. **Sprawdzić sekrety P24 i SMSAPI** — jeśli brak, ukryć moduły płatności prepay i SMS lub dodać friendly "skonfiguruj integrację".
+5. **Sprawdzić auth-email-hook + DNS dla calendar.beauty-funnels.com** — jeśli email confirmation nie dochodzi, rejestracja jest zablokowana.
+6. **Test ręczny nowego konta end-to-end** na świeżym emailu — przejść wszystkie 20 modułów i wykonać podstawową akcję (utworzyć klientkę, rezerwację, usługę, etc.).
+
+### NICE-TO-HAVE
+7. Dodać Google OAuth (workspace standard).
+8. Unifikacja `isDemo` flag w AdminDashboard.
+9. Empty states audit we wszystkich modułach.
+
+---
+
+## Co dalej
+
+Po Twojej akceptacji wykonam **KRYTYCZNE 1-3** + **WAŻNE 4-5** (sprawdzenie sekretów i AI scan). Punkt 6 (ręczny test) musisz wykonać Ty lub ja przez browser tools — daj znać czy mam to robić automatycznie czy zostawiamy Tobie. Pozostałe nice-to-have do osobnej rundy.
+
+**Pytanie kluczowe przed implementacją:**
+- Czy launch jutro to launch *bezpłatny* (FREE tier dla każdego), czy *płatny* z limitami? Od tego zależy czy dodaję `salon_subscriptions` i gating.
