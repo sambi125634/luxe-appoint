@@ -1219,6 +1219,48 @@ export type Database = {
           },
         ]
       }
+      conversation_messages: {
+        Row: {
+          body: string
+          channel: string
+          client_id: string
+          created_at: string
+          direction: string
+          error_message: string | null
+          external_message_id: string | null
+          id: string
+          salon_id: string
+          sent_at: string
+          status: string
+        }
+        Insert: {
+          body: string
+          channel?: string
+          client_id: string
+          created_at?: string
+          direction: string
+          error_message?: string | null
+          external_message_id?: string | null
+          id?: string
+          salon_id: string
+          sent_at?: string
+          status?: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          client_id?: string
+          created_at?: string
+          direction?: string
+          error_message?: string | null
+          external_message_id?: string | null
+          id?: string
+          salon_id?: string
+          sent_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       deletion_requests: {
         Row: {
           created_at: string
