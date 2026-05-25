@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { format, addDays, startOfWeek } from "date-fns";
+import { format, addDays, startOfWeek, parseISO } from "date-fns";
 import { pl } from "date-fns/locale";
 import { 
   Lightbulb, 
@@ -32,6 +32,9 @@ import {
   mockStaffMembers 
 } from "./types";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSalonId } from "@/hooks/useSalonId";
 
 interface StaffItem {
   id: string;
@@ -41,7 +44,7 @@ interface StaffItem {
 }
 
 // Demo service definitions for search
-const DEMO_SERVICES = [
+const DEMO_SERVICES: { id: string; name: string; duration: number }[] = [
   { id: "peeling", name: "Peeling kawitacyjny", duration: 60 },
   { id: "mezoterapia", name: "Mezoterapia igłowa", duration: 90 },
   { id: "masaz", name: "Masaż relaksacyjny", duration: 60 },
@@ -156,9 +159,254 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
   const [hasSearched, setHasSearched] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const gaps = useMemo(() => generateMockGaps(staffMembers), [staffMembers]);
-  const occupancy = useMemo(() => generateMockOccupancy(staffMembers), [staffMembers]);
-  const smartSlots = useMemo(() => generateSmartSlots(staffMembers), [staffMembers]);
+  // ── REAL DATA (admin mode) ─────────────────────────────────────────────
+  const { salonId } = useSalonId();
+  const staffIds = useMemo(() => staffMembers.map(s => s.id), [staffMembers]);
+
+  const horizonDays = 7;
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+  const horizonEnd = useMemo(() => addDays(today, horizonDays - 1), [today]);
+
+  // Working hours (cyclic)
+  const { data: workingHoursDb = [] } = useQuery({
+    queryKey: ["sa-working-hours", salonId, staffIds],
+    queryFn: async () => {
+      if (staffIds.length === 0) return [];
+      const { data, error } = await supabase
+        .from("working_hours")
+        .select("staff_id, day_of_week, start_time, end_time, is_working")
+        .in("staff_id", staffIds);
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !isDemo && !!salonId && staffIds.length > 0,
+  });
+
+  // Per-day exceptions
+  const { data: exceptionsDb = [] } = useQuery({
+    queryKey: ["sa-wh-exceptions", salonId, staffIds, format(today, "yyyy-MM-dd")],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("working_hours_exceptions")
+        .select("staff_id, date, start_time, end_time, is_working")
+        .eq("salon_id", salonId!)
+        .in("staff_id", staffIds)
+        .gte("date", format(today, "yyyy-MM-dd"))
+        .lte("date", format(horizonEnd, "yyyy-MM-dd"));
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !isDemo && !!salonId && staffIds.length > 0,
+  });
+
+  // Appointments in horizon
+  const { data: appointmentsDb = [] } = useQuery({
+    queryKey: ["sa-appointments", salonId, format(today, "yyyy-MM-dd")],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("staff_id, start_time, end_time, status")
+        .eq("salon_id", salonId!)
+        .gte("start_time", today.toISOString())
+        .lte("start_time", new Date(horizonEnd.getTime() + 24 * 60 * 60 * 1000).toISOString())
+        .neq("status", "cancelled");
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  // Services (for "next available" search)
+  const { data: servicesDb = [] } = useQuery({
+    queryKey: ["sa-services", salonId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("services")
+        .select("id, name, duration_minutes")
+        .eq("salon_id", salonId!)
+        .eq("is_active", true);
+      if (error) throw error;
+      return (data ?? []).map(s => ({
+        id: s.id as string,
+        name: s.name as string,
+        duration: Number(s.duration_minutes ?? 60),
+      }));
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  const searchableServices = isDemo ? DEMO_SERVICES : servicesDb;
+
+  // Helpers to compute analytics from DB
+  const timeStrToMin = (t: string) => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + (m || 0);
+  };
+  const minToTimeStr = (mins: number) => {
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+  };
+
+  // Build a window {start,end} (minutes from midnight) for staff on a given Date
+  const getStaffWindow = useCallback(
+    (staffId: string, day: Date): { start: number; end: number } | null => {
+      const dateStr = format(day, "yyyy-MM-dd");
+      const exc = exceptionsDb.find(
+        e => e.staff_id === staffId && (e.date as string) === dateStr,
+      );
+      if (exc) {
+        if (!exc.is_working) return null;
+        return {
+          start: timeStrToMin(exc.start_time as string),
+          end: timeStrToMin(exc.end_time as string),
+        };
+      }
+      const dow = day.getDay();
+      const wh = workingHoursDb.find(
+        w => w.staff_id === staffId && w.day_of_week === dow,
+      );
+      if (!wh || !wh.is_working) return null;
+      return {
+        start: timeStrToMin(wh.start_time as string),
+        end: timeStrToMin(wh.end_time as string),
+      };
+    },
+    [workingHoursDb, exceptionsDb],
+  );
+
+  // Compute real gaps, occupancy, smart slots
+  const realAnalytics = useMemo(() => {
+    if (isDemo) {
+      return {
+        gaps: [] as ScheduleGap[],
+        occupancy: [] as OccupancyData[],
+        smartSlots: [] as SmartSlot[],
+      };
+    }
+    const gaps: ScheduleGap[] = [];
+    const occupancy: OccupancyData[] = [];
+    const smartSlots: SmartSlot[] = [];
+
+    for (const staff of staffMembers) {
+      for (let i = 0; i < horizonDays; i++) {
+        const day = addDays(today, i);
+        const dateStr = format(day, "yyyy-MM-dd");
+        const win = getStaffWindow(staff.id, day);
+        if (!win) {
+          occupancy.push({
+            staffId: staff.id,
+            staffName: staff.name,
+            date: dateStr,
+            occupancyPercent: 0,
+            totalMinutes: 0,
+            bookedMinutes: 0,
+          });
+          continue;
+        }
+
+        const totalMinutes = Math.max(0, win.end - win.start);
+
+        const dayAppts = appointmentsDb
+          .filter(a => {
+            if (a.staff_id !== staff.id) return false;
+            const s = parseISO(a.start_time as string);
+            return format(s, "yyyy-MM-dd") === dateStr;
+          })
+          .map(a => {
+            const s = parseISO(a.start_time as string);
+            const e = parseISO(a.end_time as string);
+            return {
+              start: Math.max(win.start, s.getHours() * 60 + s.getMinutes()),
+              end: Math.min(win.end, e.getHours() * 60 + e.getMinutes()),
+            };
+          })
+          .filter(a => a.end > a.start)
+          .sort((a, b) => a.start - b.start);
+
+        const bookedMinutes = dayAppts.reduce((sum, a) => sum + (a.end - a.start), 0);
+        const occupancyPercent =
+          totalMinutes > 0 ? Math.round((bookedMinutes / totalMinutes) * 100) : 0;
+        occupancy.push({
+          staffId: staff.id,
+          staffName: staff.name,
+          date: dateStr,
+          occupancyPercent,
+          totalMinutes,
+          bookedMinutes,
+        });
+
+        // Compute free windows
+        let cursor = win.start;
+        const freeWindows: { start: number; end: number; fillsGap: boolean }[] = [];
+        for (let idx = 0; idx < dayAppts.length; idx++) {
+          const a = dayAppts[idx];
+          if (a.start > cursor) {
+            freeWindows.push({
+              start: cursor,
+              end: a.start,
+              fillsGap: idx > 0, // between two appts → fills gap
+            });
+          }
+          cursor = Math.max(cursor, a.end);
+        }
+        if (cursor < win.end) {
+          freeWindows.push({ start: cursor, end: win.end, fillsGap: false });
+        }
+
+        for (const fw of freeWindows) {
+          const dur = fw.end - fw.start;
+          if (dur < 15) continue;
+          gaps.push({
+            staffId: staff.id,
+            staffName: staff.name,
+            date: dateStr,
+            startTime: minToTimeStr(fw.start),
+            endTime: minToTimeStr(fw.end),
+            durationMinutes: dur,
+          });
+          // Smart slot at the start of each free window
+          smartSlots.push({
+            date: dateStr,
+            time: minToTimeStr(fw.start),
+            staffId: staff.id,
+            staffName: staff.name,
+            isRecommended: fw.fillsGap || dur >= 60,
+            fillsGap: fw.fillsGap,
+            occupancyBefore: occupancyPercent,
+            occupancyAfter: Math.min(
+              100,
+              occupancyPercent + (totalMinutes > 0 ? Math.round((dur / totalMinutes) * 100) : 0),
+            ),
+          });
+        }
+      }
+    }
+
+    gaps.sort((a, b) => b.durationMinutes - a.durationMinutes);
+    smartSlots.sort((a, b) => {
+      // Prioritize gap-fillers, then bigger occupancy gain
+      if (a.fillsGap !== b.fillsGap) return a.fillsGap ? -1 : 1;
+      return (b.occupancyAfter - b.occupancyBefore) - (a.occupancyAfter - a.occupancyBefore);
+    });
+
+    return { gaps, occupancy, smartSlots };
+  }, [
+    isDemo,
+    staffMembers,
+    today,
+    appointmentsDb,
+    getStaffWindow,
+  ]);
+
+  // Use real data when not demo; mocks in demo mode (keeps showcase intact)
+  const gaps = isDemo ? generateMockGaps(staffMembers) : realAnalytics.gaps;
+  const occupancy = isDemo ? generateMockOccupancy(staffMembers) : realAnalytics.occupancy;
+  const smartSlots = isDemo ? generateSmartSlots(staffMembers) : realAnalytics.smartSlots;
 
   const filteredGaps = gaps.filter(gap => {
     if (gap.durationMinutes < minGapDuration) return false;
@@ -189,12 +437,88 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
     setIsSearching(true);
     setHasSearched(true);
 
-    // Simulate search delay
+    // Find best matching free window
     setTimeout(() => {
-      const today = new Date();
-      const service = DEMO_SERVICES.find(s => s.id === nextAvailableService);
-      const serviceName = service?.name || DEMO_SERVICES[0].name;
-      const serviceDuration = service?.duration || 60;
+      const service = searchableServices.find(s => s.id === nextAvailableService) || searchableServices[0];
+      const serviceName = service?.name ?? "Usługa";
+      const serviceDuration = service?.duration ?? 60;
+
+      // Build candidate list from real gaps in admin mode, mock otherwise
+      const sourceGaps = isDemo ? generateMockGaps(staffMembers) : realAnalytics.gaps;
+
+      // Filter by staff
+      let candidates = sourceGaps.filter(g => g.durationMinutes >= serviceDuration);
+      if (nextAvailableStaff && nextAvailableStaff !== "any") {
+        candidates = candidates.filter(g => g.staffId === nextAvailableStaff);
+      }
+
+      // Filter by time preference
+      const inRange = (timeStr: string, fromH: number, toH: number) => {
+        const [h] = timeStr.split(":").map(Number);
+        return h >= fromH && h < toH;
+      };
+      switch (nextAvailablePreference) {
+        case "morning":
+          candidates = candidates.filter(g => inRange(g.startTime, 8, 12));
+          break;
+        case "afternoon":
+          candidates = candidates.filter(g => inRange(g.startTime, 12, 17));
+          break;
+        case "evening":
+          candidates = candidates.filter(g => inRange(g.startTime, 17, 23));
+          break;
+        case "friday":
+          candidates = candidates.filter(g => parseISO(g.date).getDay() === 5);
+          break;
+        case "weekend":
+          candidates = candidates.filter(g => {
+            const dow = parseISO(g.date).getDay();
+            return dow === 0 || dow === 6;
+          });
+          break;
+        default:
+          break;
+      }
+
+      // Pick earliest (by date then by time)
+      candidates.sort((a, b) => {
+        if (a.date !== b.date) return a.date < b.date ? -1 : 1;
+        return a.startTime < b.startTime ? -1 : 1;
+      });
+      const best = candidates[0];
+
+      if (!best) {
+        setSearchResult(null);
+        setIsSearching(false);
+        return;
+      }
+
+      setSearchResult({
+        date: best.date,
+        time: best.startTime,
+        staffName: best.staffName,
+        staffId: best.staffId,
+        serviceName,
+        serviceDuration,
+      });
+      setIsSearching(false);
+    }, 200);
+  }, [
+    nextAvailableService,
+    nextAvailableStaff,
+    nextAvailablePreference,
+    searchableServices,
+    realAnalytics.gaps,
+    isDemo,
+    staffMembers,
+  ]);
+
+  // Stop legacy random-search block below if reached (no longer in code path)
+  const _legacyUnused = useCallback(() => {
+    const today = new Date();
+    const service = DEMO_SERVICES.find(s => s.id === nextAvailableService);
+    const serviceName = service?.name || DEMO_SERVICES[0].name;
+    const serviceDuration = service?.duration || 60;
 
       // Pick staff
       let selectedStaff: StaffItem;
@@ -252,7 +576,6 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
         serviceDuration,
       });
       setIsSearching(false);
-    }, 800);
   }, [nextAvailableService, nextAvailableStaff, nextAvailablePreference, staffMembers]);
 
   const handleSlotClick = () => {
