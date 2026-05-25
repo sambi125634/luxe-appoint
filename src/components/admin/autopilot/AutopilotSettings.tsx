@@ -24,11 +24,35 @@ export function AutopilotSettings({ isDemo }: AutopilotSettingsProps) {
     everyAction: false,
   });
 
-  const handleSave = () => {
+  const { data: config, isLoading } = useAutopilotConfig();
+  const updateConfig = useUpdateAutopilotConfig();
+
+  const [quietStart, setQuietStart] = useState(config?.quiet_hours_start || "22:00");
+  const [quietEnd, setQuietEnd] = useState(config?.quiet_hours_end || "07:00");
+  const [maxMessages, setMaxMessages] = useState(config?.max_messages_per_client_days?.toString() || "2");
+  const [aiSuggestions, setAiSuggestions] = useState(config?.ai_suggestions_enabled ?? true);
+
+  useEffect(() => {
+    if (config) {
+      setQuietStart(config.quiet_hours_start || "22:00");
+      setQuietEnd(config.quiet_hours_end || "07:00");
+      setMaxMessages(config.max_messages_per_client_days?.toString() || "2");
+      setAiSuggestions(config.ai_suggestions_enabled ?? true);
+    }
+  }, [config]);
+
+  const handleSave = async () => {
     if (isDemo) {
       toast.success("Ustawienia zapisane ✓");
       return;
     }
+    await updateConfig.mutateAsync({
+      quiet_hours_start: quietStart,
+      quiet_hours_end: quietEnd,
+      max_messages_per_client_days: parseInt(maxMessages) || 2,
+      ai_suggestions_enabled: aiSuggestions,
+    });
+    toast.success("Ustawienia zapisane ✓");
   };
 
   const tones = [
