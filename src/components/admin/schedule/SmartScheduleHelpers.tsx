@@ -869,7 +869,7 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
                     <SelectValue placeholder="Wybierz usługę" />
                   </SelectTrigger>
                   <SelectContent>
-                    {DEMO_SERVICES.map(s => (
+                    {searchableServices.map(s => (
                       <SelectItem key={s.id} value={s.id}>{s.name} ({s.duration} min)</SelectItem>
                     ))}
                   </SelectContent>
