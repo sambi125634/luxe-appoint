@@ -226,14 +226,14 @@ export function SmartScheduleHelpers({ onSlotSelect, onGapSelect, isDemo = false
     queryFn: async () => {
       const { data, error } = await supabase
         .from("services")
-        .select("id, name, duration_minutes")
+        .select("id, name, duration")
         .eq("salon_id", salonId!)
         .eq("is_active", true);
       if (error) throw error;
       return (data ?? []).map(s => ({
         id: s.id as string,
         name: s.name as string,
-        duration: Number(s.duration_minutes ?? 60),
+        duration: Number(s.duration ?? 60),
       }));
     },
     enabled: !isDemo && !!salonId,
