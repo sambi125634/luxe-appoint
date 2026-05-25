@@ -12,6 +12,7 @@ import { Loader2, Sparkles, Mail } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { normalizePolishPhone } from "@/lib/phone-validation";
 
 async function resolveRedirect(userId: string): Promise<string> {
   try {
@@ -72,7 +73,10 @@ export default function AuthPage() {
     password: z.string().min(6, t("auth.signupError")),
     firstName: z.string().trim().min(2, t("auth.signupError")).max(50),
     lastName: z.string().trim().min(2, t("auth.signupError")).max(50),
-    phone: z.string().trim().min(9, "Podaj poprawny numer telefonu"),
+    phone: z.string().trim().refine(
+      (v) => normalizePolishPhone(v) !== null,
+      "Podaj poprawny polski numer telefonu (9 cyfr)"
+    ),
   });
 
   useEffect(() => {
@@ -131,12 +135,13 @@ export default function AuthPage() {
     }
     setIsLoading(true);
     const redirectUrl = `${window.location.origin}/auth`;
+    const normalizedPhone = normalizePolishPhone(signupPhone) ?? signupPhone.trim();
     const { error } = await supabase.auth.signUp({
       email: signupEmail.trim(),
       password: signupPassword,
       options: {
         emailRedirectTo: redirectUrl,
-        data: { first_name: firstName.trim(), last_name: lastName.trim(), phone: signupPhone.trim() },
+        data: { first_name: firstName.trim(), last_name: lastName.trim(), phone: normalizedPhone },
       },
     });
     if (error) {
