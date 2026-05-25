@@ -30,14 +30,14 @@ export function CommunicationSection({ isDemo, salonId }: CommunicationSectionPr
     "Witaj! Cieszymy się, że dołączyłaś do naszego salonu 🌸 Jeśli masz pytania, śmiało pisz!"
   );
 
-  // Load welcome message + birthday config from salon row
+  // Load welcome message from salon row
   const { data: salonMeta } = useQuery({
     queryKey: ["salon-comm-meta", salonId],
     queryFn: async () => {
       if (!salonId) return null;
       const { data } = await supabase
         .from("salons")
-        .select("client_app_welcome_message, birthday_campaign_active, birthday_discount_percent, birthday_send_days_before")
+        .select("welcome_message")
         .eq("id", salonId)
         .maybeSingle();
       return data;
@@ -46,8 +46,8 @@ export function CommunicationSection({ isDemo, salonId }: CommunicationSectionPr
   });
 
   useEffect(() => {
-    if (salonMeta?.client_app_welcome_message) {
-      setWelcomeMessage(salonMeta.client_app_welcome_message);
+    if (salonMeta?.welcome_message) {
+      setWelcomeMessage(salonMeta.welcome_message);
     }
   }, [salonMeta]);
 
@@ -83,16 +83,36 @@ export function CommunicationSection({ isDemo, salonId }: CommunicationSectionPr
       .select("id, email")
       .in("id", allUserIds);
     const emailToUser = new Map((profiles ?? []).map((p) => [p.email, p.id]));
-    const { data: clients } = await supabase
+    const emails = (profiles ?? []).map((p) => p.email).filter(Boolean) as string[];
+    if (emails.length === 0) return [];
+    const { data: clientsRows } = await supabase
       .from("clients")
-      .select("email, last_visit_at, total_spent")
+      .select("id, email, last_visit_at")
       .eq("salon_id", salonId)
-      .in("email", (profiles ?? []).map((p) => p.email).filter(Boolean) as string[]);
+      .in("email", emails);
+    const clients = clientsRows ?? [];
+
+    let vipClientIds = new Set<string>();
+    if (pushSegment === "vip" && clients.length) {
+      const { data: aps } = await supabase
+        .from("appointments")
+        .select("client_id")
+        .eq("salon_id", salonId)
+        .eq("status", "completed")
+        .in("client_id", clients.map((c) => c.id));
+      const counts = new Map<string, number>();
+      (aps ?? []).forEach((a) => {
+        if (a.client_id) counts.set(a.client_id, (counts.get(a.client_id) ?? 0) + 1);
+      });
+      vipClientIds = new Set(
+        [...counts.entries()].filter(([, n]) => n >= 5).map(([id]) => id)
+      );
+    }
 
     const now = Date.now();
     const month30 = 30 * 24 * 3600 * 1000;
-    const filtered = (clients ?? []).filter((c) => {
-      if (pushSegment === "vip") return (c.total_spent ?? 0) >= 1000;
+    const filtered = clients.filter((c) => {
+      if (pushSegment === "vip") return vipClientIds.has(c.id);
       if (pushSegment === "inactive")
         return !c.last_visit_at || now - new Date(c.last_visit_at).getTime() > month30;
       if (pushSegment === "no_visit") {
@@ -162,7 +182,7 @@ export function CommunicationSection({ isDemo, salonId }: CommunicationSectionPr
     setSavingWelcome(true);
     const { error } = await supabase
       .from("salons")
-      .update({ client_app_welcome_message: welcomeMessage })
+      .update({ welcome_message: welcomeMessage })
       .eq("id", salonId);
     setSavingWelcome(false);
     if (error) {
