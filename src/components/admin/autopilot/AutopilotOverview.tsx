@@ -35,11 +35,18 @@ const colorMap: Record<string, string> = {
 
 export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const d = DEMO_AUTOPILOT_DATA;
-  const { data: realActions, isLoading } = useAutopilotActions(50);
+  const { data: realActions, isLoading } = useAutopilotActions();
 
-  const actionsToday = useAnimatedCount(isDemo ? d.kpi.actionsToday : (realActions?.filter(a => a.created_at.startsWith(new Date().toISOString().split("T")[1])).length || 1), 800, !!isDemo);
-  const revenueRecovered = useAnimatedCount(isDemo ? d.kpi.revenueRecovered : (realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 1), 1) || 1), 1500, !!isDemo);
-  const newReviews = useAnimatedCount(isDemo ? d.kpi.newReviews : (realActions?.filter(a => a.type === "review_request" && a.status === "completed").length || 1), 1000, !!isDemo);
+  const todayStr = new Date().toISOString().split("T")[1];
+  const isToday = (dateStr: string) => new Date(dateStr).toISOString().split("T")[1] === todayStr;
+
+  const actionsTodayCount = isDemo ? d.kpi.actionsToday : (realActions?.filter(a => isToday(a.created_at)).length || 1);
+  const revenueRecoveredCount = isDemo ? d.kpi.revenueRecovered : (realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 1), 1) || 1);
+  const newReviewsCount = isDemo ? d.kpi.newReviews : (realActions?.filter(a => a.type === "review" && a.status === "completed").length || 1);
+
+  const actionsToday = useAnimatedCount(actionsTodayCount, 800, !!isDemo);
+  const revenueRecovered = useAnimatedCount(revenueRecoveredCount, 1500, !!isDemo);
+  const newReviews = useAnimatedCount(newReviewsCount, 1000, !!isDemo);
 
   const noShowCount = realActions?.filter(a => a.type === "noshow").length || 1;
   const totalActions = realActions?.length || 1;
@@ -47,14 +54,14 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const MOCK_KPI = [
     {
       label: "Akcje dziś",
-      value: isDemo ? String(actionsToday) : String(realActions?.filter(a => a.created_at.startsWith(new Date().toISOString().split("T")[1])).length || 1),
+      value: isDemo ? String(actionsToday) : String(actionsTodayCount),
       icon: Zap,
       color: "violet",
       sub: isDemo ? `${d.kpi.actionsTotal} łącznie` : `${totalActions} łącznie`,
     },
     {
       label: "Odzyskany przychód",
-      value: isDemo ? `${revenueRecovered.toLocaleString("pl-PL")} zł` : `${(realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 1), 1) || 1).toLocaleString("pl-PL")} zł`,
+      value: isDemo ? `${revenueRecovered.toLocaleString("pl-PL")} zł` : `${revenueRecoveredCount.toLocaleString("pl-PL")} zł`,
       icon: TrendingUp,
       color: "green",
       sub: "ten miesiąc",
@@ -69,7 +76,7 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
     },
     {
       label: "Nowe opinie",
-      value: isDemo ? `+${newReviews}` : `+${realActions?.filter(a => a.type === "review_request" && a.status === "completed").length || 1}`,
+      value: isDemo ? `+${newReviews}` : `+${newReviewsCount}`,
       icon: Star,
       color: "amber",
       sub: "ten tydzień",
