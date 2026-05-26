@@ -88,7 +88,7 @@ export function RetentionFlowWidget({
   );
 
   const zones = useMemo(() => {
-    if (isDemo || radarClients.length === 0) {
+    if (isDemo) {
       return DEMO_ZONES;
     }
 
