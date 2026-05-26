@@ -541,28 +541,28 @@
     "restartHint": "💡 Samouczek możesz uruchomić ponownie klikając 'Samouczek' w menu bocznym",
     "steps": {
       "welcome": {
-        "title": "Witaj w Beauty Calendar! 🎉",
-        "description": "Przeprowadzimy Cię przez każdą sekcję panelu. Zobaczysz co zyskujesz w każdym module i jak zacząć. Zajmie to 2 minuty."
+        "title": "Witaj w swoim salonie",
+        "description": "Pokażę Ci 6 miejsc, dzięki którym przestajesz tracić czas na telefony i papierowe notatki. 60 sekund — i wiesz, gdzie kliknąć po cokolwiek."
       },
       "dashboard": {
         "title": "Dashboard — Twoje centrum dowodzenia",
         "description": "Widzisz ile zarabiasz, ile klientek wraca i co wymaga uwagi — wszystko na pierwszy rzut oka, bez otwierania Excela."
       },
       "calendar": {
-        "title": "Kalendarz — zero telefonów",
-        "description": "Klientki rezerwują same 24/7, Ty zarządzasz tylko wyjątkami. Widzisz grafik wszystkich pracowników na jednym ekranie."
+        "title": "Kalendarz — cały zespół na jednym ekranie",
+        "description": "Tu żyje Twój dzień. Klikasz pusty slot — masz wizytę. Klientka rezerwuje sama — od razu tu trafia. Bez double-bookingu, bez zeszytu, bez chaosu."
       },
       "widgets": {
-        "title": "Widgety — Twój link do rezerwacji",
-        "description": "Wklej link na Instagram lub stronę www — klientki rezerwują nawet o 23:00. Jak pracownik, który nigdy nie śpi."
+        "title": "Twój link do rezerwacji",
+        "description": "To wszystko, czego potrzebujesz w bio na Instagramie, w Google i w stopce maila. Klientki rezerwują 24/7, nawet o 23:00 — Ty nie odbierasz już żadnego telefonu. Klikaj swobodnie — to Twój panel."
       },
       "staff": {
         "title": "Zespół — każdy wie co robi",
         "description": "Każdy pracownik ma swój kalendarz, usługi i kolor. System pilnuje grafiku — Ty nie musisz pamiętać kto co robi."
       },
       "clients": {
-        "title": "Klienci — pełna historia",
-        "description": "Pełna historia każdej klientki z tagami, notatkami i preferencjami. Wiesz kto jest VIP, kto znika i do kogo warto zadzwonić."
+        "title": "Klientki — wszystko, co o nich wiesz",
+        "description": "Każda klientka ma swoją kartę: ostatnia wizyta, ile wydała, jakie zabiegi lubi, kto z nią rozmawiał. Wiesz kto Cię finansuje — i kto przestał wracać, zanim odejdzie do konkurencji."
       },
       "conversations": {
         "title": "Konwersacje — jeden widok",
@@ -573,24 +573,24 @@
         "description": "Karty konsultacyjne z podpisem RODO, notatki głosowe i AI — profesjonalna dokumentacja bez papierowej biurokracji."
       },
       "services": {
-        "title": "Usługi — cennik online",
-        "description": "Klientki widzą ceny i rezerwują od razu. Zmień cenę raz — widget aktualizuje się automatycznie."
+        "title": "Usługi, cennik, magazyn",
+        "description": "Tu mieszka Twoja oferta. Zmieniasz cenę raz — link do rezerwacji aktualizuje się sam. Łączysz usługi z produktami, których używasz, a system pilnuje stanu magazynu i marży."
       },
       "products": {
         "title": "Produkty — magazyn pod kontrolą",
         "description": "Wiesz ile produktów zostało i kiedy zamówić. Skanuj dostawy telefonem — system liczy marże za Ciebie."
       },
       "accounting": {
-        "title": "Raporty — eksport jednym klikiem",
-        "description": "Zamykasz salon, sprawdzasz raport dzienny — wszystko się zgadza. Eksport dla księgowej jednym kliknięciem."
+        "title": "Zarobki — realny zysk, nie przychód",
+        "description": "Tu widzisz, ile naprawdę zostaje Ci w kieszeni po kosztach materiałów. Wreszcie wiesz, która usługa zarabia, a która tylko zajmuje fotel. Raport dla księgowej — jedno kliknięcie."
       },
       "pipeline": {
         "title": "Ścieżka klientki — reaguj szybciej",
         "description": "Widzisz ile klientek wraca po 1., 2., 3. wizycie — i gdzie odpadają. Reagujesz zanim odejdą do konkurencji."
       },
       "retention": {
-        "title": "Retencja — automatyczne powroty",
-        "description": "System automatycznie dba o powroty klientek. 5 sekwencji wiadomości reaguje we właściwym momencie — Ty nie musisz pamiętać."
+        "title": "Autopilot powrotów klientek",
+        "description": "AI pisze za Ciebie do klientek, które dawno nie były — sama, we właściwym momencie. Ty śpisz, one wracają na rezerwację. Bez przypominania, bez wysiłku, bez ścigania."
       },
       "referral": {
         "title": "Polecenia — darmowe klientki",
@@ -605,8 +605,8 @@
         "description": "AI Asystent zna cały system. Pytasz po polsku, dostajesz konkretną odpowiedź natychmiast."
       },
       "cta": {
-        "title": "Gotowa do startu! 🚀",
-        "description": "Znasz już wszystkie moduły. Zacznij od uzupełnienia danych — lista kontrolna na dashboardzie pokaże co jeszcze zostało."
+        "title": "Gotowe. To Twój salon.",
+        "description": "Znasz już najważniejsze. Reszty nie musisz uczyć się dziś — odkryjesz po drodze. Klikaj swobodnie, nic nie zepsujesz."
       }
     }
   },
