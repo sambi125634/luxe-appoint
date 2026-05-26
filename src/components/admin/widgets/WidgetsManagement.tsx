@@ -166,7 +166,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
     upsertWidget.mutate(widget, {
       onSuccess: (saved: any) => {
         toast.success("Kampania utworzona", {
-          description: "Link aktywny. Możesz dostroić w „Edytuj zaawansowane".",
+          description: "Link aktywny. Możesz dostroić w sekcji Edytuj zaawansowane.",
           action: saved
             ? {
                 label: "Edytuj",
