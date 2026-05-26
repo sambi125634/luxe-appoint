@@ -40,16 +40,20 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const todayStr = new Date().toISOString().split("T")[1];
   const isToday = (dateStr: string) => new Date(dateStr).toISOString().split("T")[1] === todayStr;
 
-  const actionsTodayCount = isDemo ? d.kpi.actionsToday : (realActions?.filter(a => isToday(a.created_at)).length || 1);
-  const revenueRecoveredCount = isDemo ? d.kpi.revenueRecovered : (realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 1), 1) || 1);
-  const newReviewsCount = isDemo ? d.kpi.newReviews : (realActions?.filter(a => a.type === "review" && a.status === "completed").length || 1);
+  const actionsTodayCount = isDemo ? d.kpi.actionsToday : (realActions?.filter(a => isToday(a.created_at)).length || 0);
+  const revenueRecoveredCount = isDemo
+    ? d.kpi.revenueRecovered
+    : (realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 0), 0) || 0);
+  const newReviewsCount = isDemo
+    ? d.kpi.newReviews
+    : (realActions?.filter(a => a.type === "review" && a.status === "completed").length || 0);
 
   const actionsToday = useAnimatedCount(actionsTodayCount, 800, !!isDemo);
   const revenueRecovered = useAnimatedCount(revenueRecoveredCount, 1500, !!isDemo);
   const newReviews = useAnimatedCount(newReviewsCount, 1000, !!isDemo);
 
-  const noShowCount = realActions?.filter(a => a.type === "noshow").length || 1;
-  const totalActions = realActions?.length || 1;
+  const noShowCount = realActions?.filter(a => a.type === "noshow").length || 0;
+  const totalActions = realActions?.length || 0;
 
   const MOCK_KPI = [
     {
@@ -68,10 +72,10 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
     },
     {
       label: "No-show rate",
-      value: isDemo ? `${d.kpi.noShowRate}%` : (noShowCount > 1 ? `${noShowCount}` : "—"),
+      value: isDemo ? `${d.kpi.noShowRate}%` : (noShowCount > 0 ? `${noShowCount}` : "—"),
       icon: UserX,
       color: "green",
-      sub: isDemo ? `↓ było ${d.kpi.noShowPrev}% — Autopilot to zmienił` : (noShowCount > 1 ? "Aktywny monitoring" : "Brak danych"),
+      sub: isDemo ? `↓ było ${d.kpi.noShowPrev}% — Autopilot to zmienił` : (noShowCount > 0 ? "Aktywny monitoring" : "Brak danych"),
       subColor: isDemo ? "text-green-600" : undefined,
     },
     {
