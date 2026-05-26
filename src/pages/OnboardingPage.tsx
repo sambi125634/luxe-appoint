@@ -11,8 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
   Loader2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles,
-  CheckCircle2, Upload, Instagram, Globe, Rocket, Bot, MessageSquare,
-  Mail, FileText, PartyPopper, Users, Scissors, Building2, MapPin, Link2,
+  CheckCircle2, Upload, Instagram, Globe, Rocket,
+  FileText, PartyPopper, Building2, MapPin, Link2,
 } from "lucide-react";
 import { Confetti } from "@/components/booking/Confetti";
 import { cn } from "@/lib/utils";
@@ -23,7 +23,7 @@ const STEPS = [
   { title: "O salonie", emoji: "🏢", icon: Building2 },
   { title: "AI Skan", emoji: "🔍", icon: Sparkles },
   { title: "Twój link", emoji: "🔗", icon: Link2 },
-  { title: "Klientki", emoji: "👥", icon: Users },
+  { title: "Klientki", emoji: "👥", icon: Upload },
   { title: "Gotowe!", emoji: "🎉", icon: PartyPopper },
 ];
 
@@ -53,14 +53,6 @@ const AI_SCAN_MESSAGES = [
   "📸 Importuję zdjęcia salonu...",
   "⏰ Ustawiam godziny otwarcia...",
   "✅ Gotowe! Uzupełniłam profil za Ciebie.",
-];
-
-const AUTOPILOT_FEATURES = [
-  { key: "reminders", label: "Przypomnienia SMS przed wizytą", description: "24h i 2h przed wizytą", icon: "📲" },
-  { key: "retention", label: "Reaktywacja nieaktywnych klientek", description: "Automatyczne wiadomości po 45, 60, 75 dniach", icon: "🔄" },
-  { key: "reviews", label: "Prośby o opinie Google", description: "2h po zakończonej wizycie", icon: "⭐" },
-  { key: "noshow", label: "Follow-up po no-show", description: "30 minut po niestawieniu się", icon: "🚫" },
-  { key: "brief", label: "Tygodniowy Brief CEO", description: "Każdy poniedziałek o 8:00", icon: "📊" },
 ];
 
 const SERVICE_TEMPLATES: Record<string, { category: string; services: { name: string; duration: number; price: number }[] }[]> = {
