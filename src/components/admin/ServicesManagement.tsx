@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical, Wand2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RecipeEditorDrawer from "@/modules/inventory/RecipeEditorDrawer";
 import { useProducts } from "@/hooks/useProducts";
@@ -23,6 +23,7 @@ import { useSalonId } from "@/hooks/useSalonId";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAllServiceVariants, useServiceVariants, useSyncServiceVariants } from "@/hooks/useServiceVariants";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VariantFormItem {
   id?: string;
@@ -213,6 +214,79 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   // Variant form state (editingVariants hook moved after editingService declaration below)
   const [hasVariants, setHasVariants] = useState(false);
   const [variants, setVariants] = useState<VariantFormItem[]>([]);
+
+  // AI enrichment of service descriptions (Booksy deep scrape)
+  const [isEnrichOpen, setIsEnrichOpen] = useState(false);
+  const [enrichUrl, setEnrichUrl] = useState("");
+  const [isEnriching, setIsEnriching] = useState(false);
+  const [onlyEmptyDescriptions, setOnlyEmptyDescriptions] = useState(true);
+
+  const handleEnrichDescriptions = async () => {
+    if (isDemo) {
+      toast({ title: "Tryb Demo", description: "Wzbogacanie opisów AI dostępne tylko po rejestracji" });
+      return;
+    }
+    if (!enrichUrl.trim()) {
+      toast({ title: "Brak linku", description: "Wklej link do profilu salonu (Booksy lub strona własna)", variant: "destructive" });
+      return;
+    }
+
+    const candidates = (dbServices || []).filter(s =>
+      onlyEmptyDescriptions ? !s.description || s.description.trim().length < 20 : true
+    );
+
+    if (candidates.length === 0) {
+      toast({ title: "Brak usług do wzbogacenia", description: "Wszystkie usługi mają już opisy. Wyłącz filtr, aby nadpisać." });
+      return;
+    }
+
+    setIsEnriching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("enrich-service-descriptions", {
+        body: {
+          url: enrichUrl.trim(),
+          services: candidates.map(s => ({ id: s.id, name: s.name })),
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.success) {
+        toast({ title: "Błąd", description: data?.error || "Nie udało się wzbogacić opisów", variant: "destructive" });
+        return;
+      }
+
+      const matches: { id: string; description: string; benefits: string[] }[] = data.matches || [];
+      let updated = 0;
+      for (const m of matches) {
+        const current = (dbServices || []).find(s => s.id === m.id);
+        if (!current) continue;
+        if (onlyEmptyDescriptions && current.description && current.description.trim().length >= 20) continue;
+        try {
+          await updateServiceMutation.mutateAsync({
+            id: m.id,
+            description: m.description,
+            ...(m.benefits && m.benefits.length > 0
+              ? { benefits: m.benefits as unknown as import("@/integrations/supabase/types").Json }
+              : {}),
+          });
+          updated++;
+        } catch (e) {
+          console.error("update failed", e);
+        }
+      }
+
+      toast({
+        title: "Wzbogacono opisy",
+        description: `Zaktualizowano ${updated} z ${candidates.length} usług. AI nie znalazło dopasowań dla pozostałych.`,
+      });
+      setIsEnrichOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast({ title: "Błąd", description: "Nie udało się połączyć z AI", variant: "destructive" });
+    } finally {
+      setIsEnriching(false);
+    }
+  };
 
   const services: Service[] = useMemo(() => {
     if (isDemo) return DEMO_SERVICES;
@@ -674,6 +748,12 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
               <Upload className="w-4 h-4" />
               {t('services.importCsv')}
             </Button>
+            {!isDemo && (
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsEnrichOpen(true)}>
+                <Wand2 className="w-4 h-4 text-primary" />
+                Wzbogać opisy AI
+              </Button>
+            )}
             <Button variant="luxury" size="sm" className="gap-2" onClick={() => openServiceDialog()}>
               <Plus className="w-4 h-4" />
               {t('services.addService')}
@@ -1108,6 +1188,61 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         onSave={handleRecipeSave}
         isDemo={isDemo}
       />
+
+      {/* AI Enrich Descriptions Dialog */}
+      <Dialog open={isEnrichOpen} onOpenChange={(o) => !isEnriching && setIsEnrichOpen(o)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif flex items-center gap-2">
+              <Wand2 className="w-5 h-5 text-primary" />
+              Wzbogać opisy usług AI
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              AI przeskanuje profil salonu (np. Booksy), rozwinie akordeony „Więcej info" i wyodrębni pełne opisy dla Twoich usług. Trwa 30–60 sekund.
+            </p>
+            <div>
+              <Label>Link do profilu salonu</Label>
+              <Input
+                value={enrichUrl}
+                onChange={(e) => setEnrichUrl(e.target.value)}
+                placeholder="https://booksy.com/pl-pl/..."
+                disabled={isEnriching}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-muted/40 border border-border">
+              <div className="text-sm">
+                <p className="font-medium">Pomiń usługi z opisami</p>
+                <p className="text-xs text-muted-foreground">Aktualizuj tylko puste / krótkie opisy</p>
+              </div>
+              <Switch checked={onlyEmptyDescriptions} onCheckedChange={setOnlyEmptyDescriptions} disabled={isEnriching} />
+            </div>
+            <div className="text-xs text-muted-foreground flex items-start gap-2">
+              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+              <span>AI nie wymyśla treści — zaktualizuje tylko te usługi, które znajdzie na podanej stronie.</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEnrichOpen(false)} disabled={isEnriching}>
+              Anuluj
+            </Button>
+            <Button variant="luxury" onClick={handleEnrichDescriptions} disabled={isEnriching || !enrichUrl.trim()} className="gap-2">
+              {isEnriching ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Skanowanie…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Uruchom AI
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
