@@ -1151,9 +1151,12 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     </div>
                     
                     <div className="border-t border-border my-2 pt-2">
-                      <p className="text-[10px] text-muted-foreground mb-2">Przykładowe usługi:</p>
+                      <p className="text-[10px] text-muted-foreground mb-2">Podgląd usług:</p>
                       <div className="space-y-2">
-                        {(formData.showAllServices ? mockServices.slice(0, 3) : mockServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)).map(service => (
+                        {(formData.showAllServices
+                          ? realServices.slice(0, 3)
+                          : realServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)
+                        ).map(service => (
                           <div 
                             key={service.id}
                             className={`p-2 border border-border ${getBorderRadiusClass()} hover:border-primary/50 transition-colors cursor-pointer`}
