@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical, Wand2, Loader2 } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RecipeEditorDrawer from "@/modules/inventory/RecipeEditorDrawer";
 import { useProducts } from "@/hooks/useProducts";
@@ -330,6 +331,7 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const [editingService, setEditingService] = useState<Service | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [benefitInput, setBenefitInput] = useState("");
+  const [showAdvancedFields, setShowAdvancedFields] = useState(false);
 
   // Variant data for editing (needs editingService to be declared first)
   const { data: editingVariants } = useServiceVariants(editingService?.id);
