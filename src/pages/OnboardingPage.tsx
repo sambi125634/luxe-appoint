@@ -577,20 +577,6 @@ export default function OnboardingPage() {
     goTo(2);
   };
 
-  const handleActivateAutopilot = async () => {
-    if (!createdSalonId) return;
-    setSaving(true);
-
-    await supabase.from("autopilot_config").insert({
-      salon_id: createdSalonId,
-      is_active: true,
-      ai_suggestions_enabled: autopilotToggles.reviews,
-    });
-
-    setSaving(false);
-    goTo(4);
-  };
-
   const handleWidgetDone = () => goTo(5);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -603,7 +589,12 @@ export default function OnboardingPage() {
       if (lines.length < 2) { toast.error("Plik CSV jest pusty"); return; }
       const headers = lines[0].split(/[,;]/).map(h => h.trim().replace(/^"|"$/g, ""));
       setCsvHeaders(headers);
-      const rows = lines.slice(1, 50).map(line => {
+      const MAX_ROWS = 5000;
+      const dataLines = lines.slice(1);
+      if (dataLines.length > MAX_ROWS) {
+        toast.warning(`Plik ma ${dataLines.length} wierszy — zaimportujemy pierwsze ${MAX_ROWS}.`);
+      }
+      const rows = dataLines.slice(0, MAX_ROWS).map(line => {
         const values = line.split(/[,;]/).map(v => v.trim().replace(/^"|"$/g, ""));
         const row: CsvRow = {};
         headers.forEach((h, i) => { row[h] = values[i] || ""; });
@@ -626,23 +617,30 @@ export default function OnboardingPage() {
     const emailCol = findCol(["email", "mail", "e-mail"]);
 
     let imported = 0;
+    let skipped = 0;
     for (const row of csvData) {
       const firstName = row[firstNameCol]?.trim();
-      const lastName = row[lastNameCol]?.trim() || "";
-      const phone = row[phoneCol]?.trim() || "000000000";
+      const lastName = (row[lastNameCol]?.trim()) || "—";
+      const rawPhone = row[phoneCol]?.trim() || "";
+      // Normalize Polish phone: strip spaces/dashes
+      const phone = rawPhone.replace(/[\s\-()]/g, "");
       const email = row[emailCol]?.trim() || null;
 
-      if (!firstName) continue;
+      if (!firstName) { skipped++; continue; }
+      // Require either a real phone (min 5 chars) or an email — otherwise skip
+      if (phone.length < 5 && !email) { skipped++; continue; }
 
       const { error } = await supabase.from("clients").insert({
         salon_id: createdSalonId, first_name: firstName, last_name: lastName,
-        phone, email, rodo_consent: true,
+        phone: phone.length >= 5 ? phone : `brak-${Date.now()}-${imported}`,
+        email, rodo_consent: true,
       });
       if (!error) imported++;
+      else skipped++;
     }
     setImportedCount(imported);
     setSaving(false);
-    toast.success(`Zaimportowano ${imported} klientek`);
+    toast.success(`Zaimportowano ${imported} klientek${skipped > 0 ? ` (pominięto ${skipped} bez danych kontaktowych)` : ""}`);
     goTo(6);
   };
 
@@ -1066,14 +1064,16 @@ export default function OnboardingPage() {
                   <Button variant="outline" onClick={() => setStep(3)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
-                  <Button onClick={() => {
-                    // Save autopilot config as pending (not active) and proceed
+                  <Button onClick={async () => {
                     if (createdSalonId) {
-                      supabase.from("autopilot_config").upsert({
+                      setSaving(true);
+                      const { error } = await supabase.from("autopilot_config").upsert({
                         salon_id: createdSalonId,
                         is_active: false,
                         ai_suggestions_enabled: false,
-                      });
+                      }, { onConflict: "salon_id" });
+                      setSaving(false);
+                      if (error) { toast.error("Nie udało się zapisać: " + error.message); return; }
                     }
                     goTo(4);
                   }} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
