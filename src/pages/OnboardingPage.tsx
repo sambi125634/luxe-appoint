@@ -575,7 +575,7 @@ export default function OnboardingPage() {
     goTo(2);
   };
 
-  const handleWidgetDone = () => goTo(5);
+  const handleWidgetDone = () => goTo(3);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -639,13 +639,13 @@ export default function OnboardingPage() {
     setImportedCount(imported);
     setSaving(false);
     toast.success(`Zaimportowano ${imported} klientek${skipped > 0 ? ` (pominięto ${skipped} bez danych kontaktowych)` : ""}`);
-    goTo(6);
+    goTo(4);
   };
 
   const handleComplete = async () => {
     if (!createdSalonId) return;
     setSaving(true);
-    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 7 }).eq("id", createdSalonId);
+    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 5 }).eq("id", createdSalonId);
     toast.success("🎉 Salon skonfigurowany! Witamy w Beauty Calendar.");
     navigate("/admin");
   };
