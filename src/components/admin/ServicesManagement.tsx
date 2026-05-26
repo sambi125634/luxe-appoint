@@ -727,7 +727,25 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
       {/* Services header */}
       <div className="glass-card p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-serif font-semibold">{t('services.title')} ({filteredServices.length})</h3>
+          <div className="flex items-center gap-3">
+            <h3 className="text-lg font-serif font-semibold">
+              {t('services.title')} ({filteredServices.length}
+              {filteredServices.length !== services.length && (
+                <span className="text-muted-foreground font-normal"> z {services.length}</span>
+              )})
+            </h3>
+            {filteredServices.length !== services.length && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs gap-1"
+                onClick={() => { setSearchQuery(""); setSelectedCategory(null); }}
+              >
+                <X className="w-3 h-3" />
+                Pokaż wszystkie ({services.length})
+              </Button>
+            )}
+          </div>
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
