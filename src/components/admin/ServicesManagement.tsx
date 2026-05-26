@@ -748,6 +748,12 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
               <Upload className="w-4 h-4" />
               {t('services.importCsv')}
             </Button>
+            {!isDemo && (
+              <Button variant="outline" size="sm" className="gap-2" onClick={() => setIsEnrichOpen(true)}>
+                <Wand2 className="w-4 h-4 text-primary" />
+                Wzbogać opisy AI
+              </Button>
+            )}
             <Button variant="luxury" size="sm" className="gap-2" onClick={() => openServiceDialog()}>
               <Plus className="w-4 h-4" />
               {t('services.addService')}
