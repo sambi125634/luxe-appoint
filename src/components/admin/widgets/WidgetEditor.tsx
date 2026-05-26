@@ -79,6 +79,15 @@ const fontOptions = [
 
 export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorProps) {
   const isNew = !widget;
+
+  const { data: dbServices } = useServices();
+  const { data: dbCategories } = useServiceCategories();
+  const realServices = (dbServices || []).map(s => ({
+    id: s.id,
+    name: s.name,
+    category: dbCategories?.find(c => c.id === s.category_id)?.name || "Bez kategorii",
+    price: Number(s.price),
+  }));
   
   const [formData, setFormData] = useState<Partial<BookingWidget>>(() => {
     if (widget) return { ...widget };
