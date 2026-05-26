@@ -941,7 +941,7 @@ export default function OnboardingPage() {
                 </p>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(2)} size="sm">
+                  <Button variant="outline" onClick={() => setStep(1)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
                   <Button onClick={handleWidgetDone} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
@@ -952,8 +952,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 5: Import Clients ===== */}
-          {step === 5 && (
+          {/* ===== STEP 3: Import Clients ===== */}
+          {step === 3 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
                 <div>
@@ -1002,10 +1002,10 @@ export default function OnboardingPage() {
                 )}
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(4)} size="sm">
+                  <Button variant="outline" onClick={() => setStep(2)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
-                  <Button variant="ghost" onClick={() => goTo(6)} className="flex-1 text-muted-foreground">
+                  <Button variant="ghost" onClick={() => goTo(4)} className="flex-1 text-muted-foreground">
                     Zacznę od nowa — pomiń
                   </Button>
                 </div>
