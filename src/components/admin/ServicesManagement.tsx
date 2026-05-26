@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical } from "lucide-react";
+import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical, Wand2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RecipeEditorDrawer from "@/modules/inventory/RecipeEditorDrawer";
 import { useProducts } from "@/hooks/useProducts";
@@ -23,6 +23,7 @@ import { useSalonId } from "@/hooks/useSalonId";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAllServiceVariants, useServiceVariants, useSyncServiceVariants } from "@/hooks/useServiceVariants";
+import { supabase } from "@/integrations/supabase/client";
 
 interface VariantFormItem {
   id?: string;
