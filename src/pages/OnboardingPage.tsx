@@ -1013,8 +1013,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 6: Celebration ===== */}
-          {step === 6 && (
+          {/* ===== STEP 4: Celebration ===== */}
+          {step === 4 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-6">
                 <div className="text-center py-4">
@@ -1030,7 +1030,6 @@ export default function OnboardingPage() {
                 <div className="space-y-2">
                   {[
                     { label: "Usługi skonfigurowane", value: scanResult ? `${scanResult.services.length} (AI)` : "✓ z szablonu", done: true },
-                    { label: "Autopilot", value: "AKTYWNY", done: true },
                     { label: "Link do rezerwacji", value: "Udostępniony", done: true },
                     { label: "Klientki zaimportowane", value: importedCount > 0 ? `${importedCount}` : "—", done: importedCount > 0 },
                   ].map((item, i) => (
