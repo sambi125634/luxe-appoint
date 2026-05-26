@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Mail } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -61,7 +61,6 @@ export default function AuthPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [rodoConsent, setRodoConsent] = useState(false);
-  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
 
   const loginSchema = z.object({
     email: z.string().trim().email(t("auth.loginError")),
@@ -147,7 +146,8 @@ export default function AuthPage() {
     if (error) {
       toast.error(t("auth.signupError"));
     } else {
-      setShowEmailConfirmation(true);
+      toast.success("Konto utworzone! Przekierowuję do onboardingu...");
+      // Auto-confirm jest włączone — sesja zwracana od razu, onAuthStateChange przekieruje.
     }
     setIsLoading(false);
   };
@@ -156,32 +156,6 @@ export default function AuthPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (showEmailConfirmation) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-        <Card className="w-full max-w-md border-border/50 shadow-xl">
-          <CardHeader className="text-center space-y-4">
-            <div className="w-20 h-20 mx-auto rounded-full bg-primary/10 flex items-center justify-center">
-              <Mail className="w-10 h-10 text-primary" />
-            </div>
-            <CardTitle className="font-serif text-xl">Sprawdź swoją skrzynkę email</CardTitle>
-            <CardDescription className="text-base">
-              Wysłaliśmy link aktywacyjny na adres <strong>{signupEmail}</strong>. Kliknij link w wiadomości, aby aktywować konto.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="p-3 bg-muted rounded-lg text-sm text-muted-foreground text-center">
-              Nie widzisz wiadomości? Sprawdź folder spam lub poczekaj kilka minut.
-            </div>
-            <Button variant="outline" className="w-full" onClick={() => setShowEmailConfirmation(false)}>
-              Wróć do logowania
-            </Button>
-          </CardContent>
-        </Card>
       </div>
     );
   }
