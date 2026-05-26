@@ -398,8 +398,13 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                 {!formData.showAllServices && (
                   <div className="space-y-3">
                     <Label>Wybierz usługi do wyświetlenia</Label>
+                    {realServices.length === 0 && (
+                      <div className="text-sm text-muted-foreground p-4 border border-dashed border-border rounded-lg text-center">
+                        Najpierw dodaj usługi w zakładce „Usługi", aby je tutaj wybrać.
+                      </div>
+                    )}
                     <div className="grid gap-2">
-                      {mockServices.map(service => (
+                      {realServices.map(service => (
                         <label
                           key={service.id}
                           className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
