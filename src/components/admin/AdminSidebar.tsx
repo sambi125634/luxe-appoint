@@ -148,6 +148,7 @@ export function AdminSidebar({ activeTab, onTabChange, onClose, userRole, salonN
                   {section.items.map((item) => (
                     <li key={item.tab}>
                       <button
+                        data-tour-target={item.tab}
                         onClick={() => {
                           onTabChange(item.tab);
                           onClose?.();
