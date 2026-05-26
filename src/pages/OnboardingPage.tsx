@@ -746,26 +746,6 @@ export default function OnboardingPage() {
                   </div>
                 </div>
 
-                {/* Skąd przyszły Twoje klientki? */}
-                <div className="space-y-2">
-                  <Label>Skąd teraz bierzesz nowe klientki?</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { key: "booksy", label: "Booksy / Fresha / Versum", emoji: "🔵" },
-                      { key: "instagram", label: "Instagram / Social media", emoji: "📱" },
-                      { key: "referrals", label: "Polecenia", emoji: "👯" },
-                      { key: "google", label: "Google / Strona www", emoji: "🌐" },
-                      { key: "phone", label: "Telefon / Stali klienci", emoji: "📞" },
-                    ].map(s => (
-                      <Button key={s.key} variant={clientSources.includes(s.key) ? "default" : "outline"} size="sm"
-                        onClick={() => setClientSources(prev => prev.includes(s.key) ? prev.filter(x => x !== s.key) : [...prev, s.key])}
-                        className={cn("text-xs h-auto py-2 justify-start", clientSources.includes(s.key) && "shadow-lg")}>
-                        <span className="mr-1">{s.emoji}</span>{s.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="space-y-3 p-4 bg-gradient-to-r from-[#E91E8C]/5 to-[#E91E8C]/10 rounded-xl border border-[#E91E8C]/20">
                   <div className="flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-[#E91E8C]" />
