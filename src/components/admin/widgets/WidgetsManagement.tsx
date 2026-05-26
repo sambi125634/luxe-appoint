@@ -42,6 +42,7 @@ import { EmbedCodeModal } from "./EmbedCodeModal";
 import { WidgetEditor } from "./WidgetEditor";
 import { PromotionsManager } from "./PromotionsManager";
 import { InstagramLinkGenerator } from "./InstagramLinkGenerator";
+import { QuickWidgetCreateModal } from "./QuickWidgetCreateModal";
 import { SectionGuide } from "../SectionGuide";
 
 function getWidgetUrl(slug: string): string {
@@ -86,6 +87,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false);
   const [embedWidget, setEmbedWidget] = useState<BookingWidget | null>(null);
+  const [isQuickCreateOpen, setIsQuickCreateOpen] = useState(false);
 
   // Sync real widgets into local state + auto-bootstrap "main" widget on first load
   useEffect(() => {
@@ -146,7 +148,38 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
 
   const handleCreateWidget = () => {
     setSelectedWidget(null);
+    setIsQuickCreateOpen(true);
+  };
+
+  const handleAdvancedCreate = () => {
+    setSelectedWidget(null);
+    setIsQuickCreateOpen(false);
     setIsEditorOpen(true);
+  };
+
+  const handleQuickCreate = (widget: BookingWidget) => {
+    if (isDemo) {
+      setWidgets([...widgets, { ...widget, id: Date.now().toString() }]);
+      toast.success("Kampania utworzona", { description: "Demo — dane nie zostały zapisane" });
+      return;
+    }
+    upsertWidget.mutate(widget, {
+      onSuccess: (saved: any) => {
+        toast.success("Kampania utworzona", {
+          description: "Link aktywny. Możesz dostroić w „Edytuj zaawansowane".",
+          action: saved
+            ? {
+                label: "Edytuj",
+                onClick: () => {
+                  setSelectedWidget(saved as BookingWidget);
+                  setIsEditorOpen(true);
+                },
+              }
+            : undefined,
+        });
+      },
+      onError: (e: any) => toast.error("Nie udało się utworzyć kampanii", { description: e?.message }),
+    });
   };
 
   const handleSaveWidget = (widget: BookingWidget) => {
@@ -436,6 +469,17 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
           isOpen={isEditorOpen}
           onClose={() => setIsEditorOpen(false)}
           onSave={handleSaveWidget}
+        />
+      )}
+
+      {isQuickCreateOpen && (
+        <QuickWidgetCreateModal
+          isOpen={isQuickCreateOpen}
+          onClose={() => setIsQuickCreateOpen(false)}
+          onCreate={handleQuickCreate}
+          defaultTheme={widgets.find(w => w.type === "main")?.theme}
+          salonName={salonName}
+          isDemo={isDemo}
         />
       )}
 
