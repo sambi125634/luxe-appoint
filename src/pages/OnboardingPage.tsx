@@ -328,7 +328,6 @@ export default function OnboardingPage() {
         name: salonName.trim(), city: salonCity.trim() || null,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
         social_url: instagramUrl.trim() || websiteUrl.trim() || null, onboarding_step: 1,
-        client_sources: clientSources,
       }).eq("id", createdSalonId);
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
     } else {
@@ -338,7 +337,6 @@ export default function OnboardingPage() {
         owner_id: userId, onboarding_step: 1, onboarding_completed: false,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
         social_url: instagramUrl.trim() || websiteUrl.trim() || null,
-        client_sources: clientSources,
       }).select("id, slug").single();
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
       setCreatedSalonId(salon.id);
