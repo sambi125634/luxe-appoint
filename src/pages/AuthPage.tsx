@@ -144,7 +144,17 @@ export default function AuthPage() {
       },
     });
     if (error) {
-      toast.error(t("auth.signupError"));
+      console.error("Signup error:", error);
+      const msg = error.message?.toLowerCase() ?? "";
+      if (msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already")) {
+        toast.error("Konto z tym adresem e-mail już istnieje. Zaloguj się.");
+      } else if (msg.includes("pwned") || msg.includes("weak") || msg.includes("password")) {
+        toast.error("Hasło jest zbyt słabe lub wyciekło. Użyj silniejszego (min. 8 znaków, cyfry, znaki specjalne).");
+      } else if (msg.includes("invalid") && msg.includes("email")) {
+        toast.error("Nieprawidłowy adres e-mail.");
+      } else {
+        toast.error(error.message || t("auth.signupError"));
+      }
     } else {
       toast.success("Konto utworzone! Przekierowuję do onboardingu...");
       // Auto-confirm jest włączone — sesja zwracana od razu, onAuthStateChange przekieruje.
