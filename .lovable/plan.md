@@ -1,92 +1,107 @@
-# Przebudowa Guided Tour w panelu admin
-
-## Diagnoza
-
-Obecny `src/components/demo/GuidedTour.tsx`:
-- **17 kroków** — każda zakładka sidebara to osobny krok, męcząco
-- **Pełny overlay `bg-background/80 backdrop-blur-sm`** zasłania cały panel — user nie widzi co tour pokazuje
-- Karta zawsze wycentrowana, brak związku wizualnego z opisywaną sekcją
-- Copy ogólne, nie w języku korzyści
 
 ## Cel
 
-Tour krótki (7 kroków zamiast 17), z widocznym UI w tle, reflektorem na konkretnej zakładce sidebara, copy w języku realnych korzyści dla właścicielki salonu.
+Po onboardingu i tutorialu konto admina ma być „białą kartką" — żadne liczby/treści demo nie mogą się tam pojawić. Dodatkowo: uprościć kreator widgetu i naprawić problem z widoczną liczbą usług + uprościć tworzenie usługi.
 
-## 1. Konsolidacja do 7 kroków
+---
 
-Grupowanie pokrewnych funkcji w jeden krok — każdy krok przedstawia *obszar*, nie pojedynczy klik:
+## 1. Audyt demo-data leaków w panelu admin
 
-| # | Krok | Pokazuje (sidebar tab) | O czym |
-|---|------|------------------------|--------|
-| 1 | Witaj | center | „Oto Twój salon — pokażę Ci 6 miejsc, które dają Ci kontrolę" |
-| 2 | Kalendarz i grafik | `calendar` | „Tu widzisz cały dzień zespołu. Bez double-bookingu, bez papierowych list" |
-| 3 | Klientki i wiadomości | `clients` (+ wzmianka o `conversations`) | „Pełna historia każdej klientki — kiedy była, ile wydała, kto z nią rozmawiał" |
-| 4 | Usługi, cennik, produkty | `services` (+ wzmianka o `products`) | „Twoja oferta i magazyn w jednym — kontrola marży na każdym zabiegu" |
-| 5 | Zarobki i księgowość | `accounting` | „Realny zysk po kosztach materiałów. Wiesz ile naprawdę zarabiasz" |
-| 6 | Autopilot retencji | `retention` (+ wzmianka o `pipeline` i `referral`) | „AI pisze za Ciebie do klientek, które dawno nie były. Sama wraca rezerwacja" |
-| 7 | Twój link do rezerwacji | `widgets` | „Wklej go w bio Instagrama — klientki rezerwują same, 24/7. Finish + CTA" |
+### 1a. WidgetEditor → zakładka „Analityka"
+**Plik:** `src/components/admin/widgets/WidgetEditor.tsx`
+- Linie 1048, 1052 i sąsiednie: `formData.viewCount || mockFunnelData[0].value` — fallback do mocka kiedy realna wartość to 0.
+- **Fix:** usunąć `mockFunnelData` z fallbacku. Zamiast tego pokazać empty state: „Brak danych — widget jeszcze nie ma wyświetleń. Udostępnij link, aby zacząć zbierać statystyki."
+- Cały lejek (steps) ma używać wyłącznie realnych `viewCount`/`bookingCount` z bazy; jeśli 0 → pokazać szare słupki z etykietą „0".
 
-Stare 17 kroków: `welcome, dashboard, calendar, widgets, staff, clients, conversations, consultation, services, products, accounting, pipeline, retention, referral, settings, support, cta` → wytnięte: `dashboard, staff, consultation, settings, support` (są oczywiste lub odkryją je sami).
+### 1b. WidgetsManagement — lista kart widgetów
+- `widget.viewCount` / `widget.bookingCount` są już z bazy (po starcie 0) → OK, bez zmian. Tylko weryfikacja, że `useBookingWidgets` zwraca realne liczby (a nie mock).
 
-## 2. Reflektor zamiast pełnego blura
+### 1c. Pełny przegląd reszty modułów
+Dla każdego z poniższych plików sprawdzić, czy nie ma fallbacku „jeśli brak danych → pokaż mock":
+- `src/modules/retention/*` (RetentionStats, RetentionOverview, RetentionHistory, RetentionDashboard, RetentionHealthBoard)
+- `src/modules/referral/*` (ReferralDashboard, ReferralEngine, SilentFansDashboard, AmbassadorLeaderboard, GoogleReviewsManager, ReferralSettings, ReferralProgram)
+- `src/modules/pixel/*` (PixelDashboard, PixelAttribution, LookalikeEngine, AudienceMappings, PixelHealthDashboard, PixelEventsLog, PixelSetupWizard)
+- `src/modules/consultation/*`
+- `src/modules/inventory/*` (InventoryDashboard, InventoryStats, ServiceRecipes, DeliveryMode, RecipeEditorDrawer)
+- `src/modules/analytics/*` (TrueProfitDashboard już ok — używa `isDemo`)
+- `src/components/admin/autopilot/*` (AutopilotOverview, AutopilotHistory, AutopilotScore, AutopilotFunctions, AutopilotSettings, AutopilotModule)
+- `src/components/admin/dashboard/*` (WeeklyBriefWidget, WeeklyBriefHistory, TodayStaffCard, RevenuePredictionCard, RetentionFlowWidget)
+- `src/components/admin/conversations/ConversationsModule.tsx`
+- `src/components/admin/pipeline/PipelineModule.tsx`
+- `src/components/admin/accounting/*` (StaffCompensationReport, AccountingModule)
+- `src/components/admin/products/*`
+- `src/components/admin/schedule/*` (ScheduleGridView, ScheduleTemplates, SmartScheduleHelpers, QuickBlockModal, WeekDuplication)
+- `src/components/admin/settings/AutomationSettings.tsx`, `CommunicationSettings.tsx`
+- `src/components/admin/staff/StaffInviteTab.tsx`, `StaffPermissionsTab.tsx`
+- `src/components/admin/DashboardHome.tsx` (DEMO_APPOINTMENTS itd. — używane tylko gdy `isDemo=true` → OK)
 
-Zastąpić jednolite `bg-background/80 backdrop-blur-sm` mechanizmem **spotlight**:
+**Zasada:** wszystkie hard-coded liczby/przykłady mogą być używane **wyłącznie** kiedy `isDemo === true` (czyli z `DemoPage.tsx`). W przeciwnym razie:
+- Pusty wynik → empty state z ikoną + tekstem („Brak danych — pojawi się tutaj gdy…") + CTA prowadzącym do akcji.
+- Nigdy nie pokazywać liczb przykładowych w realnym koncie.
 
-```text
-┌─────────────────────────────────────────────┐
-│  [SIDEBAR]          [CONTENT — VISIBLE]     │
-│  ─────────                                  │
-│  ┌───────┐ ← jasna ramka + glow             │
-│  │ ★ Kal │ ← spotlight (czysty, bez dimu)   │
-│  └───────┘                                  │
-│  ─────────                            ┌────┐│
-│  (dimmed 40%)                         │ TIP││
-│                                       │card││
-│                                       └────┘│
-└─────────────────────────────────────────────┘
-```
+### 1d. Test krzyżowy
+Po zmianach: zalogować się na świeżo utworzonego admina i przeklikać wszystkie zakładki — żadnych „przykładowych" liczb.
 
-Mechanizm:
-- Overlay z `pointer-events: none`, gradient/maska wycina prostokąt wokół targetowanego elementu sidebara (`data-tour-target="calendar"` na każdym `SidebarLink`)
-- Reflektor: cień wokół ramki (`box-shadow: 0 0 0 4px hsl(var(--primary)), 0 0 40px hsl(var(--primary)/0.5)`), reszta UI ściemniona przez półprzezroczystą warstwę bez bluru
-- Karta-tooltip pozycjonowana po **prawej stronie sidebara**, na wysokości podświetlonej zakładki — wskazuje strzałką na sidebar (`absolute` z `useRef` + `getBoundingClientRect` na targecie)
-- Treść (główna sekcja panelu) zostaje widoczna, lekko ściemniona (~30%), żeby user widział co kryje się pod zakładką
+---
 
-Krok „Witaj" i ostatni CTA — bez reflektora, karta wycentrowana z lekkim dimem całości (tak jak dziś).
+## 2. Naprawa listy usług w nowym koncie
 
-## 3. Copy w języku korzyści
+**Problem:** użytkownik widzi ~10 usług zamiast wszystkich zaimportowanych z Booksy.
 
-Nowe stringi w `src/i18n/locales/pl.json` (`tour.steps.*`):
+### Hipotezy do sprawdzenia:
+1. **Filter/paginacja** w `ServicesManagement.tsx` — może domyślnie ukrywa nieaktywne, jakąś kategorię lub limit 10.
+2. **assignServicesToOwner** wstawia tylko część rekordów do `staff_services` — i frontend filtruje po przypisaniu do staff.
+3. **Insert chunkami po 50** (linia 508) — chunk się udał, ale błąd cichy → część utracona.
+4. **scanResult.services** zwracane przez `ai-profile-scanner` jest już ograniczone do ~10 (limit po stronie scrapera/AI).
 
-- **Welcome**: „Cześć! Pokażę Ci 6 miejsc, dzięki którym przestajesz tracić czas na ręczne notatki i odbieranie telefonów."
-- **Calendar**: „Cały grafik zespołu w jednym widoku. Klikasz pusty slot — masz wizytę. Klientka rezerwuje sama — od razu tu trafia. Koniec z zeszytem."
-- **Clients**: „Każda klientka ma swoją kartę: ostatnia wizyta, ile wydała, jakie zabiegi lubi. Wiesz kto Cię finansuje — i kto przestał wracać."
-- **Services**: „Dodajesz usługi raz, ceny aktualizujesz w sekundę. Łączysz je z produktami, których używasz — system pilnuje stanu magazynu."
-- **Accounting**: „Tu widzisz **realny zysk** po odjęciu kosztu materiałów. Wreszcie wiesz, która usługa zarabia, a która tylko zajmuje fotel."
-- **Retention**: „AI pisze do klientek, które dawno nie były — sama. Ty śpisz, one wracają. Bez przypominania, bez wysiłku."
-- **Widgets/Finish**: „To Twój link do rezerwacji. Wklejasz w bio Instagrama, w Google, w stopkę maila — klientki rezerwują 24/7, bez dzwonienia. Gotowe. Klikaj gdzie chcesz."
+**Działania:**
+- Najpierw query SQL na świeżym koncie: `select count(*) from services where salon_id=…` — porównać z `count(*) from staff_services where staff_id=ownera`.
+- Jeśli to filtr UI → wyłączyć/poszerzyć w `ServicesManagement.tsx`.
+- Jeśli to scraper → zwiększyć limit w `supabase/functions/firecrawl-scrape/index.ts` lub `ai-profile-scanner` + dodać logging.
+- Jeśli to `assignServicesToOwner` → naprawić batch insert (też chunkami).
 
-EN — równoważne tłumaczenia w `en.json`.
+---
 
-## 4. Szczegóły techniczne
+## 3. Uproszczenie kreatora widgetu
 
-- `src/components/demo/GuidedTour.tsx`: zredukować `tourSteps` do 7, dodać pole `targetSelector?: string` zamiast/oraz `targetTab`
-- `src/components/admin/AdminSidebar.tsx`: dodać `data-tour-target={tab.id}` na każdym przycisku zakładki (potrzebne do `querySelector`)
-- Hook `useSpotlightRect(targetSelector)` — śledzi `getBoundingClientRect` z `ResizeObserver` + `scroll`, zwraca `{top, left, width, height}` dla pozycjonowania reflektora i strzałki tooltipa
-- Backdrop: dwa nakładające się `div`-y — jeden poniżej spotlight (`pointer-events: none`, `bg-black/40`), drugi z `clip-path` wycinającym otwór wokół ramki sidebara. Brak `backdrop-blur`
-- Animacja: 300ms ease przesunięcia spotlightu między krokami (`transition: all` na top/left/width/height)
-- Karta tooltipa: `max-w-sm`, strzałka `::before` wskazująca na sidebar, animowane wejście (fade + slide-x 8px)
-- Klawiatura: ← → nawigacja, `Esc` zamyka (już częściowo jest, dodać listenery)
-- `localStorage` flag `demo-tour-completed` bez zmian
+**Plik:** `src/components/admin/widgets/WidgetEditor.tsx` + `WidgetsManagement.tsx`
 
-## 5. Zakres zmian
+### Cel
+„Utwórz nowy widget" ma być szybkie i przyjemne — w 3 krokach zamiast wielozakładkowego edytora.
 
-Pliki:
-- `src/components/demo/GuidedTour.tsx` — przepisanie (struktura kroków, spotlight, pozycjonowanie)
-- `src/components/admin/AdminSidebar.tsx` — dodanie atrybutu `data-tour-target`
-- `src/i18n/locales/pl.json` + `en.json` — nowe stringi `tour.steps.*` (7 sekcji), usunięcie nieużywanych
+### Plan UX
+1. **Quick-create modal** (zamiast od razu pełnego edytora):
+   - Krok 1: nazwa kampanii + opcjonalnie opis (1 input).
+   - Krok 2: które usługi (multi-select chipsów lub „wszystkie") + opcjonalna promocja (rabat %).
+   - Krok 3: kolor akcentu (3 presety + custom) i CTA. Klik „Utwórz" → widget gotowy.
+2. **Pełny edytor** dostępny później przez „Edytuj szczegóły" — tam całe zaawansowanie (analityka, formularz, prepayment, advanced).
+3. Defaulty: skopiować z głównego widgetu salonu (theme, formFields, steps), żeby nowy widget od razu wyglądał spójnie.
+4. Karty widgetów na liście: dodać duży CTA „+ Nowy widget kampanii" jako pierwszą kartę z gradientem (zachęca wizualnie).
 
-Co zostaje:
-- `useTourState` hook bez zmian
-- Logika `onTabChange` (auto-przełączanie zakładek przy kroku) — zostaje, ale dla 7 kroków zamiast 17
-- Wywołanie w `AdminDashboard` — bez zmian
+### Techniczne
+- Nowy komponent `src/components/admin/widgets/QuickWidgetCreateModal.tsx`.
+- W `WidgetsManagement.tsx`: zmienić handler „Nowy widget" — najpierw quick modal, po zapisie opcjonalnie otworzyć pełny `WidgetEditor`.
+- Zachować obecny `WidgetEditor` dla edycji.
+
+---
+
+## 4. Uproszczenie tworzenia usługi
+
+**Plik:** `src/components/admin/ServicesManagement.tsx`
+
+- Obecny dialog tworzenia usługi ma wiele pól (kategorie, warianty, media, opisy, benefity, materiały, prepayment...). 
+- **Plan:** podzielić na „Quick add" (nazwa + kategoria + cena + czas → zapisz) i opcjonalny przycisk „Dodaj szczegóły" otwierający pełny edytor.
+- Quick add powinien być domyślnym widokiem po kliknięciu „+ Nowa usługa".
+
+---
+
+## Kolejność implementacji
+
+1. Audyt + usunięcie demo fallbacków (1a–1c) — najwyższy priorytet, bo to błąd UX.
+2. Diagnoza i fix problemu z usługami (sekcja 2).
+3. Quick widget create (sekcja 3).
+4. Quick service create (sekcja 4).
+
+## Ryzyka
+- Usunięcie mock fallbacków może odsłonić puste sekcje wyglądające „pusto" — dlatego każdy fallback zastępujemy starannym empty state (ikona + komunikat + CTA), zgodnie z konwencją projektu.
+- Quick modale nie mogą rozjechać się z istniejącymi modelami danych — używamy tych samych mutacji (`upsertWidget`, `createService`).
