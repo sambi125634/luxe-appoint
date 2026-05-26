@@ -317,7 +317,7 @@ export default function OnboardingPage() {
         setCreatedSlug(salon.slug);
         setSalonName(salon.name ?? "");
         setSalonCity(salon.city ?? "");
-        setStep(Math.min(salon.onboarding_step ?? 0, 6));
+        setStep(Math.min(salon.onboarding_step ?? 0, 4));
       }
       setCheckingAuth(false);
     });
@@ -325,7 +325,7 @@ export default function OnboardingPage() {
 
   // Confetti on final step
   useEffect(() => {
-    if (step === 6) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
+    if (step === 4) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
   }, [step]);
 
   // ---- Step handlers ----
