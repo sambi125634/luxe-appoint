@@ -50,6 +50,7 @@ import {
   defaultFormFields,
   defaultWidgetSteps 
 } from "./types";
+import { useServices, useServiceCategories } from "@/hooks/useServices";
 
 interface WidgetEditorProps {
   widget: BookingWidget | null;
@@ -57,35 +58,6 @@ interface WidgetEditorProps {
   onClose: () => void;
   onSave: (widget: BookingWidget) => void;
 }
-
-// Mock services for demo
-const mockServices = [
-  { id: "1", name: "Peeling kawitacyjny", category: "Twarz", price: 150 },
-  { id: "2", name: "Mezoterapia igłowa", category: "Twarz", price: 350 },
-  { id: "3", name: "Mikrodermabrazja", category: "Twarz", price: 180 },
-  { id: "4", name: "Masaż relaksacyjny", category: "Ciało", price: 200 },
-  { id: "5", name: "Masaż gorącymi kamieniami", category: "Ciało", price: 280 },
-  { id: "6", name: "Depilacja woskowa - nogi", category: "Depilacja", price: 120 },
-  { id: "7", name: "Depilacja laserowa bikini", category: "Depilacja", price: 250 },
-  { id: "8", name: "Stylizacja brwi", category: "Brwi i rzęsy", price: 80 },
-  { id: "9", name: "Przedłużanie rzęs 1:1", category: "Brwi i rzęsy", price: 350 },
-];
-
-// Mock funnel data for analytics
-const mockFunnelData = [
-  { step: "Wyświetlenia", value: 1250, color: "hsl(var(--muted-foreground))" },
-  { step: "Kliknięcia", value: 834, color: "hsl(var(--primary))" },
-  { step: "Formularz", value: 421, color: "hsl(var(--accent-foreground))" },
-  { step: "Rezerwacje", value: 89, color: "hsl(var(--primary))" },
-];
-
-const mockTrafficSources = [
-  { source: "Instagram", visits: 456, bookings: 34 },
-  { source: "Facebook Ads", visits: 312, bookings: 28 },
-  { source: "Google", visits: 234, bookings: 15 },
-  { source: "Bezpośredni link", visits: 178, bookings: 12 },
-  { source: "Polecenie", visits: 70, bookings: 0 },
-];
 
 const defaultAdvancedSettings: WidgetAdvancedSettings = {
   socialProofEnabled: false,
@@ -107,6 +79,15 @@ const fontOptions = [
 
 export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorProps) {
   const isNew = !widget;
+
+  const { data: dbServices } = useServices();
+  const { data: dbCategories } = useServiceCategories();
+  const realServices = (dbServices || []).map(s => ({
+    id: s.id,
+    name: s.name,
+    category: dbCategories?.find(c => c.id === s.category_id)?.name || "Bez kategorii",
+    price: Number(s.price),
+  }));
   
   const [formData, setFormData] = useState<Partial<BookingWidget>>(() => {
     if (widget) return { ...widget };
@@ -417,8 +398,13 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                 {!formData.showAllServices && (
                   <div className="space-y-3">
                     <Label>Wybierz usługi do wyświetlenia</Label>
+                    {realServices.length === 0 && (
+                      <div className="text-sm text-muted-foreground p-4 border border-dashed border-border rounded-lg text-center">
+                        Najpierw dodaj usługi w zakładce „Usługi", aby je tutaj wybrać.
+                      </div>
+                    )}
                     <div className="grid gap-2">
-                      {mockServices.map(service => (
+                      {realServices.map(service => (
                         <label
                           key={service.id}
                           className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
@@ -1034,86 +1020,50 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
             {/* Analytics */}
             {activeTab === "analytics" && (
               <div className="space-y-6">
-                {/* Conversion Rate */}
-                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
-                  <div className="text-center">
-                    <p className="text-3xl font-bold text-primary">
-                      {((mockFunnelData[3].value / mockFunnelData[0].value) * 100).toFixed(1)}%
-                    </p>
-                    <p className="text-xs text-muted-foreground">Konwersja</p>
-                  </div>
-                  <div className="h-12 w-px bg-border" />
-                  <div className="flex-1 grid grid-cols-2 gap-2">
-                    <div className="text-center">
-                      <p className="text-lg font-semibold">{formData.viewCount || mockFunnelData[0].value}</p>
-                      <p className="text-xs text-muted-foreground">Wyświetleń</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-lg font-semibold">{formData.bookingCount || mockFunnelData[3].value}</p>
-                      <p className="text-xs text-muted-foreground">Rezerwacji</p>
-                    </div>
-                  </div>
-                </div>
+                {(() => {
+                  const views = formData.viewCount || 0;
+                  const bookings = formData.bookingCount || 0;
+                  const conversion = views > 0 ? ((bookings / views) * 100).toFixed(1) : "0.0";
 
-                {/* Funnel */}
-                <div className="space-y-3">
-                  <h4 className="font-semibold">Lejek konwersji</h4>
-                  {mockFunnelData.map((item, i) => {
-                    const prevValue = i > 0 ? mockFunnelData[i - 1].value : item.value;
-                    const dropOff = i > 0 ? ((1 - item.value / prevValue) * 100).toFixed(0) : null;
-                    const widthPct = (item.value / mockFunnelData[0].value) * 100;
+                  if (views === 0 && bookings === 0) {
                     return (
-                      <div key={item.step} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>{item.step}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{item.value}</span>
-                            {dropOff && (
-                              <span className="text-xs text-destructive">-{dropOff}%</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="h-3 bg-muted rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full transition-all"
-                            style={{ 
-                              width: `${widthPct}%`,
-                              backgroundColor: `hsl(var(--primary))`,
-                              opacity: 0.4 + (i / mockFunnelData.length) * 0.6,
-                            }}
-                          />
-                        </div>
+                      <div className="flex flex-col items-center justify-center text-center py-16 px-6 border border-dashed border-border rounded-lg">
+                        <BarChart3 className="w-10 h-10 text-muted-foreground/40 mb-3" />
+                        <h4 className="font-semibold mb-1">Brak danych analitycznych</h4>
+                        <p className="text-sm text-muted-foreground max-w-sm">
+                          Statystyki pojawią się tutaj, gdy ktoś otworzy ten widget. Udostępnij link, aby zacząć zbierać dane.
+                        </p>
                       </div>
                     );
-                  })}
-                </div>
+                  }
 
-                {/* Traffic Sources */}
-                <div className="space-y-3">
-                  <h4 className="font-semibold">Źródła ruchu</h4>
-                  <div className="space-y-2">
-                    {mockTrafficSources.map(source => (
-                      <div key={source.source} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-sm">{source.source}</p>
-                          <p className="text-xs text-muted-foreground">{source.visits} wizyt</p>
+                  return (
+                    <>
+                      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                        <div className="text-center">
+                          <p className="text-3xl font-bold text-primary">{conversion}%</p>
+                          <p className="text-xs text-muted-foreground">Konwersja</p>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-sm">{source.bookings} rez.</p>
-                          <p className="text-xs text-muted-foreground">
-                            {source.visits > 0 ? ((source.bookings / source.visits) * 100).toFixed(1) : 0}% konw.
-                          </p>
+                        <div className="h-12 w-px bg-border" />
+                        <div className="flex-1 grid grid-cols-2 gap-2">
+                          <div className="text-center">
+                            <p className="text-lg font-semibold">{views}</p>
+                            <p className="text-xs text-muted-foreground">Wyświetleń</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-lg font-semibold">{bookings}</p>
+                            <p className="text-xs text-muted-foreground">Rezerwacji</p>
+                          </div>
                         </div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="p-3 bg-muted/50 rounded-lg text-center">
-                  <p className="text-xs text-muted-foreground">
-                    Dane analityczne — podgląd demonstracyjny. Dane rzeczywiste pojawią się po uruchomieniu widgetu.
-                  </p>
-                </div>
+                      <div className="p-3 bg-muted/50 rounded-lg text-center">
+                        <p className="text-xs text-muted-foreground">
+                          Pełna analityka (lejek konwersji i źródła ruchu) wkrótce. Na razie zbieramy podstawowe statystyki ruchu i rezerwacji.
+                        </p>
+                      </div>
+                    </>
+                  );
+                })()}
               </div>
             )}
           </ScrollArea>
@@ -1201,9 +1151,12 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
                     </div>
                     
                     <div className="border-t border-border my-2 pt-2">
-                      <p className="text-[10px] text-muted-foreground mb-2">Przykładowe usługi:</p>
+                      <p className="text-[10px] text-muted-foreground mb-2">Podgląd usług:</p>
                       <div className="space-y-2">
-                        {(formData.showAllServices ? mockServices.slice(0, 3) : mockServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)).map(service => (
+                        {(formData.showAllServices
+                          ? realServices.slice(0, 3)
+                          : realServices.filter(s => formData.services?.includes(s.id)).slice(0, 3)
+                        ).map(service => (
                           <div 
                             key={service.id}
                             className={`p-2 border border-border ${getBorderRadiusClass()} hover:border-primary/50 transition-colors cursor-pointer`}
