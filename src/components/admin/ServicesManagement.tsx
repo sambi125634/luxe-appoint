@@ -976,6 +976,20 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                 </Select>
               </div>
             </div>
+            {/* Toggle: details */}
+            {!showAdvancedFields && (
+              <button
+                type="button"
+                onClick={() => setShowAdvancedFields(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-border text-sm font-medium text-muted-foreground hover:border-primary/50 hover:text-primary transition-colors"
+              >
+                <ChevronDown className="w-4 h-4" />
+                Dodaj szczegóły (opis, korzyści, personel, zdjęcia, warianty)
+              </button>
+            )}
+
+            {showAdvancedFields && (
+              <>
             {/* Description */}
             <div>
               <Label>{t('services.description')}</Label>
@@ -1121,6 +1135,8 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                   Dodaj wariant
                 </button>
               </div>
+            )}
+              </>
             )}
           </div>
           <DialogFooter>
