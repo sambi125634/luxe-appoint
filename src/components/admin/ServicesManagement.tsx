@@ -410,6 +410,8 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
       setVariants([]);
     }
     setBenefitInput("");
+    // Tryb szybki dla nowych usług, pełny dla edycji
+    setShowAdvancedFields(!!service);
     setIsServiceDialogOpen(true);
   };
 
