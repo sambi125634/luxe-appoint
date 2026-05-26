@@ -1188,6 +1188,61 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         onSave={handleRecipeSave}
         isDemo={isDemo}
       />
+
+      {/* AI Enrich Descriptions Dialog */}
+      <Dialog open={isEnrichOpen} onOpenChange={(o) => !isEnriching && setIsEnrichOpen(o)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-serif flex items-center gap-2">
+              <Wand2 className="w-5 h-5 text-primary" />
+              Wzbogać opisy usług AI
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              AI przeskanuje profil salonu (np. Booksy), rozwinie akordeony „Więcej info" i wyodrębni pełne opisy dla Twoich usług. Trwa 30–60 sekund.
+            </p>
+            <div>
+              <Label>Link do profilu salonu</Label>
+              <Input
+                value={enrichUrl}
+                onChange={(e) => setEnrichUrl(e.target.value)}
+                placeholder="https://booksy.com/pl-pl/..."
+                disabled={isEnriching}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-3 p-3 rounded-lg bg-muted/40 border border-border">
+              <div className="text-sm">
+                <p className="font-medium">Pomiń usługi z opisami</p>
+                <p className="text-xs text-muted-foreground">Aktualizuj tylko puste / krótkie opisy</p>
+              </div>
+              <Switch checked={onlyEmptyDescriptions} onCheckedChange={setOnlyEmptyDescriptions} disabled={isEnriching} />
+            </div>
+            <div className="text-xs text-muted-foreground flex items-start gap-2">
+              <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+              <span>AI nie wymyśla treści — zaktualizuje tylko te usługi, które znajdzie na podanej stronie.</span>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEnrichOpen(false)} disabled={isEnriching}>
+              Anuluj
+            </Button>
+            <Button variant="luxury" onClick={handleEnrichDescriptions} disabled={isEnriching || !enrichUrl.trim()} className="gap-2">
+              {isEnriching ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Skanowanie…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4" />
+                  Uruchom AI
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
