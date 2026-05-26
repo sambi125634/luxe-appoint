@@ -858,15 +858,10 @@ export default function OnboardingPage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
-                      <Button variant="outline" onClick={() => { setScanResult(null); setScanSkipped(true); saveDefaultServices(); goTo(2); }} className="flex-1">
-                        Użyj szablonów
-                      </Button>
-                      <Button onClick={handleSaveScanResults} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
-                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                        Wygląda świetnie, zapisz
-                      </Button>
-                    </div>
+                    <Button onClick={handleSaveScanResults} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                      Zapisz {scanResult.services.length} usług i kontynuuj →
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-center py-8">
