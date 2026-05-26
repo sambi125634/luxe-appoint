@@ -50,6 +50,7 @@ import {
   defaultFormFields,
   defaultWidgetSteps 
 } from "./types";
+import { useServices, useServiceCategories } from "@/hooks/useServices";
 
 interface WidgetEditorProps {
   widget: BookingWidget | null;
@@ -57,35 +58,6 @@ interface WidgetEditorProps {
   onClose: () => void;
   onSave: (widget: BookingWidget) => void;
 }
-
-// Mock services for demo
-const mockServices = [
-  { id: "1", name: "Peeling kawitacyjny", category: "Twarz", price: 150 },
-  { id: "2", name: "Mezoterapia igłowa", category: "Twarz", price: 350 },
-  { id: "3", name: "Mikrodermabrazja", category: "Twarz", price: 180 },
-  { id: "4", name: "Masaż relaksacyjny", category: "Ciało", price: 200 },
-  { id: "5", name: "Masaż gorącymi kamieniami", category: "Ciało", price: 280 },
-  { id: "6", name: "Depilacja woskowa - nogi", category: "Depilacja", price: 120 },
-  { id: "7", name: "Depilacja laserowa bikini", category: "Depilacja", price: 250 },
-  { id: "8", name: "Stylizacja brwi", category: "Brwi i rzęsy", price: 80 },
-  { id: "9", name: "Przedłużanie rzęs 1:1", category: "Brwi i rzęsy", price: 350 },
-];
-
-// Mock funnel data for analytics
-const mockFunnelData = [
-  { step: "Wyświetlenia", value: 1250, color: "hsl(var(--muted-foreground))" },
-  { step: "Kliknięcia", value: 834, color: "hsl(var(--primary))" },
-  { step: "Formularz", value: 421, color: "hsl(var(--accent-foreground))" },
-  { step: "Rezerwacje", value: 89, color: "hsl(var(--primary))" },
-];
-
-const mockTrafficSources = [
-  { source: "Instagram", visits: 456, bookings: 34 },
-  { source: "Facebook Ads", visits: 312, bookings: 28 },
-  { source: "Google", visits: 234, bookings: 15 },
-  { source: "Bezpośredni link", visits: 178, bookings: 12 },
-  { source: "Polecenie", visits: 70, bookings: 0 },
-];
 
 const defaultAdvancedSettings: WidgetAdvancedSettings = {
   socialProofEnabled: false,
