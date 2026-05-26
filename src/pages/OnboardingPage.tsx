@@ -11,8 +11,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import {
   Loader2, ArrowRight, ArrowLeft, Copy, ExternalLink, Sparkles,
-  CheckCircle2, Upload, Instagram, Globe, Rocket, Bot, MessageSquare,
-  Mail, FileText, PartyPopper, Users, Scissors, Building2, MapPin, Link2,
+  CheckCircle2, Upload, Instagram, Globe, Rocket,
+  FileText, PartyPopper, Building2, MapPin, Link2,
 } from "lucide-react";
 import { Confetti } from "@/components/booking/Confetti";
 import { cn } from "@/lib/utils";
@@ -22,10 +22,8 @@ import { cn } from "@/lib/utils";
 const STEPS = [
   { title: "O salonie", emoji: "🏢", icon: Building2 },
   { title: "AI Skan", emoji: "🔍", icon: Sparkles },
-  { title: "Komunikacja", emoji: "📡", icon: Mail },
-  { title: "Autopilot", emoji: "🤖", icon: Bot },
   { title: "Twój link", emoji: "🔗", icon: Link2 },
-  { title: "Klientki", emoji: "👥", icon: Users },
+  { title: "Klientki", emoji: "👥", icon: Upload },
   { title: "Gotowe!", emoji: "🎉", icon: PartyPopper },
 ];
 
@@ -55,14 +53,6 @@ const AI_SCAN_MESSAGES = [
   "📸 Importuję zdjęcia salonu...",
   "⏰ Ustawiam godziny otwarcia...",
   "✅ Gotowe! Uzupełniłam profil za Ciebie.",
-];
-
-const AUTOPILOT_FEATURES = [
-  { key: "reminders", label: "Przypomnienia SMS przed wizytą", description: "24h i 2h przed wizytą", icon: "📲" },
-  { key: "retention", label: "Reaktywacja nieaktywnych klientek", description: "Automatyczne wiadomości po 45, 60, 75 dniach", icon: "🔄" },
-  { key: "reviews", label: "Prośby o opinie Google", description: "2h po zakończonej wizycie", icon: "⭐" },
-  { key: "noshow", label: "Follow-up po no-show", description: "30 minut po niestawieniu się", icon: "🚫" },
-  { key: "brief", label: "Tygodniowy Brief CEO", description: "Każdy poniedziałek o 8:00", icon: "📊" },
 ];
 
 const SERVICE_TEMPLATES: Record<string, { category: string; services: { name: string; duration: number; price: number }[] }[]> = {
@@ -268,7 +258,6 @@ export default function OnboardingPage() {
   const [salonCity, setSalonCity] = useState("");
   const [salonType, setSalonType] = useState("");
   const [teamSize, setTeamSize] = useState("1");
-  const [clientSources, setClientSources] = useState<string[]>([]);
   const [instagramUrl, setInstagramUrl] = useState("");
   const [googleMapsUrl, setGoogleMapsUrl] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
@@ -279,17 +268,6 @@ export default function OnboardingPage() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [scanSkipped, setScanSkipped] = useState(false);
   const [scanPercentage, setScanPercentage] = useState(0);
-
-  // Step 2 — Communication config
-  const [emailOption, setEmailOption] = useState<"own" | "system">("system");
-  const [smsOption, setSmsOption] = useState<"own" | "virtual" | "disabled">("virtual");
-  const [commEmail, setCommEmail] = useState("");
-  const [commPhone, setCommPhone] = useState("");
-
-  // Step 3 — Autopilot toggles
-  const [autopilotToggles, setAutopilotToggles] = useState<Record<string, boolean>>({
-    reminders: true, retention: true, reviews: true, noshow: true, brief: true,
-  });
 
   // Step 5 — CSV Import
   const [csvData, setCsvData] = useState<CsvRow[]>([]);
@@ -319,7 +297,7 @@ export default function OnboardingPage() {
         setCreatedSlug(salon.slug);
         setSalonName(salon.name ?? "");
         setSalonCity(salon.city ?? "");
-        setStep(Math.min(salon.onboarding_step ?? 0, 6));
+        setStep(Math.min(salon.onboarding_step ?? 0, 4));
       }
       setCheckingAuth(false);
     });
@@ -327,7 +305,7 @@ export default function OnboardingPage() {
 
   // Confetti on final step
   useEffect(() => {
-    if (step === 6) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
+    if (step === 4) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 4000); return () => clearTimeout(t); }
   }, [step]);
 
   // ---- Step handlers ----
@@ -350,7 +328,6 @@ export default function OnboardingPage() {
         name: salonName.trim(), city: salonCity.trim() || null,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
         social_url: instagramUrl.trim() || websiteUrl.trim() || null, onboarding_step: 1,
-        client_sources: clientSources,
       }).eq("id", createdSalonId);
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
     } else {
@@ -360,7 +337,6 @@ export default function OnboardingPage() {
         owner_id: userId, onboarding_step: 1, onboarding_completed: false,
         salon_type: salonType, team_size: parseInt(teamSize) || 1,
         social_url: instagramUrl.trim() || websiteUrl.trim() || null,
-        client_sources: clientSources,
       }).select("id, slug").single();
       if (error) { toast.error("Błąd: " + error.message); setSaving(false); return; }
       setCreatedSalonId(salon.id);
@@ -577,7 +553,7 @@ export default function OnboardingPage() {
     goTo(2);
   };
 
-  const handleWidgetDone = () => goTo(5);
+  const handleWidgetDone = () => goTo(3);
 
   const handleCsvUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -641,13 +617,13 @@ export default function OnboardingPage() {
     setImportedCount(imported);
     setSaving(false);
     toast.success(`Zaimportowano ${imported} klientek${skipped > 0 ? ` (pominięto ${skipped} bez danych kontaktowych)` : ""}`);
-    goTo(6);
+    goTo(4);
   };
 
   const handleComplete = async () => {
     if (!createdSalonId) return;
     setSaving(true);
-    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 7 }).eq("id", createdSalonId);
+    await supabase.from("salons").update({ onboarding_completed: true, onboarding_step: 5 }).eq("id", createdSalonId);
     toast.success("🎉 Salon skonfigurowany! Witamy w Beauty Calendar.");
     navigate("/admin");
   };
@@ -743,26 +719,6 @@ export default function OnboardingPage() {
                       <Button key={s.key} variant={teamSize === s.key ? "default" : "outline"} size="sm"
                         onClick={() => setTeamSize(s.key)} className="text-xs h-auto py-2">
                         {s.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Skąd przyszły Twoje klientki? */}
-                <div className="space-y-2">
-                  <Label>Skąd teraz bierzesz nowe klientki?</Label>
-                  <div className="grid grid-cols-2 gap-2">
-                    {[
-                      { key: "booksy", label: "Booksy / Fresha / Versum", emoji: "🔵" },
-                      { key: "instagram", label: "Instagram / Social media", emoji: "📱" },
-                      { key: "referrals", label: "Polecenia", emoji: "👯" },
-                      { key: "google", label: "Google / Strona www", emoji: "🌐" },
-                      { key: "phone", label: "Telefon / Stali klienci", emoji: "📞" },
-                    ].map(s => (
-                      <Button key={s.key} variant={clientSources.includes(s.key) ? "default" : "outline"} size="sm"
-                        onClick={() => setClientSources(prev => prev.includes(s.key) ? prev.filter(x => x !== s.key) : [...prev, s.key])}
-                        className={cn("text-xs h-auto py-2 justify-start", clientSources.includes(s.key) && "shadow-lg")}>
-                        <span className="mr-1">{s.emoji}</span>{s.label}
                       </Button>
                     ))}
                   </div>
@@ -880,15 +836,10 @@ export default function OnboardingPage() {
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
-                      <Button variant="outline" onClick={() => { setScanResult(null); setScanSkipped(true); saveDefaultServices(); goTo(2); }} className="flex-1">
-                        Użyj szablonów
-                      </Button>
-                      <Button onClick={handleSaveScanResults} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white">
-                        {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-                        Wygląda świetnie, zapisz
-                      </Button>
-                    </div>
+                    <Button onClick={handleSaveScanResults} disabled={saving} className="w-full bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
+                      {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
+                      Zapisz {scanResult.services.length} usług i kontynuuj →
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-center py-8">
@@ -900,193 +851,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 2: Communication Config ===== */}
+          {/* ===== STEP 2: Twój link jest gotowy ===== */}
           {step === 2 && (
-            <Card className="bg-white shadow-2xl border-0">
-              <CardContent className="p-6 space-y-5">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-blue-100 to-[#E91E8C]/10 flex items-center justify-center mb-3">
-                    <Mail className="w-8 h-8 text-[#E91E8C]" />
-                  </div>
-                  <h2 className="text-lg font-bold">Jak będziesz pisać do klientek?</h2>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Ustaw email i numer telefonu z których Beauty Calendar będzie wysyłać przypomnienia i potwierdzenia.
-                  </p>
-                </div>
-
-                <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
-                  <p className="text-xs text-blue-800">
-                    💡 <strong>Klientki będą widzieć te dane jako nadawcę</strong> — gdy klientka dostanie SMS z przypomnieniem, zobaczy numer który tu wpiszesz.
-                  </p>
-                </div>
-
-                {/* Email option */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2"><Mail className="w-4 h-4" /> Adres email do wysyłki</Label>
-                  <div
-                    onClick={() => setEmailOption("own")}
-                    className={cn("border-2 rounded-xl p-3 cursor-pointer transition-all", emailOption === "own" ? "border-[#E91E8C] bg-[#E91E8C]/5" : "border-border hover:border-[#E91E8C]/40")}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className={cn("w-4 h-4 rounded-full border-2", emailOption === "own" ? "border-[#E91E8C]" : "border-muted-foreground/40")}>
-                        {emailOption === "own" && <div className="w-2 h-2 rounded-full bg-[#E91E8C] m-[2px]" />}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Mój własny email salonu</p>
-                        <p className="text-xs text-muted-foreground">np. kontakt@mojsalon.pl</p>
-                      </div>
-                    </div>
-                    {emailOption === "own" && (
-                      <Input className="mt-2 ml-6" placeholder="kontakt@twojsalon.pl" value={commEmail} onChange={e => setCommEmail(e.target.value)} type="email" />
-                    )}
-                  </div>
-                  <div
-                    onClick={() => setEmailOption("system")}
-                    className={cn("border-2 rounded-xl p-3 cursor-pointer transition-all", emailOption === "system" ? "border-[#E91E8C] bg-[#E91E8C]/5" : "border-border hover:border-[#E91E8C]/40")}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div className={cn("w-4 h-4 rounded-full border-2", emailOption === "system" ? "border-[#E91E8C]" : "border-muted-foreground/40")}>
-                        {emailOption === "system" && <div className="w-2 h-2 rounded-full bg-[#E91E8C] m-[2px]" />}
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">Email systemu Beauty Calendar</p>
-                        <p className="text-xs text-muted-foreground">noreply@beauty-funnels.com — dobra opcja na start</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* SMS option */}
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2"><MessageSquare className="w-4 h-4" /> Numer telefonu do SMS</Label>
-                  {([
-                    { key: "own" as const, label: "Numer telefonu salonu", desc: "Klientka widzi Twój numer — może odpisać", badge: "✓ Profesjonalne" },
-                    { key: "virtual" as const, label: "Wirtualny numer Beauty Calendar", desc: "+48 732 XXX XXX — klientka nie może odpisać", badge: "Na start" },
-                    { key: "disabled" as const, label: "Tylko email — wyłącz SMS", desc: "Skuteczność przypomnień może być niższa", badge: null },
-                  ]).map(opt => (
-                    <div
-                      key={opt.key}
-                      onClick={() => setSmsOption(opt.key)}
-                      className={cn("border-2 rounded-xl p-3 cursor-pointer transition-all", smsOption === opt.key ? "border-[#E91E8C] bg-[#E91E8C]/5" : "border-border hover:border-[#E91E8C]/40")}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className={cn("w-4 h-4 rounded-full border-2 shrink-0", smsOption === opt.key ? "border-[#E91E8C]" : "border-muted-foreground/40")}>
-                          {smsOption === opt.key && <div className="w-2 h-2 rounded-full bg-[#E91E8C] m-[2px]" />}
-                        </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium">{opt.label}</p>
-                          <p className="text-xs text-muted-foreground">{opt.desc}</p>
-                        </div>
-                      </div>
-                      {smsOption === "own" && opt.key === "own" && (
-                        <Input className="mt-2 ml-6" placeholder="+48 500 123 456" value={commPhone} onChange={e => setCommPhone(e.target.value)} type="tel" />
-                      )}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Preview */}
-                <div className="p-3 bg-muted rounded-xl space-y-2">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase">Podgląd wiadomości</p>
-                  {smsOption !== "disabled" && (
-                    <div className="p-2 bg-background rounded-lg text-xs">
-                      <span className="text-muted-foreground">SMS od: {smsOption === "own" ? (commPhone || "+48 500 123 456") : "+48 732 XXX XXX"}</span>
-                      <p className="mt-1">Cześć! Przypominamy o wizycie jutro o 10:00 w {salonName || "Twoim Salonie"}. Do zobaczenia! 💄</p>
-                    </div>
-                  )}
-                  <div className="p-2 bg-background rounded-lg text-xs">
-                    <span className="text-muted-foreground">Od: {emailOption === "own" ? (commEmail || "kontakt@twojsalon.pl") : "noreply@beauty-funnels.com"}</span>
-                    <p className="mt-1 text-muted-foreground">Temat: Potwierdzenie wizyty — {salonName || "Twój Salon"}</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(1)} size="sm">
-                    <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
-                  </Button>
-                  <Button
-                    onClick={async () => {
-                      if (createdSalonId) {
-                        await supabase.from("salons").update({
-                          communication_email: emailOption === "own" ? commEmail : null,
-                          communication_phone: smsOption === "own" ? commPhone : null,
-                          communication_provider: { email_option: emailOption, sms_option: smsOption },
-                          communication_setup_completed: true,
-                        } as Record<string, unknown>).eq("id", createdSalonId);
-                      }
-                      goTo(3);
-                    }}
-                    disabled={saving}
-                    className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white"
-                    size="lg"
-                  >
-                    <ArrowRight className="mr-2 h-4 w-4" />Zapisz i kontynuuj
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-
-          {step === 3 && (
-            <Card className="bg-white shadow-2xl border-0">
-              <CardContent className="p-6 space-y-5">
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-[#1A1A2E] to-[#E91E8C] flex items-center justify-center mb-3">
-                    <Bot className="w-8 h-8 text-white" />
-                  </div>
-                  <h2 className="text-lg font-bold">🔒 Twój Autopilot czeka na aktywację</h2>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Skonfigurujemy go razem podczas bezpłatnej konsultacji (30 min).
-                    <br />Chcemy mieć pewność że działa idealnie pod Twój salon.
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Co zostanie włączone:</p>
-                  {AUTOPILOT_FEATURES.map(f => (
-                    <div key={f.key} className="flex items-center justify-between p-3 rounded-xl border border-border/50 bg-muted/30">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">{f.icon}</span>
-                        <div>
-                          <p className="text-sm font-medium">{f.label}</p>
-                          <p className="text-xs text-muted-foreground">{f.description}</p>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-bold text-muted-foreground bg-muted px-2 py-0.5 rounded-full border border-border flex items-center gap-1">
-                        🔒 PRO
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(3)} size="sm">
-                    <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
-                  </Button>
-                  <Button onClick={async () => {
-                    if (createdSalonId) {
-                      setSaving(true);
-                      const { error } = await supabase.from("autopilot_config").upsert({
-                        salon_id: createdSalonId,
-                        is_active: false,
-                        ai_suggestions_enabled: false,
-                      }, { onConflict: "salon_id" });
-                      setSaving(false);
-                      if (error) { toast.error("Nie udało się zapisać: " + error.message); return; }
-                    }
-                    goTo(4);
-                  }} disabled={saving} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
-                    <Mail className="mr-2 h-4 w-4" />
-                    Umów konsultację i aktywuj Autopilot →
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* ===== STEP 4: Twój link jest gotowy ===== */}
-          {step === 4 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
                 <div className="text-center">
@@ -1153,7 +919,7 @@ export default function OnboardingPage() {
                 </p>
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(2)} size="sm">
+                  <Button variant="outline" onClick={() => setStep(1)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
                   <Button onClick={handleWidgetDone} className="flex-1 bg-[#E91E8C] hover:bg-[#E91E8C]/90 text-white" size="lg">
@@ -1164,8 +930,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 5: Import Clients ===== */}
-          {step === 5 && (
+          {/* ===== STEP 3: Import Clients ===== */}
+          {step === 3 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-5">
                 <div>
@@ -1214,10 +980,10 @@ export default function OnboardingPage() {
                 )}
 
                 <div className="flex gap-3">
-                  <Button variant="outline" onClick={() => setStep(4)} size="sm">
+                  <Button variant="outline" onClick={() => setStep(2)} size="sm">
                     <ArrowLeft className="mr-1 h-4 w-4" />Wstecz
                   </Button>
-                  <Button variant="ghost" onClick={() => goTo(6)} className="flex-1 text-muted-foreground">
+                  <Button variant="ghost" onClick={() => goTo(4)} className="flex-1 text-muted-foreground">
                     Zacznę od nowa — pomiń
                   </Button>
                 </div>
@@ -1225,8 +991,8 @@ export default function OnboardingPage() {
             </Card>
           )}
 
-          {/* ===== STEP 6: Celebration ===== */}
-          {step === 6 && (
+          {/* ===== STEP 4: Celebration ===== */}
+          {step === 4 && (
             <Card className="bg-white shadow-2xl border-0">
               <CardContent className="p-6 space-y-6">
                 <div className="text-center py-4">
@@ -1242,7 +1008,6 @@ export default function OnboardingPage() {
                 <div className="space-y-2">
                   {[
                     { label: "Usługi skonfigurowane", value: scanResult ? `${scanResult.services.length} (AI)` : "✓ z szablonu", done: true },
-                    { label: "Autopilot", value: "AKTYWNY", done: true },
                     { label: "Link do rezerwacji", value: "Udostępniony", done: true },
                     { label: "Klientki zaimportowane", value: importedCount > 0 ? `${importedCount}` : "—", done: importedCount > 0 },
                   ].map((item, i) => (
