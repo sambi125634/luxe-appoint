@@ -830,9 +830,16 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                 ) : (
                   <>
                     <Label>{t('staff.performedServices')}</Label>
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className="flex flex-wrap gap-2 mt-2 w-full max-w-full overflow-x-hidden">
                       {servicesList.map(service => (
-                        <Button key={service.id} type="button" variant={form.serviceIds.includes(service.id) ? "default" : "outline"} size="sm" onClick={() => toggleService(service.id)}>
+                        <Button
+                          key={service.id}
+                          type="button"
+                          variant={form.serviceIds.includes(service.id) ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => toggleService(service.id)}
+                          className="h-auto min-h-8 py-1.5 px-3 whitespace-normal text-left break-words max-w-full leading-tight"
+                        >
                           {service.name}
                         </Button>
                       ))}
