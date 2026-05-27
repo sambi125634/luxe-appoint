@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Plus, Pencil, Trash2, Clock, Banknote, Search, FolderOpen, Upload, Image, Video, Package, LayoutGrid, LayoutList, X, Sparkles, GripVertical, Info, Layers, FlaskConical, Wand2, Loader2 } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { SalonScannerModal } from "./services/SalonScannerModal";
 import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RecipeEditorDrawer from "@/modules/inventory/RecipeEditorDrawer";
@@ -218,76 +220,23 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
   const [variants, setVariants] = useState<VariantFormItem[]>([]);
 
   // AI enrichment of service descriptions (Booksy deep scrape)
-  const [isEnrichOpen, setIsEnrichOpen] = useState(false);
-  const [enrichUrl, setEnrichUrl] = useState("");
-  const [isEnriching, setIsEnriching] = useState(false);
-  const [onlyEmptyDescriptions, setOnlyEmptyDescriptions] = useState(true);
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const [salonRow, setSalonRow] = useState<{ id: string; description?: string | null; address?: string | null; phone?: string | null } | null>(null);
 
-  const handleEnrichDescriptions = async () => {
-    if (isDemo) {
-      toast({ title: "Tryb Demo", description: "Wzbogacanie opisów AI dostępne tylko po rejestracji" });
-      return;
-    }
-    if (!enrichUrl.trim()) {
-      toast({ title: "Brak linku", description: "Wklej link do profilu salonu (Booksy lub strona własna)", variant: "destructive" });
-      return;
-    }
+  useEffect(() => {
+    if (isDemo || !salonId) return;
+    supabase
+      .from("salons")
+      .select("id, description, address, phone")
+      .eq("id", salonId)
+      .maybeSingle()
+      .then(({ data }) => setSalonRow(data as typeof salonRow));
+  }, [isDemo, salonId, isScannerOpen]);
 
-    const candidates = (dbServices || []).filter(s =>
-      onlyEmptyDescriptions ? !s.description || s.description.trim().length < 20 : true
-    );
-
-    if (candidates.length === 0) {
-      toast({ title: "Brak usług do wzbogacenia", description: "Wszystkie usługi mają już opisy. Wyłącz filtr, aby nadpisać." });
-      return;
-    }
-
-    setIsEnriching(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("enrich-service-descriptions", {
-        body: {
-          url: enrichUrl.trim(),
-          services: candidates.map(s => ({ id: s.id, name: s.name })),
-        },
-      });
-
-      if (error) throw error;
-      if (!data?.success) {
-        toast({ title: "Błąd", description: data?.error || "Nie udało się wzbogacić opisów", variant: "destructive" });
-        return;
-      }
-
-      const matches: { id: string; description: string; benefits: string[] }[] = data.matches || [];
-      let updated = 0;
-      for (const m of matches) {
-        const current = (dbServices || []).find(s => s.id === m.id);
-        if (!current) continue;
-        if (onlyEmptyDescriptions && current.description && current.description.trim().length >= 20) continue;
-        try {
-          await updateServiceMutation.mutateAsync({
-            id: m.id,
-            description: m.description,
-            ...(m.benefits && m.benefits.length > 0
-              ? { benefits: m.benefits as unknown as import("@/integrations/supabase/types").Json }
-              : {}),
-          });
-          updated++;
-        } catch (e) {
-          console.error("update failed", e);
-        }
-      }
-
-      toast({
-        title: "Wzbogacono opisy",
-        description: `Zaktualizowano ${updated} z ${candidates.length} usług. AI nie znalazło dopasowań dla pozostałych.`,
-      });
-      setIsEnrichOpen(false);
-    } catch (e) {
-      console.error(e);
-      toast({ title: "Błąd", description: "Nie udało się połączyć z AI", variant: "destructive" });
-    } finally {
-      setIsEnriching(false);
-    }
+  const handleScannerDataChanged = () => {
+    queryClient.invalidateQueries({ queryKey: ["services", salonId] });
+    queryClient.invalidateQueries({ queryKey: ["service-categories", salonId] });
   };
 
   const services: Service[] = useMemo(() => {
