@@ -233,48 +233,17 @@ function LegalDocumentEditor({ docType, salonId, slug, isDemo }: { docType: DocT
   );
 }
 
-function DeletionRequestsList({ salonId, isDemo }: { salonId: string | null; isDemo: boolean }) {
-  const { data: requests, isLoading } = useQuery({
-    queryKey: ["deletion-requests", salonId],
-    queryFn: async () => {
-      if (!salonId) return [];
-      const { data, error } = await (supabase as any)
-        .from("deletion_requests")
-        .select("*")
-        .eq("salon_id", salonId)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data || []) as any[];
-    },
-    enabled: !!salonId && !isDemo,
-  });
-
-  if (isLoading) return <Skeleton className="h-32 w-full" />;
-
-  if (!requests || requests.length === 0) {
-    return (
-      <div className="text-center py-8 text-sm text-muted-foreground">
-        Brak aktywnych wniosków o usunięcie danych.
-      </div>
-    );
-  }
-
+function DeletionRequestsList() {
   return (
-    <div className="space-y-2">
-      {requests.map((r: any) => (
-        <div key={r.id} className="flex items-center justify-between p-3 rounded-lg border">
-          <div>
-            <div className="font-medium text-sm">{r.email || r.user_id || "Anonim"}</div>
-            <div className="text-xs text-muted-foreground">
-              Złożono: {new Date(r.created_at).toLocaleDateString("pl-PL")}
-              {r.reason && ` · Powód: ${r.reason}`}
-            </div>
-          </div>
-          <Badge variant={r.status === "completed" ? "default" : r.status === "pending" ? "outline" : "secondary"}>
-            {r.status === "pending" ? "Oczekuje" : r.status === "completed" ? "Zrealizowano" : r.status}
-          </Badge>
-        </div>
-      ))}
+    <div className="space-y-3">
+      <Alert>
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription className="text-xs">
+          Klientki mogą zgłosić wniosek o usunięcie danych z poziomu Aplikacji Klientki (Profil → Prywatność).
+          Wnioski są procesowane centralnie przez zespół wsparcia w ciągu <strong>30 dni</strong> zgodnie z RODO.
+          Otrzymasz powiadomienie e-mail dla każdego nowego wniosku dotyczącego Twojego salonu.
+        </AlertDescription>
+      </Alert>
     </div>
   );
 }
