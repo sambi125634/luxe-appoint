@@ -1,96 +1,41 @@
-## Cel
+## Diagnoza
 
-Zakładka **Zespół** ma stać się w pełni operacyjna w realnym koncie:
-1. Uprawnienia faktycznie sterują tym, co pracownik widzi (nie są tylko kosmetyką).
-2. Można przypisać usługi pracownikowi z **własną ceną i czasem** — siatka możliwości dla wszystkich kombinacji pracownik × usługa (lub wariant usługi).
+Na zrzucie ekranu widać pełny **WidgetEditor** (zakładka „Usługi"), a nie szybki kreator (`QuickWidgetCreateModal`), który już w poprzedniej iteracji dostał grupowanie + wyszukiwarkę. To dlatego nie widać efektów aktualizacji — to dwa różne komponenty.
 
----
+Lista usług w `WidgetEditor.tsx` (linie 398–431) to płaska siatka checkboxów, bez kategorii, bez wyszukiwarki, bez „Zaznacz wszystkie z kategorii". Limit „pokazuje się tylko kilka" nie wynika z zapytania (`useServices` pobiera wszystkie usługi salonu bez limitu) — po prostu w nowym koncie po onboardingu jest ~9 pozycji startowych. Aby przy 100+ usługach interfejs nadal był wygodny, musi mieć ten sam wzorzec co szybki kreator.
 
-## 1. Uprawnienia pracowników — audyt i dociągnięcie
+## Zakres zmian
 
-Obecny stan: `StaffPermissionsTab` ma tabelę z 7 przełącznikami, ale tylko 2 z nich coś realnie robią w UI (`can_view_all_calendar` w `WeeklyCalendar`, gating w `AdminSidebar`). Reszta jest deklaratywna.
+### 1. Wspólny komponent `WidgetServiceSelector`
+Nowy plik `src/components/admin/widgets/WidgetServiceSelector.tsx` — wyciągam logikę z `QuickWidgetCreateModal` (sekcje rozwijane po kategoriach, wyszukiwarka, „Zaznacz wszystkie" per kategoria, licznik wybranych, „Rozwiń/Zwiń wszystkie"). Komponent przyjmuje:
+- `services`, `categories` (już znormalizowane)
+- `selectedIds: string[]` + `onChange(ids: string[])`
+- `showAllServices: boolean` + `onShowAllChange`
 
-Co zrobimy:
-- **Audyt każdego przełącznika** i podpięcie do realnych modułów przez `useStaffPermissions`:
-  - `can_view_finances` → ukrywa moduły Księgowość, True Profit, Raporty finansowe.
-  - `can_edit_services` → blokuje przyciski Edytuj/Usuń w `ServicesManagement`.
-  - `can_manage_clients` → gating CRUD w `ClientsManagement`.
-  - `can_view_all_calendar` → już działa (filtruje kalendarz do własnych wizyt).
-  - `can_manage_staff` → ukrywa zakładkę Zespół całkowicie.
-  - `can_view_reports` → ukrywa zakładkę Raporty/Analityka.
-  - `can_manage_products` → ukrywa Magazyn/Produkty.
-  - `can_manage_marketing` → ukrywa Marketing/Retencję/Widgety.
-- **UX zakładki uprawnień**:
-  - Dodanie krótkich opisów (tooltip „co dokładnie odblokowuje to uprawnienie") — by właściciel rozumiał konsekwencje.
-  - Presety ról: kliknięcie roli (Manager / Specjalista / Recepcjonista / Asystent) automatycznie ustawia rozsądny zestaw przełączników; dalej można dopinać ręcznie.
-  - Auto-zapis (debounce 600 ms) zamiast guzika „Zapisz wszystkie zmiany" — przyjemniej i bez ryzyka utraty zmian.
+Dzięki temu `QuickWidgetCreateModal` i `WidgetEditor` korzystają z tego samego UI — jeden punkt prawdy, spójny customer journey.
 
----
+### 2. Refaktor `WidgetEditor.tsx`, zakładka „Usługi"
+Zastąpienie obecnego płaskiego `grid` (linie 383–433) wywołaniem `<WidgetServiceSelector />`. Zachowuję istniejące `formData.showAllServices`, `formData.services` i `toggleService`.
 
-## 2. Siatka cen i czasów per pracownik
+### 3. Usprawnienia UX (customer-friendly, jak prosił użytkownik)
+- **Sticky podsumowanie** na górze listy: „Wybrano X z Y" + przycisk „Wyczyść wybór".
+- **Auto-rozwinięcie kategorii** zawierających wybrane usługi przy otwarciu istniejącego widgetu (żeby od razu było widać co jest aktywne).
+- **Quick pick** — chip-rząd z kategoriami nad listą: kliknięcie chipa zaznacza całą kategorię (skrót zamiast rozwijania).
+- **Sortowanie kategorii** wg `sort_order` (już pobierane w `useServiceCategories`), usługi alfabetycznie w obrębie kategorii.
+- **Empty state z CTA**: jeśli `realServices.length === 0`, pokażę link „Dodaj usługi w katalogu" prowadzący do zakładki Usługi w panelu (zamiast suchego komunikatu).
+- **Wskaźnik widoczności w podglądzie** — drobny tekst „Te X usług pojawi się w widgecie" tuż nad listą podglądu po prawej, żeby właściciel od razu widział, co zobaczy klientka.
 
-Obecny stan: `staff_services` to płaska tabela łącząca staff↔service (bez ceny/czasu). `service_variants` istnieje per usługa (np. „Krótkie / Średnie / Długie włosy"), ale nie ma overrideów per pracownik.
+### 4. Czego NIE ruszam
+- Nie zmieniam schematu danych, RLS ani logiki bookingu.
+- Nie ruszam pozostałych zakładek `WidgetEditor` (Kroki, Formularz, Wygląd, Płatności, Promocja, Zaawansowane, Analityka) — tylko zakładkę „Usługi".
+- `QuickWidgetCreateModal` po wyciągnięciu logiki działa dokładnie tak samo (refactor bez zmiany funkcjonalności).
 
-### Schemat — migracja
+## Pliki
 
-Rozszerzamy `staff_services` o nadpisania (oba pola nullable — `NULL` = używaj wartości z usługi/wariantu):
+- nowy: `src/components/admin/widgets/WidgetServiceSelector.tsx`
+- edycja: `src/components/admin/widgets/WidgetEditor.tsx` (tylko sekcja `activeTab === "services"`)
+- edycja: `src/components/admin/widgets/QuickWidgetCreateModal.tsx` (podmiana wewnętrznej listy na wspólny komponent — bez zmian wizualnych)
 
-```
-ALTER TABLE public.staff_services
-  ADD COLUMN price_override   numeric(10,2),
-  ADD COLUMN duration_override integer,
-  ADD COLUMN variant_id       uuid REFERENCES service_variants(id) ON DELETE CASCADE;
-```
+## Efekt dla użytkownika
 
-`variant_id` pozwala definiować ceny per **wariant** usługi (jeśli usługa ma warianty). Unique zostaje, ale rozszerzamy klucz na `(staff_id, service_id, variant_id)` (z `variant_id` IS NULL traktowanym jako sentinel).
-
-Logika cen przy bookowaniu:
-1. Jeśli istnieje rekord `staff_services` z `price_override` → użyj go.
-2. W przeciwnym razie `service_variants.price` (jeśli wybrany wariant) lub `services.price`.
-Analogicznie `duration_override` → `variant.duration` → `service.duration`.
-
-### UI — Macierz pracownik × usługa
-
-W `StaffManagement.tsx`, w dialogu pracownika (sekcja „Usługi"):
-- Zamiast prostych chipów ON/OFF — **tabela** ze wszystkimi usługami salonu, pogrupowana po kategorii (rozwijane sekcje, jak w `QuickWidgetCreateModal`).
-- Każdy wiersz: checkbox (czy świadczy) | nazwa usługi/wariantu | input „Cena (pusty = domyślna 80 zł)" | input „Czas min (pusty = domyślne 60)".
-- Jeśli usługa ma warianty — pokazujemy każdy wariant jako osobny pod-wiersz.
-- Placeholdery podpowiadają wartość domyślną w jasnoszarym kolorze.
-
-Dodatkowo, w `ServicesManagement.tsx` w edytorze usługi nowa zakładka **„Pracownicy & ceny"** pokazująca tę samą macierz z perspektywy usługi (kto ją robi i za ile) — właściciel ma dwie ścieżki dostępu do tej samej tablicy.
-
-### Zapis
-
-Po zatwierdzeniu — upsert do `staff_services` dla zaznaczonych, delete dla odznaczonych. Pola `*_override` zapisywane jako `null` gdy input pusty.
-
----
-
-## 3. Pliki do zmiany
-
-**Migracja DB:**
-- nowa migracja `staff_services` (kolumny `price_override`, `duration_override`, `variant_id`, nowy unique).
-
-**Backend/Booking:**
-- `src/hooks/useAvailableSlots.ts` i komponenty bookingowe (`ServiceSelection`, `TimeSlotCard` itp.) — odczyt overrideów przy wyświetlaniu ceny/czasu.
-- `src/hooks/useServices.ts` — opcjonalny join overrideów per staff.
-
-**Uprawnienia (audyt + gating):**
-- `src/components/admin/staff/StaffPermissionsTab.tsx` — opisy, presety ról, auto-zapis.
-- `src/components/admin/AdminSidebar.tsx` — pełny gating zakładek.
-- `src/components/admin/ServicesManagement.tsx`, `ClientsManagement.tsx`, moduły Księgowość / Raporty / Magazyn / Marketing — sprawdzanie `permissions.*` przed renderem akcji edycji/całych modułów.
-
-**Macierz cen:**
-- `src/components/admin/StaffManagement.tsx` — nowa sekcja „Usługi & ceny" w dialogu pracownika.
-- `src/components/admin/ServicesManagement.tsx` — nowa zakładka „Pracownicy & ceny" w edytorze usługi.
-- nowy współdzielony komponent `src/components/admin/staff/StaffServiceMatrix.tsx` (DRY — używany w obu miejscach).
-
----
-
-## Pytanie zanim wystartuję
-
-Chcesz, żeby **czas trwania per pracownik** też był edytowalny (mówiłeś, że „może bez sensu", ale ma „współistnieć z wariantami")? Trzy opcje:
-- (A) Tylko cena per pracownik; czas tylko z wariantu usługi.
-- (B) Cena + czas per pracownik (pełna elastyczność).
-- (C) Cena per pracownik; czas tylko gdy pracownik świadczy konkretny wariant (czyli wybór wariantu = wybór czasu).
-
-Domyślnie pójdę z **(B)** bo daje najwięcej władzy właścicielowi i nie wymusza tworzenia wariantów do drobnych różnic czasowych — daj znać jeśli wolisz inaczej.
+Niezależnie od tego, czy zakłada widget przez szybki kreator, czy edytuje istniejący w pełnym edytorze — ten sam, prosty interfejs: szukaj, rozwiń kategorię, zaznacz całą kategorię jednym kliknięciem albo wybierz pojedyncze pozycje. Skaluje się do 100+ usług bez przewijania długiej listy.
