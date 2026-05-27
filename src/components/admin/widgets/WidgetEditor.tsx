@@ -51,6 +51,7 @@ import {
   defaultWidgetSteps 
 } from "./types";
 import { useServices, useServiceCategories } from "@/hooks/useServices";
+import { WidgetServiceSelector } from "./WidgetServiceSelector";
 
 interface WidgetEditorProps {
   widget: BookingWidget | null;
