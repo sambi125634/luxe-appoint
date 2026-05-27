@@ -192,7 +192,17 @@ export function StaffPermissionsTab({ isDemo = false }: StaffPermissionsTabProps
               <th className="text-left p-3 font-medium">Pracownik</th>
               <th className="text-left p-3 font-medium">Rola</th>
               {PERMISSION_COLS.map(col => (
-                <th key={col.key} className="text-center p-3 font-medium whitespace-nowrap">{col.short}</th>
+                <th key={col.key} className="text-center p-3 font-medium whitespace-nowrap">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="inline-flex items-center gap-1 cursor-help">
+                        {col.short}
+                        <Info className="w-3 h-3 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs text-xs">{col.desc}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </th>
               ))}
             </tr>
           </thead>
