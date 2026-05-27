@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useReferralCode, useReferralStats, useReferralHistory } from "@/hooks/useUserReferral";
+import { buildReferralUrl } from "@/lib/referralUrl";
 
 function useCurrentSalonId() {
   return useQuery({
@@ -66,7 +67,7 @@ export function ReferFriend() {
   }, [salonId, codeLoading, referralCodeData, firstName, createCode]);
 
   const referralCode = referralCodeData?.code ?? "";
-  const referralUrl = `https://beautycalendar.pl/join/${salonSlug}?ref=${referralCode}`;
+  const referralUrl = referralCode ? buildReferralUrl(salonSlug, referralCode) : "";
 
   const isLoading = salonLoading || codeLoading || statsLoading;
 

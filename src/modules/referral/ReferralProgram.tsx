@@ -16,6 +16,7 @@ import {
   isAutoDescription,
   type ReferralProgramConfig,
 } from "@/hooks/useReferralConfig";
+import { buildReferralUrl } from "@/lib/referralUrl";
 
 interface ReferralProgramProps {
   isDemo?: boolean;
@@ -77,7 +78,7 @@ export function ReferralProgram({ isDemo }: ReferralProgramProps) {
   const referralCodes = isDemo ? mockReferralCodes : [];
 
   const handleCopyLink = (code: string) => {
-    navigator.clipboard.writeText(`calendar.beauty-funnels.com/salon/demo?ref=${code}`);
+    navigator.clipboard.writeText(buildReferralUrl(null, code));
     toast.success("Link skopiowany do schowka");
   };
 
@@ -89,7 +90,7 @@ export function ReferralProgram({ isDemo }: ReferralProgramProps) {
       .replace(/\{imię\}/g, "Anna")
       .replace(/\{benefit_polecajacej\}/g, value.referrer_reward_description || "[Twój benefit]")
       .replace(/\{benefit_nowej\}/g, value.referee_reward_description || "[benefit dla nowej]")
-      .replace(/\{link\}/g, "calendar.beauty-funnels.com/r/ANNA2K")
+      .replace(/\{link\}/g, buildReferralUrl(null, "ANNA2K"))
       .replace(/\{wizyt\}/g, String(value.activate_after_visits || 5));
   }, [value]);
 
