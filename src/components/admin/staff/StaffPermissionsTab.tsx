@@ -114,9 +114,15 @@ export function StaffPermissionsTab({ isDemo = false }: StaffPermissionsTabProps
   };
 
   const updateRole = (staffId: string, role: string) => {
+    const preset = ROLE_PRESETS[role];
     setChanges(prev => ({
       ...prev,
-      [staffId]: { ...prev[staffId], role },
+      [staffId]: {
+        ...prev[staffId],
+        role,
+        // Apply role preset automatically — user can still tweak individual switches
+        ...(preset ? { permissions: preset } : {}),
+      },
     }));
   };
 
