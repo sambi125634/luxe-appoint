@@ -22,13 +22,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { AccountingExport } from "./types";
+import { AccountingExport, Transaction } from "./types";
 import { mockAccountingExports, mockTransactions, mockEmployeeCommissions, mockVouchers } from "./mockData";
 import { useTranslation } from "react-i18next";
 import { exportToCSV } from "@/lib/csvExport";
 
 interface ExportSectionProps {
   dateRange: { from: Date; to: Date };
+  isDemo?: boolean;
+  transactions?: Transaction[];
 }
 
 function generateExportFile(exportType: string, dateRange: { from: Date; to: Date }) {

@@ -25,9 +25,10 @@ import { exportEmployeeCommissions, CommissionExportData } from "@/lib/csvExport
 
 interface EmployeeCommissionsProps {
   dateRange: { from: Date; to: Date };
+  isDemo?: boolean;
 }
 
-export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
+export function EmployeeCommissions({ dateRange, isDemo = false }: EmployeeCommissionsProps) {
   const { t } = useTranslation();
   const [expandedStaff, setExpandedStaff] = useState<string | null>(null);
 
@@ -38,7 +39,8 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
     }).format(amount);
   };
 
-  const commissions = mockEmployeeCommissions;
+  const commissions = isDemo ? mockEmployeeCommissions : [];
+  const txSource = isDemo ? mockTransactions : [];
 
   // Totals
   const totals = commissions.reduce(
@@ -63,7 +65,7 @@ export function EmployeeCommissions({ dateRange }: EmployeeCommissionsProps) {
   );
 
   const getStaffTransactions = (staffId: string) => {
-    return mockTransactions.filter((t) => t.staffId === staffId);
+    return txSource.filter((t) => t.staffId === staffId);
   };
 
   const toggleExpand = (staffId: string) => {

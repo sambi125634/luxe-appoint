@@ -251,11 +251,11 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
         </TabsContent>
 
         <TabsContent value="daily" className="mt-6">
-          <DailyCashUp dateRange={filters.dateRange} />
+          <DailyCashUp dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="sales" className="mt-6">
-          <SalesVatReport dateRange={filters.dateRange} />
+          <SalesVatReport dateRange={filters.dateRange} isDemo={isDemo} transactions={transactions} />
         </TabsContent>
 
         <TabsContent value="products" className="mt-6">
@@ -263,11 +263,11 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
         </TabsContent>
 
         <TabsContent value="commissions" className="mt-6">
-          <EmployeeCommissions dateRange={filters.dateRange} />
+          <EmployeeCommissions dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="vouchers" className="mt-6">
-          <VouchersReport dateRange={filters.dateRange} />
+          <VouchersReport dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="occupancy" className="mt-6">
@@ -279,7 +279,7 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
         </TabsContent>
 
         <TabsContent value="export" className="mt-6">
-          <ExportSection dateRange={filters.dateRange} />
+          <ExportSection dateRange={filters.dateRange} isDemo={isDemo} transactions={transactions} />
         </TabsContent>
 
         <TabsContent value="compensation" className="mt-6">
