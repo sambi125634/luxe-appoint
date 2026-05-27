@@ -431,8 +431,8 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
             workingDays.map(h => ({ staff_id: staffId!, day_of_week: h.dayOfWeek, start_time: h.startTime, end_time: h.endTime, is_working: true }))
           );
         }
-        await supabase.from("staff_services").delete().eq("staff_id", staffId);
-        if (form.serviceIds.length > 0) {
+        // Only seed staff_services on create — matrix handles overrides on edit
+        if (!editingStaff && form.serviceIds.length > 0) {
           await supabase.from("staff_services").insert(
             form.serviceIds.map(serviceId => ({ staff_id: staffId!, service_id: serviceId }))
           );
