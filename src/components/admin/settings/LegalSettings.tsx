@@ -315,7 +315,7 @@ export function LegalSettings({ isDemo }: LegalSettingsProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <DeletionRequestsList salonId={salonId} isDemo={!!isDemo} />
+          <DeletionRequestsList />
         </CardContent>
       </Card>
 
