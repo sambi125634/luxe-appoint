@@ -1,41 +1,33 @@
-## Diagnoza
+## Cel
+Zakładka **Konwersacje** po imporcie listy klientów nie powinna zalewać widoku pustymi wątkami. Pokazujemy tylko realne rozmowy (≥1 wiadomość), a nową rozmowę można zacząć z dowolnym klientem przez przycisk **„Nowa konwersacja"**.
 
-Na zrzucie ekranu widać pełny **WidgetEditor** (zakładka „Usługi"), a nie szybki kreator (`QuickWidgetCreateModal`), który już w poprzedniej iteracji dostał grupowanie + wyszukiwarkę. To dlatego nie widać efektów aktualizacji — to dwa różne komponenty.
+## Zmiany
 
-Lista usług w `WidgetEditor.tsx` (linie 398–431) to płaska siatka checkboxów, bez kategorii, bez wyszukiwarki, bez „Zaznacz wszystkie z kategorii". Limit „pokazuje się tylko kilka" nie wynika z zapytania (`useServices` pobiera wszystkie usługi salonu bez limitu) — po prostu w nowym koncie po onboardingu jest ~9 pozycji startowych. Aby przy 100+ usługach interfejs nadal był wygodny, musi mieć ten sam wzorzec co szybki kreator.
+### 1. `src/hooks/useConversations.ts`
+Filtrujemy listę kontaktów: zwracamy tylko klientów, dla których istnieje wpis w `conversation_messages` (czyli `lastByClient.has(c.id)`). Zamiast `clients.map(...)` → `clients.filter(c => lastByClient.has(c.id)).map(...)`. Sortowanie po `lastMessageAt` malejąco.
 
-## Zakres zmian
+### 2. `src/components/admin/conversations/ConversationsModule.tsx`
+- Nad listą kontaktów dodajemy przycisk **„＋ Nowa konwersacja"** (primary, full-width w panelu listy).
+- Klik otwiera modal `NewConversationDialog` — wyszukiwarka klientów (po imieniu, telefonie, e-mailu) oparta o `useClients()` / istniejące zapytanie do tabeli `clients`. Lista z wirtualnym scrollem dla 1000+ rekordów.
+- Wybór klienta → wybór kanału (SMS / Email / WhatsApp) → pole pierwszej wiadomości → `useSendMessage()`.
+- Po wysłaniu: dialog się zamyka, refetch `conv-contacts`, automatycznie otwieramy nowo utworzony wątek (`setSelectedContactId`).
 
-### 1. Wspólny komponent `WidgetServiceSelector`
-Nowy plik `src/components/admin/widgets/WidgetServiceSelector.tsx` — wyciągam logikę z `QuickWidgetCreateModal` (sekcje rozwijane po kategoriach, wyszukiwarka, „Zaznacz wszystkie" per kategoria, licznik wybranych, „Rozwiń/Zwiń wszystkie"). Komponent przyjmuje:
-- `services`, `categories` (już znormalizowane)
-- `selectedIds: string[]` + `onChange(ids: string[])`
-- `showAllServices: boolean` + `onShowAllChange`
+### 3. Empty state listy
+Gdy `contacts.length === 0`:
+- Ikona + nagłówek „Brak konwersacji"
+- Podtekst: „Twoi klienci są zapisani w bazie. Zacznij rozmowę, gdy będziesz gotowa."
+- CTA: ten sam przycisk „Nowa konwersacja"
 
-Dzięki temu `QuickWidgetCreateModal` i `WidgetEditor` korzystają z tego samego UI — jeden punkt prawdy, spójny customer journey.
+### 4. Nowy komponent
+`src/components/admin/conversations/NewConversationDialog.tsx` — modal z 3 krokami w jednym widoku:
+1. Search input + lista klientów (max 50 wyników, debounce 200 ms)
+2. Wybór kanału (3 przyciski-segmenty)
+3. Textarea + przycisk „Wyślij"
 
-### 2. Refaktor `WidgetEditor.tsx`, zakładka „Usługi"
-Zastąpienie obecnego płaskiego `grid` (linie 383–433) wywołaniem `<WidgetServiceSelector />`. Zachowuję istniejące `formData.showAllServices`, `formData.services` i `toggleService`.
+## Czego NIE ruszamy
+- Schema bazy — `conversation_messages` zostaje bez zmian.
+- RLS, edge functions, integracje SMS/Email — bez zmian.
+- Inne moduły (CRM, Klienci) — bez zmian; klienci dalej są w pełnej liście w zakładce „Klienci".
 
-### 3. Usprawnienia UX (customer-friendly, jak prosił użytkownik)
-- **Sticky podsumowanie** na górze listy: „Wybrano X z Y" + przycisk „Wyczyść wybór".
-- **Auto-rozwinięcie kategorii** zawierających wybrane usługi przy otwarciu istniejącego widgetu (żeby od razu było widać co jest aktywne).
-- **Quick pick** — chip-rząd z kategoriami nad listą: kliknięcie chipa zaznacza całą kategorię (skrót zamiast rozwijania).
-- **Sortowanie kategorii** wg `sort_order` (już pobierane w `useServiceCategories`), usługi alfabetycznie w obrębie kategorii.
-- **Empty state z CTA**: jeśli `realServices.length === 0`, pokażę link „Dodaj usługi w katalogu" prowadzący do zakładki Usługi w panelu (zamiast suchego komunikatu).
-- **Wskaźnik widoczności w podglądzie** — drobny tekst „Te X usług pojawi się w widgecie" tuż nad listą podglądu po prawej, żeby właściciel od razu widział, co zobaczy klientka.
-
-### 4. Czego NIE ruszam
-- Nie zmieniam schematu danych, RLS ani logiki bookingu.
-- Nie ruszam pozostałych zakładek `WidgetEditor` (Kroki, Formularz, Wygląd, Płatności, Promocja, Zaawansowane, Analityka) — tylko zakładkę „Usługi".
-- `QuickWidgetCreateModal` po wyciągnięciu logiki działa dokładnie tak samo (refactor bez zmiany funkcjonalności).
-
-## Pliki
-
-- nowy: `src/components/admin/widgets/WidgetServiceSelector.tsx`
-- edycja: `src/components/admin/widgets/WidgetEditor.tsx` (tylko sekcja `activeTab === "services"`)
-- edycja: `src/components/admin/widgets/QuickWidgetCreateModal.tsx` (podmiana wewnętrznej listy na wspólny komponent — bez zmian wizualnych)
-
-## Efekt dla użytkownika
-
-Niezależnie od tego, czy zakłada widget przez szybki kreator, czy edytuje istniejący w pełnym edytorze — ten sam, prosty interfejs: szukaj, rozwiń kategorię, zaznacz całą kategorię jednym kliknięciem albo wybierz pojedyncze pozycje. Skaluje się do 100+ usług bez przewijania długiej listy.
+## Rezultat
+Po imporcie 500 klientów w **Konwersacjach** widać 0 wątków + duży CTA. Właściciel klika „Nowa konwersacja", wyszukuje klientkę, wybiera kanał, pisze, wysyła. Wątek pojawia się na liście dopiero teraz. Czysto, skalowalnie, zgodnie z paradygmatem Intercom/Front.
