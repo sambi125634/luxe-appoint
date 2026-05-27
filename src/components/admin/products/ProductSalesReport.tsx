@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TrendingUp, DollarSign, Package, Percent, Download, Calendar, Coins } from "lucide-react";
+import { TrendingUp, DollarSign, Package, Percent, Download, Calendar, Coins, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -20,11 +20,14 @@ const mockSalesData = [
 
 type Period = "week" | "month" | "quarter" | "year";
 
-export function ProductSalesReport() {
+export function ProductSalesReport({ isDemo = false }: { isDemo?: boolean }) {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<Period>("month");
 
-  const salesWithProducts = mockSalesData.map((sale) => {
+  // W realnym panelu nie pokazujemy danych przykładowych — czekamy na pierwszą sprzedaż produktu.
+  const salesSource = isDemo ? mockSalesData : [];
+
+  const salesWithProducts = salesSource.map((sale) => {
     const product = mockProducts.find((p) => p.id === sale.productId);
     const margin = sale.revenue - sale.cost;
     const marginPercent = sale.revenue > 0 ? (margin / sale.revenue) * 100 : 0;
@@ -58,6 +61,8 @@ export function ProductSalesReport() {
   const handleExport = () => {
     console.log("Exporting product sales report...");
   };
+
+  const isEmpty = salesWithProducts.length === 0;
 
   return (
     <div className="space-y-6">
@@ -133,6 +138,17 @@ export function ProductSalesReport() {
           </div>
         </CardHeader>
         <CardContent>
+          {isEmpty ? (
+            <div className="flex flex-col items-center justify-center text-center py-16 px-4 border border-dashed rounded-lg">
+              <div className="p-3 rounded-full bg-muted mb-4">
+                <BarChart3 className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <h3 className="font-semibold text-base mb-1">Brak sprzedaży produktów</h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Tu pojawi się Twój raport, gdy zaczniesz rejestrować sprzedaż produktów na wizytach lub w kasie. Marża, True Profit i koszty pracy policzą się automatycznie.
+              </p>
+            </div>
+          ) : (
           <div className="rounded-lg border overflow-hidden">
             <Table>
               <TableHeader>
@@ -200,6 +216,7 @@ export function ProductSalesReport() {
               </TableBody>
             </Table>
           </div>
+          )}
         </CardContent>
       </Card>
     </div>

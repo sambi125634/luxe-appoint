@@ -170,7 +170,7 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
         </TabsContent>
 
         <TabsContent value="sales-report" className="mt-6">
-          <ProductSalesReport />
+          <ProductSalesReport isDemo={isDemo} />
         </TabsContent>
 
 
