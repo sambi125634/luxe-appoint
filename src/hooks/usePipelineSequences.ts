@@ -53,8 +53,8 @@ export function usePipelineSequences(variant: SequenceVariant) {
     queryKey: ["pipeline-sequences", salonId, variant],
     enabled: !!salonId,
     queryFn: async (): Promise<PipelineSequence[]> => {
-      const { data, error } = await supabase
-        .from("autopilot_pipeline_sequences" as never)
+      const { data, error } = await (supabase as any)
+        .from("autopilot_pipeline_sequences")
         .select("*")
         .eq("salon_id", salonId!)
         .eq("variant", variant)
