@@ -259,7 +259,7 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
         </TabsContent>
 
         <TabsContent value="products" className="mt-6">
-          <ProductSalesAccountingReport dateRange={filters.dateRange} />
+          <ProductSalesAccountingReport dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="commissions" className="mt-6">
@@ -271,11 +271,11 @@ export function AccountingModule({ isDemo = false }: AccountingModuleProps) {
         </TabsContent>
 
         <TabsContent value="occupancy" className="mt-6">
-          <OccupancyReport />
+          <OccupancyReport dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="noshows" className="mt-6">
-          <NoShowsReport />
+          <NoShowsReport dateRange={filters.dateRange} isDemo={isDemo} />
         </TabsContent>
 
         <TabsContent value="export" className="mt-6">
