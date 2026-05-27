@@ -22,6 +22,7 @@ import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StaffInviteTab } from "./staff/StaffInviteTab";
 import { StaffPermissionsTab } from "./staff/StaffPermissionsTab";
+import { StaffServiceMatrix } from "./staff/StaffServiceMatrix";
 
 import demoMaria from "@/assets/demo-staff-maria.jpg";
 import demoKasia from "@/assets/demo-staff-kasia.jpg";
