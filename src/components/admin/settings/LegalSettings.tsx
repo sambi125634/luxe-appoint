@@ -238,13 +238,13 @@ function DeletionRequestsList({ salonId, isDemo }: { salonId: string | null; isD
     queryKey: ["deletion-requests", salonId],
     queryFn: async () => {
       if (!salonId) return [];
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("deletion_requests")
         .select("*")
         .eq("salon_id", salonId)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data || [];
+      return (data || []) as any[];
     },
     enabled: !!salonId && !isDemo,
   });
