@@ -172,7 +172,7 @@ export function VouchersReport({ dateRange, isDemo = false }: VouchersReportProp
         </div>
         <div className="bg-card rounded-xl p-5 border border-border">
           <p className="text-sm text-muted-foreground mb-1">{t('accounting.allVouchers')}</p>
-          <p className="text-2xl font-bold">{mockVouchers.length}</p>
+          <p className="text-2xl font-bold">{sourceVouchers.length}</p>
         </div>
       </div>
 
