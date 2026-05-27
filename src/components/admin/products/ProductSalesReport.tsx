@@ -138,6 +138,17 @@ export function ProductSalesReport({ isDemo = false }: { isDemo?: boolean }) {
           </div>
         </CardHeader>
         <CardContent>
+          {isEmpty ? (
+            <div className="flex flex-col items-center justify-center text-center py-16 px-4 border border-dashed rounded-lg">
+              <div className="p-3 rounded-full bg-muted mb-4">
+                <BarChart3 className="w-6 h-6 text-muted-foreground" />
+              </div>
+              <h3 className="font-semibold text-base mb-1">Brak sprzedaży produktów</h3>
+              <p className="text-sm text-muted-foreground max-w-sm">
+                Tu pojawi się Twój raport, gdy zaczniesz rejestrować sprzedaż produktów na wizytach lub w kasie. Marża, True Profit i koszty pracy policzą się automatycznie.
+              </p>
+            </div>
+          ) : (
           <div className="rounded-lg border overflow-hidden">
             <Table>
               <TableHeader>
@@ -205,6 +216,7 @@ export function ProductSalesReport({ isDemo = false }: { isDemo?: boolean }) {
               </TableBody>
             </Table>
           </div>
+          )}
         </CardContent>
       </Card>
     </div>
