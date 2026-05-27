@@ -1045,13 +1045,26 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
             </div>
             {/* Staff */}
             <div>
-              <Label>{t('services.performingStaff')}</Label>
               {editingService && !isDemo ? (
-                <div className="mt-2">
+                <div className="mt-2 p-4 rounded-xl border-2 border-primary/40 bg-primary/5">
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div>
+                      <h4 className="font-semibold text-base flex items-center gap-2">
+                        💰 Indywidualna cena i czas — per pracownik
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Zaznacz, kto wykonuje tę usługę i — jeśli chcesz — ustaw inną cenę lub czas dla konkretnej osoby.
+                        Puste pole = cena/czas domyślny z usługi.
+                        <br />
+                        <span className="italic">Przykład: mezoterapia — Anna 350 zł, Kasia 400 zł, Marta 320 zł.</span>
+                      </p>
+                    </div>
+                  </div>
                   <StaffServiceMatrix mode="byService" serviceId={editingService.id} />
                 </div>
               ) : (
                 <>
+                  <Label>{t('services.performingStaff')}</Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {staffList.map(staff => (
                       <Button key={staff.id} type="button" variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"} size="sm" onClick={() => toggleStaffSelection(staff.id)}>
@@ -1063,9 +1076,10 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
                     )}
                   </div>
                   {!isDemo && (
-                    <p className="text-xs text-muted-foreground mt-2">
-                      💡 Po zapisaniu usługi otworzy się siatka z indywidualnymi cenami i czasami per pracownik.
-                    </p>
+                    <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/30 text-sm">
+                      <strong>💰 Indywidualne ceny per pracownik</strong> odblokują się po pierwszym zapisie usługi.
+                      Wrócisz tutaj, by ustawić np.: <em>Anna 350 zł, Kasia 400 zł</em>.
+                    </div>
                   )}
                 </>
               )}
