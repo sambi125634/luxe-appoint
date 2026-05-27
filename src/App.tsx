@@ -16,6 +16,7 @@ import InstallPage from "./pages/InstallPage";
 import ClientApp from "./pages/ClientApp";
 import MobileAdminApp from "./pages/MobileAdminApp";
 import JoinSalonPage from "./pages/JoinSalonPage";
+import ReferralRedirectPage from "./pages/ReferralRedirectPage";
 import StaffOnboardingPage from "./pages/StaffOnboardingPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ClientAuthPage from "./pages/ClientAuthPage";
@@ -82,6 +83,7 @@ const App = () => {
             <Route path="/s/:slug" element={<BookingPage />} />
             <Route path="/i/:slug" element={<InstagramLanding />} />
             <Route path="/join/:slug" element={<JoinSalonPage />} />
+            <Route path="/r/:code" element={<ReferralRedirectPage />} />
             <Route path="/install" element={<InstallPage />} />
             <Route path="/demo-agent" element={<DemoAgentPage />} />
             <Route path="/ad" element={<AdLandingPage />} />
