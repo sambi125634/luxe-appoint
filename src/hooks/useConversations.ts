@@ -34,21 +34,29 @@ export function useConversationContacts(enabled = true) {
         }
       });
 
-      return clients.map((c) => {
-        const last = lastByClient.get(c.id);
-        return {
-          id: c.id,
-          externalContactId: c.id,
-          firstName: c.first_name,
-          lastName: c.last_name,
-          email: c.email || undefined,
-          phone: c.phone || undefined,
-          lastMessageAt: last ? new Date(last.at) : undefined,
-          lastMessagePreview: last?.body,
-          unreadCount: 0,
-          tags: c.tags || [],
-        };
-      });
+      // Only return clients that have at least one message — avoid showing
+      // an empty conversation per imported client.
+      return clients
+        .filter((c) => lastByClient.has(c.id))
+        .map((c) => {
+          const last = lastByClient.get(c.id)!;
+          return {
+            id: c.id,
+            externalContactId: c.id,
+            firstName: c.first_name,
+            lastName: c.last_name,
+            email: c.email || undefined,
+            phone: c.phone || undefined,
+            lastMessageAt: new Date(last.at),
+            lastMessagePreview: last.body,
+            unreadCount: 0,
+            tags: c.tags || [],
+          };
+        })
+        .sort(
+          (a, b) =>
+            (b.lastMessageAt?.getTime() ?? 0) - (a.lastMessageAt?.getTime() ?? 0),
+        );
     },
   });
 }

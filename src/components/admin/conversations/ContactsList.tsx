@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Search, RefreshCw, Filter } from "lucide-react";
+import { Search, RefreshCw, Filter, MessageSquarePlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ interface ContactsListProps {
   onSelectContact: (contact: Contact) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
+  onNewConversation?: () => void;
 }
 
 function formatTimeAgo(date?: Date, t?: (key: string) => string): string {
@@ -40,6 +41,7 @@ export function ContactsList({
   onSelectContact,
   searchQuery,
   onSearchChange,
+  onNewConversation,
 }: ContactsListProps) {
   const { t } = useTranslation();
   
@@ -58,6 +60,12 @@ export function ContactsList({
             </Button>
           </div>
         </div>
+        {onNewConversation && (
+          <Button onClick={onNewConversation} className="w-full gap-2" size="sm">
+            <MessageSquarePlus className="w-4 h-4" />
+            Nowa konwersacja
+          </Button>
+        )}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
@@ -72,6 +80,15 @@ export function ContactsList({
       {/* Contacts */}
       <ScrollArea className="flex-1">
         <div className="divide-y divide-border">
+          {contacts.length === 0 && (
+            <div className="p-8 text-center text-sm text-muted-foreground">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-muted flex items-center justify-center">
+                <MessageSquarePlus className="w-5 h-5" />
+              </div>
+              <p className="font-medium text-foreground mb-1">Brak konwersacji</p>
+              <p>Klientki są w bazie. Kliknij „Nowa konwersacja", aby napisać pierwszą wiadomość.</p>
+            </div>
+          )}
           {contacts.map((contact) => (
             <button
               key={contact.id}

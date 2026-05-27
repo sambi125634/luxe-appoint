@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { MessageSquarePlus, Settings, ExternalLink, MessageSquare, Phone } from "lucide-react";
 import { ContactsList } from "./ContactsList";
 import { ConversationView } from "./ConversationView";
+import { NewConversationDialog } from "./NewConversationDialog";
 import { Contact, Conversation, Message } from "./types";
 import { SectionGuide } from "../SectionGuide";
 import { Button } from "@/components/ui/button";
@@ -169,6 +170,7 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
   const { t } = useTranslation();
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [newConvOpen, setNewConvOpen] = useState(false);
   const { settings } = useSalonSettings();
 
   const smsConfigured = settings.integrations.smsapi?.enabled && !!settings.integrations.smsapi?.apiKey;
@@ -272,6 +274,7 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
           onSelectContact={setSelectedContact}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
+          onNewConversation={isDemo ? undefined : () => setNewConvOpen(true)}
         />
       </div>
 
@@ -297,6 +300,26 @@ export function ConversationsModule({ isDemo = false, onNavigate }: Conversation
           </div>
         )}
       </div>
+
+      {!isDemo && (
+        <NewConversationDialog
+          open={newConvOpen}
+          onOpenChange={setNewConvOpen}
+          onCreated={async (contact, ch) => {
+            try {
+              await sendMessage.mutateAsync({
+                clientId: contact.id,
+                body: contact.lastMessagePreview || "",
+                channel: ch,
+              });
+              setSelectedContact(contact);
+              toast.success("Konwersacja rozpoczęta");
+            } catch (e: any) {
+              toast.error("Nie udało się wysłać", { description: e?.message });
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
