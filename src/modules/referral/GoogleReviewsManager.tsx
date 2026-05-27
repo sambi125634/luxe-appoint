@@ -45,33 +45,6 @@ const REVIEW_TEMPLATES: Record<string, { label: string; body: string; recommende
   },
 };
 
-const reviewTemplates = [
-  {
-    id: "warm",
-    label: "💜 Ciepły i osobisty",
-    preview: "Cześć {imię}! Dziękuję za dzisiejszą wizytę! Czy możesz poświęcić 30 sekund na opinię w Google? Bardzo mi to pomoże: {link} ❤️",
-    recommended: true,
-  },
-  {
-    id: "short",
-    label: "⚡ Krótki i konkretny",
-    preview: "Hej {imię}! Twoja opinia w Google bardzo nam pomaga. 20 sekund: {link} ⭐",
-    recommended: false,
-  },
-  {
-    id: "social",
-    label: "🌸 Z elementem społecznym",
-    preview: "Wiele kobiet szuka dobrego salonu przez Google. Twoja opinia pomoże im nas znaleźć! {link} 🌸",
-    recommended: false,
-  },
-  {
-    id: "gratitude",
-    label: "🙏 Z podziękowaniem",
-    preview: "Cześć {imię}! Dziękuję że jesteś z nami od {wizyt} wizyt. Twoja opinia w Google to najlepsza nagroda: {link} 💜",
-    recommended: false,
-  },
-];
-
 const mockReviewHistory = [
   { id: "1", clientName: "Kasia Wiśniewska", sentAt: "2h temu", status: "sent", channel: "sms" },
   { id: "2", clientName: "Ewa Jankowska", sentAt: "wczoraj", status: "clicked", channel: "email" },
