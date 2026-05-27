@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap, Radio, Download } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, CreditCard, Scale } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
@@ -8,6 +8,9 @@ import { NotificationSettings } from "./NotificationSettings";
 import { IntegrationSettings } from "./IntegrationSettings";
 import { AutomationSettings } from "./AutomationSettings";
 import { CommunicationSettings } from "./CommunicationSettings";
+import { TeamSettings } from "./TeamSettings";
+import { PaymentsSettings } from "./PaymentsSettings";
+import { LegalSettings } from "./LegalSettings";
 import { ExportModule } from "@/components/admin/export";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { SettingsTabType } from "./types";
@@ -44,8 +47,11 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     { id: "booking" as const, label: t("settingsModule.booking"), icon: Calendar },
     { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell },
     { id: "communication" as const, label: "Komunikacja", icon: Radio },
+    { id: "team" as const, label: "Zespół", icon: Users },
+    { id: "payments" as const, label: "Płatności", icon: CreditCard },
     { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
     { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
+    { id: "legal" as const, label: "Prawne", icon: Scale },
     { id: "export" as const, label: "Eksport danych", icon: Download },
   ];
 
@@ -53,7 +59,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
       <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-7 h-auto gap-2 bg-transparent p-0">
+        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-10 h-auto gap-2 bg-transparent p-0">
           {tabs.map((tab) => (
             <TabsTrigger
               key={tab.id}
@@ -101,6 +107,12 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               onNavigateToModule={onNavigateToModule}
             />
           </TabsContent>
+          <TabsContent value="team" className="m-0">
+            <TeamSettings isDemo={isDemo} onNavigateToModule={onNavigateToModule} />
+          </TabsContent>
+          <TabsContent value="payments" className="m-0">
+            <PaymentsSettings isDemo={isDemo} />
+          </TabsContent>
           <TabsContent value="integrations" className="m-0">
             <IntegrationSettings
               settings={settings.integrations}
@@ -118,6 +130,9 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               onNavigateToModule={onNavigateToModule}
               isDemo={isDemo}
             />
+          </TabsContent>
+          <TabsContent value="legal" className="m-0">
+            <LegalSettings isDemo={isDemo} />
           </TabsContent>
           <TabsContent value="export" className="m-0">
             <ExportModule />

@@ -23,6 +23,7 @@ import ClientAuthPage from "./pages/ClientAuthPage";
 import NotFound from "./pages/NotFound";
 import DemoAgentPage from "./pages/DemoAgentPage";
 import AdLandingPage from "./pages/AdLandingPage";
+import LegalDocumentPage from "./pages/LegalDocumentPage";
 const queryClient = new QueryClient();
 
 const ADMIN_HOSTNAMES = ["admin.beauty-funnels.com"];
@@ -84,6 +85,9 @@ const App = () => {
             <Route path="/i/:slug" element={<InstagramLanding />} />
             <Route path="/join/:slug" element={<JoinSalonPage />} />
             <Route path="/r/:code" element={<ReferralRedirectPage />} />
+            <Route path="/terms/:slug" element={<LegalDocumentPage docType="terms" />} />
+            <Route path="/privacy/:slug" element={<LegalDocumentPage docType="privacy" />} />
+            <Route path="/cookies/:slug" element={<LegalDocumentPage docType="cookies" />} />
             <Route path="/install" element={<InstallPage />} />
             <Route path="/demo-agent" element={<DemoAgentPage />} />
             <Route path="/ad" element={<AdLandingPage />} />
