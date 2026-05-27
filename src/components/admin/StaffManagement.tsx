@@ -812,13 +812,24 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                 </div>
               </div>
               <div>
-                <Label>{t('staff.performedServices')}</Label>
                 {editingStaff && !isDemo ? (
-                  <div className="mt-2">
+                  <div className="mt-2 p-4 rounded-xl border-2 border-primary/40 bg-primary/5">
+                    <div className="mb-3">
+                      <h4 className="font-semibold text-base flex items-center gap-2">
+                        💰 Usługi, ceny i czasy — indywidualnie dla tego pracownika
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Zaznacz usługi, które wykonuje, i ustaw inną cenę lub czas, jeśli różnią się od domyślnych.
+                        Puste pole = wartość z karty usługi.
+                        <br />
+                        <span className="italic">Przykład: mezoterapia 400 zł / 75 min zamiast bazowych 350 zł / 60 min.</span>
+                      </p>
+                    </div>
                     <StaffServiceMatrix mode="byStaff" staffId={editingStaff.id} />
                   </div>
                 ) : (
                   <>
+                    <Label>{t('staff.performedServices')}</Label>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {servicesList.map(service => (
                         <Button key={service.id} type="button" variant={form.serviceIds.includes(service.id) ? "default" : "outline"} size="sm" onClick={() => toggleService(service.id)}>
@@ -828,9 +839,10 @@ export function StaffManagement({ isDemo = false }: StaffManagementProps) {
                       {servicesList.length === 0 && <p className="text-sm text-muted-foreground">Dodaj usługi w zakładce Usługi</p>}
                     </div>
                     {!isDemo && (
-                      <p className="text-xs text-muted-foreground mt-2">
-                        💡 Po zapisaniu pracownika otworzy się siatka z indywidualnymi cenami i czasami per usługa/wariant.
-                      </p>
+                      <div className="mt-3 p-3 rounded-lg bg-primary/5 border border-primary/30 text-sm">
+                        <strong>💰 Indywidualne ceny i czasy per usługa</strong> odblokują się po pierwszym zapisie pracownika.
+                        Po zapisie wrócisz tutaj, by ustawić np.: <em>mezoterapia 400 zł / 75 min</em>.
+                      </div>
                     )}
                   </>
                 )}
