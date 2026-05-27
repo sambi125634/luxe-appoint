@@ -3137,6 +3137,50 @@ export type Database = {
           },
         ]
       }
+      salon_legal_documents: {
+        Row: {
+          content_md: string
+          created_at: string
+          doc_type: string
+          id: string
+          is_published: boolean
+          published_at: string | null
+          salon_id: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          content_md?: string
+          created_at?: string
+          doc_type: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          salon_id: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          content_md?: string
+          created_at?: string
+          doc_type?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          salon_id?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salon_legal_documents_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       salons: {
         Row: {
           address: string | null
