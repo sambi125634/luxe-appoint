@@ -29,9 +29,11 @@ import { useToast } from "@/hooks/use-toast";
 
 interface SalesVatReportProps {
   dateRange: { from: Date; to: Date };
+  isDemo?: boolean;
+  transactions?: Transaction[];
 }
 
-export function SalesVatReport({ dateRange }: SalesVatReportProps) {
+export function SalesVatReport({ dateRange, isDemo = false, transactions }: SalesVatReportProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [isDailyView, setIsDailyView] = useState(false);
@@ -50,7 +52,8 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
 
   // Filter transactions by dateRange first, then by other filters
   const filteredTransactions = useMemo(() => {
-    let filtered = mockTransactions.filter((tx) => {
+    const source = transactions ?? (isDemo ? mockTransactions : []);
+    let filtered = source.filter((tx) => {
       if (tx.status !== "opłacone") return false;
       const txDate = new Date(tx.dateTime);
       return isWithinInterval(txDate, { start: startOfDay(dateRange.from), end: endOfDay(dateRange.to) });
@@ -69,7 +72,7 @@ export function SalesVatReport({ dateRange }: SalesVatReportProps) {
       filtered = filtered.filter((tx) => tx.staffId === filterStaff);
     }
     return filtered;
-  }, [dateRange, filterType, filterVat, filterPayment, filterStaff]);
+  }, [dateRange, filterType, filterVat, filterPayment, filterStaff, transactions, isDemo]);
 
   // Calculate totals
   const totalGross = filteredTransactions.reduce((sum, t) => sum + t.grossAmount, 0);

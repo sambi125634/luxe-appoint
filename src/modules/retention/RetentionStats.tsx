@@ -52,7 +52,9 @@ const DEMO_TOP_REACTIVATED = [
 ];
 
 export function RetentionStats({ isDemo = false, activeSequencesCount = 0, onTabChange }: RetentionStatsProps) {
-  const hasData = isDemo || activeSequencesCount > 0;
+  // Only show populated stats in true demo mode; real accounts get the empty state
+  // until real tracking data is wired in.
+  const hasData = isDemo;
 
   if (!hasData) {
     return (

@@ -22,13 +22,14 @@ import { useToast } from "@/hooks/use-toast";
 
 interface DailyCashUpProps {
   dateRange: { from: Date; to: Date };
+  isDemo?: boolean;
 }
 
-export function DailyCashUp({ dateRange }: DailyCashUpProps) {
+export function DailyCashUp({ dateRange, isDemo = false }: DailyCashUpProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [selectedDay, setSelectedDay] = useState<DailyClosing | null>(null);
-  const [closings, setClosings] = useState<DailyClosing[]>(mockDailyClosings);
+  const [closings, setClosings] = useState<DailyClosing[]>(isDemo ? mockDailyClosings : []);
   const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const formatCurrency = (amount: number) => {

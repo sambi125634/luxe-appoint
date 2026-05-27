@@ -28,9 +28,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface VouchersReportProps {
   dateRange: { from: Date; to: Date };
+  isDemo?: boolean;
 }
 
-export function VouchersReport({ dateRange }: VouchersReportProps) {
+export function VouchersReport({ dateRange, isDemo = false }: VouchersReportProps) {
   const { t } = useTranslation();
   const { toast } = useToast();
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -44,8 +45,9 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
     }).format(amount);
   };
 
-  // Filter vouchers
-  let filteredVouchers = [...mockVouchers];
+  // Filter vouchers — real accounts start with no vouchers until the system creates them.
+  const sourceVouchers = isDemo ? mockVouchers : [];
+  let filteredVouchers = [...sourceVouchers];
 
   if (filterStatus !== "all") {
     filteredVouchers = filteredVouchers.filter((v) => v.status === filterStatus);
@@ -63,7 +65,7 @@ export function VouchersReport({ dateRange }: VouchersReportProps) {
   }
 
   // Calculate summaries
-  const activeVouchers = mockVouchers.filter((v) => v.status === "aktywny");
+  const activeVouchers = sourceVouchers.filter((v) => v.status === "aktywny");
   const totalLiability = activeVouchers.reduce((sum, v) => sum + v.remainingValue, 0);
   
   const today = new Date();
