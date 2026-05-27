@@ -174,6 +174,8 @@ export function ProductSalesAccountingReport({ dateRange, isDemo = false }: Prod
     );
   }
 
+  if (!data) return null;
+
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN" }).format(amount);
 
