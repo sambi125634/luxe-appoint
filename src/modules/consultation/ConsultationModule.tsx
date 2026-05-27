@@ -100,7 +100,7 @@ export function ConsultationModule({ isDemo }: Props) {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-serif font-bold">{t("consultation.title")}</h2>
-        <p className="text-muted-foreground">Cyfrowe karty z bibliotekÄ… {TEMPLATE_LIBRARY.length} gotowych szablonów</p>
+        <p className="text-muted-foreground">Cyfrowe karty z biblioteką {TEMPLATE_LIBRARY.length} gotowych szablonów</p>
       </div>
 
       <SectionGuide sectionKey="consultation" />
@@ -126,7 +126,7 @@ export function ConsultationModule({ isDemo }: Props) {
           {/* Header buttons */}
           <div className="flex items-center gap-3 flex-wrap">
             <Button onClick={() => setShowGallery((v) => !v)} className="gap-2">
-              <Sparkles className="w-4 h-4" /> {showGallery ? "Ukryj bibliotekÄ™" : "Z biblioteki szablonów"}
+              <Sparkles className="w-4 h-4" /> {showGallery ? "Ukryj bibliotekę" : "Z biblioteki szablonów"}
             </Button>
             <Button variant="outline" onClick={openScratch} className="gap-2">
               <Plus className="w-4 h-4" /> Utwórz od zera
@@ -137,7 +137,7 @@ export function ConsultationModule({ isDemo }: Props) {
           {(showGallery || displayTemplates.length === 0) && (
             <div>
               <p className="text-sm font-medium mb-3">
-                Biblioteka szablonów {displayTemplates.length === 0 ? "— zacznij od jednego klikniÄ™cia" : ""}
+                Biblioteka szablonów {displayTemplates.length === 0 ? "— zacznij od jednego kliknięcia" : ""}
               </p>
               <TemplateGallery onPick={(tpl) => openFromLibrary(tpl.id)} />
             </div>
