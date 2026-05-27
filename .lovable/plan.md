@@ -1,76 +1,69 @@
-
 ## Cel
 
-Zamienić wąski przycisk **„Wzbogać opisy AI"** w zakładce **Usługi** na pełnowartościowy **Skaner salonu (Firecrawl + AI)**, który robi to samo co onboarding — ale dostępny w każdej chwili po rejestracji. Dla osób, które pominęły skan w onboardingu lub chcą doimportować coś później.
+Upewnić się, że zakładka **Raporty** (`AccountingModule`) w panelu admin:
+1. dla nowego salonu pokazuje pusty stan (już działa — `transactions.length === 0` → komunikat „Brak danych księgowych"),
+2. po pojawieniu się pierwszych transakcji wszystkie pod-zakładki pokazują **tylko** dane danego salonu — żadnych demo-mocków,
+3. dane jednego salonu nigdy nie wyciekają do innego (RLS).
 
-To strategiczne — Firecrawl to nasz game-changer, ma być widoczny i głośny w UI, nie schowany pod abstrakcyjnym „Wzbogać opisy AI".
+## Co znalazłem
 
----
+Empty-state na poziomie modułu działa poprawnie. Problem: gdy salon ma choć jedną transakcję, renderują się WSZYSTKIE pod-zakładki, a 3 z nich wciąż pokazują twarde dane demo niezależnie od salonu:
 
-## Część 1 — Nowy modal „Skaner salonu" w zakładce Usługi
+- `ProductSalesAccountingReport.tsx` — `MOCK_PRODUCT_SALES_REPORT` (top produkty, sprzedaż dzienna, kategorie) renderowane bezwarunkowo, brak `isDemo`, brak `salonId`, brak query do `transactions` (gdzie `type='product'`).
+- `OccupancyReport.tsx` — twarde `occupancyByDay` / `occupancyByHour`, brak query do `appointments`.
+- `NoShowsReport.tsx` — twarde `noShowsData` + lista trzech klientów z numerami telefonów, brak query do `appointments` z `status='no_show'`.
 
-### Trigger
-Zamiast `[🪄 Wzbogać opisy AI]` pokazujemy **`[✨ Skaner salonu]`** (variant `luxury`, obok „Importuj CSV"). Klik → modal z trzema trybami.
+Pozostałe pod-zakładki (`AccountingCharts`, `SalesVatReport`, `EmployeeCommissions`, `DailyCashUp`, `VouchersReport`, `StaffCompensationReport`, `ExportSection`, `TrueProfitDashboard`) mają już prawidłowy guard `isDemo` lub liczą z propsa `transactions` (czyli z DB).
 
-### Tryby (3 zakładki w modalu)
+## Co zrobię
 
-**1. 📥 Zaimportuj usługi** (nowy)
-- Wkleja link Booksy / Fresha / Versum / własna strona / Google Maps / Instagram.
-- Backend: wywołanie istniejącego `ai-profile-scanner` (ten sam co w onboardingu).
-- UI pokazuje wykryte usługi w checkboxach z nazwą, ceną, czasem trwania, kategorią.
-- Przed importem: wybór które usługi dodać, ostrzeżenie o duplikatach (matching po nazwie), opcja „nadpisz cenę/czas istniejących".
-- Zapis: insert nowych + opcjonalny update istniejących, automatyczny mapping na kategorię (utworzy nową jeśli brak), przypisanie do właścicielki.
-- Pasek progress z komunikatami w stylu onboardingu („Czytamy Twój profil…", „Wykrywamy usługi…", „Mapujemy ceny…").
+### 1. ProductSalesAccountingReport — realne dane per-salon
+- Dodać prop `isDemo?: boolean`, pobierać przez `useQuery` z `transactions` gdzie `salon_id = current` i `type = 'product'` w `dateRange`.
+- Wyliczyć w pamięci: `topProducts` (group by `description`/`product_id`), `salesByCategory` (group by `category`), `salesByDay` (group by dzień), totals.
+- Gdy zero produktowych transakcji → ten sam wzorzec empty-state co w `ProductSalesReport` (ikona `Package`, „Brak sprzedaży produktów w tym okresie").
+- Demo nadal używa `MOCK_PRODUCT_SALES_REPORT`.
 
-**2. ✨ Wzbogać opisy** (obecny flow — przeniesiony tu)
-- Bez zmian funkcjonalnych: `enrich-service-descriptions` + checkbox „tylko puste opisy".
-- Zostaje to samo, tylko jako jedna z opcji w nowym modalu.
+### 2. OccupancyReport — realne dane per-salon
+- Dodać prop `isDemo?: boolean` + `dateRange`.
+- `useQuery` na `appointments` (`salon_id = current`, `start_time` w zakresie, `status IN ('completed','booked','confirmed')`).
+- Wyliczyć obłożenie per dzień tygodnia i per godzina (% slotów z `working_hours` lub uproszczone „liczba wizyt / max w danym slocie").
+- Empty-state: „Obłożenie pojawi się po pierwszych wizytach".
 
-**3. 🎁 Pobierz dodatkowo** (nowy — bonusowe pola)
-Po jednym skanie strony pokazuje co jeszcze możemy zaciągnąć do profilu salonu:
-- **Godziny otwarcia** (jeśli salon nie ma ustawionych albo różnią się od scrap'a)
-- **Opis salonu / „o nas"** (pole `description` w `salons`)
-- **Adres / telefon** (jeśli puste w profilu)
-- **Korzyści / benefity per usługa** (już wyciągane, tylko zapisz)
-- **Średnia ocen i liczba opinii z Booksy** (jako social proof — pole `external_rating`, `external_reviews_count` w salon settings)
-- **Zdjęcie/logo salonu** (jeśli Firecrawl wyciągnie OG image)
+### 3. NoShowsReport — realne dane per-salon
+- Dodać prop `isDemo?: boolean` + `dateRange`.
+- `useQuery` na `appointments` gdzie `status = 'no_show'`, JOIN z `clients` po `client_id`.
+- Trend miesięczny + top „uciekinierzy" liczone z DB. Brak danych → empty-state „Brak no-shows — gratulacje".
 
-Każda sekcja z checkboxem „Zaimportuj to" + podglądem wartości przed zapisem.
+### 4. Przekazać `isDemo` z `AccountingModule` do tych trzech komponentów (obecnie nie jest przekazywane).
 
-### Stan i obsługa błędów
-- Stan: `idle | scraping | reviewing | saving | done | error`.
-- Błędy z `ai-profile-scanner` (inactive_salon, no_services_found) tłumaczone na ludzki tekst, opcja „Spróbuj inny URL".
-- W demo: toast „Skaner dostępny po rejestracji" (jak obecnie z enrich).
-- Loader = ten sam motyw co onboarding (AI_SCAN_MESSAGES, %).
+### 5. Ukryty back-test izolacji per-salon
 
----
+Po wprowadzeniu zmian uruchomię w sandboxie skrypt SQL (psql, BEZ migracji) na 2 realnych salonach (np. `91fa7aab…` i `ca3da012…`):
 
-## Część 2 — Promocja Firecrawl w UI
+```text
+1. INSERT 5 fikcyjnych appointments + 5 transactions dla salonu A,
+   description="BACKTEST-<uuid>", łatwy do odfiltrowania.
+2. INSERT 3 fikcyjnych transactions (1 'no_show', 2 'product') dla salonu B.
+3. SELECT count + SUM(amount) WHERE salon_id=A  → musi zwrócić tylko A.
+4. SELECT * WHERE salon_id=A AND description LIKE 'BACKTEST-%'
+   z sesją RLS jako owner_id salonu B → musi zwrócić 0 wierszy
+   (sprawdzenie polityki "Only owners can view transactions").
+5. Uruchomić ten sam query co useQuery w AccountingModule
+   dla salonu A — potwierdzić, że dane wracają i mają poprawne pola.
+6. DELETE FROM transactions/appointments WHERE description LIKE 'BACKTEST-%';
+   final SELECT count = 0.
+```
 
-- Nazwa w UI: **„Skaner salonu — wykrywa usługi, opisy i godziny w 15 sekund"** (subtitle pod przyciskiem lub w modal headerze).
-- Mały badge na karcie funkcji `🪄 Powered by Firecrawl` — chociaż wewnętrznie i tak biały-label.  
-  Ustalenie: **nie eksponujemy słowa „Firecrawl" klientom** zgodnie z polityką white-label (ghl-white-label-strategy). Zamiast tego: `⚡ Skaner AI` jako nasza własna marka.
+Wyniki zaraportuję jako tabelę w odpowiedzi. Nic nie zostanie w bazie — wszystko z markerem `BACKTEST-` usuwane na końcu. Nie pokażę back-testu w UI, to czysto serwerowa walidacja.
 
----
+## Czego NIE ruszam
 
-## Część 3 — Onboarding (opcjonalne wzmocnienie)
+- Empty-state na poziomie `AccountingModule` (już dobry).
+- Pozostałych pod-zakładek mających już `isDemo`.
+- Schematu DB — nie tworzę migracji.
+- Edge functions.
 
-Onboarding już domyślnie pokazuje pole „Link do Booksy/Fresha/Versum" i skanuje — sprawdziłem (`startAiScan`). **Nic nie trzeba dodawać w onboardingu**, działa.
-
-Jedyna ewentualna zmiana: dopisać do podpowiedzi „Możesz to też zrobić później w zakładce **Usługi → Skaner salonu**" — żeby ten kto skipnie, wiedział gdzie wrócić.
-
----
-
-## Pliki do zmiany / utworzenia
-
-- ➕ `src/components/admin/services/SalonScannerModal.tsx` — nowy modal z 3 zakładkami (Importuj usługi / Wzbogać opisy / Dodatkowe dane), używa `ai-profile-scanner` + `enrich-service-descriptions`.
-- ➕ `src/hooks/useSalonScanner.ts` — wspólna logika scrap + zapis (wywołania edge functions, parsing wyników, mapping na DB inserts/updates).
-- ✏️ `src/components/admin/ServicesManagement.tsx` — przycisk `Wzbogać opisy AI` → `Skaner salonu`, usunięty stary inline dialog (kod enrich przeniesiony do hooka/modala).
-- ✏️ `src/pages/OnboardingPage.tsx` — drobna dopiska w komunikacie skipnięcia skanu (1 linijka).
-- ✏️ `supabase/functions/ai-profile-scanner/index.ts` — **bez zmian funkcji** (zwracane pola już pokrywają zakres), tylko jeśli zauważymy że brakuje któregoś pola (np. `external_reviews_count`) dodamy w schemacie odpowiedzi.
-
-## Pytania otwarte
-
-1. **Matching duplikatów** przy imporcie usług — wystarczy fuzzy po nazwie (np. levenshtein <3) czy chcesz pokazać UI „znaleziono potencjalny duplikat: X — zaktualizować czy pominąć?" dla każdej?
-2. **Logo/OG image salonu** — czy chcesz, żebym dorzucił auto-pobieranie loga (Firecrawl `formats: ['branding']`) — wymaga osobnego scrap'a; albo zostawiamy na później?
-3. **Limit użycia** — czy nakładamy rate limit na ten przycisk (np. 5 skanów / dzień / salon), żeby nie spalić budżetu Firecrawl, czy zostawiamy bez limitu?
+## Akceptacja
+- Nowy salon (0 transakcji): cały moduł = jeden komunikat „Brak danych księgowych".
+- Salon z 1 transakcją usługową: tab „Sprzedaż produktów" = empty-state, „Obłożenie" = realne liczby z 1 wizyty, „No-shows" = empty-state. Zero pozycji „Serum witaminowe C 30ml" / „Monika Zawadzka" itd.
+- Back-test pokazuje 0 wycieków między salonami.
