@@ -10,6 +10,7 @@ import { AutopilotFunctions } from "./AutopilotFunctions";
 import { AutopilotHistory } from "./AutopilotHistory";
 import { AutopilotSettings } from "./AutopilotSettings";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
+import { useAutopilotConfig } from "@/hooks/useAutopilot";
 
 interface AutopilotModuleProps {
   isDemo?: boolean;
@@ -26,6 +27,8 @@ type TabId = (typeof tabs)[number]["id"];
 
 export function AutopilotModule({ isDemo }: AutopilotModuleProps) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const { data: cfg } = useAutopilotConfig();
+  const isLive = isDemo ? true : !!cfg?.is_active && !cfg?.paused_until;
 
   return (
     <div className="space-y-0">
@@ -43,10 +46,17 @@ export function AutopilotModule({ isDemo }: AutopilotModuleProps) {
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Badge variant="outline" className="text-[10px] h-5 border-green-200 bg-green-50 text-green-700 gap-1 cursor-default">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                      Aktywny 24/7
-                    </Badge>
+                    {isLive ? (
+                      <Badge variant="outline" className="text-[10px] h-5 border-green-200 bg-green-50 text-green-700 gap-1 cursor-default">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                        Aktywny 24/7
+                      </Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-[10px] h-5 border-muted bg-muted/30 text-muted-foreground gap-1 cursor-default">
+                        <span className="w-1.5 h-1.5 rounded-full bg-muted-foreground/60" />
+                        Uśpiony — włącz funkcje by aktywować
+                      </Badge>
+                    )}
                   </TooltipTrigger>
                   <TooltipContent>
                     <p className="text-xs">
@@ -62,7 +72,9 @@ export function AutopilotModule({ isDemo }: AutopilotModuleProps) {
           <p className="text-sm text-muted-foreground mt-2">
             {isDemo
               ? `Autopilot aktywny · Dziś zadziałał ${DEMO_AUTOPILOT_DATA.kpi.actionsToday}× · Odzyskano ${DEMO_AUTOPILOT_DATA.kpi.revenueRecovered.toLocaleString("pl-PL")} zł tego miesiąca`
-              : "System pracuje za Ciebie — nawet gdy śpisz"}
+              : isLive
+                ? "System pracuje za Ciebie — nawet gdy śpisz"
+                : "Włącz funkcje w zakładce „Funkcje" — Autopilot zacznie działać."}
           </p>
         </div>
         <AutopilotScore isDemo={isDemo} />
