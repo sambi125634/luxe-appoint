@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { 
   Package, Download, TrendingUp, DollarSign, ShoppingBag,
   ArrowUpRight, ArrowDownRight, Filter, Minus
@@ -19,9 +19,15 @@ import {
   PieChart, Pie, Cell, Legend,
 } from "recharts";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useSalonId } from "@/hooks/useSalonId";
+import { format } from "date-fns";
+import { pl } from "date-fns/locale";
 
 interface ProductSalesAccountingReportProps {
   dateRange: { from: Date; to: Date };
+  isDemo?: boolean;
 }
 
 // ─── Rich demo data ───
@@ -79,22 +85,103 @@ const MOCK_PRODUCT_SALES_REPORT = {
 
 const PIE_COLORS = ["#7c3aed", "#E91E8C", "#0D9488", "#F59E0B", "#6B7280"];
 
-export function ProductSalesAccountingReport({ dateRange }: ProductSalesAccountingReportProps) {
+export function ProductSalesAccountingReport({ dateRange, isDemo = false }: ProductSalesAccountingReportProps) {
   const { t } = useTranslation();
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const { salonId } = useSalonId();
 
-  // Always show demo for now (same pattern as existing component)
-  const isShowingDemo = true;
-  const data = MOCK_PRODUCT_SALES_REPORT;
+  const { data: txs } = useQuery({
+    queryKey: ["product-sales", salonId, dateRange.from.toISOString(), dateRange.to.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("amount, quantity, category, description, transaction_date, staff_id, staff_members(name)")
+        .eq("salon_id", salonId!)
+        .eq("type", "product")
+        .gte("transaction_date", dateRange.from.toISOString())
+        .lte("transaction_date", dateRange.to.toISOString());
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !isDemo && !!salonId,
+  });
+
+  const realData = useMemo(() => {
+    const list = txs || [];
+    if (list.length === 0) return null;
+    const totalRevenue = list.reduce((s, t: any) => s + Number(t.amount || 0), 0);
+    const totalItemsSold = list.reduce((s, t: any) => s + Number(t.quantity || 1), 0);
+    const totalOrders = list.length;
+    const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+    const productAgg: Record<string, { id: string; name: string; brand: string; category: string; unitsSold: number; revenue: number; }> = {};
+    list.forEach((t: any) => {
+      const key = t.description || "Bez nazwy";
+      if (!productAgg[key]) productAgg[key] = { id: key, name: key, brand: "", category: t.category || "Inne", unitsSold: 0, revenue: 0 };
+      productAgg[key].unitsSold += Number(t.quantity || 1);
+      productAgg[key].revenue += Number(t.amount || 0);
+    });
+    const topProducts = Object.values(productAgg)
+      .map(p => ({ ...p, avgPrice: p.unitsSold > 0 ? p.revenue / p.unitsSold : 0, margin: 0, trend: 0 }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10);
+
+    const catAgg: Record<string, { category: string; revenue: number; units: number; color: string }> = {};
+    list.forEach((t: any) => {
+      const c = t.category || "Inne";
+      if (!catAgg[c]) catAgg[c] = { category: c, revenue: 0, units: 0, color: "" };
+      catAgg[c].revenue += Number(t.amount || 0);
+      catAgg[c].units += Number(t.quantity || 1);
+    });
+    const salesByCategory = Object.values(catAgg).sort((a, b) => b.revenue - a.revenue);
+
+    const dayAgg: Record<string, { date: string; revenue: number; units: number }> = {};
+    list.forEach((t: any) => {
+      const d = format(new Date(t.transaction_date), "d MMM", { locale: pl });
+      if (!dayAgg[d]) dayAgg[d] = { date: d, revenue: 0, units: 0 };
+      dayAgg[d].revenue += Number(t.amount || 0);
+      dayAgg[d].units += Number(t.quantity || 1);
+    });
+    const salesByDay = Object.values(dayAgg);
+
+    const staffAgg: Record<string, { name: string; unitsSold: number; revenue: number; commission: number }> = {};
+    list.forEach((t: any) => {
+      const name = t.staff_members?.name || "Nieprzypisane";
+      if (!staffAgg[name]) staffAgg[name] = { name, unitsSold: 0, revenue: 0, commission: 0 };
+      staffAgg[name].unitsSold += Number(t.quantity || 1);
+      staffAgg[name].revenue += Number(t.amount || 0);
+      staffAgg[name].commission += Number(t.amount || 0) * 0.1;
+    });
+    const staffSales = Object.values(staffAgg).sort((a, b) => b.revenue - a.revenue);
+
+    return { period: "Wybrany okres", totalRevenue, totalItemsSold, totalOrders, avgOrderValue, topProducts, salesByCategory, salesByDay, staffSales };
+  }, [txs]);
+
+  const isShowingDemo = isDemo;
+  const data = isDemo ? MOCK_PRODUCT_SALES_REPORT : realData;
+
+  if (!isDemo && !data) {
+    return (
+      <div className="flex flex-col items-center justify-center text-center py-16 px-4 border border-dashed rounded-lg">
+        <div className="p-3 rounded-full bg-muted mb-4">
+          <Package className="w-6 h-6 text-muted-foreground" />
+        </div>
+        <h3 className="font-semibold text-base mb-1">Brak sprzedaży produktów w tym okresie</h3>
+        <p className="text-sm text-muted-foreground max-w-sm">
+          Top produkty, sprzedaż wg kategorii i pracowników pojawią się automatycznie po pierwszej sprzedaży produktu klientce.
+        </p>
+      </div>
+    );
+  }
 
   const formatCurrency = (amount: number) =>
     new Intl.NumberFormat("pl-PL", { style: "currency", currency: "PLN" }).format(amount);
 
   const filteredProducts = categoryFilter === "all"
-    ? data.topProducts
-    : data.topProducts.filter((p) => p.category === categoryFilter);
+    ? data!.topProducts
+    : data!.topProducts.filter((p: any) => p.category === categoryFilter);
 
-  const categories = [...new Set(data.topProducts.map((p) => p.category))];
+  const categories = [...new Set(data!.topProducts.map((p: any) => p.category))];
 
   return (
     <div className="space-y-6">
