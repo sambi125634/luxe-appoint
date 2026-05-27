@@ -1046,16 +1046,29 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
             {/* Staff */}
             <div>
               <Label>{t('services.performingStaff')}</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {staffList.map(staff => (
-                  <Button key={staff.id} type="button" variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"} size="sm" onClick={() => toggleStaffSelection(staff.id)}>
-                    {staff.name}
-                  </Button>
-                ))}
-                {staffList.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Dodaj pracowników w zakładce Zespół</p>
-                )}
-              </div>
+              {editingService && !isDemo ? (
+                <div className="mt-2">
+                  <StaffServiceMatrix mode="byService" serviceId={editingService.id} />
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {staffList.map(staff => (
+                      <Button key={staff.id} type="button" variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"} size="sm" onClick={() => toggleStaffSelection(staff.id)}>
+                        {staff.name}
+                      </Button>
+                    ))}
+                    {staffList.length === 0 && (
+                      <p className="text-sm text-muted-foreground">Dodaj pracowników w zakładce Zespół</p>
+                    )}
+                  </div>
+                  {!isDemo && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      💡 Po zapisaniu usługi otworzy się siatka z indywidualnymi cenami i czasami per pracownik.
+                    </p>
+                  )}
+                </>
+              )}
             </div>
             {/* Media */}
             <div>
