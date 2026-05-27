@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAllServiceVariants, useServiceVariants, useSyncServiceVariants } from "@/hooks/useServiceVariants";
 import { supabase } from "@/integrations/supabase/client";
+import { StaffServiceMatrix } from "./staff/StaffServiceMatrix";
 
 interface VariantFormItem {
   id?: string;
@@ -483,8 +484,8 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         savedId = result.id;
       }
 
-      // Sync staff_services
-      if (serviceForm.staffIds.length > 0) {
+      // Sync staff_services — only on create (matrix manages the rest)
+      if (!editingService && serviceForm.staffIds.length > 0) {
         await syncStaffServicesMutation.mutateAsync({ serviceId: savedId, staffIds: serviceForm.staffIds });
       }
 
@@ -1045,16 +1046,29 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
             {/* Staff */}
             <div>
               <Label>{t('services.performingStaff')}</Label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {staffList.map(staff => (
-                  <Button key={staff.id} type="button" variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"} size="sm" onClick={() => toggleStaffSelection(staff.id)}>
-                    {staff.name}
-                  </Button>
-                ))}
-                {staffList.length === 0 && (
-                  <p className="text-sm text-muted-foreground">Dodaj pracowników w zakładce Zespół</p>
-                )}
-              </div>
+              {editingService && !isDemo ? (
+                <div className="mt-2">
+                  <StaffServiceMatrix mode="byService" serviceId={editingService.id} />
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {staffList.map(staff => (
+                      <Button key={staff.id} type="button" variant={serviceForm.staffIds.includes(staff.id) ? "default" : "outline"} size="sm" onClick={() => toggleStaffSelection(staff.id)}>
+                        {staff.name}
+                      </Button>
+                    ))}
+                    {staffList.length === 0 && (
+                      <p className="text-sm text-muted-foreground">Dodaj pracowników w zakładce Zespół</p>
+                    )}
+                  </div>
+                  {!isDemo && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      💡 Po zapisaniu usługi otworzy się siatka z indywidualnymi cenami i czasami per pracownik.
+                    </p>
+                  )}
+                </>
+              )}
             </div>
             {/* Media */}
             <div>

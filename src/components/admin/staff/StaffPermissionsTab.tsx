@@ -10,6 +10,7 @@ import { useStaffMembers } from "@/hooks/useStaffMembers";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface StaffPermissions {
   can_view_finances: boolean;
@@ -19,6 +20,7 @@ interface StaffPermissions {
   can_manage_staff: boolean;
   can_view_reports: boolean;
   can_manage_products: boolean;
+  can_manage_marketing: boolean;
 }
 
 const DEFAULT_PERMISSIONS: StaffPermissions = {
@@ -29,6 +31,7 @@ const DEFAULT_PERMISSIONS: StaffPermissions = {
   can_manage_staff: false,
   can_view_reports: false,
   can_manage_products: false,
+  can_manage_marketing: false,
 };
 
 const ROLE_OPTIONS = [
@@ -39,15 +42,44 @@ const ROLE_OPTIONS = [
   { value: "assistant", label: "Asystent", emoji: "⚪" },
 ];
 
-const PERMISSION_COLS: { key: keyof StaffPermissions; short: string }[] = [
-  { key: "can_view_finances", short: "Finanse" },
-  { key: "can_manage_clients", short: "Klientki" },
-  { key: "can_view_all_calendar", short: "Kalendarz" },
-  { key: "can_view_reports", short: "Raporty" },
-  { key: "can_edit_services", short: "Usługi" },
-  { key: "can_manage_products", short: "Produkty" },
-  { key: "can_manage_staff", short: "Zespół" },
+const PERMISSION_COLS: { key: keyof StaffPermissions; short: string; desc: string }[] = [
+  { key: "can_view_finances", short: "Finanse", desc: "Dostęp do Księgowości i pełnych raportów finansowych." },
+  { key: "can_manage_clients", short: "Klientki", desc: "Dodawanie, edycja i usuwanie kartotek klientek." },
+  { key: "can_view_all_calendar", short: "Kalendarz", desc: "Widok wszystkich wizyt w salonie (zamiast tylko swoich)." },
+  { key: "can_view_reports", short: "Raporty", desc: "Dostęp do raportów sprzedaży i analityki." },
+  { key: "can_edit_services", short: "Usługi", desc: "Tworzenie, edycja i usuwanie usług i wariantów." },
+  { key: "can_manage_products", short: "Produkty", desc: "Zarządzanie magazynem, produktami i dostawami." },
+  { key: "can_manage_marketing", short: "Marketing", desc: "Widgety bookingowe, retencja, autopilot, polecenia." },
+  { key: "can_manage_staff", short: "Zespół", desc: "Zarządzanie pracownikami, rolami i uprawnieniami." },
 ];
+
+const ROLE_PRESETS: Record<string, StaffPermissions> = {
+  owner: {
+    can_view_finances: true, can_edit_services: true, can_manage_clients: true,
+    can_view_all_calendar: true, can_manage_staff: true, can_view_reports: true,
+    can_manage_products: true, can_manage_marketing: true,
+  },
+  manager: {
+    can_view_finances: true, can_edit_services: true, can_manage_clients: true,
+    can_view_all_calendar: true, can_manage_staff: false, can_view_reports: true,
+    can_manage_products: true, can_manage_marketing: true,
+  },
+  receptionist: {
+    can_view_finances: false, can_edit_services: false, can_manage_clients: true,
+    can_view_all_calendar: true, can_manage_staff: false, can_view_reports: false,
+    can_manage_products: false, can_manage_marketing: false,
+  },
+  specialist: {
+    can_view_finances: false, can_edit_services: false, can_manage_clients: true,
+    can_view_all_calendar: false, can_manage_staff: false, can_view_reports: false,
+    can_manage_products: false, can_manage_marketing: false,
+  },
+  assistant: {
+    can_view_finances: false, can_edit_services: false, can_manage_clients: false,
+    can_view_all_calendar: false, can_manage_staff: false, can_view_reports: false,
+    can_manage_products: false, can_manage_marketing: false,
+  },
+};
 
 interface StaffPermissionsTabProps {
   isDemo?: boolean;
@@ -82,9 +114,15 @@ export function StaffPermissionsTab({ isDemo = false }: StaffPermissionsTabProps
   };
 
   const updateRole = (staffId: string, role: string) => {
+    const preset = ROLE_PRESETS[role];
     setChanges(prev => ({
       ...prev,
-      [staffId]: { ...prev[staffId], role },
+      [staffId]: {
+        ...prev[staffId],
+        role,
+        // Apply role preset automatically — user can still tweak individual switches
+        ...(preset ? { permissions: preset } : {}),
+      },
     }));
   };
 
@@ -154,7 +192,17 @@ export function StaffPermissionsTab({ isDemo = false }: StaffPermissionsTabProps
               <th className="text-left p-3 font-medium">Pracownik</th>
               <th className="text-left p-3 font-medium">Rola</th>
               {PERMISSION_COLS.map(col => (
-                <th key={col.key} className="text-center p-3 font-medium whitespace-nowrap">{col.short}</th>
+                <th key={col.key} className="text-center p-3 font-medium whitespace-nowrap">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger className="inline-flex items-center gap-1 cursor-help">
+                        {col.short}
+                        <Info className="w-3 h-3 text-muted-foreground" />
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs text-xs">{col.desc}</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </th>
               ))}
             </tr>
           </thead>
