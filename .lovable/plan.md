@@ -1,89 +1,127 @@
 
 ## Cel
 
-Dać właścicielce/pracownikowi szybki sposób na oznaczanie „odbyta / nie odbyta" dla wizyt z ostatnich 7 dni, aby pipeline „Ścieżka Klientki" działał na realnych danych. Plus: automatyczne przypomnienie 15 min po końcu wizyty oraz konfigurowalna sekwencja Autopilota 1→5 z osobnym wariantem dla klientek z tagiem `ads`.
+Zamienić obecne 6 statycznych „szablonów-atrap" (klik tylko otwierał pusty builder) na **pełnoprawną bibliotekę gotowych kart** z prawdziwymi pytaniami, pogrupowaną w kategorie. Równolegle ulepszyć ścieżkę „Utwórz od zera", żeby właścicielka salonu nie zostawała sama przed pustym ekranem.
+
+AI w tym module **zostaje wyłączone** — jak ustaliliśmy wcześniej działało niestabilnie. Cała wartość ma płynąć z dobrze przygotowanego katalogu + lepszego builder'a.
 
 ---
 
-## 1. Widget „Do potwierdzenia" — Dashboard
+## Część 1 — Biblioteka szablonów (Utwórz z szablonu)
 
-Nowa karta na górze `AdminDashboard` (pod powitaniem, nad istniejącymi metrykami).
+### Nowy układ ekranu
+Zamiast jednego płaskiego grida 6 kart — **zakładki kategorii** na górze + grid kart pasujących do wybranej kategorii. Każda karta szablonu ma: emoji, nazwę, krótki opis (1 linia), liczbę pytań, czas wypełnienia, badge „Najpopularniejsze" / „RODO" / „Medyczne" gdy istotne. Klik → otwiera builder z **pre-wypełnionymi polami** (nie pustym formularzem jak teraz).
 
-Zawartość:
-- Nagłówek: „Potwierdź wizyty" + licznik np. „7 czeka"
-- Lista wizyt z ostatnich 7 dni gdzie `status IN ('booked','confirmed')` i `end_time < now()` (czyli zakończone, jeszcze nie oznaczone)
-- Każdy wiersz: godzina + data (np. „Dziś 14:00" / „Wt 12 lis"), imię klientki, usługa, pracownik
-- Dwa przyciski akcji:
-  - **„Odbyta"** → `status = 'completed'` (zielony, primary)
-  - **„Nie stawiła się"** → `status = 'no_show'` (outline, subtelny)
-- Po kliknięciu: optimistic update + toast „Zapisano" + element znika z listy
-- Empty state: „Wszystkie wizyty potwierdzone ✓"
-- Stopka karty: link „Zobacz w kalendarzu →" prowadzący do `/admin?tab=calendar`
+### Proponowane kategorie i szablony
 
-Pluginowane także w `Calendar` jako rozwijany pasek na górze widoku dnia („Do potwierdzenia (3)") z tą samą logiką.
+**🌟 Najpopularniejsze** (skrót do top 4)
+- Ogólna karta pierwszej wizyty (8 pytań)
+- Manicure hybrydowy (6 pytań)
+- Zabieg na twarz — podstawy (10 pytań)
+- Zgoda RODO + marketing (3 pytania)
 
-## 2. Auto-przypomnienia 15 min po wizycie
+**💅 Paznokcie**
+- Manicure hybrydowy / klasyczny
+- Manicure japoński / SPA
+- Przedłużanie żelem / akrylem
+- Pedicure leczniczy
+- Stylizacja paznokci stóp
 
-Edge function `notify-pending-confirmations` uruchamiana z `pg_cron` co 10 minut:
-- Znajduje appointments, gdzie `end_time` przeszło ≥15 min temu, `status IN ('booked','confirmed')`, oraz nie wysłano jeszcze przypomnienia (nowa kolumna `confirmation_reminder_sent_at`)
-- Wysyła web push do właścicielki (jeśli ma subscription) + tworzy wpis w `client_notifications` dla in-app
-- Treść: „Wizyta {klientka} o {godzina} — czy się odbyła?" z deep linkiem do dashboardu
-- Oznacza `confirmation_reminder_sent_at = now()`
-- Szanuje quiet hours z `autopilot_config`
+**💆 Twarz / Kosmetyka**
+- Pierwsza wizyta kosmetyczna (typ skóry, pielęgnacja domowa)
+- Peeling chemiczny (kwasy, przeciwwskazania)
+- Mezoterapia igłowa
+- Oczyszczanie wodorowe / kawitacja
+- Mikrodermabrazja
+- Henna i regulacja brwi / laminacja
 
-## 3. Autopilot — sekcja „Ścieżka Klientki 1→5"
+**💉 Medycyna estetyczna**
+- Botoks / toksyna botulinowa (wywiad lekarski)
+- Kwas hialuronowy — usta / policzki
+- Mezoterapia osoczem (PRP)
+- Lipoliza iniekcyjna
+- Nici liftingujące
 
-Nowa karta w zakładce Autopilot z 5 etapami sekwencji:
-- **Przed 1. wizytą** (np. 24h przed: przypomnienie + tipy)
-- **Po 1. wizycie** (np. 2h: podziękowanie + prośba o opinię; 7 dni: zaproszenie do 2.)
-- **Między 1 a 2** (np. 14 dni: rabat na drugą wizytę)
-- **Po 2. wizycie** (budowanie nawyku)
-- **Między 2 a 3 → 4 → 5** (utrwalanie cyklu, materiały edukacyjne)
+**💇 Włosy / Barber**
+- Koloryzacja / refleksy (test uczuleniowy)
+- Keratynowe prostowanie / botox
+- Strzyżenie damskie / męskie
+- Przedłużanie włosów
+- Trychologia — wywiad
 
-Każdy etap: toggle on/off, opóźnienie (godziny/dni), kanał (SMS / Email / Push), edytor treści z merge tagami `{first_name} {service} {salon}`.
+**🌸 Ciało / SPA**
+- Masaż klasyczny / relaksacyjny
+- Masaż leczniczy (wywiad ortopedyczny)
+- Depilacja woskiem / laserowa
+- Modelowanie sylwetki
+- Drenaż limfatyczny
 
-### Segmentacja przez tag
+**👁 Stylizacja oka**
+- Przedłużanie rzęs 1:1 / objętościowe
+- Lifting rzęs + laminacja
+- Henna brwi / pudrowe brwi
 
-W górze sekcji toggle: **„Osobna sekwencja dla klientek z tagiem `ads`"**
-- Wyłączony: jedna sekwencja dla wszystkich
-- Włączony: pojawia się druga zakładka „Wariant: Reklamy" — pełna kopia struktury, niezależne treści/timing, używana tylko gdy klientka ma tag `ads` (lub inny wybrany z dropdown istniejących `client_tags`)
+**🏥 Klinika / przeciwwskazania**
+- Wywiad medyczny rozszerzony
+- Kwalifikacja do zabiegu laserowego
+- Karta pacjenta — pierwsza wizyta w klinice
 
-Bazowo Autopilot **włączony domyślnie tylko dla klientek z tagiem `ads`** (klucz do high-ticket funnelu), wszystkie inne lądują w pipeline ale bez automatyzacji — zgodnie z hipotezą, że właścicielki nie skonfigurują tego same, ale zobaczą wgląd.
+**📋 RODO / Zgody**
+- Zgoda RODO + marketing
+- Zgoda na dokumentację fotograficzną przed/po
+- Zgoda na zabieg dla osoby niepełnoletniej (rodzic)
+- Klauzula informacyjna — przetwarzanie danych zdrowotnych
 
-## 4. Schema bazy
+**🎁 Pre/Post visit (bonusowe)**
+- Ankieta zadowolenia po wizycie (3 pytania + NPS)
+- Brief przed sesją makijażu okolicznościowego
+- Zalecenia pielęgnacyjne — checklista po zabiegu
 
-Nowa migracja:
-- `appointments.confirmation_reminder_sent_at TIMESTAMPTZ NULL` (do dedupe push)
-- Tabela `autopilot_pipeline_sequences`:
-  - `id, salon_id, variant ('default'|'ads'), stage (text: 'before_1','after_1','between_1_2'...), delay_hours int, channel text, subject text, body text, is_active bool, tag_filter text NULL`
-  - GRANT + RLS (salon_id przez `user_belongs_to_salon`)
-- Cron job (przez insert tool) do `notify-pending-confirmations` co 10 min
+Razem ~38 gotowych kart. Każda z prawdziwą listą pytań w kodzie (typowane pola: `text`, `textarea`, `select`, `slider`, `signature`).
 
-## 5. Pliki do utworzenia/zmiany
+### Implementacja danych
+Nowy plik `src/modules/consultation/templateLibrary.ts` z eksportem `TEMPLATE_LIBRARY: TemplateDefinition[]` — każdy element ma `id, name, emoji, category, description, estimatedMinutes, badge?, fields: ConsultationField[]`. Łatwo dopisywać kolejne, łatwo testować, łatwo tłumaczyć.
 
-Nowe:
-- `src/components/admin/dashboard/PendingConfirmationsCard.tsx`
-- `src/hooks/usePendingConfirmations.ts` (query + mutation: markCompleted/markNoShow)
-- `src/components/admin/calendar/PendingConfirmationsBar.tsx` (collapsed bar)
-- `src/components/admin/autopilot/ClientJourneySequenceEditor.tsx` (5 etapów + toggle wariantu ads)
-- `supabase/functions/notify-pending-confirmations/index.ts`
+Szablony **nie idą do bazy** dopóki użytkowniczka nie kliknie „Użyj" — wtedy `useSaveTemplate` zapisuje skopiowane pola jako nową kartę salonu (już edytowalną).
 
-Zmiany:
-- `src/pages/AdminDashboard.tsx` — wstrzyknięcie `PendingConfirmationsCard` na górze
-- `src/components/admin/calendar/...DayView` — wstrzyknięcie `PendingConfirmationsBar`
-- Sekcja Autopilot (główny ekran) — dodanie karty „Ścieżka Klientki 1→5"
-- Migracja DB + cron
+---
 
-## 6. Sekwencja realizacji
+## Część 2 — Ulepszony tryb „Od zera"
 
-1. Migracja: kolumna `confirmation_reminder_sent_at` + tabela `autopilot_pipeline_sequences` (RLS, GRANT)
-2. Hook + Widget Dashboard (działa od razu, manualne oznaczanie pipeline'u zaczyna płynąć)
-3. Wariant w Kalendarzu (pasek)
-4. Edge function + cron (push + in-app reminder)
-5. Edytor sekwencji w Autopilocie (z toggle „Wariant: ads")
-6. Seed domyślnych sekwencji dla istniejących salonów
+Dzisiaj „Od zera" otwiera dokładnie ten sam builder co „Z szablonu" — bez różnicy, bez pomocy. Zmiany:
 
-## 7. Poza zakresem (kolejna iteracja)
+1. **Krok 0 — wybór punktu startu**: 3 przyciski kafelkowe
+   - „Mam pomysł — zacznij z 1 pustym polem"
+   - „Podpowiedz pytania" → lista kategorii PRESET_QUESTIONS (już istnieje, tylko lepsza ekspozycja)
+   - „Skopiuj inną moją kartę" → lista istniejących kart salonu jako baza
+2. **Lepszy katalog gotowych pytań w builderze**: PRESET_QUESTIONS rozszerzyć o sekcje:
+   - 🧒 Pediatria / nieletni
+   - 🩺 Wywiad medyczny (cukrzyca, zaburzenia krzepliwości, leki przeciwzakrzepowe, rozrusznik)
+   - 📸 Foto przed/po + RODO
+   - 🌡 Przeciwwskazania sezonowe (opalanie, ciąża, karmienie)
+   - ⭐ Ocena/NPS (jak oceniasz, czy polecisz, co poprawić)
+3. **Szablony jako „starter"**: w nagłówku trybu od-zera dodać link „Albo wybierz gotowy szablon →" wracający do biblioteki.
+4. **Walidacja końcowa**: przed zapisem checkować że karta ma min. 1 pytanie + nazwę; pokazywać podgląd jak klient zobaczy formularz.
 
-- Faktyczne wysyłanie sekwencji 1→5 do klientek (na razie tylko UI konfiguracji + zapis — egzekucja kampanii w v2 razem z `retention` engine).
-- Mobilna karta potwierdzeń w `MobileDashboard` (można dodać równolegle, ale traktuję jako follow-up).
+---
+
+## Część 3 — Drobne porządki w UI listy
+
+- Usunąć nagłówek „Karty konsultacyjne & Voice Notes" wraz z podtytułem AI, bo AI faktycznie nie żyje — zostawić sam tytuł sekcji „Karty konsultacyjne".
+- Sekcja „Gotowe szablony do kliknięcia" pokazuje się tylko gdy salon ma 0 kart. Po dodaniu pierwszej karty — szablony chowamy do przycisku „+ Z biblioteki szablonów" obok „Utwórz od zera", żeby zawsze były dostępne, ale nie zaśmiecały widoku.
+
+---
+
+## Pytania otwarte (możesz odpowiedzieć przy akceptacji)
+
+1. **Voice Notes** — zostawiamy w nazwie i funkcjonalności, czy też wycinamy razem z AI?
+2. **Czy ~38 szablonów to OK**, czy wolisz mniej (np. tylko top 15-20) na start?
+3. **Brakuje branż?** Mam dorzucić np. tatuaż / piercing / podologia / dietetyka / fizjoterapia?
+
+## Pliki do zmiany / utworzenia
+
+- ✏️ `src/modules/consultation/ConsultationModule.tsx` — nowy układ z kategoriami, usunięcie podtytułu AI
+- ➕ `src/modules/consultation/templateLibrary.ts` — pełny katalog szablonów z polami
+- ➕ `src/modules/consultation/TemplateGallery.tsx` — komponent grida z zakładkami kategorii
+- ✏️ `src/modules/consultation/EasyCardBuilder.tsx` — krok 0 z wyborem punktu startu, rozszerzone PRESET_QUESTIONS, walidacja, podgląd
+- ✏️ `src/modules/consultation/CardBuilder.tsx` — synchronizacja SYSTEM_TEMPLATES z nową biblioteką (lub usunięcie duplikacji)
