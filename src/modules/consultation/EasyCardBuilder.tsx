@@ -16,6 +16,8 @@ import { useServices } from "@/hooks/useServices";
 import { useSaveServiceConsultationCards } from "@/hooks/useConsultationSends";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { TemplateGallery } from "./TemplateGallery";
+import { TEMPLATE_LIBRARY } from "./templateLibrary";
 
 const CATEGORIES = [
   { id: "general", label: "Ogólna", emoji: "✨" },
@@ -68,19 +70,70 @@ const PRESET_QUESTIONS: Record<string, { label: string; type: ConsultationField[
   ],
 };
 
+const EXTRA_PRESETS: Record<string, { label: string; type: ConsultationField["type"]; options?: string[] }[]> = {
+  "🩺 Wywiad medyczny": [
+    { label: "Cukrzyca?", type: "select", options: ["Tak", "Nie"] },
+    { label: "Zaburzenia krzepliwości krwi?", type: "select", options: ["Tak", "Nie"] },
+    { label: "Leki przeciwzakrzepowe?", type: "select", options: ["Tak", "Nie"] },
+    { label: "Rozrusznik serca / implanty metalowe?", type: "select", options: ["Tak", "Nie"] },
+    { label: "Choroby autoimmunologiczne?", type: "textarea" },
+  ],
+  "🧒 Niepełnoletni / pediatria": [
+    { label: "Imię i nazwisko rodzica / opiekuna", type: "text" },
+    { label: "Data urodzenia dziecka", type: "text" },
+    { label: "Zgoda rodzica na zabieg", type: "signature" },
+  ],
+  "📸 Foto i social media": [
+    { label: "Zgoda na wykonanie zdjęć przed/po", type: "select", options: ["Tak", "Nie"] },
+    { label: "Zgoda na publikację w social media", type: "select", options: ["Tak", "Nie"] },
+    { label: "Zgoda na publikację z zakrytą twarzą", type: "select", options: ["Tak", "Nie"] },
+  ],
+  "🌡 Przeciwwskazania sezonowe": [
+    { label: "Świeże opalanie / solarium (ostatnie 14 dni)?", type: "select", options: ["Tak", "Nie"] },
+    { label: "Ciąża lub karmienie piersią?", type: "select", options: ["Tak", "Nie"] },
+    { label: "Aktywna opryszczka?", type: "select", options: ["Tak", "Nie"] },
+  ],
+  "⭐ Ankieta po wizycie": [
+    { label: "Jak oceniasz wizytę? (1-10)", type: "slider" },
+    { label: "Czy polecisz nas znajomym? (0-10)", type: "slider" },
+    { label: "Co możemy poprawić?", type: "textarea" },
+    { label: "Co Ci się szczególnie podobało?", type: "textarea" },
+  ],
+};
+
+const ALL_PRESETS = { ...PRESET_QUESTIONS, ...EXTRA_PRESETS };
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   isDemo?: boolean;
   editTemplate?: { id: string; name: string; fields: ConsultationField[]; category?: string; estimated_minutes?: number } | null;
+  /** Pre-fill from a library template (Utwórz z szablonu flow) */
+  presetTemplateId?: string | null;
+  /** When true, opens the scratch starter chooser (Step 0) */
+  scratchMode?: boolean;
 }
 
-export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate }: Props) {
-  const [step, setStep] = useState(1);
-  const [name, setName] = useState(editTemplate?.name || "");
-  const [category, setCategory] = useState(editTemplate?.category || "general");
-  const [estimatedMinutes, setEstimatedMinutes] = useState(String(editTemplate?.estimated_minutes || 3));
-  const [fields, setFields] = useState<ConsultationField[]>(editTemplate?.fields || []);
+export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate, presetTemplateId, scratchMode }: Props) {
+  // Hydrate from library template if provided
+  const libraryTpl = presetTemplateId
+    ? TEMPLATE_LIBRARY.find((t) => t.id === presetTemplateId)
+    : undefined;
+
+  // Step 0 = scratch starter chooser (only for true scratch with no preset)
+  const initialStep = scratchMode && !libraryTpl && !editTemplate ? 0 : 1;
+
+  const [step, setStep] = useState(initialStep);
+  const [name, setName] = useState(editTemplate?.name || libraryTpl?.name || "");
+  const [category, setCategory] = useState(editTemplate?.category || libraryTpl?.dbCategory || "general");
+  const [estimatedMinutes, setEstimatedMinutes] = useState(
+    String(editTemplate?.estimated_minutes || libraryTpl?.estimatedMinutes || 3)
+  );
+  const [fields, setFields] = useState<ConsultationField[]>(
+    editTemplate?.fields ||
+      (libraryTpl ? libraryTpl.fields.map((f) => ({ ...f, id: crypto.randomUUID() })) : [])
+  );
+  const [showLibraryPicker, setShowLibraryPicker] = useState(false);
   const [sendTiming, setSendTiming] = useState("before_appointment");
   const [isRequired, setIsRequired] = useState(true);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
@@ -153,11 +206,75 @@ export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate }: Props
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {editTemplate ? "Edytuj kartę" : "Utwórz kartę konsultacyjną"}
+            {editTemplate
+              ? "Edytuj kartę"
+              : libraryTpl
+              ? `Szablon: ${libraryTpl.name}`
+              : showLibraryPicker
+              ? "Wybierz gotowy szablon"
+              : "Utwórz kartę konsultacyjną"}
           </DialogTitle>
         </DialogHeader>
 
+        {/* Library picker overlay */}
+        {showLibraryPicker && (
+          <div className="space-y-4">
+            <TemplateGallery
+              onPick={(tpl) => {
+                setName(tpl.name);
+                setCategory(tpl.dbCategory);
+                setEstimatedMinutes(String(tpl.estimatedMinutes));
+                setFields(tpl.fields.map((f) => ({ ...f, id: crypto.randomUUID() })));
+                setShowLibraryPicker(false);
+                setStep(1);
+              }}
+            />
+            <div className="flex justify-end">
+              <Button variant="ghost" onClick={() => setShowLibraryPicker(false)}>
+                Wróć
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 0 — scratch starter chooser */}
+        {!showLibraryPicker && step === 0 && (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">Od czego chcesz zacząć?</p>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <button
+                onClick={() => setStep(1)}
+                className="text-left p-5 rounded-xl border-2 border-transparent bg-muted/50 hover:border-primary hover:bg-primary/5 transition-all"
+              >
+                <span className="text-2xl">📝</span>
+                <p className="font-medium text-sm mt-2">Pusta karta</p>
+                <p className="text-xs text-muted-foreground mt-1">Zacznij od zera — pełna kontrola</p>
+              </button>
+              <button
+                onClick={() => { setStep(2); }}
+                className="text-left p-5 rounded-xl border-2 border-transparent bg-muted/50 hover:border-primary hover:bg-primary/5 transition-all"
+              >
+                <span className="text-2xl">💡</span>
+                <p className="font-medium text-sm mt-2">Podpowiedz pytania</p>
+                <p className="text-xs text-muted-foreground mt-1">Buduj klikając gotowe bloki</p>
+              </button>
+              <button
+                onClick={() => setShowLibraryPicker(true)}
+                className="text-left p-5 rounded-xl border-2 border-transparent bg-muted/50 hover:border-primary hover:bg-primary/5 transition-all"
+              >
+                <span className="text-2xl">⭐</span>
+                <p className="font-medium text-sm mt-2">Gotowy szablon</p>
+                <p className="text-xs text-muted-foreground mt-1">{TEMPLATE_LIBRARY.length} szablonów z biblioteki</p>
+              </button>
+            </div>
+            <div className="flex justify-end">
+              <Button variant="ghost" onClick={onClose}>Anuluj</Button>
+            </div>
+          </div>
+        )}
+
         {/* Step indicators */}
+        {!showLibraryPicker && step >= 1 && (
         <div className="flex items-center gap-2 mb-4">
           {[1, 2, 3].map(s => (
             <div key={s} className={cn(
@@ -168,10 +285,19 @@ export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate }: Props
             </div>
           ))}
         </div>
+        )}
 
         {/* STEP 1 */}
-        {step === 1 && (
+        {!showLibraryPicker && step === 1 && (
           <div className="space-y-5">
+            {!editTemplate && !libraryTpl && (
+              <button
+                onClick={() => setShowLibraryPicker(true)}
+                className="text-xs text-primary hover:underline"
+              >
+                ⭐ Albo wybierz gotowy szablon z biblioteki →
+              </button>
+            )}
             <div>
               <Label>Jak chcesz nazwać tę kartę?</Label>
               <Input value={name} onChange={e => setName(e.target.value)} placeholder="np. Karta przed zabiegiem twarzy" className="mt-1" />
@@ -212,13 +338,13 @@ export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate }: Props
         )}
 
         {/* STEP 2 */}
-        {step === 2 && (
+        {!showLibraryPicker && step === 2 && (
           <div className="space-y-5">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left: presets */}
               <div className="space-y-4">
                 <p className="text-sm font-medium">Kliknij gotowe pytanie aby dodać</p>
-                {Object.entries(PRESET_QUESTIONS).map(([group, questions]) => (
+                {Object.entries(ALL_PRESETS).map(([group, questions]) => (
                   <div key={group}>
                     <p className="text-sm font-semibold mb-2">{group}</p>
                     <div className="space-y-1">
@@ -287,7 +413,7 @@ export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate }: Props
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setStep(1)} className="gap-2">
+              <Button variant="outline" onClick={() => setStep(Math.max(initialStep, 1))} className="gap-2">
                 <ArrowLeft className="w-4 h-4" /> Wstecz
               </Button>
               <Button onClick={() => setStep(3)} className="gap-2" disabled={fields.length === 0}>
@@ -298,7 +424,7 @@ export function EasyCardBuilder({ isOpen, onClose, isDemo, editTemplate }: Props
         )}
 
         {/* STEP 3 */}
-        {step === 3 && (
+        {!showLibraryPicker && step === 3 && (
           <div className="space-y-5">
             <div>
               <Label>Przypisz do usług (opcjonalnie)</Label>
