@@ -213,20 +213,20 @@ export function SalonScannerModal({
         insertedIds = ((ins as { id: string }[] | null) ?? []).map(r => r.id);
       }
       for (const u of toUpdate) {
-        await supabase.from("services").update({ price: u.price, duration: u.duration }).eq("id", u.id);
+        await (supabase.from("services") as any).update({ price: u.price, duration: u.duration }).eq("id", u.id);
       }
 
       // Auto-assign new services to owner
       if (insertedIds.length > 0) {
-        const { data: ownerStaff } = await supabase
-          .from("staff_members")
+        const { data: ownerStaff } = await (supabase
+          .from("staff_members") as any)
           .select("id")
           .eq("salon_id", salonId)
           .eq("is_owner", true)
           .maybeSingle();
         if (ownerStaff) {
-          await supabase.from("staff_services").insert(
-            insertedIds.map(sid => ({ staff_id: ownerStaff.id, service_id: sid }))
+          await (supabase.from("staff_services") as any).insert(
+            insertedIds.map(sid => ({ staff_id: (ownerStaff as { id: string }).id, service_id: sid }))
           );
         }
       }
