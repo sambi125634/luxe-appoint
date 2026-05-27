@@ -2634,6 +2634,87 @@ export type Database = {
           },
         ]
       }
+      referral_program_config: {
+        Row: {
+          activate_after_visits: number
+          auto_send_review_request: boolean
+          code_validity_days: number
+          created_at: string
+          facebook_review_url: string | null
+          google_review_url: string | null
+          id: string
+          is_active: boolean
+          max_referrals_per_client: number | null
+          referee_reward_description: string
+          referee_reward_type: string
+          referee_reward_value: number
+          referral_message_channel: string
+          referral_message_template: string
+          referrer_reward_description: string
+          referrer_reward_type: string
+          referrer_reward_value: number
+          reminder_after_days: number
+          review_message_template: string
+          review_request_channel: string
+          review_request_delay_hours: number
+          review_template_preset: string
+          salon_id: string
+          updated_at: string
+        }
+        Insert: {
+          activate_after_visits?: number
+          auto_send_review_request?: boolean
+          code_validity_days?: number
+          created_at?: string
+          facebook_review_url?: string | null
+          google_review_url?: string | null
+          id?: string
+          is_active?: boolean
+          max_referrals_per_client?: number | null
+          referee_reward_description?: string
+          referee_reward_type?: string
+          referee_reward_value?: number
+          referral_message_channel?: string
+          referral_message_template?: string
+          referrer_reward_description?: string
+          referrer_reward_type?: string
+          referrer_reward_value?: number
+          reminder_after_days?: number
+          review_message_template?: string
+          review_request_channel?: string
+          review_request_delay_hours?: number
+          review_template_preset?: string
+          salon_id: string
+          updated_at?: string
+        }
+        Update: {
+          activate_after_visits?: number
+          auto_send_review_request?: boolean
+          code_validity_days?: number
+          created_at?: string
+          facebook_review_url?: string | null
+          google_review_url?: string | null
+          id?: string
+          is_active?: boolean
+          max_referrals_per_client?: number | null
+          referee_reward_description?: string
+          referee_reward_type?: string
+          referee_reward_value?: number
+          referral_message_channel?: string
+          referral_message_template?: string
+          referrer_reward_description?: string
+          referrer_reward_type?: string
+          referrer_reward_value?: number
+          reminder_after_days?: number
+          review_message_template?: string
+          review_request_channel?: string
+          review_request_delay_hours?: number
+          review_template_preset?: string
+          salon_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       retention_conversions: {
         Row: {
           appointment_id: string | null

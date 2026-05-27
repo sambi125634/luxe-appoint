@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, Send, ExternalLink, Info, CheckCircle2, Clock } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Star, Send, ExternalLink, Info, CheckCircle2, Clock, Save, Pencil, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import { useReferralConfig, useUpdateReferralConfig } from "@/hooks/useReferralConfig";
 
 interface GoogleReviewsManagerProps {
   isDemo?: boolean;
@@ -19,32 +21,29 @@ const mockSilentFans = [
   { id: "5", name: "Magda Dąbrowska", nps: 10, visits: 6, lastVisit: "3 dni temu", status: "completed" as const },
 ];
 
-const reviewTemplates = [
-  {
-    id: "warm",
+const REVIEW_TEMPLATES: Record<string, { label: string; body: string; recommended?: boolean }> = {
+  warm: {
     label: "💜 Ciepły i osobisty",
-    preview: "Cześć {imię}! Dziękuję za dzisiejszą wizytę! Czy możesz poświęcić 30 sekund na opinię w Google? Bardzo mi to pomoże: {link} ❤️",
+    body: "Cześć {imię}! Dziękuję za dzisiejszą wizytę! Czy możesz poświęcić 30 sekund na opinię w Google? Bardzo mi to pomoże: {link} ❤️",
     recommended: true,
   },
-  {
-    id: "short",
+  short: {
     label: "⚡ Krótki i konkretny",
-    preview: "Hej {imię}! Twoja opinia w Google bardzo nam pomaga. 20 sekund: {link} ⭐",
-    recommended: false,
+    body: "Hej {imię}! Twoja opinia w Google bardzo nam pomaga. 20 sekund: {link} ⭐",
   },
-  {
-    id: "social",
+  social: {
     label: "🌸 Z elementem społecznym",
-    preview: "Wiele kobiet szuka dobrego salonu przez Google. Twoja opinia pomoże im nas znaleźć! {link} 🌸",
-    recommended: false,
+    body: "Wiele kobiet szuka dobrego salonu przez Google. Twoja opinia pomoże im nas znaleźć! {link} 🌸",
   },
-  {
-    id: "gratitude",
+  gratitude: {
     label: "🙏 Z podziękowaniem",
-    preview: "Cześć {imię}! Dziękuję że jesteś z nami od {wizyt} wizyt. Twoja opinia w Google to najlepsza nagroda: {link} 💜",
-    recommended: false,
+    body: "Cześć {imię}! Dziękuję że jesteś z nami od {wizyt} wizyt. Twoja opinia w Google to najlepsza nagroda: {link} 💜",
   },
-];
+  custom: {
+    label: "✏️ Własna treść",
+    body: "",
+  },
+};
 
 const mockReviewHistory = [
   { id: "1", clientName: "Kasia Wiśniewska", sentAt: "2h temu", status: "sent", channel: "sms" },
@@ -53,31 +52,94 @@ const mockReviewHistory = [
 ];
 
 export function GoogleReviewsManager({ isDemo }: GoogleReviewsManagerProps) {
-  const [googleReviewUrl, setGoogleReviewUrl] = useState("");
-  const [selectedTemplate, setSelectedTemplate] = useState("warm");
-  const hasGoogleUrl = isDemo || !!googleReviewUrl;
+  const { data: config, isLoading } = useReferralConfig(isDemo);
+  const updateConfig = useUpdateReferralConfig(isDemo);
+
+  const [urlDraft, setUrlDraft] = useState("");
+  const [editingUrl, setEditingUrl] = useState(false);
+  const [templateDraft, setTemplateDraft] = useState("");
+  const [presetDraft, setPresetDraft] = useState("warm");
+
+  useEffect(() => {
+    if (!config) return;
+    setUrlDraft(config.google_review_url || "");
+    setTemplateDraft(config.review_message_template);
+    setPresetDraft(config.review_template_preset);
+  }, [config]);
+
+  const savedUrl = config?.google_review_url || "";
+  const hasGoogleUrl = !!savedUrl;
 
   const silentFans = isDemo ? mockSilentFans : [];
   const reviewHistory = isDemo ? mockReviewHistory : [];
   const readyCount = silentFans.filter(f => f.status === "ready").length;
 
+  const validateUrl = (url: string): string | null => {
+    if (!url) return "Wklej link do opinii Google";
+    try {
+      const u = new URL(url);
+      if (u.protocol !== "https:" && u.protocol !== "http:") return "Link musi zaczynać się od https://";
+      return null;
+    } catch {
+      return "To nie jest poprawny link URL";
+    }
+  };
+
   const saveGoogleUrl = () => {
-    toast.success("Link do opinii Google zapisany");
+    const err = validateUrl(urlDraft);
+    if (err) {
+      toast.error(err);
+      return;
+    }
+    updateConfig.mutate(
+      { google_review_url: urlDraft.trim() },
+      { onSuccess: () => setEditingUrl(false) }
+    );
+  };
+
+  const isTemplateDirty =
+    !!config &&
+    (templateDraft !== config.review_message_template || presetDraft !== config.review_template_preset);
+
+  const saveTemplate = () => {
+    updateConfig.mutate({
+      review_message_template: templateDraft,
+      review_template_preset: presetDraft,
+    });
+  };
+
+  const selectPreset = (id: string) => {
+    setPresetDraft(id);
+    if (id !== "custom") {
+      setTemplateDraft(REVIEW_TEMPLATES[id].body);
+    }
+  };
+
+  const onTemplateChange = (text: string) => {
+    setTemplateDraft(text);
+    // If user diverges from preset body, mark as custom
+    if (presetDraft !== "custom" && REVIEW_TEMPLATES[presetDraft]?.body !== text) {
+      setPresetDraft("custom");
+    }
   };
 
   const sendReviewRequest = (fan: typeof mockSilentFans[0]) => {
     toast.success(`Prośba o opinię wysłana do ${fan.name}`);
   };
 
+  if (isLoading || !config) {
+    return <div className="p-8 text-center text-muted-foreground text-sm">Wczytywanie konfiguracji…</div>;
+  }
+
   return (
     <div className="space-y-6">
-      {/* Setup - Google Review URL */}
-      {!hasGoogleUrl && (
+      {/* Setup - Google Review URL — always visible */}
+      {(!hasGoogleUrl || editingUrl) && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center text-2xl flex-shrink-0">⭐</div>
             <div className="flex-1">
-              <h3 className="font-semibold mb-1">Najpierw ustaw link do opinii Google</h3>
+              <h3 className="font-semibold mb-1">{hasGoogleUrl ? "Edytuj link do opinii Google" : "Najpierw ustaw link do opinii Google"}</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Potrzebujesz bezpośredniego linku który otwiera formularz wystawienia opinii —
                 nie stronę Twojego salonu. Dzięki temu klientka jednym kliknięciem trafia prosto do miejsca gdzie może wpisać opinię.
@@ -112,19 +174,44 @@ export function GoogleReviewsManager({ isDemo }: GoogleReviewsManagerProps) {
               <div className="flex gap-3">
                 <Input
                   placeholder="https://search.google.com/local/writereview?placeid=..."
-                  value={googleReviewUrl}
-                  onChange={e => setGoogleReviewUrl(e.target.value)}
+                  value={urlDraft}
+                  onChange={e => setUrlDraft(e.target.value)}
                   className="flex-1"
                 />
-                <Button onClick={saveGoogleUrl} disabled={!googleReviewUrl}>Zapisz link</Button>
+                <Button onClick={saveGoogleUrl} disabled={!urlDraft || updateConfig.isPending}>
+                  {updateConfig.isPending ? "Zapisywanie…" : "Zapisz link"}
+                </Button>
+                {hasGoogleUrl && (
+                  <Button variant="ghost" onClick={() => { setUrlDraft(savedUrl); setEditingUrl(false); }}>
+                    Anuluj
+                  </Button>
+                )}
               </div>
-              {googleReviewUrl && (
-                <Button variant="outline" size="sm" className="mt-2 gap-2" onClick={() => window.open(googleReviewUrl, "_blank")}>
+              {urlDraft && (
+                <Button variant="outline" size="sm" className="mt-2 gap-2" onClick={() => window.open(urlDraft, "_blank")}>
                   <ExternalLink className="w-3.5 h-3.5" /> Testuj link
                 </Button>
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {hasGoogleUrl && !editingUrl && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+            <Check className="w-5 h-5 text-green-700" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-green-900">Link do opinii Google ustawiony</p>
+            <p className="text-xs text-green-700/80 truncate font-mono">{savedUrl}</p>
+          </div>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => window.open(savedUrl, "_blank")}>
+            <ExternalLink className="w-3.5 h-3.5" /> Testuj
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => setEditingUrl(true)}>
+            <Pencil className="w-3.5 h-3.5" /> Edytuj
+          </Button>
         </div>
       )}
 
@@ -188,14 +275,14 @@ export function GoogleReviewsManager({ isDemo }: GoogleReviewsManagerProps) {
         <CardHeader className="pb-3">
           <CardTitle className="text-base">✏️ Szablony wiadomości z prośbą o opinię</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-            {reviewTemplates.map(tmpl => (
+            {Object.entries(REVIEW_TEMPLATES).map(([id, tmpl]) => (
               <div
-                key={tmpl.id}
-                onClick={() => setSelectedTemplate(tmpl.id)}
+                key={id}
+                onClick={() => selectPreset(id)}
                 className={`border-2 rounded-xl p-3 cursor-pointer transition-all relative ${
-                  selectedTemplate === tmpl.id
+                  presetDraft === id
                     ? "border-primary bg-primary/5"
                     : "border-border hover:border-primary/40"
                 }`}
@@ -206,9 +293,36 @@ export function GoogleReviewsManager({ isDemo }: GoogleReviewsManagerProps) {
                   </span>
                 )}
                 <p className="font-semibold text-sm mb-1">{tmpl.label}</p>
-                <p className="text-xs text-muted-foreground">{tmpl.preview}</p>
+                <p className="text-xs text-muted-foreground line-clamp-2">{tmpl.body || "Napisz własną treść poniżej…"}</p>
               </div>
             ))}
+          </div>
+
+          <div>
+            <label className="text-xs font-medium block mb-1">Treść wiadomości (edytuj swobodnie)</label>
+            <Textarea
+              value={templateDraft}
+              onChange={(e) => onTemplateChange(e.target.value)}
+              rows={5}
+              className="font-mono text-xs"
+              placeholder="Cześć {imię}! Twoja opinia bardzo nam pomoże: {link}"
+            />
+            <div className="mt-2 p-2 bg-blue-50 rounded-md text-[11px] text-blue-700 flex items-start gap-2">
+              <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
+              <span>
+                Placeholdery: <code className="bg-white px-1 rounded">{"{imię}"}</code>{" "}
+                <code className="bg-white px-1 rounded">{"{link}"}</code>{" "}
+                <code className="bg-white px-1 rounded">{"{wizyt}"}</code>{" "}
+                <code className="bg-white px-1 rounded">{"{salon}"}</code>
+              </span>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <Button onClick={saveTemplate} disabled={!isTemplateDirty || updateConfig.isPending} className="gap-2">
+              <Save className="w-4 h-4" />
+              {updateConfig.isPending ? "Zapisywanie…" : "Zapisz szablon"}
+            </Button>
           </div>
         </CardContent>
       </Card>
