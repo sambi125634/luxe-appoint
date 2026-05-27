@@ -253,59 +253,112 @@ export function QuickWidgetCreateModal({
 
             {!showAllServices && (
               <div className="space-y-2">
-                <Label>Wybierz usługi dla tej kampanii</Label>
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                    <Input
-                      placeholder="Szukaj usługi…"
-                      className="pl-9"
-                      value={serviceSearch}
-                      onChange={(e) => setServiceSearch(e.target.value)}
-                    />
-                  </div>
-                  {categories.length > 0 && (
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                      <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Wszystkie kategorie</SelectItem>
-                        {categories.map(c => (
-                          <SelectItem key={c.id} value={c.id}>{c.icon} {c.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                <div className="flex items-center justify-between">
+                  <Label>Wybierz usługi dla tej kampanii</Label>
+                  <span className="text-xs text-muted-foreground">
+                    {serviceIds.length > 0 ? `Wybrano: ${serviceIds.length}` : `${totalShown} dostępnych`}
+                  </span>
                 </div>
-                <div className="border border-border rounded-lg max-h-52 overflow-y-auto divide-y divide-border">
-                  {filteredServices.length === 0 && (
-                    <p className="text-sm text-muted-foreground p-4 text-center">Brak usług</p>
+                <div className="relative">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Szukaj usługi we wszystkich kategoriach…"
+                    className="pl-9"
+                    value={serviceSearch}
+                    onChange={(e) => setServiceSearch(e.target.value)}
+                  />
+                </div>
+                <div className="border border-border rounded-lg max-h-72 overflow-y-auto divide-y divide-border">
+                  {grouped.length === 0 && (
+                    <p className="text-sm text-muted-foreground p-4 text-center">
+                      {services.length === 0 ? "Brak usług w katalogu" : "Brak wyników wyszukiwania"}
+                    </p>
                   )}
-                  {filteredServices.map(s => {
-                    const selected = serviceIds.includes(s.id);
+                  {grouped.map(group => {
+                    const expanded = !!expandedCats[group.id];
+                    const allSelected = group.items.every(it => serviceIds.includes(it.id));
+                    const someSelected = !allSelected && group.items.some(it => serviceIds.includes(it.id));
                     return (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => toggleService(s.id)}
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-muted/50 transition-colors",
-                          selected && "bg-primary/5"
-                        )}
-                      >
-                        <div className={cn(
-                          "w-5 h-5 rounded border-2 flex items-center justify-center shrink-0",
-                          selected ? "bg-primary border-primary" : "border-muted-foreground/30"
-                        )}>
-                          {selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                      <div key={group.id}>
+                        <div className="w-full flex items-center gap-2 px-3 py-2 bg-muted/30 hover:bg-muted/50 transition-colors">
+                          <button
+                            type="button"
+                            onClick={() => toggleCategory(group.id)}
+                            className="flex items-center gap-2 flex-1 text-left"
+                          >
+                            <ChevronDown
+                              className={cn(
+                                "w-4 h-4 text-muted-foreground transition-transform shrink-0",
+                                !expanded && "-rotate-90"
+                              )}
+                            />
+                            <span className="text-sm font-medium truncate">
+                              {group.icon} {group.name}
+                            </span>
+                            <Badge variant="outline" className="text-[10px] h-5 px-1.5 shrink-0">
+                              {group.items.length}
+                            </Badge>
+                            {someSelected && (
+                              <Badge variant="secondary" className="text-[10px] h-5 px-1.5 shrink-0">
+                                {group.items.filter(it => serviceIds.includes(it.id)).length} wybr.
+                              </Badge>
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => selectAllInCategory(group.items, !allSelected)}
+                            className="text-[11px] text-primary hover:underline shrink-0"
+                          >
+                            {allSelected ? "Odznacz" : "Zaznacz wszystkie"}
+                          </button>
                         </div>
-                        <span className="flex-1 text-sm truncate">{s.name}</span>
-                        <span className="text-xs text-muted-foreground">{s.price} zł</span>
-                      </button>
+                        {expanded && (
+                          <div className="divide-y divide-border">
+                            {group.items.map(s => {
+                              const selected = serviceIds.includes(s.id);
+                              return (
+                                <button
+                                  key={s.id}
+                                  type="button"
+                                  onClick={() => toggleService(s.id)}
+                                  className={cn(
+                                    "w-full flex items-center gap-3 pl-9 pr-3 py-2 text-left hover:bg-muted/50 transition-colors",
+                                    selected && "bg-primary/5"
+                                  )}
+                                >
+                                  <div className={cn(
+                                    "w-5 h-5 rounded border-2 flex items-center justify-center shrink-0",
+                                    selected ? "bg-primary border-primary" : "border-muted-foreground/30"
+                                  )}>
+                                    {selected && <Check className="w-3 h-3 text-primary-foreground" />}
+                                  </div>
+                                  <span className="flex-1 text-sm truncate">{s.name}</span>
+                                  <span className="text-xs text-muted-foreground shrink-0">{s.price} zł</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
-                {serviceIds.length > 0 && (
-                  <p className="text-xs text-muted-foreground">Wybrano: {serviceIds.length}</p>
+                {services.length > 0 && (
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Łącznie usług w katalogu: {services.length}</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const next: Record<string, boolean> = {};
+                        const allExpanded = grouped.every(g => expandedCats[g.id]);
+                        for (const g of grouped) next[g.id] = !allExpanded;
+                        setExpandedCats(next);
+                      }}
+                      className="text-primary hover:underline"
+                    >
+                      {grouped.every(g => expandedCats[g.id]) ? "Zwiń wszystkie" : "Rozwiń wszystkie"}
+                    </button>
+                  </div>
                 )}
               </div>
             )}
