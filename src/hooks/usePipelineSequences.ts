@@ -86,8 +86,8 @@ export function useUpsertPipelineSequence() {
         sort_order: seq.sort_order ?? 0,
         ...(seq.id ? { id: seq.id } : {}),
       };
-      const { error } = await supabase
-        .from("autopilot_pipeline_sequences" as never)
+      const { error } = await (supabase as any)
+        .from("autopilot_pipeline_sequences")
         .upsert(payload, { onConflict: "id" });
       if (error) throw error;
     },
