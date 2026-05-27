@@ -68,7 +68,7 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const newReviews = useAnimatedCount(newReviewsCount, 1000, !!isDemo);
 
   const noShowPreventedCount = realExecuted.filter(a =>
-    a.type === "noshow" || a.type === "noshow_prevention"
+    String(a.type) === "noshow" || String(a.type) === "noshow_prevention" || String(a.type) === "reminder"
   ).length;
   const totalActions = realActions?.length || 0;
   const hasAnyData = totalActions > 0;
