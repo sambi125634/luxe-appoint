@@ -96,6 +96,7 @@ export type Database = {
           client_id: string | null
           confirmation_email_sent: boolean
           confirmation_email_sent_at: string | null
+          confirmation_reminder_sent_at: string | null
           created_at: string
           end_time: string
           followup_email_sent: boolean
@@ -124,6 +125,7 @@ export type Database = {
           client_id?: string | null
           confirmation_email_sent?: boolean
           confirmation_email_sent_at?: string | null
+          confirmation_reminder_sent_at?: string | null
           created_at?: string
           end_time: string
           followup_email_sent?: boolean
@@ -152,6 +154,7 @@ export type Database = {
           client_id?: string | null
           confirmation_email_sent?: boolean
           confirmation_email_sent_at?: string | null
+          confirmation_reminder_sent_at?: string | null
           created_at?: string
           end_time?: string
           followup_email_sent?: boolean
@@ -389,6 +392,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      autopilot_pipeline_sequences: {
+        Row: {
+          body: string
+          channel: string
+          created_at: string
+          delay_hours: number
+          id: string
+          is_active: boolean
+          salon_id: string
+          sort_order: number
+          stage: string
+          subject: string | null
+          tag_filter: string | null
+          updated_at: string
+          variant: string
+        }
+        Insert: {
+          body?: string
+          channel?: string
+          created_at?: string
+          delay_hours?: number
+          id?: string
+          is_active?: boolean
+          salon_id: string
+          sort_order?: number
+          stage: string
+          subject?: string | null
+          tag_filter?: string | null
+          updated_at?: string
+          variant?: string
+        }
+        Update: {
+          body?: string
+          channel?: string
+          created_at?: string
+          delay_hours?: number
+          id?: string
+          is_active?: boolean
+          salon_id?: string
+          sort_order?: number
+          stage?: string
+          subject?: string | null
+          tag_filter?: string | null
+          updated_at?: string
+          variant?: string
+        }
+        Relationships: []
       }
       autopilot_stats: {
         Row: {
