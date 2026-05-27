@@ -2,9 +2,10 @@ import { CheckCircle2, Circle, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useTranslation } from "react-i18next";
+import { Check } from "lucide-react";
 
 interface SetupChecklistProps {
   salonId: string;
@@ -19,8 +20,17 @@ interface ChecklistItem {
   tab: string;
 }
 
+const DISMISS_KEY = (salonId: string) => `setup-checklist-dismissed:${salonId}`;
+function readDismissed(salonId: string): Record<string, boolean> {
+  try { return JSON.parse(localStorage.getItem(DISMISS_KEY(salonId)) || "{}"); } catch { return {}; }
+}
+function writeDismissed(salonId: string, data: Record<string, boolean>) {
+  localStorage.setItem(DISMISS_KEY(salonId), JSON.stringify(data));
+}
+
 export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
   const { t } = useTranslation();
+  const qc = useQueryClient();
 
   const { data: checklist = [], isLoading } = useQuery({
     queryKey: ["setup-checklist", salonId],
@@ -48,6 +58,14 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
         workingHoursCount = count ?? 0;
       }
 
+      // Widget considered installed when any widget has views or bookings, or user dismissed it
+      const { data: widgets } = await supabase
+        .from("booking_widgets" as any)
+        .select("view_count, booking_count")
+        .eq("salon_id", salonId);
+      const widgetUsed = (widgets ?? []).some((w: any) => (w?.view_count ?? 0) > 0 || (w?.booking_count ?? 0) > 0);
+      const dismissed = readDismissed(salonId);
+
       const hasSalonData = !!(salon?.name && salon?.address && salon?.phone);
 
       const items: ChecklistItem[] = [
@@ -57,12 +75,13 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
         { id: "staff", labelKey: "setupChecklist.staff", descKey: "setupChecklist.staffDesc", completed: (staffCount ?? 0) > 0, tab: "staff" },
         { id: "client", labelKey: "setupChecklist.firstClient", descKey: "setupChecklist.firstClientDesc", completed: (clientsCount ?? 0) > 0, tab: "clients" },
         { id: "appointment", labelKey: "setupChecklist.firstAppointment", descKey: "setupChecklist.firstAppointmentDesc", completed: (appointmentsCount ?? 0) > 0, tab: "calendar" },
-        { id: "widget", labelKey: "setupChecklist.bookingWidget", descKey: "setupChecklist.bookingWidgetDesc", completed: false, tab: "widgets" },
+        { id: "widget", labelKey: "setupChecklist.bookingWidget", descKey: "setupChecklist.bookingWidgetDesc", completed: widgetUsed || !!dismissed.widget, tab: "widgets" },
       ];
 
-      return items;
+      return items.map((i) => ({ ...i, completed: i.completed || !!dismissed[i.id] }));
     },
     enabled: !!salonId,
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) return null;
@@ -72,6 +91,14 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
   if (completedCount === totalCount) return null;
+
+  const handleDismiss = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const current = readDismissed(salonId);
+    current[id] = true;
+    writeDismissed(salonId, current);
+    qc.invalidateQueries({ queryKey: ["setup-checklist", salonId] });
+  };
 
   return (
     <Card className="border-primary/20 bg-primary/5">
@@ -108,7 +135,19 @@ export function SetupChecklist({ salonId, onNavigate }: SetupChecklistProps) {
                 <p className="text-xs text-muted-foreground">{t(item.descKey)}</p>
               </div>
               {!item.completed && (
-                <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                <div className="flex items-center gap-1 shrink-0">
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    onClick={(e) => handleDismiss(item.id, e)}
+                    onKeyDown={(e) => { if (e.key === "Enter") handleDismiss(item.id, e as any); }}
+                    className="text-xs text-muted-foreground hover:text-primary px-2 py-1 rounded hover:bg-muted/50"
+                    title="Oznacz jako wykonane"
+                  >
+                    <Check className="w-3.5 h-3.5" />
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                </div>
               )}
             </button>
           ))}
