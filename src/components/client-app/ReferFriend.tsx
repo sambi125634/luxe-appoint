@@ -67,7 +67,7 @@ export function ReferFriend() {
   }, [salonId, codeLoading, referralCodeData, firstName, createCode]);
 
   const referralCode = referralCodeData?.code ?? "";
-  const referralUrl = `https://beautycalendar.pl/join/${salonSlug}?ref=${referralCode}`;
+  const referralUrl = referralCode ? buildReferralUrl(salonSlug, referralCode) : "";
 
   const isLoading = salonLoading || codeLoading || statsLoading;
 
