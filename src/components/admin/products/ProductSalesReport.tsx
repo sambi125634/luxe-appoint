@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TrendingUp, DollarSign, Package, Percent, Download, Calendar, Coins } from "lucide-react";
+import { TrendingUp, DollarSign, Package, Percent, Download, Calendar, Coins, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -20,11 +20,14 @@ const mockSalesData = [
 
 type Period = "week" | "month" | "quarter" | "year";
 
-export function ProductSalesReport() {
+export function ProductSalesReport({ isDemo = false }: { isDemo?: boolean }) {
   const { t } = useTranslation();
   const [period, setPeriod] = useState<Period>("month");
 
-  const salesWithProducts = mockSalesData.map((sale) => {
+  // W realnym panelu nie pokazujemy danych przykładowych — czekamy na pierwszą sprzedaż produktu.
+  const salesSource = isDemo ? mockSalesData : [];
+
+  const salesWithProducts = salesSource.map((sale) => {
     const product = mockProducts.find((p) => p.id === sale.productId);
     const margin = sale.revenue - sale.cost;
     const marginPercent = sale.revenue > 0 ? (margin / sale.revenue) * 100 : 0;
@@ -58,6 +61,8 @@ export function ProductSalesReport() {
   const handleExport = () => {
     console.log("Exporting product sales report...");
   };
+
+  const isEmpty = salesWithProducts.length === 0;
 
   return (
     <div className="space-y-6">
