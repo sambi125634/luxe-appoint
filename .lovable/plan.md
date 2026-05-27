@@ -1,46 +1,55 @@
+# Plan
+
 ## Cel
-Dokończyć dwa zadania z poprzedniej sesji, aby uprościć tworzenie widgetów i usług w panelu admin.
+Naprawić dwa problemy w panelu admina po aktywacji konta:
+1. kreator nowego widgetu ma pokazywać pełną listę usług, nie tylko ok. 10,
+2. analityka i dashboard mają pokazywać wyłącznie dane z danego konta albo pusty stan — bez liczb demo.
 
-## Zakres
+## Co zrobię
 
-### 1. Quick Widget Create Modal
-Nowy uproszczony modal do szybkiego tworzenia widgetu kampanii (3 kroki zamiast pełnego edytora):
+### 1. Uporządkuję wybór usług w szybkim kreatorze widgetu
+- Przebuduję krok wyboru usług w `QuickWidgetCreateModal.tsx` tak, aby zamiast płaskiej krótkiej listy pokazywał pełny katalog usług z konta.
+- Zgrupuję usługi kategoriami z możliwością rozwijania/zamykania sekcji.
+- Dodam licznik usług w kategorii oraz licznik zaznaczonych usług.
+- Zachowam wyszukiwarkę, ale będzie filtrować po całej liście, nie tylko po widocznym fragmencie.
+- Upewnię się, że stan `Pokaż wszystkie usługi` nadal działa poprawnie, ale tryb ręcznego wyboru pokaże wszystkie rekordy dostępne dla salonu.
+- Sprawdzę też pełny `WidgetEditor`, żeby selekcja usług była spójna także tam, jeśli ten sam problem występuje w edycji zaawansowanej.
 
-- **Krok 1 – Nazwa kampanii** (np. "Promocja walentynkowa", "Reels Instagram – luty")
-- **Krok 2 – Usługi + promocja**
-  - Multi-select z listy realnych usług salonu (`useServices`)
-  - Opcjonalny rabat % lub kwota
-  - Opcjonalna data ważności promocji
-- **Krok 3 – Branding skrótowy**
-  - Kolor akcentu (color picker, domyślnie z głównego widgetu salonu)
-  - Tekst CTA (domyślnie "Zarezerwuj termin")
-  - Podgląd przycisku na żywo
+### 2. Zweryfikuję źródło limitu 10 usług
+- Sprawdzę, czy problem wynika z samego UI, czy z danych pobieranych do selektora.
+- Jeśli potrzeba, poprawię hooki lub zapytania tak, by nie ucinały listy usług dla realnego salonu.
+- Jeśli limit nie jest w query, usunę ograniczenie renderowania po stronie komponentu i zachowam wydajny układ z kategoriami.
 
-Po zapisie: utworzenie wpisu w `widgets` z domyślami skopiowanymi z głównego widgetu salonu, redirect do listy widgetów z toastem sukcesu i przyciskiem "Edytuj zaawansowane" (otwiera pełny `WidgetEditor`).
+### 3. Odetnę demo liczby od realnego dashboardu admina
+- Przejrzę komponenty dashboardu, które wcześniej miały demo/fallback metryki, i zostawię demo tylko dla trybu `isDemo`.
+- W realnym koncie każdy widget ma działać w jednym z dwóch stanów:
+  - pokazuje prawdziwe dane z konta,
+  - albo pokazuje pusty/zerowy stan, jeśli konto nie ma jeszcze danych.
+- Szczególnie sprawdzę `DashboardHome.tsx` oraz karty analityczne i retencyjne, bo tam są fallbacki i wcześniejsze demo struktury.
 
-**Pliki:**
-- nowy: `src/components/admin/widgets/QuickWidgetCreateModal.tsx`
-- edycja: `src/components/admin/widgets/WidgetsManagement.tsx` — przycisk "Utwórz nowy widget" otwiera Quick Modal zamiast od razu pełnego edytora; pełny edytor dostępny przez "Edytuj zaawansowane"
+### 4. Dopilnuję pustych stanów zamiast sztucznych wartości
+- Dla nowych kont, gdzie nie ma jeszcze historii, pozostawię czytelne puste stany zamiast przykładowych KPI.
+- Tam, gdzie dziś są liczby oparte o demo lub „bezpieczne przykłady”, zastąpię je zerem, brakiem danych albo komunikatem startowym — zależnie od kontekstu komponentu.
 
-### 2. Quick Service Add
-Podział obecnego dialogu usługi na dwa tryby:
+## Zakres plików
+Prawdopodobnie obejmie to:
+- `src/components/admin/widgets/QuickWidgetCreateModal.tsx`
+- `src/components/admin/widgets/WidgetEditor.tsx`
+- `src/components/admin/DashboardHome.tsx`
+- ewentualnie powiązane komponenty dashboardu/analityki, jeśli to one jeszcze wyświetlają demo fallbacki
+- ewentualnie hooki analityczne tylko wtedy, gdy to w nich siedzi fallback dla realnych kont
 
-- **Tryb szybki (domyślny):** tylko 4 pola — nazwa, kategoria, cena, czas trwania. Przycisk "Zapisz" → utworzenie usługi, toast, zamknięcie.
-- **Tryb pełny (rozwijany):** "Dodaj szczegóły" pokazuje pozostałe pola (opis, zdjęcia, recipe materiałów, prepayment, warianty itd.) — czyli obecny pełny formularz.
+## Ważne ustalenia z analizy
+- Lista usług w szybkim kreatorze jest dziś pobierana z `useServices()` i filtrowana lokalnie, więc problem wygląda na ograniczenie prezentacji albo dodatkowe miejsce w przepływie, które jeszcze trzeba wyrównać.
+- Dashboard ma wyraźny rozdział `isDemo` vs real data, ale w kilku miejscach są historyczne fallbacki/demo struktury, więc poprawka będzie polegała na domknięciu tych warunków i pustych stanów dla nowych kont.
+- W retencji jest dodatkowo limit `.limit(100)`, który nie jest źródłem problemu 10 usług, ale może wpływać na pełnię danych w niektórych modułach analitycznych — ruszę go tylko jeśli okaże się częścią zgłoszonego problemu.
 
-**Pliki:**
-- edycja: `src/components/admin/ServicesManagement.tsx` — refaktor dialogu dodawania usługi na sekcję "Szybko" + collapsible "Szczegóły"
+## Efekt końcowy
+- Przy tworzeniu widgetu promocyjnego zobaczysz wszystkie usługi z konta, pogrupowane kategoriami i wygodne do zaznaczania.
+- W realnym panelu admina nie będzie już liczb demo po aktywacji i onboardingu.
+- Nowe konto pokaże tylko własne dane albo pusty stan, dopóki nie pojawią się prawdziwe akcje i wyniki.
 
-### 3. Weryfikacja listy usług (75 vs ~10)
-Sprawdzić w `ServicesManagement.tsx` filtry domyślne listy (np. ukrywanie nieaktywnych, filtr po kategorii, paginacja) — jeśli zawęża widoczność, dodać clear filtra "Pokaż wszystkie (75)" + licznik na górze listy.
-
-## Co NIE wchodzi w zakres
-- Zmiany w schemacie bazy (nie są potrzebne — wszystko mieści się w istniejących tabelach `widgets` i `services`)
-- Refaktor pełnego `WidgetEditor` (zostaje jako tryb zaawansowany)
-- Zmiany w onboardingu/tutorialu (zrobione w poprzednich krokach)
-
-## Kryteria sukcesu
-- Tworzenie nowej kampanii-widgetu zajmuje <60 sekund od kliknięcia "Nowy widget"
-- Dodanie nowej usługi w trybie szybkim zajmuje <30 sekund
-- Lista usług pokazuje wszystkie zaimportowane pozycje (lub jasny komunikat ile jest ukrytych przez filtr)
-- Zero regresji w pełnym `WidgetEditor` i pełnym formularzu usługi
+## Techniczne szczegóły
+- Bez zmian schematu bazy, jeśli nie okaże się to konieczne.
+- Bez ruszania demo route — demo pozostanie tylko tam, gdzie `isDemo === true`.
+- Bez dodawania nowych funkcji ponad to zgłoszenie: tylko pełny wybór usług i usunięcie demo metryk z realnego admina.
