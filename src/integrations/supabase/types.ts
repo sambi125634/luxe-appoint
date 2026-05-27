@@ -3573,21 +3573,30 @@ export type Database = {
       staff_services: {
         Row: {
           created_at: string
+          duration_override: number | null
           id: string
+          price_override: number | null
           service_id: string
           staff_id: string
+          variant_id: string | null
         }
         Insert: {
           created_at?: string
+          duration_override?: number | null
           id?: string
+          price_override?: number | null
           service_id: string
           staff_id: string
+          variant_id?: string | null
         }
         Update: {
           created_at?: string
+          duration_override?: number | null
           id?: string
+          price_override?: number | null
           service_id?: string
           staff_id?: string
+          variant_id?: string | null
         }
         Relationships: [
           {
@@ -3609,6 +3618,13 @@ export type Database = {
             columns: ["staff_id"]
             isOneToOne: false
             referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "staff_services_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "service_variants"
             referencedColumns: ["id"]
           },
         ]
