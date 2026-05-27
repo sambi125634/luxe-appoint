@@ -74,7 +74,7 @@ export function AutopilotModule({ isDemo }: AutopilotModuleProps) {
               ? `Autopilot aktywny · Dziś zadziałał ${DEMO_AUTOPILOT_DATA.kpi.actionsToday}× · Odzyskano ${DEMO_AUTOPILOT_DATA.kpi.revenueRecovered.toLocaleString("pl-PL")} zł tego miesiąca`
               : isLive
                 ? "System pracuje za Ciebie — nawet gdy śpisz"
-                : "Włącz funkcje w zakładce „Funkcje" — Autopilot zacznie działać."}
+                : 'Włącz funkcje w zakładce "Funkcje" — Autopilot zacznie działać.'}
           </p>
         </div>
         <AutopilotScore isDemo={isDemo} />
