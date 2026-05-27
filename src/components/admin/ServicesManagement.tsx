@@ -484,8 +484,8 @@ export function ServicesManagement({ isDemo = false }: ServicesManagementProps) 
         savedId = result.id;
       }
 
-      // Sync staff_services
-      if (serviceForm.staffIds.length > 0) {
+      // Sync staff_services — only on create (matrix manages the rest)
+      if (!editingService && serviceForm.staffIds.length > 0) {
         await syncStaffServicesMutation.mutateAsync({ serviceId: savedId, staffIds: serviceForm.staffIds });
       }
 
