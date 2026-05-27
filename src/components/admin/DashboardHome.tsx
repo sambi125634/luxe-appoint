@@ -20,6 +20,7 @@ import { WeeklyBriefWidget } from "./dashboard/WeeklyBriefWidget";
 import { TodayStaffCard } from "./dashboard/TodayStaffCard";
 import { SectionGuide } from "./SectionGuide";
 import { SetupChecklist } from "./SetupChecklist";
+import { PendingConfirmationsCard } from "./dashboard/PendingConfirmationsCard";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useStockAlerts } from "@/hooks/useStockAlerts";
 import { useQuery } from "@tanstack/react-query";
@@ -282,6 +283,9 @@ export function DashboardHome({ onNavigate, isDemo = false }: DashboardHomeProps
 
       {/* Setup Checklist */}
       {!isDemo && salonId && <SetupChecklist salonId={salonId} onNavigate={handleNavigate} />}
+
+      {/* Pending visit confirmations — keeps pipeline accurate */}
+      {!isDemo && salonId && <PendingConfirmationsCard onNavigate={handleNavigate} />}
 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
