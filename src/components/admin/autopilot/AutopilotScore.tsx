@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
+import { useAutopilotScore } from "@/hooks/useAutopilot";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AutopilotScoreProps {
   isDemo?: boolean;
@@ -28,8 +30,9 @@ function useAnimatedCount(target: number, duration: number, enabled: boolean) {
 }
 
 export function AutopilotScore({ isDemo }: AutopilotScoreProps) {
-  const score = isDemo ? DEMO_AUTOPILOT_DATA.score : 72;
-  const animatedScore = useAnimatedCount(score, 2000, !!isDemo);
+  const { data: realScore } = useAutopilotScore();
+  const demoScore = DEMO_AUTOPILOT_DATA.score;
+  const animatedDemo = useAnimatedCount(demoScore, 2000, !!isDemo);
 
   const getColor = (s: number) => {
     if (s >= 80) return "text-green-600";
@@ -44,7 +47,45 @@ export function AutopilotScore({ isDemo }: AutopilotScoreProps) {
     return "Wymaga działania";
   };
 
-  const displayScore = isDemo ? animatedScore : score;
+  // Production: real score or null (not enough data)
+  if (!isDemo) {
+    if (!realScore || realScore.score === null) {
+      return (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex flex-col items-end cursor-help">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-3xl font-black tabular-nums text-muted-foreground">—</span>
+                  <span className="text-muted-foreground text-sm">/100</span>
+                </div>
+                <span className="text-xs font-medium text-muted-foreground">Zbieranie danych</span>
+                <span className="text-xs text-muted-foreground">Autopilot Score</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs max-w-[220px]">
+                Wynik pojawi się po pierwszych akcjach Autopilota w Twoim salonie.
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      );
+    }
+    const s = realScore.score;
+    return (
+      <div className="flex flex-col items-end">
+        <div className="flex items-baseline gap-1">
+          <span className={cn("text-3xl font-black tabular-nums", getColor(s))}>{s}</span>
+          <span className="text-muted-foreground text-sm">/100</span>
+        </div>
+        <span className={cn("text-xs font-medium", getColor(s))}>{getLabel(s)}</span>
+        <span className="text-xs text-muted-foreground">Autopilot Score</span>
+      </div>
+    );
+  }
+
+  const displayScore = animatedDemo;
 
   return (
     <div className="flex flex-col items-end">
