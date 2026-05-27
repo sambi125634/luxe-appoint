@@ -67,9 +67,10 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const revenueRecovered = useAnimatedCount(revenueRecoveredCount, 1500, !!isDemo);
   const newReviews = useAnimatedCount(newReviewsCount, 1000, !!isDemo);
 
-  const noShowPreventedCount = realExecuted.filter(a =>
-    String(a.type) === "noshow" || String(a.type) === "noshow_prevention" || String(a.type) === "reminder"
-  ).length;
+  const noShowPreventedCount = realExecuted.filter(a => {
+    const t = String(a.type);
+    return t === "noshow" || t === "noshow_prevention";
+  }).length;
   const totalActions = realActions?.length || 0;
   const hasAnyData = totalActions > 0;
   const dash = "—";
