@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
 import { useAutopilotActions } from "@/hooks/useAutopilot";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ClientJourneySequenceEditor } from "./ClientJourneySequenceEditor";
 
 interface AutopilotOverviewProps {
   isDemo?: boolean;
@@ -200,6 +201,7 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
           </div>
         )}
       </div>
+      {!isDemo && <ClientJourneySequenceEditor />}
     </div>
   );
 }
