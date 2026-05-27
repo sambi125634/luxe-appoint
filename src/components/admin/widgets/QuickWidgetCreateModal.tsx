@@ -1,13 +1,11 @@
-import { useMemo, useState, useEffect } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
-import { Check, ChevronLeft, ChevronRight, ChevronDown, Sparkles, Tag, Palette, Search } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Sparkles, Tag, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useServices, useServiceCategories } from "@/hooks/useServices";
+import { WidgetServiceSelector } from "./WidgetServiceSelector";
 import {
   BookingWidget,
   WidgetTheme,
@@ -49,65 +47,12 @@ export function QuickWidgetCreateModal({
   const [name, setName] = useState("");
   const [serviceIds, setServiceIds] = useState<string[]>([]);
   const [showAllServices, setShowAllServices] = useState(false);
-  const [serviceSearch, setServiceSearch] = useState("");
-  const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>({});
   const [promoType, setPromoType] = useState<"none" | "percentage" | "fixed">("none");
   const [promoValue, setPromoValue] = useState<number>(10);
   const [promoCode, setPromoCode] = useState("");
   const [validTo, setValidTo] = useState<string>("");
   const [accentColor, setAccentColor] = useState(baseTheme.primaryColor);
   const [ctaText, setCtaText] = useState("Zarezerwuj termin");
-
-  const { data: dbServices } = useServices();
-  const { data: dbCategories } = useServiceCategories();
-
-  const services = useMemo(() => {
-    if (isDemo) return [] as Array<{ id: string; name: string; price: number; category_id: string | null }>;
-    return (dbServices || []).map(s => ({
-      id: s.id,
-      name: s.name,
-      price: Number(s.price),
-      category_id: s.category_id,
-    }));
-  }, [dbServices, isDemo]);
-
-  const categories = useMemo(() => {
-    if (isDemo) return [];
-    return (dbCategories || []).map(c => ({ id: c.id, name: c.name, icon: c.icon || "✨" }));
-  }, [dbCategories, isDemo]);
-
-  // Group services by category. Includes an "Uncategorised" bucket.
-  const grouped = useMemo(() => {
-    const q = serviceSearch.trim().toLowerCase();
-    const buckets: Array<{
-      id: string;
-      name: string;
-      icon: string;
-      items: Array<{ id: string; name: string; price: number; category_id: string | null }>;
-    }> = categories.map(c => ({ id: c.id, name: c.name, icon: c.icon, items: [] }));
-    const uncategorised = { id: "__none__", name: "Bez kategorii", icon: "•", items: [] as typeof buckets[number]["items"] };
-
-    for (const s of services) {
-      if (q && !s.name.toLowerCase().includes(q)) continue;
-      const bucket = buckets.find(b => b.id === s.category_id);
-      if (bucket) bucket.items.push(s);
-      else uncategorised.items.push(s);
-    }
-    const all = [...buckets, uncategorised].filter(b => b.items.length > 0);
-    return all;
-  }, [services, categories, serviceSearch]);
-
-  const totalShown = grouped.reduce((n, g) => n + g.items.length, 0);
-
-  // When search is active, auto-expand all categories to surface matches.
-  useEffect(() => {
-    if (serviceSearch.trim().length === 0) return;
-    setExpandedCats(prev => {
-      const next = { ...prev };
-      for (const g of grouped) next[g.id] = true;
-      return next;
-    });
-  }, [serviceSearch, grouped]);
 
   const reset = () => {
     setStep(1);
@@ -120,29 +65,11 @@ export function QuickWidgetCreateModal({
     setValidTo("");
     setAccentColor(baseTheme.primaryColor);
     setCtaText("Zarezerwuj termin");
-    setServiceSearch("");
-    setExpandedCats({});
   };
 
   const handleClose = () => {
     onClose();
     setTimeout(reset, 200);
-  };
-
-  const toggleService = (id: string) => {
-    setServiceIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
-  };
-
-  const toggleCategory = (catId: string) => {
-    setExpandedCats(prev => ({ ...prev, [catId]: !prev[catId] }));
-  };
-
-  const selectAllInCategory = (items: Array<{ id: string }>, select: boolean) => {
-    setServiceIds(prev => {
-      const ids = items.map(i => i.id);
-      if (select) return Array.from(new Set([...prev, ...ids]));
-      return prev.filter(id => !ids.includes(id));
-    });
   };
 
   const canNext1 = name.trim().length >= 2;
