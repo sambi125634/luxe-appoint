@@ -25,6 +25,7 @@ import { TimeOffManagement } from "./TimeOffManagement";
 import { useTranslation } from "react-i18next";
 import { SectionGuide } from "./SectionGuide";
 import { useSalonId } from "@/hooks/useSalonId";
+import { PendingConfirmationsCard } from "./dashboard/PendingConfirmationsCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -251,6 +252,7 @@ export function ScheduleManagement({ isDemo = false, salonSlug, onNavigate }: Sc
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="calendar" />
+      {!isDemo && <PendingConfirmationsCard variant="card" />}
       {/* Top Navigation */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Tabs value={activeView} onValueChange={(v) => setActiveView(v as "calendar" | "grid" | "templates" | "smart" | "time-off")} className="w-full sm:w-auto">
