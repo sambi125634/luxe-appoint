@@ -172,12 +172,18 @@ export function SalonScannerModal({
       )) as string[];
 
       if (neededCats.length > 0) {
-        const { data: createdCats, error: catErr } = await supabase
-          .from("service_categories")
-          .insert(neededCats.map((name, i) => ({ salon_id: salonId, name, icon: "✨", sort_order: existingCategories.length + i })))
+        const catRows = neededCats.map((name, i) => ({
+          salon_id: salonId,
+          name,
+          icon: "✨",
+          sort_order: existingCategories.length + i,
+        }));
+        const { data: createdCats, error: catErr } = await (supabase
+          .from("service_categories") as any)
+          .insert(catRows)
           .select("id, name");
         if (catErr) throw catErr;
-        createdCats?.forEach(c => catByName.set(norm(c.name), c.id));
+        (createdCats as { id: string; name: string }[] | null)?.forEach(c => catByName.set(norm(c.name), c.id));
       }
 
       const toInsert: Array<{ salon_id: string; name: string; price: number; duration: number; category_id: string | null }> = [];
@@ -202,9 +208,9 @@ export function SalonScannerModal({
 
       let insertedIds: string[] = [];
       if (toInsert.length > 0) {
-        const { data: ins, error: insErr } = await supabase.from("services").insert(toInsert).select("id");
+        const { data: ins, error: insErr } = await (supabase.from("services") as any).insert(toInsert).select("id");
         if (insErr) throw insErr;
-        insertedIds = ins?.map(r => r.id) ?? [];
+        insertedIds = ((ins as { id: string }[] | null) ?? []).map(r => r.id);
       }
       for (const u of toUpdate) {
         await supabase.from("services").update({ price: u.price, duration: u.duration }).eq("id", u.id);
