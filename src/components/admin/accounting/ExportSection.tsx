@@ -82,13 +82,13 @@ function generateExportFile(exportType: string, dateRange: { from: Date; to: Dat
   }
 }
 
-export function ExportSection({ dateRange }: ExportSectionProps) {
+export function ExportSection({ dateRange, isDemo = false }: ExportSectionProps) {
   const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [exportType, setExportType] = useState<string>("pełny");
   const [exportFormat, setExportFormat] = useState<string>("csv");
   const [accountantEmail, setAccountantEmail] = useState<string>("ksiegowosc@salon.pl");
-  const [exports, setExports] = useState<AccountingExport[]>(mockAccountingExports);
+  const [exports, setExports] = useState<AccountingExport[]>(isDemo ? mockAccountingExports : []);
   const dateLocale = i18n.language === 'pl' ? pl : enUS;
 
   const handleExport = () => {
