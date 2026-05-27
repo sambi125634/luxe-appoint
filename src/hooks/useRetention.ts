@@ -121,7 +121,23 @@ export function useRetentionSequences(salonId?: string) {
         .eq("salon_id", salonId)
         .order("trigger_days", { ascending: true });
       if (error) throw error;
-      return (data ?? []) as unknown as RetentionSequence[];
+      const rows = (data ?? []) as unknown as RetentionSequence[];
+      if (rows.length > 0) return rows;
+
+      // Lazy fallback: seed defaults if salon has none yet
+      const { error: rpcError } = await supabase.rpc(
+        "seed_default_retention_sequences" as never,
+        { p_salon_id: salonId } as never,
+      );
+      if (rpcError) return rows;
+
+      const { data: seeded, error: reselectError } = await supabase
+        .from("retention_sequences" as never)
+        .select("*")
+        .eq("salon_id", salonId)
+        .order("trigger_days", { ascending: true });
+      if (reselectError) return rows;
+      return (seeded ?? []) as unknown as RetentionSequence[];
     },
     enabled: !!salonId,
   });

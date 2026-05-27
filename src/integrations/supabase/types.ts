@@ -4440,6 +4440,10 @@ export type Database = {
         Args: { p_salon_id: string }
         Returns: undefined
       }
+      seed_default_retention_sequences: {
+        Args: { p_salon_id: string }
+        Returns: undefined
+      }
       user_belongs_to_salon: {
         Args: { _salon_id: string; _user_id: string }
         Returns: boolean

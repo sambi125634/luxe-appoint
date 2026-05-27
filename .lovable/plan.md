@@ -1,69 +1,58 @@
-## Cel
+# Sekwencje retencyjne — admin pokazuje pustkę
 
-Upewnić się, że zakładka **Raporty** (`AccountingModule`) w panelu admin:
-1. dla nowego salonu pokazuje pusty stan (już działa — `transactions.length === 0` → komunikat „Brak danych księgowych"),
-2. po pojawieniu się pierwszych transakcji wszystkie pod-zakładki pokazują **tylko** dane danego salonu — żadnych demo-mocków,
-3. dane jednego salonu nigdy nie wyciekają do innego (RLS).
+## Przyczyna
 
-## Co znalazłem
+W demo lista 5 sekwencji pochodzi ze stałej `MOCK_SEQUENCES` (mock-data). W realnym panelu admin (`RetentionDashboard` → `useRetentionSequences`) komponent czyta tabelę `public.retention_sequences` po `salon_id`. Tabela jest tworzona migracją z marca 2026, ale **nigdzie nie jest seedowana** — ani w onboardingu, ani triggerem na `salons`. Dla każdego nowego salonu zwraca 0 wierszy, więc `sequences.map(...)` w `SequenceEditor` renderuje wyłącznie nagłówek + kartę „Skąd wysyłamy" i kończy się pustką pod spodem (brak kafelków „Zanim odejdzie", „45 dni" itd. ze screena demo).
 
-Empty-state na poziomie modułu działa poprawnie. Problem: gdy salon ma choć jedną transakcję, renderują się WSZYSTKIE pod-zakładki, a 3 z nich wciąż pokazują twarde dane demo niezależnie od salonu:
+Druga sprawa: jest tylko 5 sequence_keys (`proactive`, `45day`, `60day`, `75day`, `90day`). User pyta, czy nie zwiększyć liczby punktów — tak, dorzucamy kilka, żeby lejek był „grubszy" i lepiej testowalny.
 
-- `ProductSalesAccountingReport.tsx` — `MOCK_PRODUCT_SALES_REPORT` (top produkty, sprzedaż dzienna, kategorie) renderowane bezwarunkowo, brak `isDemo`, brak `salonId`, brak query do `transactions` (gdzie `type='product'`).
-- `OccupancyReport.tsx` — twarde `occupancyByDay` / `occupancyByHour`, brak query do `appointments`.
-- `NoShowsReport.tsx` — twarde `noShowsData` + lista trzech klientów z numerami telefonów, brak query do `appointments` z `status='no_show'`.
+## Plan
 
-Pozostałe pod-zakładki (`AccountingCharts`, `SalesVatReport`, `EmployeeCommissions`, `DailyCashUp`, `VouchersReport`, `StaffCompensationReport`, `ExportSection`, `TrueProfitDashboard`) mają już prawidłowy guard `isDemo` lub liczą z propsa `transactions` (czyli z DB).
+### 1. Backfill + auto-seed w bazie (1 migracja)
 
-## Co zrobię
+Nowa migracja `…_seed_retention_sequences.sql`:
 
-### 1. ProductSalesAccountingReport — realne dane per-salon
-- Dodać prop `isDemo?: boolean`, pobierać przez `useQuery` z `transactions` gdzie `salon_id = current` i `type = 'product'` w `dateRange`.
-- Wyliczyć w pamięci: `topProducts` (group by `description`/`product_id`), `salesByCategory` (group by `category`), `salesByDay` (group by dzień), totals.
-- Gdy zero produktowych transakcji → ten sam wzorzec empty-state co w `ProductSalesReport` (ikona `Package`, „Brak sprzedaży produktów w tym okresie").
-- Demo nadal używa `MOCK_PRODUCT_SALES_REPORT`.
+- Funkcja `public.seed_default_retention_sequences(p_salon_id uuid)` (SECURITY DEFINER, `search_path = public`) — wstawia komplet domyślnych sekwencji do `retention_sequences` z `ON CONFLICT (salon_id, sequence_key) DO NOTHING`. Każda sekwencja ma sensowny `trigger_days`, `message_template` (PL, z placeholderami `[Imię]`, `[zabieg]`, `[data]`), `tone`, `include_incentive`, `countdown_hours`, **`is_active = false`** (właściciel sam włącza po przejrzeniu — żeby nie wysłać przypadkiem do bazy klientek bez kontroli).
+- Zestaw domyślny — 7 sekwencji (rozszerzenie obecnych 5):
+  1. `proactive` (0 dni, AI rytm)
+  2. `30day` — *nowy*, łagodny check-in
+  3. `45day` — łagodna
+  4. `60day` — edukacyjna („efekty utrzymują się…")
+  5. `75day` — incentive 48h countdown, rabat 20%
+  6. `90day` — ostatnia szansa, troska
+  7. `120day` — *nowy*, win-back z mocniejszą ofertą (np. 30%)
+- Trigger `AFTER INSERT ON public.salons` → wywołuje `seed_default_retention_sequences(NEW.id)`. Dzięki temu każdy nowo zakładany salon dostaje komplet kart od razu, a właściciel tylko klika toggle „Aktywna".
+- Backfill — pojedynczy `INSERT … SELECT` po stworzeniu funkcji, dla istniejących salonów, które nie mają jeszcze żadnego wiersza w `retention_sequences` (`NOT EXISTS`).
 
-### 2. OccupancyReport — realne dane per-salon
-- Dodać prop `isDemo?: boolean` + `dateRange`.
-- `useQuery` na `appointments` (`salon_id = current`, `start_time` w zakresie, `status IN ('completed','booked','confirmed')`).
-- Wyliczyć obłożenie per dzień tygodnia i per godzina (% slotów z `working_hours` lub uproszczone „liczba wizyt / max w danym slocie").
-- Empty-state: „Obłożenie pojawi się po pierwszych wizytach".
+Bez zmian w `GRANT`/RLS — tabela już ma poprawne polityki właściciela.
 
-### 3. NoShowsReport — realne dane per-salon
-- Dodać prop `isDemo?: boolean` + `dateRange`.
-- `useQuery` na `appointments` gdzie `status = 'no_show'`, JOIN z `clients` po `client_id`.
-- Trend miesięczny + top „uciekinierzy" liczone z DB. Brak danych → empty-state „Brak no-shows — gratulacje".
+### 2. Bezpiecznik po stronie aplikacji
 
-### 4. Przekazać `isDemo` z `AccountingModule` do tych trzech komponentów (obecnie nie jest przekazywane).
+`useRetentionSequences` (`src/hooks/useRetention.ts`):
 
-### 5. Ukryty back-test izolacji per-salon
+- Po pobraniu danych: jeśli `salonId` jest, a `data` puste → wywołaj `supabase.rpc("seed_default_retention_sequences", { p_salon_id: salonId })` i ponów `select`. To leniwy fallback dla salonów, których jeszcze nie objął trigger / backfill (np. utworzonych w oknie czasowym między release'ami). Bez UI side-effectów — toast tylko przy błędzie.
 
-Po wprowadzeniu zmian uruchomię w sandboxie skrypt SQL (psql, BEZ migracji) na 2 realnych salonach (np. `91fa7aab…` i `ca3da012…`):
+### 3. Bez zmian wizualnych
 
-```text
-1. INSERT 5 fikcyjnych appointments + 5 transactions dla salonu A,
-   description="BACKTEST-<uuid>", łatwy do odfiltrowania.
-2. INSERT 3 fikcyjnych transactions (1 'no_show', 2 'product') dla salonu B.
-3. SELECT count + SUM(amount) WHERE salon_id=A  → musi zwrócić tylko A.
-4. SELECT * WHERE salon_id=A AND description LIKE 'BACKTEST-%'
-   z sesją RLS jako owner_id salonu B → musi zwrócić 0 wierszy
-   (sprawdzenie polityki "Only owners can view transactions").
-5. Uruchomić ten sam query co useQuery w AccountingModule
-   dla salonu A — potwierdzić, że dane wracają i mają poprawne pola.
-6. DELETE FROM transactions/appointments WHERE description LIKE 'BACKTEST-%';
-   final SELECT count = 0.
-```
+`SequenceEditor` i `RetentionDashboard` zostają jak są — gdy tylko zapytanie zwróci 7 wierszy, lista wyrenderuje się identycznie jak w demo, tylko z toggle'em wyłączonym, gotowym do uzbrojenia. Linkmark „Polecane" na karcie Email też się nie zmienia.
 
-Wyniki zaraportuję jako tabelę w odpowiedzi. Nic nie zostanie w bazie — wszystko z markerem `BACKTEST-` usuwane na końcu. Nie pokażę back-testu w UI, to czysto serwerowa walidacja.
+### 4. Walidacja (back-test, bez śladu w bazie)
+
+W sandboxie psql:
+
+1. `BEGIN;`
+2. Wstaw fikcyjny salon (`INSERT INTO salons …`), sprawdź że trigger założył 7 wierszy w `retention_sequences` dla tego `salon_id`, każdy `is_active=false`.
+3. Sprawdź drugi (istniejący) salon — czy backfill założył komplet, czy unikalność `(salon_id, sequence_key)` nie pozwoliła na duplikaty.
+4. Wywołaj `SELECT seed_default_retention_sequences('<istniejący-salon>')` drugi raz — oczekiwane: 0 nowych wierszy (`ON CONFLICT`).
+5. `ROLLBACK;` — potwierdzić, że nic nie zostało.
 
 ## Czego NIE ruszam
 
-- Empty-state na poziomie `AccountingModule` (już dobry).
-- Pozostałych pod-zakładek mających już `isDemo`.
-- Schematu DB — nie tworzę migracji.
-- Edge functions.
+- RLS, grants, edge functions, schedulera wysyłki.
+- Demo (`MOCK_SEQUENCES` zostaje, demo nadal czyta z mocków, nie z bazy).
+- UI `SequenceEditor` / `RetentionDashboard` — bez zmian.
+- Mutacje (zapis sekwencji) — już działają, tylko nie miały co edytować.
 
-## Akceptacja
-- Nowy salon (0 transakcji): cały moduł = jeden komunikat „Brak danych księgowych".
-- Salon z 1 transakcją usługową: tab „Sprzedaż produktów" = empty-state, „Obłożenie" = realne liczby z 1 wizyty, „No-shows" = empty-state. Zero pozycji „Serum witaminowe C 30ml" / „Monika Zawadzka" itd.
-- Back-test pokazuje 0 wycieków między salonami.
+## Pytanie do Ciebie
+
+Domyślny `is_active` przy seedowaniu — proponuję **`false`** (właściciel świadomie aktywuje każdą sekwencję po przejrzeniu treści, zero ryzyka wysłania automatycznych SMS-ów/maili do klientek bez wiedzy właściciela). Alternatywa: `true` dla `proactive` + `45/60/90 day`, `false` dla `75day` (incentive) i `120day` (win-back z rabatem). Daj znać, którą wersję wdrażam.
