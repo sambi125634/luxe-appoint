@@ -25,6 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAllServiceVariants, useServiceVariants, useSyncServiceVariants } from "@/hooks/useServiceVariants";
 import { supabase } from "@/integrations/supabase/client";
+import { StaffServiceMatrix } from "./staff/StaffServiceMatrix";
 
 interface VariantFormItem {
   id?: string;
