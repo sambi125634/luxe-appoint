@@ -51,6 +51,7 @@ import {
   defaultWidgetSteps 
 } from "./types";
 import { useServices, useServiceCategories } from "@/hooks/useServices";
+import { WidgetServiceSelector } from "./WidgetServiceSelector";
 
 interface WidgetEditorProps {
   widget: BookingWidget | null;
@@ -381,55 +382,12 @@ export function WidgetEditor({ widget, isOpen, onClose, onSave }: WidgetEditorPr
 
             {/* Services */}
             {activeTab === "services" && (
-              <div className="space-y-6">
-                <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                  <div>
-                    <Label>Pokaż wszystkie usługi</Label>
-                    <p className="text-sm text-muted-foreground">
-                      Włącz, aby pokazać pełną ofertę
-                    </p>
-                  </div>
-                  <Switch
-                    checked={formData.showAllServices}
-                    onCheckedChange={(v) => updateField('showAllServices', v)}
-                  />
-                </div>
-
-                {!formData.showAllServices && (
-                  <div className="space-y-3">
-                    <Label>Wybierz usługi do wyświetlenia</Label>
-                    {realServices.length === 0 && (
-                      <div className="text-sm text-muted-foreground p-4 border border-dashed border-border rounded-lg text-center">
-                        Najpierw dodaj usługi w zakładce „Usługi", aby je tutaj wybrać.
-                      </div>
-                    )}
-                    <div className="grid gap-2">
-                      {realServices.map(service => (
-                        <label
-                          key={service.id}
-                          className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                            formData.services?.includes(service.id)
-                              ? 'border-primary bg-primary/5'
-                              : 'border-border hover:border-primary/50'
-                          }`}
-                        >
-                          <Checkbox
-                            checked={formData.services?.includes(service.id)}
-                            onCheckedChange={() => toggleService(service.id)}
-                          />
-                          <div className="flex-1">
-                            <span className="font-medium">{service.name}</span>
-                            <span className="text-sm text-muted-foreground ml-2">
-                              {service.category}
-                            </span>
-                          </div>
-                          <Badge variant="secondary">{service.price} zł</Badge>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <WidgetServiceSelector
+                selectedIds={formData.services || []}
+                onChange={(ids) => updateField('services', ids)}
+                showAllServices={!!formData.showAllServices}
+                onShowAllChange={(v) => updateField('showAllServices', v)}
+              />
             )}
 
             {/* Steps */}
