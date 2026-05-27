@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart, FileText } from "lucide-react";
+import { Package, Warehouse, Truck, TrendingUp, Building2, FlaskConical, BarChart3, Loader2, ShoppingCart, FileText, Sparkles, ScanLine, ArrowRight } from "lucide-react";
 import { ProductsCatalog } from "./ProductsCatalog";
 import { StockManagement } from "./StockManagement";
 import { DeliveriesManagement } from "./DeliveriesManagement";
@@ -79,12 +79,37 @@ export function ProductsModule({ isDemo }: { isDemo?: boolean }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
-        <Button variant="outline" onClick={() => setIsInvoiceUploadOpen(true)} className="gap-2">
-          <FileText className="w-4 h-4" />
-          <span className="hidden sm:inline">Wgraj fakturę</span>
-        </Button>
+      <div className="grid gap-4 lg:grid-cols-5 items-stretch">
+        <div className="lg:col-span-3 min-w-0">
+          <SectionGuide sectionKey={activeTab === 'recipes' ? 'recipes' : 'products'} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsInvoiceUploadOpen(true)}
+          className="lg:col-span-2 group relative overflow-hidden rounded-2xl border border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-background p-5 text-left transition-all hover:border-primary/60 hover:shadow-lg hover:-translate-y-0.5"
+        >
+          <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/10 blur-2xl transition-opacity group-hover:opacity-80" aria-hidden />
+          <div className="relative flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+              <ScanLine className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                  <Sparkles className="h-3 w-3" />
+                  AI Skaner
+                </span>
+              </div>
+              <h3 className="font-serif text-base font-semibold leading-tight">
+                Wgraj fakturę — AI zaktualizuje stany
+              </h3>
+              <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                Zrób zdjęcie lub wgraj PDF. System odczyta produkty, ilości i ceny, a magazyn zaktualizuje się w sekundę.
+              </p>
+            </div>
+            <ArrowRight className="h-4 w-4 shrink-0 text-primary opacity-0 transition-all group-hover:opacity-100 group-hover:translate-x-1 mt-3" />
+          </div>
+        </button>
       </div>
       <InvoiceAIScanner
         open={isInvoiceUploadOpen}
