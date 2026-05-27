@@ -70,6 +70,98 @@ export function useAutopilotActions() {
   });
 }
 
+// ---- Real Autopilot Score (no hardcoded fallback) ----
+
+export interface AutopilotScoreResult {
+  score: number | null; // null = not enough data yet
+  hasData: boolean;
+  breakdown: {
+    execution: number;
+    activation: number;
+    conversion: number;
+    config: number;
+  };
+}
+
+export function useAutopilotScore() {
+  const { salonId } = useSalonId();
+
+  return useQuery({
+    queryKey: ["autopilot-score", salonId],
+    queryFn: async (): Promise<AutopilotScoreResult> => {
+      if (!salonId) {
+        return { score: null, hasData: false, breakdown: { execution: 0, activation: 0, conversion: 0, config: 0 } };
+      }
+
+      const since = new Date();
+      since.setDate(since.getDate() - 30);
+
+      const [actionsRes, configRes, salonRes] = await Promise.all([
+        supabase
+          .from("autopilot_actions")
+          .select("status, metadata, created_at")
+          .eq("salon_id", salonId)
+          .gte("created_at", since.toISOString()),
+        supabase
+          .from("autopilot_config")
+          .select("*")
+          .eq("salon_id", salonId)
+          .maybeSingle(),
+        supabase
+          .from("salons")
+          .select("created_at")
+          .eq("id", salonId)
+          .maybeSingle(),
+      ]);
+
+      const actions = actionsRes.data ?? [];
+      const config = configRes.data as Record<string, unknown> | null;
+      const salonCreatedAt = salonRes.data?.created_at ? new Date(salonRes.data.created_at) : null;
+      const ageDays = salonCreatedAt ? (Date.now() - salonCreatedAt.getTime()) / 86400000 : 0;
+
+      // No data yet → show "—" not a fake number
+      if (actions.length === 0 && ageDays < 7) {
+        return { score: null, hasData: false, breakdown: { execution: 0, activation: 0, conversion: 0, config: 0 } };
+      }
+
+      // 40 pts — executed/total ratio
+      const executed = actions.filter(a => ["executed", "sent", "completed"].includes(String(a.status))).length;
+      const execution = actions.length > 0 ? Math.round((executed / actions.length) * 40) : 0;
+
+      // 30 pts — share of active autopilot features in config (boolean flags only)
+      let activation = 0;
+      if (config) {
+        const flags = Object.entries(config).filter(([k, v]) =>
+          typeof v === "boolean" && k !== "is_active" && !k.startsWith("_")
+        );
+        if (flags.length > 0) {
+          const on = flags.filter(([, v]) => v === true).length;
+          activation = Math.round((on / flags.length) * 30);
+        }
+      }
+
+      // 20 pts — conversion ratio (metadata.converted = true)
+      const converted = actions.filter(a => {
+        const m = a.metadata as Record<string, unknown> | null;
+        return m && m.converted === true;
+      }).length;
+      const conversion = executed > 0 ? Math.round((converted / executed) * 20) : 0;
+
+      // 10 pts — config completeness (is_active + at least one feature on)
+      const cfgActive = config && (config as { is_active?: boolean }).is_active === true;
+      const configScore = cfgActive ? 10 : 0;
+
+      const total = execution + activation + conversion + configScore;
+      return {
+        score: total,
+        hasData: true,
+        breakdown: { execution, activation, conversion, config: configScore },
+      };
+    },
+    enabled: !!salonId,
+  });
+}
+
 export function useDismissAction() {
   const qc = useQueryClient();
   return useMutation({

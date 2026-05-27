@@ -1,58 +1,89 @@
-# Sekwencje retencyjne — admin pokazuje pustkę
+# Naprawa zakłamanych danych w AI Autopilot
 
-## Przyczyna
+## Diagnoza — skąd biorą się fałszywe liczby
 
-W demo lista 5 sekwencji pochodzi ze stałej `MOCK_SEQUENCES` (mock-data). W realnym panelu admin (`RetentionDashboard` → `useRetentionSequences`) komponent czyta tabelę `public.retention_sequences` po `salon_id`. Tabela jest tworzona migracją z marca 2026, ale **nigdzie nie jest seedowana** — ani w onboardingu, ani triggerem na `salons`. Dla każdego nowego salonu zwraca 0 wierszy, więc `sequences.map(...)` w `SequenceEditor` renderuje wyłącznie nagłówek + kartę „Skąd wysyłamy" i kończy się pustką pod spodem (brak kafelków „Zanim odejdzie", „45 dni" itd. ze screena demo).
+Sprawdziłem bazę: tabela `autopilot_actions` ma **0 rekordów** dla wszystkich kont. Wszystkie liczby, które widzisz na nowym koncie (Akcje: 1, Odzyskany przychód: 1 zł, Nowe opinie: +1, Score: 72/100), pochodzą **z hardkodowanych wartości w kodzie UI**, nie z żadnych akcji w Twoim salonie. Konkretnie:
 
-Druga sprawa: jest tylko 5 sequence_keys (`proactive`, `45day`, `60day`, `75day`, `90day`). User pyta, czy nie zwiększyć liczby punktów — tak, dorzucamy kilka, żeby lejek był „grubszy" i lepiej testowalny.
+### Bug 1 — Autopilot Score zawsze 72/100
+Plik `src/components/admin/autopilot/AutopilotScore.tsx`:
+```ts
+const score = isDemo ? DEMO_AUTOPILOT_DATA.score : 72;  // ← hardkod 72
+```
+Dla każdego nowego konta (i każdego konta produkcyjnego!) zwraca **72**. To czysty placeholder, który został w kodzie po prototypie.
 
-## Plan
+### Bug 2 — „Akcje dziś" liczone błędnie
+`AutopilotOverview.tsx`:
+```ts
+const todayStr = new Date().toISOString().split("T")[1]; // ← pobiera CZAS, nie DATĘ
+const isToday = (d) => new Date(d).toISOString().split("T")[1] === todayStr;
+```
+Powinno być `split("T")[0]` (data). Obecna logika porównuje znaczniki czasu z milisekundami — przypadkowo dopasowuje 0–1 rekordów. Stąd „1".
 
-### 1. Backfill + auto-seed w bazie (1 migracja)
+### Bug 3 — „Odzyskany przychód" sumowany ze wszystkich rekordów
+Sumuje `metadata.revenue_recovered` z **wszystkich** akcji (limit 50), bez filtra na bieżący miesiąc ani na status `completed/executed`. Jeśli jakikolwiek rekord ma `metadata.revenue_recovered = 1` (np. testowy / migracja), pojawi się 1 zł.
 
-Nowa migracja `…_seed_retention_sequences.sql`:
+### Bug 4 — „No-show rate" nie jest procentem
+Etykieta mówi „No-show rate" (%), a wartość to surowy COUNT z `autopilot_actions` — wprowadza w błąd.
 
-- Funkcja `public.seed_default_retention_sequences(p_salon_id uuid)` (SECURITY DEFINER, `search_path = public`) — wstawia komplet domyślnych sekwencji do `retention_sequences` z `ON CONFLICT (salon_id, sequence_key) DO NOTHING`. Każda sekwencja ma sensowny `trigger_days`, `message_template` (PL, z placeholderami `[Imię]`, `[zabieg]`, `[data]`), `tone`, `include_incentive`, `countdown_hours`, **`is_active = false`** (właściciel sam włącza po przejrzeniu — żeby nie wysłać przypadkiem do bazy klientek bez kontroli).
-- Zestaw domyślny — 7 sekwencji (rozszerzenie obecnych 5):
-  1. `proactive` (0 dni, AI rytm)
-  2. `30day` — *nowy*, łagodny check-in
-  3. `45day` — łagodna
-  4. `60day` — edukacyjna („efekty utrzymują się…")
-  5. `75day` — incentive 48h countdown, rabat 20%
-  6. `90day` — ostatnia szansa, troska
-  7. `120day` — *nowy*, win-back z mocniejszą ofertą (np. 30%)
-- Trigger `AFTER INSERT ON public.salons` → wywołuje `seed_default_retention_sequences(NEW.id)`. Dzięki temu każdy nowo zakładany salon dostaje komplet kart od razu, a właściciel tylko klika toggle „Aktywna".
-- Backfill — pojedynczy `INSERT … SELECT` po stworzeniu funkcji, dla istniejących salonów, które nie mają jeszcze żadnego wiersza w `retention_sequences` (`NOT EXISTS`).
+### Bug 5 — `recentActions.slice(1, 20)`
+Lista ostatnich akcji pomija pierwszy element (zaczyna od indeksu 1) — bug off-by-one.
 
-Bez zmian w `GRANT`/RLS — tabela już ma poprawne polityki właściciela.
+### Bug 6 — fallback `|| "Klientka"`
+Gdy `triggered_by` jest puste, w feedzie pojawia się generyczna „Klientka" — mylące.
 
-### 2. Bezpiecznik po stronie aplikacji
+---
 
-`useRetentionSequences` (`src/hooks/useRetention.ts`):
+## Plan naprawy
 
-- Po pobraniu danych: jeśli `salonId` jest, a `data` puste → wywołaj `supabase.rpc("seed_default_retention_sequences", { p_salon_id: salonId })` i ponów `select`. To leniwy fallback dla salonów, których jeszcze nie objął trigger / backfill (np. utworzonych w oknie czasowym między release'ami). Bez UI side-effectów — toast tylko przy błędzie.
+### 1. `AutopilotScore.tsx` — realny wzór scoringu lub „—"
+Usuwam hardkod `72`. Dla salonów bez danych pokazuję stan pusty:
+- Jeśli `autopilot_actions.count = 0` **i** salon < 7 dni → komponent wyświetla `—/100` z etykietą „Zbieranie danych" i tooltipem „Wynik pojawi się po pierwszych akcjach Autopilota".
+- W przeciwnym razie liczę realny wynik (0–100) z formuły opartej WYŁĄCZNIE na własnych danych salonu: 
+  - 40 pkt — `executed/total` ratio akcji ostatnich 30 dni
+  - 30 pkt — odsetek aktywnych funkcji Autopilota w `autopilot_config`
+  - 20 pkt — odsetek odpowiedzi/konwersji z akcji (np. `metadata.converted = true`)
+  - 10 pkt — kompletność konfiguracji (godziny pracy, integracje, kanały)
+- Logika trafia do nowego hooka `useAutopilotScore(salonId)` w `src/hooks/useAutopilot.ts`. Tylko zapytania do tabel tego salonu (RLS już to wymusza).
 
-### 3. Bez zmian wizualnych
+### 2. `AutopilotOverview.tsx` — naprawa KPI
+- **Akcje dziś**: poprawiam `split("T")[1]` → `split("T")[0]`. Filtruję po `created_at >= today 00:00` i `status IN ('executed','sent','completed')`.
+- **Odzyskany przychód**: filtruję po `created_at` w bieżącym miesiącu i tylko `status = 'executed'`. Etykieta podtekstu: „ten miesiąc" pozostaje.
+- **No-show rate**: zmieniam etykietę na „Zapobiegnięte no-show" (count z `type='noshow_prevention'` i `status='executed'`). Jeśli 0 → pokazuje `—` + „Brak akcji w tym okresie".
+- **Nowe opinie**: filtruję bieżący tydzień + `status='executed'`. Jeśli 0 → `0`, nie `+0`.
+- Wszystkie KPI dla pustej bazy pokazują `—` zamiast `0 zł`/`+0`, plus jednolity stan pusty: „Autopilot dopiero zbiera dane — pierwsze wartości pojawią się po pierwszych akcjach".
+- Usuwam `useAnimatedCount` dla wartości produkcyjnych (animacja licznika sugeruje „dzieje się coś" — zbędne na zerach).
+- Poprawiam `slice(1, 20)` → `slice(0, 20)`.
+- Usuwam fallback `"Klientka"` — jeśli brak `client_id`, pomijam wiersz.
 
-`SequenceEditor` i `RetentionDashboard` zostają jak są — gdy tylko zapytanie zwróci 7 wierszy, lista wyrenderuje się identycznie jak w demo, tylko z toggle'em wyłączonym, gotowym do uzbrojenia. Linkmark „Polecane" na karcie Email też się nie zmienia.
+### 3. `AutopilotStatusBar.tsx` — już ma guard
+Pasek już ukrywa się gdy `actions_today === 0 && revenue_today === 0`. Dodaję ten sam filtr daty/statusu co wyżej i upewniam się, że zapytanie używa `status='executed'` (jest), żeby drafty/pending nie podbijały liczb.
 
-### 4. Walidacja (back-test, bez śladu w bazie)
+### 4. `AutopilotModule.tsx` — nagłówek
+Linia „System pracuje za Ciebie — nawet gdy śpisz" zostaje (jest neutralna). Badge „Aktywny 24/7" pokazuję tylko gdy `autopilot_config.is_active = true` w realnym koncie. Dla świeżego konta z wyłączonymi funkcjami → badge zmienia się na „Uśpiony — włącz funkcje by aktywować".
 
-W sandboxie psql:
+### 5. Test bez zakłamań
+Po wdrożeniu, na nowym koncie test akceptacji:
+- Wszystkie 4 KPI pokazują `—` lub `0` z podpisem „Brak danych"
+- Score: `—/100` + „Zbieranie danych"
+- Pasek górny: ukryty
+- Lista „Ostatnie akcje": pusty stan „Autopilot dopiero zaczyna zbierać dane"
 
-1. `BEGIN;`
-2. Wstaw fikcyjny salon (`INSERT INTO salons …`), sprawdź że trigger założył 7 wierszy w `retention_sequences` dla tego `salon_id`, każdy `is_active=false`.
-3. Sprawdź drugi (istniejący) salon — czy backfill założył komplet, czy unikalność `(salon_id, sequence_key)` nie pozwoliła na duplikaty.
-4. Wywołaj `SELECT seed_default_retention_sequences('<istniejący-salon>')` drugi raz — oczekiwane: 0 nowych wierszy (`ON CONFLICT`).
-5. `ROLLBACK;` — potwierdzić, że nic nie zostało.
+### 6. Sweep — żeby to się nie powtórzyło
+Po naprawie przeszukuję `src/components/admin/` i `src/modules/` regexem na hardkodowane liczby w ścieżkach niezwiązanych z `isDemo`/`mock`/`demo-data.ts` (np. `: 72`, `: 2350`, `revenue_recovered: 1`) i wycinam pozostałe placeholdery. Dotyczy też `RetentionOverview`, `WeeklyBriefWidget` itd., żeby zasada „dane wyłącznie z realnych zdarzeń tego salonu" obowiązywała w całym panelu.
 
-## Czego NIE ruszam
+---
 
-- RLS, grants, edge functions, schedulera wysyłki.
-- Demo (`MOCK_SEQUENCES` zostaje, demo nadal czyta z mocków, nie z bazy).
-- UI `SequenceEditor` / `RetentionDashboard` — bez zmian.
-- Mutacje (zapis sekwencji) — już działają, tylko nie miały co edytować.
+## Pliki do zmiany
 
-## Pytanie do Ciebie
+- `src/components/admin/autopilot/AutopilotScore.tsx` — usunąć hardkod 72, użyć `useAutopilotScore`
+- `src/hooks/useAutopilot.ts` — dodać `useAutopilotScore(salonId)` z realną formułą
+- `src/components/admin/autopilot/AutopilotOverview.tsx` — naprawić filtr dat, statusy, `slice`, fallbacki, stan pusty
+- `src/components/admin/autopilot/AutopilotModule.tsx` — warunkowy badge „Aktywny/Uśpiony"
+- `src/components/admin/AutopilotStatusBar.tsx` — wzmocnić filtry statusu (drobna korekta)
+- Sweep pozostałych modułów (Retention, WeeklyBrief) pod kątem hardkodów demo wyciekających do prod
 
-Domyślny `is_active` przy seedowaniu — proponuję **`false`** (właściciel świadomie aktywuje każdą sekwencję po przejrzeniu treści, zero ryzyka wysłania automatycznych SMS-ów/maili do klientek bez wiedzy właściciela). Alternatywa: `true` dla `proactive` + `45/60/90 day`, `false` dla `75day` (incentive) i `120day` (win-back z rabatem). Daj znać, którą wersję wdrażam.
+## Co poza zakresem (bez zmian)
+- Logika trybu demo i `demo-data.ts` — pozostaje nietknięta (działa tylko gdy `isDemo=true`)
+- Schematy DB / RLS — nie wymagają zmian, izolacja salonów już działa
+
+Po Twojej akceptacji wdrażam.
