@@ -16,6 +16,8 @@ import { EasyCardBuilder } from "./EasyCardBuilder";
 import { SendCardModal } from "./SendCardModal";
 import { ServiceCardAssignment } from "./ServiceCardAssignment";
 import { SendsHistory } from "./SendsHistory";
+import { TemplateGallery } from "./TemplateGallery";
+import { TEMPLATE_LIBRARY } from "./templateLibrary";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -32,15 +34,6 @@ const CATEGORY_MAP: Record<string, { emoji: string; label: string }> = {
   rodo: { emoji: "📋", label: "RODO" },
   custom: { emoji: "✏️", label: "Własna" },
 };
-
-const STARTER_TEMPLATES = [
-  { name: "Ogólna karta konsultacyjna", emoji: "✨", questionsCount: 8, minutes: 3, category: "general" },
-  { name: "Zabiegi paznokci", emoji: "💅", questionsCount: 6, minutes: 2, category: "nails" },
-  { name: "Zabiegi twarzy", emoji: "💆", questionsCount: 10, minutes: 4, category: "face" },
-  { name: "Zabiegi włosów", emoji: "💇", questionsCount: 7, minutes: 3, category: "hair" },
-  { name: "Klinika estetyczna", emoji: "🏥", questionsCount: 14, minutes: 6, category: "medical" },
-  { name: "Zgoda RODO + marketing", emoji: "📋", questionsCount: 3, minutes: 1, category: "rodo" },
-];
 
 const GROUP_EXPLANATIONS = [
   { emoji: "💎", name: "VIP Shopper", desc: "Kupiła za ponad 2000 zł łącznie i wróciła min. 3 razy" },
@@ -60,6 +53,9 @@ export function ConsultationModule({ isDemo }: Props) {
   const [showSendModal, setShowSendModal] = useState(false);
   const [sendCardId, setSendCardId] = useState<string | undefined>();
   const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [presetTemplateId, setPresetTemplateId] = useState<string | null>(null);
+  const [scratchMode, setScratchMode] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
 
   const displayTemplates = isDemo
     ? [
@@ -80,6 +76,23 @@ export function ConsultationModule({ isDemo }: Props) {
 
   const openEdit = (tpl: any) => {
     setEditTemplate(tpl);
+    setPresetTemplateId(null);
+    setScratchMode(false);
+    setShowBuilder(true);
+  };
+
+  const openFromLibrary = (tplId: string) => {
+    setEditTemplate(null);
+    setPresetTemplateId(tplId);
+    setScratchMode(false);
+    setShowGallery(false);
+    setShowBuilder(true);
+  };
+
+  const openScratch = () => {
+    setEditTemplate(null);
+    setPresetTemplateId(null);
+    setScratchMode(true);
     setShowBuilder(true);
   };
 
@@ -87,7 +100,7 @@ export function ConsultationModule({ isDemo }: Props) {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-serif font-bold">{t("consultation.title")}</h2>
-        <p className="text-muted-foreground">{t("consultation.subtitle")}</p>
+        <p className="text-muted-foreground">Cyfrowe karty z bibliotekÄ… {TEMPLATE_LIBRARY.length} gotowych szablonów</p>
       </div>
 
       <SectionGuide sectionKey="consultation" />
@@ -112,30 +125,21 @@ export function ConsultationModule({ isDemo }: Props) {
         <TabsContent value="cards" className="mt-6 space-y-6">
           {/* Header buttons */}
           <div className="flex items-center gap-3 flex-wrap">
-            <Button onClick={() => { setEditTemplate(null); setShowBuilder(true); }} className="gap-2">
-              <Sparkles className="w-4 h-4" /> Utwórz z szablonu
+            <Button onClick={() => setShowGallery((v) => !v)} className="gap-2">
+              <Sparkles className="w-4 h-4" /> {showGallery ? "Ukryj bibliotekÄ™" : "Z biblioteki szablonów"}
             </Button>
-            <Button variant="outline" onClick={() => { setEditTemplate(null); setShowBuilder(true); }} className="gap-2">
+            <Button variant="outline" onClick={openScratch} className="gap-2">
               <Plus className="w-4 h-4" /> Utwórz od zera
             </Button>
           </div>
 
-          {/* Starter templates - show when no cards */}
-          {displayTemplates.length === 0 && (
+          {/* Template library — visible on toggle OR when there are no cards yet */}
+          {(showGallery || displayTemplates.length === 0) && (
             <div>
-              <p className="text-sm font-medium mb-3">Gotowe szablony do kliknięcia</p>
-              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                {STARTER_TEMPLATES.map(tpl => (
-                  <Card key={tpl.name} className="cursor-pointer hover:shadow-md transition-shadow hover:border-primary/30" onClick={() => { setEditTemplate(null); setShowBuilder(true); }}>
-                    <CardContent className="py-4 space-y-2">
-                      <span className="text-2xl">{tpl.emoji}</span>
-                      <p className="font-medium text-sm">{tpl.name}</p>
-                      <p className="text-xs text-muted-foreground">{tpl.questionsCount} pytań · {tpl.minutes} min</p>
-                      <Button variant="link" size="sm" className="p-0 h-auto text-xs">Użyj szablonu →</Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <p className="text-sm font-medium mb-3">
+                Biblioteka szablonów {displayTemplates.length === 0 ? "— zacznij od jednego klikniÄ™cia" : ""}
+              </p>
+              <TemplateGallery onPick={(tpl) => openFromLibrary(tpl.id)} />
             </div>
           )}
 
@@ -203,9 +207,11 @@ export function ConsultationModule({ isDemo }: Props) {
       {showBuilder && (
         <EasyCardBuilder
           isOpen={showBuilder}
-          onClose={() => { setShowBuilder(false); setEditTemplate(null); }}
+          onClose={() => { setShowBuilder(false); setEditTemplate(null); setPresetTemplateId(null); setScratchMode(false); }}
           isDemo={isDemo}
           editTemplate={editTemplate}
+          presetTemplateId={presetTemplateId}
+          scratchMode={scratchMode}
         />
       )}
 
