@@ -38,65 +38,94 @@ export function AutopilotOverview({ isDemo }: AutopilotOverviewProps) {
   const d = DEMO_AUTOPILOT_DATA;
   const { data: realActions, isLoading } = useAutopilotActions();
 
-  const todayStr = new Date().toISOString().split("T")[1];
-  const isToday = (dateStr: string) => new Date(dateStr).toISOString().split("T")[1] === todayStr;
+  // Date helpers (use DATE part, not TIME)
+  const now = new Date();
+  const todayStart = new Date(now); todayStart.setHours(0, 0, 0, 0);
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - 7);
 
-  const actionsTodayCount = isDemo ? d.kpi.actionsToday : (realActions?.filter(a => isToday(a.created_at)).length || 0);
+  const EXECUTED_STATUSES = new Set(["executed", "sent", "completed"]);
+  const isExecuted = (s: string) => EXECUTED_STATUSES.has(s);
+
+  const realExecuted = (realActions ?? []).filter(a => isExecuted(String(a.status)));
+
+  const actionsTodayCount = isDemo
+    ? d.kpi.actionsToday
+    : realExecuted.filter(a => new Date(a.created_at) >= todayStart).length;
+
   const revenueRecoveredCount = isDemo
     ? d.kpi.revenueRecovered
-    : (realActions?.reduce((sum, a) => sum + (Number(a.metadata?.revenue_recovered) || 0), 0) || 0);
+    : realExecuted
+        .filter(a => new Date(a.created_at) >= monthStart)
+        .reduce((sum, a) => sum + (Number((a.metadata as Record<string, unknown> | null)?.revenue_recovered) || 0), 0);
+
   const newReviewsCount = isDemo
     ? d.kpi.newReviews
-    : (realActions?.filter(a => a.type === "review" && a.status === "completed").length || 0);
+    : realExecuted.filter(a => a.type === "review" && new Date(a.created_at) >= weekStart).length;
 
   const actionsToday = useAnimatedCount(actionsTodayCount, 800, !!isDemo);
   const revenueRecovered = useAnimatedCount(revenueRecoveredCount, 1500, !!isDemo);
   const newReviews = useAnimatedCount(newReviewsCount, 1000, !!isDemo);
 
-  const noShowCount = realActions?.filter(a => a.type === "noshow").length || 0;
+  const noShowPreventedCount = realExecuted.filter(a =>
+    a.type === "noshow" || a.type === "noshow_prevention"
+  ).length;
   const totalActions = realActions?.length || 0;
+  const hasAnyData = totalActions > 0;
+  const dash = "—";
 
   const MOCK_KPI = [
     {
       label: "Akcje dziś",
-      value: isDemo ? String(actionsToday) : String(actionsTodayCount),
+      value: isDemo ? String(actionsToday) : (hasAnyData ? String(actionsTodayCount) : dash),
       icon: Zap,
       color: "violet",
-      sub: isDemo ? `${d.kpi.actionsTotal} łącznie` : `${totalActions} łącznie`,
+      sub: isDemo ? `${d.kpi.actionsTotal} łącznie` : (hasAnyData ? `${totalActions} łącznie` : "Brak akcji"),
     },
     {
       label: "Odzyskany przychód",
-      value: isDemo ? `${revenueRecovered.toLocaleString("pl-PL")} zł` : `${revenueRecoveredCount.toLocaleString("pl-PL")} zł`,
+      value: isDemo
+        ? `${revenueRecovered.toLocaleString("pl-PL")} zł`
+        : (revenueRecoveredCount > 0 ? `${revenueRecoveredCount.toLocaleString("pl-PL")} zł` : dash),
       icon: TrendingUp,
       color: "green",
-      sub: "ten miesiąc",
+      sub: hasAnyData || isDemo ? "ten miesiąc" : "Brak danych",
     },
     {
-      label: "No-show rate",
-      value: isDemo ? `${d.kpi.noShowRate}%` : (noShowCount > 0 ? `${noShowCount}` : "—"),
+      label: isDemo ? "No-show rate" : "Zapobiegnięte no-show",
+      value: isDemo ? `${d.kpi.noShowRate}%` : (noShowPreventedCount > 0 ? `${noShowPreventedCount}` : dash),
       icon: UserX,
       color: "green",
-      sub: isDemo ? `↓ było ${d.kpi.noShowPrev}% — Autopilot to zmienił` : (noShowCount > 0 ? "Aktywny monitoring" : "Brak danych"),
+      sub: isDemo
+        ? `↓ było ${d.kpi.noShowPrev}% — Autopilot to zmienił`
+        : (noShowPreventedCount > 0 ? "Aktywny monitoring" : "Brak akcji w tym okresie"),
       subColor: isDemo ? "text-green-600" : undefined,
     },
     {
       label: "Nowe opinie",
-      value: isDemo ? `+${newReviews}` : `+${newReviewsCount}`,
+      value: isDemo ? `+${newReviews}` : (newReviewsCount > 0 ? `+${newReviewsCount}` : dash),
       icon: Star,
       color: "amber",
-      sub: "ten tydzień",
+      sub: hasAnyData || isDemo ? "ten tydzień" : "Brak danych",
     },
   ];
 
   const plannedActions = isDemo ? d.plannedActions : [];
-  const recentActions = isDemo ? d.recentActions : (realActions || []).slice(1, 20).map(a => ({
-    time: a.created_at.split("T")[1].substring(1, 6),
-    type: a.type,
-    clientName: a.triggered_by || "Klientka",
-    status: a.status,
-    statusLabel: a.status === "completed" ? "Wykonane" : a.status === "pending" ? "Oczekuje" : "Błąd",
-    effect: a.metadata?.revenue_recovered as number | undefined,
-  }));
+  const recentActions = isDemo
+    ? d.recentActions
+    : (realActions || [])
+        .filter(a => !!a.triggered_by) // skip rows without real client/source
+        .slice(0, 20)
+        .map(a => ({
+          time: a.created_at.substring(11, 16),
+          type: a.type,
+          clientName: a.triggered_by as string,
+          status: a.status,
+          statusLabel:
+            isExecuted(String(a.status)) ? "Wykonane" :
+            a.status === "pending" ? "Oczekuje" : "Błąd",
+          effect: (a.metadata as Record<string, unknown> | null)?.revenue_recovered as number | undefined,
+        }));
 
   if (!isDemo && isLoading) {
     return (
