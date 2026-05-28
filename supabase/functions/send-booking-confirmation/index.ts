@@ -110,21 +110,22 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     // Get template or use default
-    const template = settings.emailConfirmationTemplate || 
+    const template = settings.confirmationEmailTemplate || 
       `Cześć {imie}!\n\nTwoja rezerwacja została potwierdzona.\n\n📅 Data: {data}\n⏰ Godzina: {godzina}\n💇 Usługa: {usluga}\n👤 Specjalista: {specjalista}\n📍 Adres: {adres}\n\nDo zobaczenia!\n{nazwa_salonu}`;
 
     // Replace variables in template
     const emailBody = template
-      .replace(/{imie}/g, client.first_name)
-      .replace(/{nazwisko}/g, client.last_name)
-      .replace(/{data}/g, formattedDate)
-      .replace(/{godzina}/g, formattedTime)
-      .replace(/{usluga}/g, service.name)
-      .replace(/{specjalista}/g, staff.name)
-      .replace(/{adres}/g, salon.address || "")
-      .replace(/{nazwa_salonu}/g, salon.name)
-      .replace(/{cena}/g, `${service.price} zł`)
-      .replace(/{czas_trwania}/g, `${service.duration} min`);
+      .replace(/{imie}/g, client.first_name ?? "")
+      .replace(/{nazwisko}/g, client.last_name ?? "")
+      .replace(/{data}/g, formattedDate ?? "")
+      .replace(/{godzina}/g, formattedTime ?? "")
+      .replace(/{usluga}/g, service?.name ?? "")
+      .replace(/{specjalista}/g, staff?.name ?? "")
+      .replace(/{adres}/g, salon.address ?? "")
+      .replace(/{telefon}/g, salon.phone ?? "")
+      .replace(/{nazwa_salonu}/g, salon.name ?? "")
+      .replace(/{cena}/g, service?.price != null ? `${service.price} zł` : "")
+      .replace(/{czas_trwania}/g, service?.duration != null ? `${service.duration} min` : "");
 
     // Convert newlines to HTML
     const htmlBody = emailBody.replace(/\n/g, "<br>");
