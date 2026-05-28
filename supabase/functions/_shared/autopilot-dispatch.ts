@@ -18,11 +18,10 @@ export function createServiceClient(): SupabaseClient {
 export async function isDemoSalon(supabase: SupabaseClient, salonId: string): Promise<boolean> {
   const { data } = await supabase
     .from("salons")
-    .select("slug, is_demo")
+    .select("slug")
     .eq("id", salonId)
     .maybeSingle();
   if (!data) return false;
-  if ((data as Record<string, unknown>).is_demo === true) return true;
   const slug = (data as { slug?: string }).slug ?? "";
   return slug.startsWith("demo-") || slug === "demo-salon";
 }
