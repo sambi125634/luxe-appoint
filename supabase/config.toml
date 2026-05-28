@@ -68,3 +68,42 @@ verify_jwt = false
 
 [functions.autopilot-smart-reminder]
 verify_jwt = false
+
+[functions.autopilot-flash-offer]
+verify_jwt = false
+
+[functions.autopilot-weather-trigger]
+verify_jwt = false
+
+[functions.autopilot-dead-hours]
+verify_jwt = false
+
+[functions.autopilot-upsell-pre-visit]
+verify_jwt = false
+
+[functions.autopilot-vip-radar]
+verify_jwt = false
+
+[functions.autopilot-silent-ambassador]
+verify_jwt = false
+
+[functions.autopilot-snowball-referral]
+verify_jwt = false
+
+[functions.autopilot-first-visit-sequence]
+verify_jwt = false
+
+[functions.autopilot-loyalty-engine]
+verify_jwt = false
+
+[functions.autopilot-review-guard]
+verify_jwt = false
+
+[functions.autopilot-price-change-followup]
+verify_jwt = false
+
+[functions.autopilot-profit-alarm]
+verify_jwt = false
+
+[functions.autopilot-abandoned-booking]
+verify_jwt = false
