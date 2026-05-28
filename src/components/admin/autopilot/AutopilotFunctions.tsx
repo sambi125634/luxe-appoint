@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { DEMO_AUTOPILOT_DATA } from "./demo-data";
 import { AutopilotConfigSheet, FUNCTION_CONFIGS } from "./AutopilotConfigSheet";
 import { FlashOfertaCard } from "./FlashOfertaCard";
+import { PogodowyTriggerCard } from "./PogodowyTriggerCard";
 
 interface AutopilotFunctionsProps {
   isDemo?: boolean;
@@ -796,6 +797,7 @@ export function AutopilotFunctions({ isDemo }: AutopilotFunctionsProps) {
   return (
     <div className="space-y-4">
       <FlashOfertaCard isDemo={isDemo} />
+      <PogodowyTriggerCard isDemo={isDemo} />
       <p className="text-sm text-muted-foreground">
         Kliknij "Konfiguruj" aby dostosować każdą funkcję. Przykłady pokazują jak będzie wyglądać z Twoimi danymi.
       </p>
