@@ -115,21 +115,22 @@ const handler = async (req: Request): Promise<Response> => {
           });
 
           // Get template or use default
-          const template = settings.emailReminderTemplate || 
+          const template = settings.reminderEmailTemplate || 
             `Cześć {imie}!\n\nPrzypominamy o jutrzejszej wizycie.\n\n📅 Data: {data}\n⏰ Godzina: {godzina}\n💇 Usługa: {usluga}\n👤 Specjalista: {specjalista}\n📍 Adres: {adres}\n\nDo zobaczenia!\n{nazwa_salonu}`;
 
           // Replace variables
           const emailBody = template
-            .replace(/{imie}/g, client.first_name)
-            .replace(/{nazwisko}/g, client.last_name)
-            .replace(/{data}/g, formattedDate)
-            .replace(/{godzina}/g, formattedTime)
-            .replace(/{usluga}/g, service.name)
-            .replace(/{specjalista}/g, staff.name)
-            .replace(/{adres}/g, salon.address || "")
-            .replace(/{nazwa_salonu}/g, salon.name)
-            .replace(/{cena}/g, `${service.price} zł`)
-            .replace(/{czas_trwania}/g, `${service.duration} min`);
+            .replace(/{imie}/g, client.first_name ?? "")
+            .replace(/{nazwisko}/g, client.last_name ?? "")
+            .replace(/{data}/g, formattedDate ?? "")
+            .replace(/{godzina}/g, formattedTime ?? "")
+            .replace(/{usluga}/g, service?.name ?? "")
+            .replace(/{specjalista}/g, staff?.name ?? "")
+            .replace(/{adres}/g, salon.address ?? "")
+            .replace(/{telefon}/g, salon.phone ?? "")
+            .replace(/{nazwa_salonu}/g, salon.name ?? "")
+            .replace(/{cena}/g, service?.price != null ? `${service.price} zł` : "")
+            .replace(/{czas_trwania}/g, service?.duration != null ? `${service.duration} min` : "");
 
           const htmlBody = emailBody.replace(/\n/g, "<br>");
 
