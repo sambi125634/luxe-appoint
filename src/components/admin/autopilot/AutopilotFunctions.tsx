@@ -12,6 +12,13 @@ import { DEMO_AUTOPILOT_DATA } from "./demo-data";
 import { AutopilotConfigSheet, FUNCTION_CONFIGS } from "./AutopilotConfigSheet";
 import { FlashOfertaCard } from "./FlashOfertaCard";
 import { PogodowyTriggerCard } from "./PogodowyTriggerCard";
+import { useAutopilotConfig, useUpdateAutopilotConfig } from "@/hooks/useAutopilot";
+import {
+  useAutopilotModuleStats,
+  MODULE_KEY_MAP,
+  formatLastRun,
+  type AutopilotModuleStatsRow,
+} from "@/hooks/useAutopilotModuleStats";
 
 interface AutopilotFunctionsProps {
   isDemo?: boolean;
@@ -605,12 +612,14 @@ function FunctionCard({
   isDemo,
   onToggle,
   onConfigure,
+  stats,
 }: {
   fn: FunctionDef;
   enabled: boolean;
   isDemo: boolean | undefined;
   onToggle: (key: FunctionKey) => void;
   onConfigure: (key: string) => void;
+  stats?: AutopilotModuleStatsRow;
 }) {
   const controls = useAnimation();
   const c = fn.colors;
@@ -672,6 +681,12 @@ function FunctionCard({
                   {fn.title}
                 </p>
                 <p className="text-xs text-muted-foreground">{fn.schedule}</p>
+                {!isDemo && enabled && stats?.last_run_at && (
+                  <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Aktywny · {formatLastRun(stats.last_run_at)}
+                  </div>
+                )}
               </div>
             </div>
             <Switch checked={enabled} onCheckedChange={handleToggle} />
@@ -763,7 +778,11 @@ function FunctionCard({
 // ── MAIN COMPONENT ──
 
 export function AutopilotFunctions({ isDemo }: AutopilotFunctionsProps) {
-  const [enabledState, setEnabledState] = useState<Record<string, boolean>>(() => {
+  const { data: liveConfig } = useAutopilotConfig();
+  const updateConfig = useUpdateAutopilotConfig();
+  const { data: moduleStats } = useAutopilotModuleStats();
+
+  const [demoEnabled, setDemoEnabled] = useState<Record<string, boolean>>(() => {
     if (isDemo) {
       const init: Record<string, boolean> = {};
       for (const [k, v] of Object.entries(DEMO_AUTOPILOT_DATA.functions)) {
@@ -771,18 +790,28 @@ export function AutopilotFunctions({ isDemo }: AutopilotFunctionsProps) {
       }
       return init;
     }
-    const init: Record<string, boolean> = {};
-    [...FUNCTIONS, ...NEW_FUNCTIONS].forEach((f) => {
-      init[f.key] = true;
-    });
-    return init;
+    return {};
   });
 
   const [configSheetOpen, setConfigSheetOpen] = useState(false);
   const [activeFunction, setActiveFunction] = useState<string | null>(null);
 
+  const isEnabled = (key: FunctionKey): boolean => {
+    if (isDemo) return !!demoEnabled[key];
+    const col = MODULE_KEY_MAP[key]?.configCol;
+    if (!col || !liveConfig) return false;
+    return !!(liveConfig as unknown as Record<string, boolean>)[col];
+  };
+
   const handleToggle = (key: FunctionKey) => {
-    setEnabledState((prev) => ({ ...prev, [key]: !prev[key] }));
+    if (isDemo) {
+      setDemoEnabled((prev) => ({ ...prev, [key]: !prev[key] }));
+      return;
+    }
+    const col = MODULE_KEY_MAP[key]?.configCol;
+    if (!col) return;
+    const next = !isEnabled(key);
+    updateConfig.mutate({ [col]: next } as never);
   };
 
   const handleConfigureClick = (functionId: string) => {
@@ -806,10 +835,11 @@ export function AutopilotFunctions({ isDemo }: AutopilotFunctionsProps) {
           <FunctionCard
             key={fn.key}
             fn={fn}
-            enabled={!!enabledState[fn.key]}
+            enabled={isEnabled(fn.key)}
             isDemo={isDemo}
             onToggle={handleToggle}
             onConfigure={handleConfigureClick}
+            stats={moduleStats?.[MODULE_KEY_MAP[fn.key]?.moduleKey]}
           />
         ))}
 
@@ -827,10 +857,11 @@ export function AutopilotFunctions({ isDemo }: AutopilotFunctionsProps) {
           <FunctionCard
             key={fn.key}
             fn={fn}
-            enabled={!!enabledState[fn.key]}
+            enabled={isEnabled(fn.key)}
             isDemo={isDemo}
             onToggle={handleToggle}
             onConfigure={handleConfigureClick}
+            stats={moduleStats?.[MODULE_KEY_MAP[fn.key]?.moduleKey]}
           />
         ))}
       </div>
@@ -844,7 +875,7 @@ export function AutopilotFunctions({ isDemo }: AutopilotFunctionsProps) {
         }}
         functionId={activeFunction}
         config={activeFunction ? FUNCTION_CONFIGS[activeFunction] || null : null}
-        enabled={activeFunction ? !!enabledState[activeFunction] : false}
+        enabled={activeFunction ? isEnabled(activeFunction as FunctionKey) : false}
         iconBg={activeFnDef?.colors.iconBg || ""}
         iconColor={activeFnDef?.colors.iconColor || ""}
         icon={activeFnDef?.icon || null}
