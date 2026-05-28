@@ -4,7 +4,8 @@ import { Star, Play, Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 
-const VIDEO_URL: string | null = null;
+const VIDEO_URL: string | null = "/testimonials/testimonial-1.mp4";
+const VIDEO_POSTER: string = "/testimonials/testimonial-1-poster.jpg";
 
 const WrittenCard = ({
   testimonial,
@@ -80,7 +81,32 @@ export const TestimonialsSection = () => {
               </div>
             </button>
           ) : VIDEO_URL && playing ? (
-            <video src={VIDEO_URL} autoPlay controls playsInline className="absolute inset-0 w-full h-full object-cover" />
+            <video
+              src={VIDEO_URL}
+              poster={VIDEO_POSTER}
+              autoPlay
+              controls
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          ) : VIDEO_URL ? (
+            <button
+              onClick={() => setPlaying(true)}
+              className="absolute inset-0 z-10 group"
+              aria-label={t("landing.testimonials.playLabel")}
+            >
+              <img
+                src={VIDEO_POSTER}
+                alt={t("landing.testimonials.videoAuthor")}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40 group-hover:from-black/20 group-hover:to-black/50 transition-colors" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+                  <Play className="w-7 h-7 text-primary ml-1 fill-primary" />
+                </div>
+              </div>
+            </button>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-muted/40 to-muted gap-4">
               <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
