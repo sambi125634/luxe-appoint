@@ -1,133 +1,103 @@
-# Plan: Dokumentacja platformy + propozycja sekcji Ustawienia
-
 ## Cel
-Stworzyć jeden obszerny dokument `.docx` (do wgrania w Twój Cloud / ChatGPT / Claude Projects), który:
-1. Wyjaśnia **całą platformę Beauty Calendar** "jak czterolatkowi" — moduł po module, zakładka po zakładce.
-2. Zawiera **propozycję nowej architektury sekcji Ustawienia** — co powinno tam być, jak pogrupowane, dlaczego.
 
-Dokument będzie zapisany jako `/mnt/documents/beauty-calendar-platform-overview.docx` i dostarczony przez `<presentation-artifact>` (gotowy do pobrania).
+Dać właścicielom salonów pełną swobodę konfiguracji okna rezerwacji, dodać czytelne objaśnienia trudniejszych pojęć i naprawić mylącą opcję „potwierdzenia telefonicznego".
 
----
-
-## Część 1 — Podsumowanie platformy (rozdziały)
-
-### A. Filozofia i zamysł
-- Dlaczego Beauty Calendar powstał (problemy Booksy: prowizje, kradzież klientek, brak danych)
-- Dla kogo (salony beauty, kosmetyczki, barberzy, studia paznokci)
-- Główne USP: zero prowizji, własne dane, AI Autopilot, True Profit, Private App Space
-- Model biznesowy (FREE / PRO 149 zł / ELITE 349 zł + onboarding)
-
-### B. Architektura użytkowników (3 warstwy)
-- **Super Admin** (Ty) — zarządzanie tenantami
-- **Admin Salonu** (Owner / Staff) — codzienna praca
-- **Klientka** (mobile app) — rezerwacje, lojalność, polecenia
-
-### C. Moduły admina — każdy zakładka po zakładce (jak 4-latkowi)
-Dla każdego: **Co to jest? → Po co? → Jaki problem rozwiązuje? → Jak działa krok po kroku?**
-
-1. **Dashboard** — co widzisz rano gdy otwierasz
-2. **Kalendarz** (Schedule) — Day View kolumny pracowników, drag & drop, AI slot scoring
-3. **Klientki** (CRM) — segmentacja VIP/Nowa/Lost, Client Journey 11 kroków, risk score
-4. **Wizyty** — modal rezerwacji, conflict check, payment Przelewy24
-5. **Usługi** — warianty, recipes (materiały), True Profit
-6. **Magazyn** (Inventory) — stock movements, AI skaner faktur, alerty
-7. **Polecenia** (Referrals) — linki /r/{code}, nagrody, leaderboard ambasadorek
-8. **Opinie Google** — Silent Fans, automatyczne prośby
-9. **Retencja** — sekwencje 45/60/75/90 dni, beauty rhythms
-10. **Marketing** — kampanie, Instagram landing /ig/{slug}, widgety bookingowe
-11. **AI Autopilot** — 16 funkcji, scoring, ostatnie akcje (TYLKO PRAWDZIWE DANE)
-12. **Księgowość / True Profit** — koszty materiałów + 35 zł/h staff = realny zysk
-13. **Raporty sprzedaży** — McKinsey-style premium
-14. **Aplikacja klientki** (Client App) — branding, loyalty, podgląd mobilny
-15. **Wsparcie AI** — chatbot Gemini 2.5 Flash
-16. **Eksport danych**
-
-### D. Aplikacja klientki (osobny rozdział)
-5 tabów: Salons / Visits / For You / Activity / Profile + onboarding, polecenia, beauty rhythms, waitlist, push notifications.
-
-### E. Integracje (jak działają i co dają)
-- Google Calendar (bi-directional sync)
-- Przelewy24 (płatności)
-- Meta Pixel (wewnętrznie)
-- Retell AI (voice agent /demo-agent)
-- GoHighLevel (white-label "System/Automation")
-- Booksy scraper (onboarding)
-- SMS (SMSAPI), Email (Resend), Web Push (VAPID)
-
-### F. Bezpieczeństwo i compliance
-- RLS per salon_id, multi-tenant isolation
-- RODO/GDPR, deletion requests 30 dni
-- staff_public_view, CHECK constraints
+Zakres dotyczy wyłącznie zakładki **Ustawienia → Rezerwacje** (`BookingSettingsPanel.tsx`).
 
 ---
 
-## Część 2 — Propozycja nowej sekcji USTAWIENIA
+## 1. Maksymalne wyprzedzenie rezerwacji
 
-Obecnie masz 7 zakładek: Profil / Rezerwacje / Powiadomienia / Komunikacja / Integracje / Automatyzacja / Eksport. Propozycja: **przeorganizować w 6 logicznych grup** które pokrywają WSZYSTKIE konfiguracje platformy w jednym miejscu, bez duplikatów z innymi modułami.
+Obecnie: 7 / 14 / 30 / 60 / 90 dni.
 
-### Proponowane zakładki:
+Nowe opcje:
+- 7 dni
+- 14 dni
+- 30 dni
+- 60 dni
+- 90 dni
+- 180 dni (6 miesięcy)
+- 365 dni (1 rok)
+- **Bez limitu** (zapisywane jako `0` lub bardzo duża wartość — patrz sekcja techniczna)
 
-**1. Salon (Profil + Branding)**
-- Dane salonu, adres, kontakt, NIP
-- Logo, kolory marki, hero image
-- Godziny otwarcia, dni wolne (święta)
-- Slug salonu (URL bookingu)
+Pod selectem zostaje opis dynamiczny („Klientki mogą rezerwować do X dni naprzód" / „Bez limitu czasowego").
 
-**2. Rezerwacje (Booking Rules)**
-- Slot duration, buffer time, advance booking window
-- Polityka anulowania / no-show
-- Conditional Prepayment (próg risk score >60)
-- Widget bookingowy — wygląd, social proof
-- Quick picks, AI slot scoring on/off
+## 2. Minimalne wyprzedzenie
 
-**3. Komunikacja (Powiadomienia + Kanały)**
-- Email (templates: confirm, reminder, follow-up) + custom DNS dla ELITE
-- SMS (SMSAPI nadawca, limity)
-- WhatsApp (jeśli dostępne)
-- Web Push (VAPID, prompts)
-- Timing przypomnień (24h, 2h)
+Obecnie: brak limitu / 1h / 2h / 4h / 24h.
 
-**4. Zespół i Uprawnienia (NOWE — wyciągnięte z osobnych miejsc)**
-- Lista pracowników, role (Owner / Staff)
-- Uprawnienia per moduł (staff_permissions)
-- Stawki godzinowe (do True Profit, domyślnie 35 zł/h)
-- Invite link (send-staff-invitation)
+Nowe opcje (granularne dla last-minute + większy zakres dla salonów premium):
+- Bez limitu (rezerwacja możliwa nawet za chwilę)
+- 15 minut
+- 30 minut
+- 45 minut
+- 1 godzina
+- 2 godziny
+- 4 godziny
+- 12 godzin
+- 24 godziny
+- 48 godzin
+- 72 godziny
 
-**5. Płatności i Finanse**
-- Przelewy24 — konfiguracja merchant_id
-- Stripe (opcjonalnie)
-- Waluta, VAT, format faktur
-- Eksport JPK / księgowość
+## 3. Tooltipy / objaśnienia (interwał slotów, bufor)
 
-**6. Integracje i Automatyzacja**
-- Google Calendar (sync on/off, dwukierunkowość)
-- Meta Pixel ID (jeśli wystawiamy w UI)
-- AI Autopilot — 16 toggle (przeniesione z dedykowanego modułu? lub link)
-- Webhooks (advanced)
-- Eksport danych (CSV, JPK)
+Przy etykietach **Interwał slotów** i **Bufor między wizytami** dodaję ikonę `HelpCircle` z `Tooltip` (shadcn) — kliknięcie/hover pokazuje krótkie wyjaśnienie:
 
-**7. Prawne i Konto (NOWE)**
-- Regulamin świadczenia usług (edytor + publish do /terms)
-- Polityka prywatności (edytor + /privacy)
-- Cookies policy + banner config
-- RODO — wnioski o usunięcie (lista deletion_requests)
-- Subskrypcja (FREE/PRO/ELITE — upgrade, faktury, anulowanie)
-- Strefa niebezpieczna (usuń salon)
+- **Interwał slotów** — „Co ile minut pojawia się nowy slot do rezerwacji. Np. interwał 15 min = klientka widzi godziny 10:00, 10:15, 10:30… Mniejszy interwał = więcej możliwości wyboru, ale też więcej drobnych okienek w grafiku."
+- **Bufor między wizytami** — „Dodatkowy czas automatycznie blokowany po każdej wizycie — na sprzątanie stanowiska, dezynfekcję, krótką przerwę. Bufor nie jest widoczny dla klientki, ale chroni Cię przed nakładającymi się wizytami."
 
-### Zasady projektowe sekcji:
-- **Każda zmiana = save z toast** (sonner), brak "ukrytych" form
-- **Defaults sensowne** — nowy salon działa bez konfigurowania niczego
-- **Tooltips "?"** przy każdej opcji — wyjaśnienie po polsku
-- **Sekcje "Tylko PRO/ELITE"** wyszarzone z CTA upgrade
-- **Wyszukiwarka ustawień** (Ctrl+K) — kluczowa przy 6 zakładkach × 10 opcji
-- **Mobile-friendly** — accordion zamiast tabs na <768px
+Analogiczny tooltip dodaję też do **Maksymalnego/minimalnego wyprzedzenia** i **Polityki anulacji** — dla spójności.
+
+## 4. Uporządkowanie sekcji potwierdzeń (najważniejsze)
+
+Obecnie w sekcji „Dodatkowe opcje" są dwa przełączniki, które się dublują i wprowadzają w błąd:
+
+- **Automatyczne potwierdzenie rezerwacji** (`autoConfirmBookings`)
+- **Wymagaj potwierdzenia telefonicznego** (`requirePhoneConfirm`) — **bez mechanizmu w systemie**, bo nie ma jak technicznie wykryć, że klient zadzwonił i potwierdził
+
+### Proponowane rozwiązanie
+
+Zamieniam dwa zduplikowane toggle na **jedną grupę „Tryb potwierdzania wizyt"** z trzema wyraźnymi opcjami (RadioGroup w stylu kart):
+
+1. **Automatyczne (zalecane)** — rezerwacja od razu trafia do grafiku jako potwierdzona. Klientka dostaje natychmiastowe potwierdzenie SMS/email. Najlepsze dla większości salonów.
+2. **Ręczne — wymaga akceptacji w panelu** — każda nowa rezerwacja trafia jako „Oczekująca" do listy w module Grafik (badge „Do potwierdzenia"). Personel jednym kliknięciem akceptuje lub odrzuca. Klientka dostaje SMS dopiero po akceptacji. (To zastępuje mylące „potwierdzenie telefoniczne" — w praktyce dokładnie taki workflow daje swobodę zadzwonienia do klientki przed akceptacją.)
+3. **Hybrydowe — automatyczne dla stałych, ręczne dla nowych** — stali klienci (≥1 ukończona wizyta) idą automatem, nowi/anonimowi wymagają akceptacji personelu.
+
+Pod opcją „Ręczne" i „Hybrydowe" dodaję info-box: „Niezatwierdzone rezerwacje wygasają po 24h, jeśli nikt z personelu ich nie zaakceptuje. Klientka dostaje o tym powiadomienie i może zarezerwować inny termin."
+
+Stary `requirePhoneConfirm` zostaje wycofany z UI (kolumna w DB zostaje na razie nietknięta — bez migracji destrukcyjnej, ignorujemy w odczycie). Logika `autoConfirmBookings` w bazie pokrywa tryby 1 i 2; tryb 3 mapuje się na nową kolumnę boolean `auto_confirm_returning_only` (patrz sekcja techniczna).
 
 ---
 
-## Deliverable
-Po zatwierdzeniu planu wygeneruję:
-- `beauty-calendar-platform-overview.docx` (~30–50 stron, polski, Plus Jakarta Sans, struktura nagłówków H1/H2/H3, spis treści)
-- Dostarczę przez `<presentation-artifact>` do pobrania
-- QA: konwersja do PDF i podgląd każdej strony zanim oddam
+## Sekcja techniczna (dla devów)
 
-**Nie będę zmieniał kodu** — to czysta dokumentacja + propozycja architektury. Implementację nowej sekcji Ustawienia zrobimy w osobnym kroku po Twojej akceptacji proponowanej struktury.
+### Zmiany pliku
+- `src/components/admin/settings/BookingSettingsPanel.tsx` — rozszerzone opcje selectów, tooltipy, nowa sekcja „Tryb potwierdzania".
+- `src/locales/pl.json` / `en.json` — nowe klucze (`bookingMode.auto`, `bookingMode.manual`, `bookingMode.hybrid`, opisy tooltipów, opisy „365 dni" / „bez limitu" / „15/30/45 min" itd.).
+- `src/hooks/useSalonSettings.ts` — dodać `autoConfirmReturningOnly: boolean` do `BookingSettings`, czytać/zapisywać z `salon_settings`.
+- `src/integrations/supabase/types.ts` — wygenerowane po migracji.
+
+### Migracja
+- `ALTER TABLE public.salon_settings ADD COLUMN auto_confirm_returning_only boolean NOT NULL DEFAULT false;`
+- (opcjonalnie później) `requirePhoneConfirm` zostaje w DB jako legacy, ignorowane przez UI.
+
+### Walidacja
+- `advanceBookingDays`: dopuszczalne `7, 14, 30, 60, 90, 180, 365, 0` (gdzie `0` = bez limitu). Front mapuje „Bez limitu" → `0`; w logice wyznaczania dostępnych slotów `0` interpretujemy jako „brak górnej granicy" (ograniczeniem zostaje tylko grafik pracy).
+- `minAdvanceHours`: zmiana typu wartości — zostaje liczba godzin, ale pozycje submożdzinowe zapisujemy jako ułamki (`0.25`, `0.5`, `0.75`). Wymaga zmiany pola w DB z `integer` na `numeric(5,2)` — uwzględnione w tej samej migracji.
+
+### Zgodność wstecz
+- Salony z istniejącą wartością `autoConfirmBookings=true` mapują się na tryb „Automatyczne".
+- `autoConfirmBookings=false` mapuje się na „Ręczne".
+- `autoConfirmReturningOnly=true` (po włączeniu) override'uje powyższe i pokazuje tryb „Hybrydowe".
+- Stary `requirePhoneConfirm` znika z UI bez utraty danych w DB.
+
+### QA
+- Sprawdzić, że widget rezerwacji (`/s/[slug]`) honoruje nowe maksymalne wyprzedzenie 365/∞ i minimalne 15 min.
+- Sprawdzić, że nowe rezerwacje w trybie „Ręczne" trafiają z `status='pending'` i są widoczne w module Grafik z badge'em do akceptacji (już istniejąca logika — wymaga jedynie potwierdzenia ścieżki).
+- Brak regresji w mobile collapsible sidebar (poprzednia zmiana).
+
+---
+
+## Pytanie do zatwierdzenia
+
+Czy zgadzasz się na zastąpienie mylącego „potwierdzenia telefonicznego" trybem **Automatyczne / Ręczne / Hybrydowe** (tryb 3 wymaga drobnej migracji DB)? Jeśli wolisz prościej — mogę zostawić tylko **Automatyczne / Ręczne** bez hybrydowego, bez migracji.
