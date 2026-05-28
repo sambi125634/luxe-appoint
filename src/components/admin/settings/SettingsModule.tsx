@@ -87,21 +87,35 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
         <aside className="lg:sticky lg:top-6 lg:self-start">
           {/* Mobile header toggle */}
           <div className="lg:hidden">
+            <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-2 px-1">
+              Sekcja ustawień — dotknij, aby zmienić
+            </p>
             <button
               onClick={() => setMobileOpen((p) => !p)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border/60 shadow-sm"
+              aria-expanded={mobileOpen}
+              aria-label="Otwórz menu ustawień"
+              className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl border shadow-sm transition-all active:scale-[0.99] ${
+                mobileOpen
+                  ? "bg-primary/5 border-primary/40 ring-2 ring-primary/20"
+                  : "bg-gradient-to-br from-card to-primary/[0.03] border-primary/25 hover:border-primary/40"
+              }`}
             >
-              <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                <SlidersHorizontal className="w-4 h-4 text-primary" />
+              </div>
               <div className="flex-1 text-left">
-                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-primary/70">
                   {activeMeta.group}
                 </div>
-                <div className="text-sm font-medium text-foreground flex items-center gap-2">
+                <div className="text-sm font-semibold text-foreground flex items-center gap-2">
                   {activeMeta.label}
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${mobileOpen ? "rotate-180" : ""}`}
-                  />
                 </div>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-primary font-medium shrink-0">
+                <span>{mobileOpen ? "Zamknij" : "Zmień"}</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${mobileOpen ? "rotate-180" : ""}`}
+                />
               </div>
             </button>
 
@@ -211,6 +225,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={updateProfile}
+              isDemo={isDemo}
             />
           )}
           {activeTab === "booking" && (

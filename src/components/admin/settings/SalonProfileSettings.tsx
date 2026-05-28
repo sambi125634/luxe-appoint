@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, MapPin, Phone, Mail, Palette, Upload, Save, Loader2 } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Palette, Upload, Save, Loader2, X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +15,13 @@ interface SalonProfileSettingsProps {
   isLoading: boolean;
   isSaving: boolean;
   onSave: (updates: Partial<SalonProfile>) => Promise<boolean>;
+  isDemo?: boolean;
 }
 
-export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: SalonProfileSettingsProps) {
+export function SalonProfileSettings({ profile, isLoading, isSaving, onSave, isDemo = false }: SalonProfileSettingsProps) {
   const { t } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<Partial<SalonProfile>>({
     name: "",
     description: "",
@@ -47,6 +52,54 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
 
   const handleSave = async () => {
     await onSave(formData);
+  };
+
+  const handleLogoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (isDemo) {
+      toast.error("Wgrywanie logo jest dostępne po założeniu konta.");
+      return;
+    }
+    if (!profile?.id) {
+      toast.error("Brak identyfikatora salonu. Odśwież stronę i spróbuj ponownie.");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Wybierz plik graficzny (PNG, JPG lub SVG).");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Plik jest zbyt duży. Maksymalny rozmiar to 2 MB.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const ext = file.name.split(".").pop()?.toLowerCase() || "png";
+      const path = `logos/${profile.id}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("salon-media")
+        .upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const { data: publicData } = supabase.storage.from("salon-media").getPublicUrl(path);
+      const logoUrl = publicData.publicUrl;
+      setFormData((prev) => ({ ...prev, logoUrl }));
+      const ok = await onSave({ logoUrl });
+      if (ok) toast.success("Logo zostało wgrane.");
+    } catch (err) {
+      console.error("[SalonProfileSettings] logo upload error", err);
+      toast.error("Nie udało się wgrać logo. Spróbuj ponownie.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleLogoRemove = async () => {
+    setFormData((prev) => ({ ...prev, logoUrl: "" }));
+    if (!isDemo) await onSave({ logoUrl: null });
   };
 
   if (isLoading) {
@@ -188,19 +241,66 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: S
           <div className="space-y-2">
             <Label>{t("settingsModule.salonLogo")}</Label>
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || isSaving}
+                className="relative w-20 h-20 rounded-lg border-2 border-dashed border-border hover:border-primary/60 flex items-center justify-center bg-muted/50 transition-colors overflow-hidden disabled:opacity-60"
+                aria-label="Wgraj logo salonu"
+              >
                 {formData.logoUrl ? (
                   <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-cover rounded-lg" />
                 ) : (
                   <Upload className="w-6 h-6 text-muted-foreground" />
                 )}
-              </div>
+                {uploading && (
+                  <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  </div>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                className="hidden"
+                onChange={handleLogoSelect}
+              />
               <div className="space-y-2">
-                <Button variant="outline" size="sm" disabled>
-                  <Upload className="w-4 h-4 mr-2" />
-                  {t("settingsModule.selectFile")}
-                </Button>
-                <p className="text-xs text-muted-foreground">{t("settingsModule.fileFormat")}</p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading || isSaving}
+                  >
+                    {uploading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    {formData.logoUrl ? "Zmień logo" : t("settingsModule.selectFile")}
+                  </Button>
+                  {formData.logoUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogoRemove}
+                      disabled={uploading || isSaving}
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Usuń
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">PNG, JPG, SVG lub WEBP · maks. 2 MB</p>
+                {isDemo && (
+                  <p className="text-[11px] text-muted-foreground/70 italic">
+                    Dostępne po założeniu konta.
+                  </p>
+                )}
               </div>
             </div>
           </div>
