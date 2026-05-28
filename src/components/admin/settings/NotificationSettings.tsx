@@ -71,6 +71,8 @@ export function NotificationSettings({
     { key: "{specjalista}", desc: t("settingsModule.varSpecialist") },
     { key: "{adres}", desc: t("settingsModule.varAddress") },
     { key: "{telefon}", desc: t("settingsModule.varPhone") },
+    { key: "{cena}", desc: "Cena usługi" },
+    { key: "{czas_trwania}", desc: "Czas trwania" },
   ];
 
   if (isLoading) {
