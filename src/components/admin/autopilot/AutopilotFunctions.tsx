@@ -12,6 +12,13 @@ import { DEMO_AUTOPILOT_DATA } from "./demo-data";
 import { AutopilotConfigSheet, FUNCTION_CONFIGS } from "./AutopilotConfigSheet";
 import { FlashOfertaCard } from "./FlashOfertaCard";
 import { PogodowyTriggerCard } from "./PogodowyTriggerCard";
+import { useAutopilotConfig, useUpdateAutopilotConfig } from "@/hooks/useAutopilot";
+import {
+  useAutopilotModuleStats,
+  MODULE_KEY_MAP,
+  formatLastRun,
+  type AutopilotModuleStatsRow,
+} from "@/hooks/useAutopilotModuleStats";
 
 interface AutopilotFunctionsProps {
   isDemo?: boolean;
