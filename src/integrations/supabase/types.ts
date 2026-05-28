@@ -264,7 +264,8 @@ export type Database = {
       }
       autopilot_actions: {
         Row: {
-          ai_explanation: string
+          ai_explanation: string | null
+          channel: string | null
           client_id: string | null
           created_at: string | null
           cta_action: string | null
@@ -272,6 +273,10 @@ export type Database = {
           executed_at: string | null
           id: string
           metadata: Json | null
+          module_key: string | null
+          payload: Json | null
+          result: Json | null
+          revenue_recovered: number | null
           salon_id: string
           scheduled_at: string
           status: string
@@ -279,7 +284,8 @@ export type Database = {
           type: string
         }
         Insert: {
-          ai_explanation: string
+          ai_explanation?: string | null
+          channel?: string | null
           client_id?: string | null
           created_at?: string | null
           cta_action?: string | null
@@ -287,6 +293,10 @@ export type Database = {
           executed_at?: string | null
           id?: string
           metadata?: Json | null
+          module_key?: string | null
+          payload?: Json | null
+          result?: Json | null
+          revenue_recovered?: number | null
           salon_id: string
           scheduled_at?: string
           status?: string
@@ -294,7 +304,8 @@ export type Database = {
           type: string
         }
         Update: {
-          ai_explanation?: string
+          ai_explanation?: string | null
+          channel?: string | null
           client_id?: string | null
           created_at?: string | null
           cta_action?: string | null
@@ -302,6 +313,10 @@ export type Database = {
           executed_at?: string | null
           id?: string
           metadata?: Json | null
+          module_key?: string | null
+          payload?: Json | null
+          result?: Json | null
+          revenue_recovered?: number | null
           salon_id?: string
           scheduled_at?: string
           status?: string
@@ -327,59 +342,113 @@ export type Database = {
       }
       autopilot_config: {
         Row: {
+          abandoned_booking_enabled: boolean | null
           ai_suggestions_enabled: boolean | null
           created_at: string | null
+          dead_hours_enabled: boolean | null
+          first_visit_sequence_enabled: boolean | null
+          flash_offer_enabled: boolean | null
           id: string
           is_active: boolean | null
+          loyalty_engine_enabled: boolean | null
           max_messages_per_client_days: number | null
           noshow_followup_minutes: number | null
+          noshow_recovery_enabled: boolean | null
           paused_until: string | null
           pixel_sync_enabled: boolean | null
+          price_change_followup_enabled: boolean | null
+          price_detector_enabled: boolean | null
+          profit_alarm_enabled: boolean | null
           quiet_hours_end: string | null
           quiet_hours_start: string | null
           reminder_hours_before: number[] | null
           retention_trigger_days: number[] | null
+          review_guard_enabled: boolean | null
           review_request_delay_hours: number | null
           salon_id: string
+          silent_ambassador_enabled: boolean | null
+          smart_reminder_enabled: boolean | null
+          snowball_referral_enabled: boolean | null
           updated_at: string | null
+          upsell_pre_visit_enabled: boolean | null
+          vacation_brain_enabled: boolean | null
+          vip_radar_enabled: boolean | null
+          vip_tomorrow_enabled: boolean | null
+          weather_trigger_enabled: boolean | null
           weekly_brief_day: string | null
           weekly_brief_hour: number | null
         }
         Insert: {
+          abandoned_booking_enabled?: boolean | null
           ai_suggestions_enabled?: boolean | null
           created_at?: string | null
+          dead_hours_enabled?: boolean | null
+          first_visit_sequence_enabled?: boolean | null
+          flash_offer_enabled?: boolean | null
           id?: string
           is_active?: boolean | null
+          loyalty_engine_enabled?: boolean | null
           max_messages_per_client_days?: number | null
           noshow_followup_minutes?: number | null
+          noshow_recovery_enabled?: boolean | null
           paused_until?: string | null
           pixel_sync_enabled?: boolean | null
+          price_change_followup_enabled?: boolean | null
+          price_detector_enabled?: boolean | null
+          profit_alarm_enabled?: boolean | null
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
           reminder_hours_before?: number[] | null
           retention_trigger_days?: number[] | null
+          review_guard_enabled?: boolean | null
           review_request_delay_hours?: number | null
           salon_id: string
+          silent_ambassador_enabled?: boolean | null
+          smart_reminder_enabled?: boolean | null
+          snowball_referral_enabled?: boolean | null
           updated_at?: string | null
+          upsell_pre_visit_enabled?: boolean | null
+          vacation_brain_enabled?: boolean | null
+          vip_radar_enabled?: boolean | null
+          vip_tomorrow_enabled?: boolean | null
+          weather_trigger_enabled?: boolean | null
           weekly_brief_day?: string | null
           weekly_brief_hour?: number | null
         }
         Update: {
+          abandoned_booking_enabled?: boolean | null
           ai_suggestions_enabled?: boolean | null
           created_at?: string | null
+          dead_hours_enabled?: boolean | null
+          first_visit_sequence_enabled?: boolean | null
+          flash_offer_enabled?: boolean | null
           id?: string
           is_active?: boolean | null
+          loyalty_engine_enabled?: boolean | null
           max_messages_per_client_days?: number | null
           noshow_followup_minutes?: number | null
+          noshow_recovery_enabled?: boolean | null
           paused_until?: string | null
           pixel_sync_enabled?: boolean | null
+          price_change_followup_enabled?: boolean | null
+          price_detector_enabled?: boolean | null
+          profit_alarm_enabled?: boolean | null
           quiet_hours_end?: string | null
           quiet_hours_start?: string | null
           reminder_hours_before?: number[] | null
           retention_trigger_days?: number[] | null
+          review_guard_enabled?: boolean | null
           review_request_delay_hours?: number | null
           salon_id?: string
+          silent_ambassador_enabled?: boolean | null
+          smart_reminder_enabled?: boolean | null
+          snowball_referral_enabled?: boolean | null
           updated_at?: string | null
+          upsell_pre_visit_enabled?: boolean | null
+          vacation_brain_enabled?: boolean | null
+          vip_radar_enabled?: boolean | null
+          vip_tomorrow_enabled?: boolean | null
+          weather_trigger_enabled?: boolean | null
           weekly_brief_day?: string | null
           weekly_brief_hour?: number | null
         }
@@ -388,6 +457,41 @@ export type Database = {
             foreignKeyName: "autopilot_config_salon_id_fkey"
             columns: ["salon_id"]
             isOneToOne: true
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      autopilot_module_settings: {
+        Row: {
+          config: Json
+          created_at: string
+          id: string
+          module_key: string
+          salon_id: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          created_at?: string
+          id?: string
+          module_key: string
+          salon_id: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          created_at?: string
+          id?: string
+          module_key?: string
+          salon_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autopilot_module_settings_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
             referencedRelation: "salons"
             referencedColumns: ["id"]
           },
@@ -4565,6 +4669,25 @@ export type Database = {
       }
     }
     Views: {
+      autopilot_module_stats: {
+        Row: {
+          last_run_at: string | null
+          module_key: string | null
+          revenue_recovered: number | null
+          salon_id: string | null
+          total_converted: number | null
+          total_sent: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "autopilot_actions_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_google_calendar_safe: {
         Row: {
           block_from_google: boolean | null
