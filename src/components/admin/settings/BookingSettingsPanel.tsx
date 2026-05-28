@@ -119,7 +119,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="advanceDays">{t("settingsModule.maxAdvanceDays")}</Label>
+              <Label htmlFor="advanceDays" className="flex items-center gap-1.5">
+                {t("settingsModule.maxAdvanceDays")}
+                <InfoHint text="Jak daleko w przyszłość klientka może zarezerwować wizytę. Większa wartość = większa swoboda, ale też więcej rezerwacji na 'kiedyś', które łatwiej anulować. Dla salonów premium z wcześniejszym planowaniem polecamy 90-180 dni." />
+              </Label>
               <Select
                 value={formData.advanceBookingDays.toString()}
                 onValueChange={(v) => setFormData({ ...formData, advanceBookingDays: parseInt(v) })}
@@ -133,32 +136,40 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                   <SelectItem value="30">30 {t("settingsModule.days")}</SelectItem>
                   <SelectItem value="60">60 {t("settingsModule.days")}</SelectItem>
                   <SelectItem value="90">90 {t("settingsModule.days")}</SelectItem>
+                  <SelectItem value="180">180 dni (6 miesięcy)</SelectItem>
+                  <SelectItem value="365">365 dni (1 rok)</SelectItem>
+                  <SelectItem value="0">Bez limitu</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.clientsCanBookAdvance", { days: formData.advanceBookingDays })}
-              </p>
+              <p className="text-xs text-muted-foreground">{advanceLabel(formData.advanceBookingDays)}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minAdvance">{t("settingsModule.minAdvanceHours")}</Label>
+              <Label htmlFor="minAdvance" className="flex items-center gap-1.5">
+                {t("settingsModule.minAdvanceHours")}
+                <InfoHint text="Ile minimum musi minąć między rezerwacją a wizytą. 'Bez limitu' pozwala na rezerwację last-minute (nawet za 5 minut). 15-30 minut to dobry balans — zostawia czas na przygotowanie stanowiska." />
+              </Label>
               <Select
                 value={formData.minAdvanceHours.toString()}
-                onValueChange={(v) => setFormData({ ...formData, minAdvanceHours: parseInt(v) })}
+                onValueChange={(v) => setFormData({ ...formData, minAdvanceHours: parseFloat(v) })}
               >
                 <SelectTrigger id="minAdvance">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="0">{t("settingsModule.noLimit")}</SelectItem>
-                  <SelectItem value="1">1 {t("settingsModule.hour")}</SelectItem>
-                  <SelectItem value="2">2 {t("settingsModule.hours2")}</SelectItem>
-                  <SelectItem value="4">4 {t("settingsModule.hours4")}</SelectItem>
-                  <SelectItem value="24">24 {t("settingsModule.hours24")}</SelectItem>
+                  <SelectItem value="0.25">15 minut</SelectItem>
+                  <SelectItem value="0.5">30 minut</SelectItem>
+                  <SelectItem value="0.75">45 minut</SelectItem>
+                  <SelectItem value="1">1 godzina</SelectItem>
+                  <SelectItem value="2">2 godziny</SelectItem>
+                  <SelectItem value="4">4 godziny</SelectItem>
+                  <SelectItem value="12">12 godzin</SelectItem>
+                  <SelectItem value="24">24 godziny</SelectItem>
+                  <SelectItem value="48">48 godzin (2 dni)</SelectItem>
+                  <SelectItem value="72">72 godziny (3 dni)</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.clientMustBookHours", { hours: formData.minAdvanceHours })}
-              </p>
+              <p className="text-xs text-muted-foreground">{minAdvanceLabel(formData.minAdvanceHours)}</p>
             </div>
           </div>
         </CardContent>
