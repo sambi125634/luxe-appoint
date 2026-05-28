@@ -132,7 +132,10 @@ export default function AdminDashboard() {
       case "consultation": return <ConsultationModule />;
       case "referral": return <ReferralEngine />;
       case "autopilot": return <AutopilotModule />;
-      case "client-app": return <ClientAppPage />;
+      case "client-app": return <ClientAppPage onNavigate={(tab, settingsTab) => {
+        if (tab === "settings" && settingsTab) setSettingsInitialTab(settingsTab);
+        setActiveTab(tab as TabType);
+      }} />;
       default: return null;
     }
   };

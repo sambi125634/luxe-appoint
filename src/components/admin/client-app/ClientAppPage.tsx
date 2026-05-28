@@ -5,41 +5,61 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { ClientAppHeader } from "./ClientAppHeader";
 import { StatsSection } from "./sections/StatsSection";
-import { BrandingSection } from "./sections/BrandingSection";
-import { GallerySection } from "./sections/GallerySection";
-import { LoyaltySection } from "./sections/LoyaltySection";
-import { CommunicationSection } from "./sections/CommunicationSection";
-import { BookingRulesSection } from "./sections/BookingRulesSection";
+import { HeroSection } from "./sections/HeroSection";
+import { PushSection } from "./sections/PushSection";
+import { ConfigOverviewSection } from "./sections/ConfigOverviewSection";
 import { MobilePreview } from "./preview/MobilePreview";
 import { DEMO_BRANDING } from "./demo/demoData";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
+interface ClientAppPageProps {
+  onNavigate?: (tab: string, settingsTab?: string) => void;
+}
+
 const NAV_ITEMS = [
   { id: "stats", label: "Statystyki" },
-  { id: "branding", label: "Wygląd" },
-  { id: "gallery", label: "Galeria" },
-  { id: "loyalty", label: "Lojalność" },
-  { id: "communication", label: "Powiadomienia" },
-  { id: "booking", label: "Ustawienia" },
+  { id: "hero", label: "Zdjęcie powitalne" },
+  { id: "push", label: "Push" },
+  { id: "config", label: "Podgląd konfiguracji" },
 ];
 
-export default function ClientAppPage() {
+export default function ClientAppPage({ onNavigate }: ClientAppPageProps = {}) {
   const { salonId, isLoading: salonLoading } = useSalonId();
   const { isDemo, appUsers, isLoading: modeLoading } = useClientAppMode(salonId);
-  const [previewConfig, setPreviewConfig] = useState(DEMO_BRANDING);
+  const [splashUrl, setSplashUrl] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState("stats");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const { data: salonSlug } = useQuery({
-    queryKey: ["salon-slug-app", salonId],
+  const { data: salonMeta } = useQuery({
+    queryKey: ["salon-meta-app", salonId],
     queryFn: async () => {
       if (!salonId) return null;
-      const { data } = await supabase.from("salons").select("slug").eq("id", salonId).single();
-      return data?.slug ?? null;
+      const { data } = await supabase
+        .from("salons")
+        .select("slug, name, description, theme_primary_color, logo_url")
+        .eq("id", salonId)
+        .maybeSingle();
+      return data;
     },
     enabled: !!salonId,
   });
+
+  const salonSlug = salonMeta?.slug ?? null;
+
+  const previewConfig = isDemo
+    ? {
+        primary_color: DEMO_BRANDING.primary_color,
+        salon_name: DEMO_BRANDING.salon_name,
+        description: DEMO_BRANDING.description,
+        logo_url: splashUrl,
+      }
+    : {
+        primary_color: salonMeta?.theme_primary_color ?? DEMO_BRANDING.primary_color,
+        salon_name: salonMeta?.name ?? DEMO_BRANDING.salon_name,
+        description: salonMeta?.description ?? "",
+        logo_url: splashUrl ?? salonMeta?.logo_url ?? null,
+      };
 
   // Intersection observer for active section highlighting
   useEffect(() => {
@@ -105,20 +125,14 @@ export default function ClientAppPage() {
         <div id="stats" ref={(el) => { sectionRefs.current.stats = el; }}>
           <StatsSection isDemo={isDemo} salonId={salonId} />
         </div>
-        <div id="branding" ref={(el) => { sectionRefs.current.branding = el; }}>
-          <BrandingSection isDemo={isDemo} salonId={salonId} onConfigChange={setPreviewConfig} />
+        <div id="hero" ref={(el) => { sectionRefs.current.hero = el; }}>
+          <HeroSection isDemo={isDemo} salonId={salonId} onSplashChange={setSplashUrl} />
         </div>
-        <div id="gallery" ref={(el) => { sectionRefs.current.gallery = el; }}>
-          <GallerySection isDemo={isDemo} salonId={salonId} />
+        <div id="push" ref={(el) => { sectionRefs.current.push = el; }}>
+          <PushSection isDemo={isDemo} salonId={salonId} />
         </div>
-        <div id="loyalty" ref={(el) => { sectionRefs.current.loyalty = el; }}>
-          <LoyaltySection isDemo={isDemo} salonId={salonId} />
-        </div>
-        <div id="communication" ref={(el) => { sectionRefs.current.communication = el; }}>
-          <CommunicationSection isDemo={isDemo} salonId={salonId} />
-        </div>
-        <div id="booking" ref={(el) => { sectionRefs.current.booking = el; }}>
-          <BookingRulesSection isDemo={isDemo} salonId={salonId} />
+        <div id="config" ref={(el) => { sectionRefs.current.config = el; }}>
+          <ConfigOverviewSection isDemo={isDemo} salonId={salonId} onNavigate={onNavigate} />
         </div>
       </div>
 
