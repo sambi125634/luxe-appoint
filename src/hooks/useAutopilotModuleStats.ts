@@ -4,9 +4,8 @@ import { useSalonId } from "./useSalonId";
 
 export interface AutopilotModuleStatsRow {
   module_key: string;
-  actions_total: number;
-  actions_sent: number;
-  actions_converted: number;
+  total_sent: number;
+  total_converted: number;
   revenue_recovered: number;
   last_run_at: string | null;
 }
@@ -19,13 +18,12 @@ export function useAutopilotModuleStats() {
     queryFn: async (): Promise<Record<string, AutopilotModuleStatsRow>> => {
       if (!salonId) return {};
       const { data, error } = await supabase
-        // @ts-expect-error view not in generated types yet
         .from("autopilot_module_stats")
         .select("*")
         .eq("salon_id", salonId);
       if (error) throw error;
       const map: Record<string, AutopilotModuleStatsRow> = {};
-      for (const row of (data || []) as AutopilotModuleStatsRow[]) {
+      for (const row of (data || []) as unknown as AutopilotModuleStatsRow[]) {
         if (row.module_key) map[row.module_key] = row;
       }
       return map;
