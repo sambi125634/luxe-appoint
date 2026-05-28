@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Bot, Clock, Shield, Zap, ExternalLink, CheckCircle2, AlertCircle, Save, Loader2, Globe } from "lucide-react";
+import { Shield, Save, Loader2, Globe } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
 
@@ -26,14 +24,6 @@ interface AutopilotGlobalConfig {
   quietHoursEnd: string;
   maxMessagesPerClientDays: number;
   aiSuggestionsEnabled: boolean;
-}
-
-interface ModuleStatus {
-  key: string;
-  labelKey: string;
-  icon: React.ReactNode;
-  configured: boolean;
-  targetTab: string;
 }
 
 interface AutomationSettingsProps {
@@ -66,7 +56,6 @@ export function AutomationSettings({
   const [autopilot, setAutopilot] = useState<AutopilotGlobalConfig>(defaultAutopilotConfig);
   const [autopilotLoading, setAutopilotLoading] = useState(false);
   const [localSettings, setLocalSettings] = useState(settings);
-  const [moduleStatuses, setModuleStatuses] = useState<ModuleStatus[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -74,12 +63,8 @@ export function AutomationSettings({
   }, [settings]);
 
   useEffect(() => {
-    if (!salonId || isDemo) {
-      setModuleStatuses(getDemoModuleStatuses());
-      return;
-    }
+    if (!salonId || isDemo) return;
     fetchAutopilotConfig();
-    fetchModuleStatuses();
   }, [salonId, isDemo]);
 
   const fetchAutopilotConfig = async () => {
@@ -100,61 +85,6 @@ export function AutomationSettings({
       });
     }
   };
-
-  const fetchModuleStatuses = async () => {
-    if (!salonId) return;
-    const [pixelRes, retentionRes, referralRes] = await Promise.all([
-      supabase.from("pixel_config").select("is_active").eq("salon_id", salonId).maybeSingle(),
-      supabase.from("retention_sequences").select("id").eq("salon_id", salonId).limit(1),
-      supabase.from("referral_codes").select("id").eq("salon_id", salonId).limit(1),
-    ]);
-
-    setModuleStatuses([
-      {
-        key: "pixel",
-        labelKey: "admin.pixel",
-        icon: <Zap className="w-4 h-4" />,
-        configured: !!(pixelRes.data?.is_active),
-        targetTab: "pixel",
-      },
-      {
-        key: "retention",
-        labelKey: "admin.retention",
-        icon: <Clock className="w-4 h-4" />,
-        configured: !!(retentionRes.data && retentionRes.data.length > 0),
-        targetTab: "retention",
-      },
-      {
-        key: "referral",
-        labelKey: "admin.referral",
-        icon: <ExternalLink className="w-4 h-4" />,
-        configured: !!(referralRes.data && referralRes.data.length > 0),
-        targetTab: "referral",
-      },
-      {
-        key: "analytics",
-        labelKey: "admin.trueProfit",
-        icon: <Globe className="w-4 h-4" />,
-        configured: false,
-        targetTab: "analytics",
-      },
-      {
-        key: "consultation",
-        labelKey: "admin.consultation",
-        icon: <Shield className="w-4 h-4" />,
-        configured: false,
-        targetTab: "consultation",
-      },
-    ]);
-  };
-
-  const getDemoModuleStatuses = (): ModuleStatus[] => [
-    { key: "pixel", labelKey: "admin.pixel", icon: <Zap className="w-4 h-4" />, configured: true, targetTab: "pixel" },
-    { key: "retention", labelKey: "admin.retention", icon: <Clock className="w-4 h-4" />, configured: true, targetTab: "retention" },
-    { key: "referral", labelKey: "admin.referral", icon: <ExternalLink className="w-4 h-4" />, configured: false, targetTab: "referral" },
-    { key: "analytics", labelKey: "admin.trueProfit", icon: <Globe className="w-4 h-4" />, configured: false, targetTab: "analytics" },
-    { key: "consultation", labelKey: "admin.consultation", icon: <Shield className="w-4 h-4" />, configured: true, targetTab: "consultation" },
-  ];
 
   const saveAutopilot = async (updates: Partial<AutopilotGlobalConfig>) => {
     if (!salonId || isDemo) return;
