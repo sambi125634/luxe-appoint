@@ -55,6 +55,54 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave, isD
     await onSave(formData);
   };
 
+  const handleLogoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+
+    if (isDemo) {
+      toast.error("Wgrywanie logo jest dostępne po założeniu konta.");
+      return;
+    }
+    if (!profile?.id) {
+      toast.error("Brak identyfikatora salonu. Odśwież stronę i spróbuj ponownie.");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("Wybierz plik graficzny (PNG, JPG lub SVG).");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Plik jest zbyt duży. Maksymalny rozmiar to 2 MB.");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const ext = file.name.split(".").pop()?.toLowerCase() || "png";
+      const path = `logos/${profile.id}-${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("salon-media")
+        .upload(path, file, { cacheControl: "3600", upsert: true, contentType: file.type });
+      if (uploadError) throw uploadError;
+      const { data: publicData } = supabase.storage.from("salon-media").getPublicUrl(path);
+      const logoUrl = publicData.publicUrl;
+      setFormData((prev) => ({ ...prev, logoUrl }));
+      const ok = await onSave({ logoUrl });
+      if (ok) toast.success("Logo zostało wgrane.");
+    } catch (err) {
+      console.error("[SalonProfileSettings] logo upload error", err);
+      toast.error("Nie udało się wgrać logo. Spróbuj ponownie.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleLogoRemove = async () => {
+    setFormData((prev) => ({ ...prev, logoUrl: "" }));
+    if (!isDemo) await onSave({ logoUrl: null });
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
