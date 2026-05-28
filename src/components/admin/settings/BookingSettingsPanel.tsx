@@ -210,7 +210,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="slotInterval">{t("settingsModule.slotInterval")}</Label>
+              <Label htmlFor="slotInterval" className="flex items-center gap-1.5">
+                {t("settingsModule.slotInterval")}
+                <InfoHint text="Co ile minut pojawia się nowy slot do rezerwacji. Np. interwał 15 min = klientka widzi godziny 10:00, 10:15, 10:30… Mniejszy interwał = więcej możliwości wyboru, ale też więcej drobnych okienek w grafiku." />
+              </Label>
               <Select
                 value={formData.slotInterval.toString()}
                 onValueChange={(v) => setFormData({ ...formData, slotInterval: parseInt(v) })}
@@ -226,7 +229,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="buffer">{t("settingsModule.bufferBetween")}</Label>
+              <Label htmlFor="buffer" className="flex items-center gap-1.5">
+                {t("settingsModule.bufferBetween")}
+                <InfoHint text="Dodatkowy czas automatycznie blokowany po każdej wizycie — na sprzątanie stanowiska, dezynfekcję, krótką przerwę. Bufor nie jest widoczny dla klientki, ale chroni Cię przed nakładającymi się wizytami." />
+              </Label>
               <Select
                 value={formData.bufferBetweenAppointments.toString()}
                 onValueChange={(v) => setFormData({ ...formData, bufferBetweenAppointments: parseInt(v) })}
