@@ -1,35 +1,59 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useClientAppMode } from "@/hooks/useClientAppMode";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { ClientAppHeader } from "./ClientAppHeader";
-import { StatsSection } from "./sections/StatsSection";
-import { HeroSection } from "./sections/HeroSection";
-import { PushSection } from "./sections/PushSection";
-import { ConfigOverviewSection } from "./sections/ConfigOverviewSection";
-import { MobilePreview } from "./preview/MobilePreview";
-import { DEMO_BRANDING } from "./demo/demoData";
-import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
+import { Smartphone, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import { PhonePreview } from "./preview/PhonePreview";
+import { MarkaTab } from "./tabs/MarkaTab";
+import { KomunikacjaTab } from "./tabs/KomunikacjaTab";
+import { LojalnosciowyTab } from "./tabs/LojalnosciowyTab";
+import { GaleriaTab } from "./tabs/GaleriaTab";
+import { BroadcastTab } from "./tabs/BroadcastTab";
+import { StatystykiTab } from "./tabs/StatystykiTab";
+import { LinkQRTab } from "./tabs/LinkQRTab";
 
-interface ClientAppPageProps {
-  onNavigate?: (tab: string, settingsTab?: string) => void;
+export interface BrandState {
+  salonName: string;
+  logoUrl: string | null;
+  coverUrl: string | null;
+  brandColor: string;
+  description: string;
+  instagram: string;
 }
 
-const NAV_ITEMS = [
-  { id: "stats", label: "Statystyki" },
-  { id: "hero", label: "Zdjęcie powitalne" },
-  { id: "push", label: "Push" },
-  { id: "config", label: "Podgląd konfiguracji" },
+type TabId = "marka" | "komunikacja" | "lojalnosciowy" | "galeria" | "broadcast" | "statystyki" | "link";
+
+const TABS: { id: TabId; label: string }[] = [
+  { id: "marka", label: "Marka" },
+  { id: "komunikacja", label: "Komunikacja" },
+  { id: "lojalnosciowy", label: "Lojalnościowy" },
+  { id: "galeria", label: "Galeria" },
+  { id: "broadcast", label: "Broadcast" },
+  { id: "statystyki", label: "Statystyki" },
+  { id: "link", label: "Link & QR" },
 ];
 
-export default function ClientAppPage({ onNavigate }: ClientAppPageProps = {}) {
+const DEFAULT_BRAND: BrandState = {
+  salonName: "Helena Milewska Kosmetologia",
+  logoUrl: null,
+  coverUrl: "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800",
+  brandColor: "#7c3aed",
+  description: "Gabinet kosmetyczny w sercu Warszawy. Specjalizujemy się w manicure hybrydowym i zabiegach pielęgnacyjnych twarzy. 💜",
+  instagram: "helena_milewska_kosmetologia",
+};
+
+export default function ClientAppPage(_props: { onNavigate?: (tab: string, settingsTab?: string) => void } = {}) {
   const { salonId, isLoading: salonLoading } = useSalonId();
-  const { isDemo, appUsers, isLoading: modeLoading } = useClientAppMode(salonId);
-  const [splashUrl, setSplashUrl] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState("stats");
-  const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const { isDemo, isLoading: modeLoading } = useClientAppMode(salonId);
+  const [activeTab, setActiveTab] = useState<TabId>("marka");
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [brand, setBrand] = useState<BrandState>(DEFAULT_BRAND);
+  const [pointsName, setPointsName] = useState("Punkty Piękności");
 
   const { data: salonMeta } = useQuery({
     queryKey: ["salon-meta-app", salonId],
@@ -40,50 +64,21 @@ export default function ClientAppPage({ onNavigate }: ClientAppPageProps = {}) {
         .select("slug, name, description, theme_primary_color, logo_url")
         .eq("id", salonId)
         .maybeSingle();
+      if (data && !isDemo) {
+        setBrand((b) => ({
+          ...b,
+          salonName: data.name ?? b.salonName,
+          description: data.description ?? b.description,
+          brandColor: data.theme_primary_color ?? b.brandColor,
+          logoUrl: data.logo_url ?? b.logoUrl,
+        }));
+      }
       return data;
     },
     enabled: !!salonId,
   });
 
   const salonSlug = salonMeta?.slug ?? null;
-
-  const previewConfig = isDemo
-    ? {
-        primary_color: DEMO_BRANDING.primary_color,
-        salon_name: DEMO_BRANDING.salon_name,
-        description: DEMO_BRANDING.description,
-        logo_url: splashUrl,
-      }
-    : {
-        primary_color: salonMeta?.theme_primary_color ?? DEMO_BRANDING.primary_color,
-        salon_name: salonMeta?.name ?? DEMO_BRANDING.salon_name,
-        description: salonMeta?.description ?? "",
-        logo_url: splashUrl ?? salonMeta?.logo_url ?? null,
-      };
-
-  // Intersection observer for active section highlighting
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        }
-      },
-      { rootMargin: "-100px 0px -60% 0px" }
-    );
-
-    Object.values(sectionRefs.current).forEach((el) => {
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [salonLoading, modeLoading]);
-
-  const scrollTo = (id: string) => {
-    sectionRefs.current[id]?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
 
   if (salonLoading || modeLoading) {
     return (
@@ -96,52 +91,86 @@ export default function ClientAppPage({ onNavigate }: ClientAppPageProps = {}) {
     );
   }
 
-  return (
-    <div className="flex gap-6">
-      {/* Left — main content */}
-      <div className="flex-1 min-w-0 space-y-6 pb-10">
-        <ClientAppHeader isDemo={isDemo} appUsers={appUsers} salonSlug={salonSlug} />
+  const previewConfig = {
+    salonName: brand.salonName,
+    logoUrl: brand.logoUrl,
+    coverUrl: brand.coverUrl,
+    brandColor: brand.brandColor,
+    description: brand.description,
+    pointsName,
+  };
 
-        {/* Section nav */}
-        <div className="sticky top-16 z-20 bg-background/80 backdrop-blur-sm py-2 -mx-1 px-1 border-b">
-          <div className="flex gap-1 overflow-x-auto">
-            {NAV_ITEMS.map((item) => (
+  return (
+    <div className="flex gap-6 relative">
+      {/* LEFT */}
+      <div className="flex-1 min-w-0 space-y-6 pb-24 lg:pb-10">
+        {/* Tab pills */}
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm -mx-1 px-1 py-3 border-b">
+          <div className="flex gap-1 overflow-x-auto scrollbar-hide">
+            {TABS.map((t) => (
               <button
-                key={item.id}
-                onClick={() => scrollTo(item.id)}
+                key={t.id}
+                onClick={() => setActiveTab(t.id)}
                 className={cn(
-                  "px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors",
-                  activeSection === item.id
-                    ? "bg-primary text-primary-foreground"
+                  "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all",
+                  activeTab === t.id
+                    ? "bg-primary text-primary-foreground shadow-sm"
                     : "text-muted-foreground hover:bg-muted"
                 )}
               >
-                {item.label}
+                {t.label}
               </button>
             ))}
           </div>
         </div>
 
-        <div id="stats" ref={(el) => { sectionRefs.current.stats = el; }}>
-          <StatsSection isDemo={isDemo} salonId={salonId} />
-        </div>
-        <div id="hero" ref={(el) => { sectionRefs.current.hero = el; }}>
-          <HeroSection isDemo={isDemo} salonId={salonId} onSplashChange={setSplashUrl} />
-        </div>
-        <div id="push" ref={(el) => { sectionRefs.current.push = el; }}>
-          <PushSection isDemo={isDemo} salonId={salonId} />
-        </div>
-        <div id="config" ref={(el) => { sectionRefs.current.config = el; }}>
-          <ConfigOverviewSection isDemo={isDemo} salonId={salonId} onNavigate={onNavigate} />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activeTab === "marka" && <MarkaTab brand={brand} setBrand={setBrand} isDemo={isDemo} />}
+            {activeTab === "komunikacja" && <KomunikacjaTab />}
+            {activeTab === "lojalnosciowy" && (
+              <LojalnosciowyTab pointsName={pointsName} setPointsName={setPointsName} brandColor={brand.brandColor} />
+            )}
+            {activeTab === "galeria" && <GaleriaTab />}
+            {activeTab === "broadcast" && <BroadcastTab />}
+            {activeTab === "statystyki" && <StatystykiTab />}
+            {activeTab === "link" && <LinkQRTab salonSlug={salonSlug} salonName={brand.salonName} />}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* RIGHT — desktop phone preview */}
+      <div className="w-80 flex-shrink-0 hidden lg:block">
+        <div className="sticky top-6">
+          <PhonePreview config={previewConfig} />
         </div>
       </div>
 
-      {/* Right — phone preview (hidden on smaller screens) */}
-      <div className="w-80 flex-shrink-0 hidden xl:block">
-        <div className="sticky top-24">
-          <MobilePreview config={previewConfig} isDemo={isDemo} />
-        </div>
-      </div>
+      {/* Floating mobile preview button */}
+      <button
+        onClick={() => setMobilePreviewOpen(true)}
+        className="lg:hidden fixed bottom-20 right-4 z-30 flex items-center gap-2 px-4 py-3 rounded-full bg-primary text-primary-foreground shadow-lg"
+      >
+        <Smartphone className="w-4 h-4" /> Podgląd
+      </button>
+
+      <Dialog open={mobilePreviewOpen} onOpenChange={setMobilePreviewOpen}>
+        <DialogContent className="max-w-sm p-4">
+          <button
+            onClick={() => setMobilePreviewOpen(false)}
+            className="absolute top-3 right-3 p-1 hover:bg-muted rounded"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <PhonePreview config={previewConfig} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
