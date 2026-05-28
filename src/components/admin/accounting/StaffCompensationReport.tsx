@@ -145,7 +145,7 @@ export function StaffCompensationReport({ dateRange, isDemo = false }: StaffComp
         details,
       };
     });
-  }, [isDemo, staffMembers, completedAppointments, workingHoursData, dateRange]);
+  }, [isDemo, staffMembers, completedAppointments, workingHoursData, dateRange, settings.team]);
 
   const totalPay = rows.reduce((s, r) => s + r.calculatedPay, 0);
 
