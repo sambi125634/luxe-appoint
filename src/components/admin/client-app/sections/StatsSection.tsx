@@ -137,7 +137,14 @@ export function StatsSection({ isDemo, salonId }: StatsSectionProps) {
     );
   }
 
-  const renderGroup = (title: string, icon: typeof TrendingUp, items: typeof adoption) => (
+  type MetricItem = {
+    label: string;
+    value: number | string;
+    icon: typeof TrendingUp;
+    color: string;
+    hint?: string;
+  };
+  const renderGroup = (title: string, icon: typeof TrendingUp, items: MetricItem[]) => (
     <div className="space-y-2">
       <div className="flex items-center gap-2 px-1">
         {(() => { const Icon = icon; return <Icon className="w-3.5 h-3.5 text-muted-foreground" />; })()}
