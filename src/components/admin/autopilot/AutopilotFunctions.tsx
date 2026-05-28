@@ -612,12 +612,14 @@ function FunctionCard({
   isDemo,
   onToggle,
   onConfigure,
+  stats,
 }: {
   fn: FunctionDef;
   enabled: boolean;
   isDemo: boolean | undefined;
   onToggle: (key: FunctionKey) => void;
   onConfigure: (key: string) => void;
+  stats?: AutopilotModuleStatsRow;
 }) {
   const controls = useAnimation();
   const c = fn.colors;
@@ -679,6 +681,12 @@ function FunctionCard({
                   {fn.title}
                 </p>
                 <p className="text-xs text-muted-foreground">{fn.schedule}</p>
+                {!isDemo && enabled && stats?.last_run_at && (
+                  <div className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-full px-2 py-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Aktywny · {formatLastRun(stats.last_run_at)}
+                  </div>
+                )}
               </div>
             </div>
             <Switch checked={enabled} onCheckedChange={handleToggle} />
