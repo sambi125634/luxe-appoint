@@ -32,6 +32,7 @@ export const DEMO_AUTOPILOT_DATA = {
   ],
 
   historyActions: [
+    { time: "dziś 15:10", type: "Flash Oferta™", clientName: "8 klientek", status: "success" as const, statusLabel: "✓ 2 rezerwacje", effect: 280 },
     { time: "dziś 14:23", type: "VIP na jutro", clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
     { time: "dziś 13:41", type: "No-show Recovery", clientName: "Kasia M.", status: "success" as const, statusLabel: "✓ Wróciła", effect: 180 },
     { time: "dziś 12:15", type: "Cichy Ambasador", clientName: "Magda W.", status: "success" as const, statusLabel: "✓ Opinia ★×5", effect: null },
@@ -42,6 +43,7 @@ export const DEMO_AUTOPILOT_DATA = {
     { time: "wczoraj 18:00", type: "Cichy Ambasador", clientName: "Beata W.", status: "failed" as const, statusLabel: "✗ Brak odpowiedzi", effect: null },
     { time: "wczoraj 15:30", type: "No-show Recovery", clientName: "Paula S.", status: "pending" as const, statusLabel: "⏳ Czeka", effect: null },
     { time: "wczoraj 12:00", type: "Martwe godziny", clientName: "—", status: "success" as const, statusLabel: "✓ Rezerwacja", effect: 180 },
+    { time: "wczoraj 11:00", type: "Flash Oferta™", clientName: "12 klientek", status: "success" as const, statusLabel: "✓ 1 rezerwacja", effect: 140 },
     { time: "wczoraj 09:00", type: "Raport tygodniowy", clientName: "—", status: "success" as const, statusLabel: "✓ Otwarto", effect: null },
     { time: "2 dni temu 20:00", type: "VIP na jutro", clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
     { time: "2 dni temu 18:00", type: "Cichy Ambasador", clientName: "Kasia T.", status: "success" as const, statusLabel: "✓ Opinia ★×5", effect: null },
