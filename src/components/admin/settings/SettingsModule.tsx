@@ -211,6 +211,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={updateProfile}
+              isDemo={isDemo}
             />
           )}
           {activeTab === "booking" && (
