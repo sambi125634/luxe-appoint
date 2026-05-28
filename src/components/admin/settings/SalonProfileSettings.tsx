@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, MapPin, Phone, Mail, Palette, Upload, Save, Loader2 } from "lucide-react";
+import { Building2, MapPin, Phone, Mail, Palette, Upload, Save, Loader2, X } from "lucide-react";
+import { useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,10 +16,13 @@ interface SalonProfileSettingsProps {
   isLoading: boolean;
   isSaving: boolean;
   onSave: (updates: Partial<SalonProfile>) => Promise<boolean>;
+  isDemo?: boolean;
 }
 
-export function SalonProfileSettings({ profile, isLoading, isSaving, onSave }: SalonProfileSettingsProps) {
+export function SalonProfileSettings({ profile, isLoading, isSaving, onSave, isDemo = false }: SalonProfileSettingsProps) {
   const { t } = useTranslation();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<Partial<SalonProfile>>({
     name: "",
     description: "",
