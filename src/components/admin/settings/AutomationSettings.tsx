@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Bot, Clock, Shield, Zap, ExternalLink, CheckCircle2, AlertCircle, Save, Loader2, Globe } from "lucide-react";
+import { Shield, Save, Loader2, Globe } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -8,8 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
 
@@ -26,14 +24,6 @@ interface AutopilotGlobalConfig {
   quietHoursEnd: string;
   maxMessagesPerClientDays: number;
   aiSuggestionsEnabled: boolean;
-}
-
-interface ModuleStatus {
-  key: string;
-  labelKey: string;
-  icon: React.ReactNode;
-  configured: boolean;
-  targetTab: string;
 }
 
 interface AutomationSettingsProps {
@@ -66,7 +56,6 @@ export function AutomationSettings({
   const [autopilot, setAutopilot] = useState<AutopilotGlobalConfig>(defaultAutopilotConfig);
   const [autopilotLoading, setAutopilotLoading] = useState(false);
   const [localSettings, setLocalSettings] = useState(settings);
-  const [moduleStatuses, setModuleStatuses] = useState<ModuleStatus[]>([]);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -74,12 +63,8 @@ export function AutomationSettings({
   }, [settings]);
 
   useEffect(() => {
-    if (!salonId || isDemo) {
-      setModuleStatuses(getDemoModuleStatuses());
-      return;
-    }
+    if (!salonId || isDemo) return;
     fetchAutopilotConfig();
-    fetchModuleStatuses();
   }, [salonId, isDemo]);
 
   const fetchAutopilotConfig = async () => {
@@ -100,61 +85,6 @@ export function AutomationSettings({
       });
     }
   };
-
-  const fetchModuleStatuses = async () => {
-    if (!salonId) return;
-    const [pixelRes, retentionRes, referralRes] = await Promise.all([
-      supabase.from("pixel_config").select("is_active").eq("salon_id", salonId).maybeSingle(),
-      supabase.from("retention_sequences").select("id").eq("salon_id", salonId).limit(1),
-      supabase.from("referral_codes").select("id").eq("salon_id", salonId).limit(1),
-    ]);
-
-    setModuleStatuses([
-      {
-        key: "pixel",
-        labelKey: "admin.pixel",
-        icon: <Zap className="w-4 h-4" />,
-        configured: !!(pixelRes.data?.is_active),
-        targetTab: "pixel",
-      },
-      {
-        key: "retention",
-        labelKey: "admin.retention",
-        icon: <Clock className="w-4 h-4" />,
-        configured: !!(retentionRes.data && retentionRes.data.length > 0),
-        targetTab: "retention",
-      },
-      {
-        key: "referral",
-        labelKey: "admin.referral",
-        icon: <ExternalLink className="w-4 h-4" />,
-        configured: !!(referralRes.data && referralRes.data.length > 0),
-        targetTab: "referral",
-      },
-      {
-        key: "analytics",
-        labelKey: "admin.trueProfit",
-        icon: <Globe className="w-4 h-4" />,
-        configured: false,
-        targetTab: "analytics",
-      },
-      {
-        key: "consultation",
-        labelKey: "admin.consultation",
-        icon: <Shield className="w-4 h-4" />,
-        configured: false,
-        targetTab: "consultation",
-      },
-    ]);
-  };
-
-  const getDemoModuleStatuses = (): ModuleStatus[] => [
-    { key: "pixel", labelKey: "admin.pixel", icon: <Zap className="w-4 h-4" />, configured: true, targetTab: "pixel" },
-    { key: "retention", labelKey: "admin.retention", icon: <Clock className="w-4 h-4" />, configured: true, targetTab: "retention" },
-    { key: "referral", labelKey: "admin.referral", icon: <ExternalLink className="w-4 h-4" />, configured: false, targetTab: "referral" },
-    { key: "analytics", labelKey: "admin.trueProfit", icon: <Globe className="w-4 h-4" />, configured: false, targetTab: "analytics" },
-    { key: "consultation", labelKey: "admin.consultation", icon: <Shield className="w-4 h-4" />, configured: true, targetTab: "consultation" },
-  ];
 
   const saveAutopilot = async (updates: Partial<AutopilotGlobalConfig>) => {
     if (!salonId || isDemo) return;
@@ -262,77 +192,12 @@ export function AutomationSettings({
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label>{t("settingsModule.dataRetention")}</Label>
-            <Select
-              value={String(localSettings.dataRetentionYears)}
-              onValueChange={(v) => updateLocal("dataRetentionYears", Number(v))}
-            >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">{t("settingsModule.year1")}</SelectItem>
-                <SelectItem value="2">{t("settingsModule.years2")}</SelectItem>
-                <SelectItem value="3">{t("settingsModule.years3")}</SelectItem>
-                <SelectItem value="5">{t("settingsModule.years5")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {hasChanges && (
             <Button onClick={handleSaveDefaults} disabled={isSaving} className="gap-2">
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {t("settingsModule.saveSettings")}
             </Button>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Module Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
-            {t("settingsModule.moduleStatus")}
-          </CardTitle>
-          <CardDescription>
-            {t("settingsModule.moduleStatusDesc")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {moduleStatuses.map((mod) => (
-              <div
-                key={mod.key}
-                className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-md ${mod.configured ? 'bg-green-500/10 text-green-600' : 'bg-orange-500/10 text-orange-600'}`}>
-                    {mod.icon}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{t(mod.labelKey)}</p>
-                    <Badge variant={mod.configured ? "default" : "secondary"} className="text-xs mt-0.5">
-                      {mod.configured ? (
-                        <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> {t("settingsModule.moduleConfigured")}</span>
-                      ) : (
-                        <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {t("settingsModule.moduleNeedsConfig")}</span>
-                      )}
-                    </Badge>
-                  </div>
-                </div>
-                {onNavigateToModule && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onNavigateToModule(mod.targetTab)}
-                    className="text-xs"
-                  >
-                    {t("settingsModule.goToModule")}
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>

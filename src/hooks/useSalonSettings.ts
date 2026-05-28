@@ -340,9 +340,36 @@ export function useSalonSettings() {
         [section]: { ...settings[section], ...updates },
       };
 
+      // Build update payload — always sync JSONB settings.
+      const updatePayload: Record<string, unknown> = {
+        settings: JSON.parse(JSON.stringify(newSettings)) as Json,
+      };
+
+      // Side-effect sync: prepayment policy lives in 2 columns used by edge
+      // functions (payment_required, deposit_percent). Keep them in sync so
+      // there is one source of truth even though logic reads from columns.
+      if (section === "booking") {
+        const prepay = newSettings.booking.prepayment;
+        updatePayload.payment_required = !!prepay?.enabled;
+        updatePayload.deposit_percent =
+          prepay?.enabled && prepay.type === "percentage"
+            ? Math.max(0, Math.min(100, prepay.amount || 0))
+            : prepay?.enabled && prepay.type === "full"
+              ? 100
+              : 0;
+      }
+
+      // Side-effect sync: Przelewy24 IDs are also stored in dedicated columns
+      // used by P24 edge functions for backward compatibility.
+      if (section === "integrations") {
+        const p24 = newSettings.integrations.przelewy24;
+        updatePayload.p24_merchant_id = p24?.merchantId || null;
+        updatePayload.p24_pos_id = p24?.posId || null;
+      }
+
       const { error } = await supabase
         .from("salons")
-        .update({ settings: JSON.parse(JSON.stringify(newSettings)) as Json })
+        .update(updatePayload)
         .eq("id", profile.id);
 
       if (error) throw error;

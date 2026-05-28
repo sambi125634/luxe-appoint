@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, CreditCard, Scale, ChevronRight, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, Scale, ChevronRight, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
@@ -8,7 +8,6 @@ import { IntegrationSettings } from "./IntegrationSettings";
 import { AutomationSettings } from "./AutomationSettings";
 import { CommunicationSettings } from "./CommunicationSettings";
 import { TeamSettings } from "./TeamSettings";
-import { PaymentsSettings } from "./PaymentsSettings";
 import { LegalSettings } from "./LegalSettings";
 import { ExportModule } from "@/components/admin/export";
 import { useSalonSettings } from "@/hooks/useSalonSettings";
@@ -49,8 +48,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
     { id: "team" as const, label: "Zespół", icon: Users, group: "Salon", description: "Pracownicy i stawki" },
     { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell, group: "Komunikacja", description: "Email, SMS, push" },
     { id: "communication" as const, label: "Komunikacja", icon: Radio, group: "Komunikacja", description: "Kanały i szablony" },
-    { id: "payments" as const, label: "Płatności", icon: CreditCard, group: "Operacje", description: "Przelewy24, VAT, zaliczki" },
-    { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug, group: "Operacje", description: "Google, Meta, kalendarze" },
+    { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug, group: "Operacje", description: "Płatności, Google, kalendarze" },
     { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap, group: "Operacje", description: "AI Autopilot" },
     { id: "legal" as const, label: "Prawne", icon: Scale, group: "Zgodność", description: "Regulamin, RODO, cookies" },
     { id: "export" as const, label: "Eksport danych", icon: Download, group: "Zgodność", description: "Backup i RODO export" },
@@ -255,7 +253,6 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
             />
           )}
           {activeTab === "team" && <TeamSettings isDemo={isDemo} onNavigateToModule={onNavigateToModule} />}
-          {activeTab === "payments" && <PaymentsSettings isDemo={isDemo} />}
           {activeTab === "integrations" && (
             <IntegrationSettings
               settings={settings.integrations}
