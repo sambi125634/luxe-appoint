@@ -33,6 +33,36 @@ const MODULES: ModuleSchedule[] = [
   },
 ];
 
+// Phase 2-4 modules
+MODULES.push(
+  { key: "flash_offer", configFlag: "flash_offer_enabled", functionName: "autopilot-flash-offer",
+    shouldRun: (n) => n.getHours() >= 15 && n.getHours() < 19 && n.getMinutes() < 15 },
+  { key: "weather_trigger", configFlag: "weather_trigger_enabled", functionName: "autopilot-weather-trigger",
+    shouldRun: (n) => n.getHours() === 7 && n.getMinutes() < 30 },
+  { key: "dead_hours", configFlag: "dead_hours_enabled", functionName: "autopilot-dead-hours",
+    shouldRun: (n) => n.getDay() === 1 && n.getHours() === 9 && n.getMinutes() < 30 },
+  { key: "upsell_pre_visit", configFlag: "upsell_pre_visit_enabled", functionName: "autopilot-upsell-pre-visit",
+    shouldRun: (n) => n.getHours() === 19 && n.getMinutes() < 30 },
+  { key: "vip_radar", configFlag: "vip_radar_enabled", functionName: "autopilot-vip-radar",
+    shouldRun: (n) => n.getHours() === 8 && n.getMinutes() < 30 },
+  { key: "silent_ambassador", configFlag: "silent_ambassador_enabled", functionName: "autopilot-silent-ambassador",
+    shouldRun: (n) => n.getDay() === 0 && n.getHours() === 11 && n.getMinutes() < 30 },
+  { key: "snowball_referral", configFlag: "snowball_referral_enabled", functionName: "autopilot-snowball-referral",
+    shouldRun: (n) => n.getHours() === 18 && n.getMinutes() < 30 },
+  { key: "first_visit_sequence", configFlag: "first_visit_sequence_enabled", functionName: "autopilot-first-visit-sequence",
+    shouldRun: () => true },
+  { key: "loyalty_engine", configFlag: "loyalty_engine_enabled", functionName: "autopilot-loyalty-engine",
+    shouldRun: () => true },
+  { key: "review_guard", configFlag: "review_guard_enabled", functionName: "autopilot-review-guard",
+    shouldRun: (n) => n.getHours() === 10 && n.getMinutes() < 30 },
+  { key: "price_change_followup", configFlag: "price_change_followup_enabled", functionName: "autopilot-price-change-followup",
+    shouldRun: (n) => n.getHours() === 12 && n.getMinutes() < 30 },
+  { key: "profit_alarm", configFlag: "profit_alarm_enabled", functionName: "autopilot-profit-alarm",
+    shouldRun: (n) => n.getDay() === 1 && n.getHours() === 9 && n.getMinutes() < 30 },
+  { key: "abandoned_booking", configFlag: "abandoned_booking_enabled", functionName: "autopilot-abandoned-booking",
+    shouldRun: () => true },
+);
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
