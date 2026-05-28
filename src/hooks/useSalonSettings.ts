@@ -31,6 +31,7 @@ export interface BookingSettings {
   allowOnlinePayments: boolean;
   requirePhoneConfirmation: boolean;
   autoConfirmBookings: boolean;
+  autoConfirmReturningOnly: boolean;
   defaultWorkingHoursStart: string;
   defaultWorkingHoursEnd: string;
   slotInterval: number;
@@ -114,6 +115,7 @@ const defaultBookingSettings: BookingSettings = {
   allowOnlinePayments: false,
   requirePhoneConfirmation: false,
   autoConfirmBookings: true,
+  autoConfirmReturningOnly: false,
   defaultWorkingHoursStart: "09:00",
   defaultWorkingHoursEnd: "18:00",
   slotInterval: 15,

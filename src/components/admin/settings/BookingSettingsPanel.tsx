@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Calendar, Clock, Ban, CreditCard, Save, Loader2, AlertTriangle, Percent, Banknote } from "lucide-react";
+import { Calendar, Clock, Ban, CreditCard, Save, Loader2, AlertTriangle, Percent, Banknote, HelpCircle, Zap, UserCheck, Users, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BookingSettings, PrepaymentSettings } from "@/hooks/useSalonSettings";
 
 interface BookingSettingsPanelProps {
@@ -23,6 +24,25 @@ const defaultPrepayment: PrepaymentSettings = {
   requireForHighRisk: true,
   requireForNewClients: false,
 };
+
+type ConfirmationMode = "auto" | "manual" | "hybrid";
+
+const InfoHint = ({ text }: { text: string }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button
+        type="button"
+        className="inline-flex items-center justify-center text-muted-foreground/60 hover:text-primary transition-colors"
+        aria-label="Wyjaśnienie"
+      >
+        <HelpCircle className="w-3.5 h-3.5" />
+      </button>
+    </TooltipTrigger>
+    <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+      {text}
+    </TooltipContent>
+  </Tooltip>
+);
 
 export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: BookingSettingsPanelProps) {
   const { t } = useTranslation();
@@ -49,6 +69,32 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
     });
   };
 
+  const confirmationMode: ConfirmationMode = formData.autoConfirmReturningOnly
+    ? "hybrid"
+    : formData.autoConfirmBookings
+      ? "auto"
+      : "manual";
+
+  const setConfirmationMode = (mode: ConfirmationMode) => {
+    setFormData({
+      ...formData,
+      autoConfirmBookings: mode !== "manual",
+      autoConfirmReturningOnly: mode === "hybrid",
+    });
+  };
+
+  const advanceLabel = (days: number) =>
+    days === 0
+      ? "Klientki mogą rezerwować bez limitu czasowego."
+      : `Klientki mogą rezerwować do ${days} dni naprzód.`;
+
+  const minAdvanceLabel = (hours: number) => {
+    if (hours === 0) return "Rezerwacja możliwa nawet na ostatnią chwilę.";
+    if (hours < 1) return `Klientka musi zarezerwować min. ${Math.round(hours * 60)} minut przed wizytą.`;
+    if (hours === 1) return "Klientka musi zarezerwować min. 1 godzinę przed wizytą.";
+    return `Klientka musi zarezerwować min. ${hours} godzin przed wizytą.`;
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -73,7 +119,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="advanceDays">{t("settingsModule.maxAdvanceDays")}</Label>
+              <Label htmlFor="advanceDays" className="flex items-center gap-1.5">
+                {t("settingsModule.maxAdvanceDays")}
+                <InfoHint text="Jak daleko w przyszłość klientka może zarezerwować wizytę. Większa wartość = większa swoboda, ale też więcej rezerwacji na 'kiedyś', które łatwiej anulować. Dla salonów premium z wcześniejszym planowaniem polecamy 90-180 dni." />
+              </Label>
               <Select
                 value={formData.advanceBookingDays.toString()}
                 onValueChange={(v) => setFormData({ ...formData, advanceBookingDays: parseInt(v) })}
@@ -87,32 +136,40 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
                   <SelectItem value="30">30 {t("settingsModule.days")}</SelectItem>
                   <SelectItem value="60">60 {t("settingsModule.days")}</SelectItem>
                   <SelectItem value="90">90 {t("settingsModule.days")}</SelectItem>
+                  <SelectItem value="180">180 dni (6 miesięcy)</SelectItem>
+                  <SelectItem value="365">365 dni (1 rok)</SelectItem>
+                  <SelectItem value="0">Bez limitu</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.clientsCanBookAdvance", { days: formData.advanceBookingDays })}
-              </p>
+              <p className="text-xs text-muted-foreground">{advanceLabel(formData.advanceBookingDays)}</p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="minAdvance">{t("settingsModule.minAdvanceHours")}</Label>
+              <Label htmlFor="minAdvance" className="flex items-center gap-1.5">
+                {t("settingsModule.minAdvanceHours")}
+                <InfoHint text="Ile minimum musi minąć między rezerwacją a wizytą. 'Bez limitu' pozwala na rezerwację last-minute (nawet za 5 minut). 15-30 minut to dobry balans — zostawia czas na przygotowanie stanowiska." />
+              </Label>
               <Select
                 value={formData.minAdvanceHours.toString()}
-                onValueChange={(v) => setFormData({ ...formData, minAdvanceHours: parseInt(v) })}
+                onValueChange={(v) => setFormData({ ...formData, minAdvanceHours: parseFloat(v) })}
               >
                 <SelectTrigger id="minAdvance">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="0">{t("settingsModule.noLimit")}</SelectItem>
-                  <SelectItem value="1">1 {t("settingsModule.hour")}</SelectItem>
-                  <SelectItem value="2">2 {t("settingsModule.hours2")}</SelectItem>
-                  <SelectItem value="4">4 {t("settingsModule.hours4")}</SelectItem>
-                  <SelectItem value="24">24 {t("settingsModule.hours24")}</SelectItem>
+                  <SelectItem value="0.25">15 minut</SelectItem>
+                  <SelectItem value="0.5">30 minut</SelectItem>
+                  <SelectItem value="0.75">45 minut</SelectItem>
+                  <SelectItem value="1">1 godzina</SelectItem>
+                  <SelectItem value="2">2 godziny</SelectItem>
+                  <SelectItem value="4">4 godziny</SelectItem>
+                  <SelectItem value="12">12 godzin</SelectItem>
+                  <SelectItem value="24">24 godziny</SelectItem>
+                  <SelectItem value="48">48 godzin (2 dni)</SelectItem>
+                  <SelectItem value="72">72 godziny (3 dni)</SelectItem>
                 </SelectContent>
               </Select>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.clientMustBookHours", { hours: formData.minAdvanceHours })}
-              </p>
+              <p className="text-xs text-muted-foreground">{minAdvanceLabel(formData.minAdvanceHours)}</p>
             </div>
           </div>
         </CardContent>
@@ -153,7 +210,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="slotInterval">{t("settingsModule.slotInterval")}</Label>
+              <Label htmlFor="slotInterval" className="flex items-center gap-1.5">
+                {t("settingsModule.slotInterval")}
+                <InfoHint text="Co ile minut pojawia się nowy slot do rezerwacji. Np. interwał 15 min = klientka widzi godziny 10:00, 10:15, 10:30… Mniejszy interwał = więcej możliwości wyboru, ale też więcej drobnych okienek w grafiku." />
+              </Label>
               <Select
                 value={formData.slotInterval.toString()}
                 onValueChange={(v) => setFormData({ ...formData, slotInterval: parseInt(v) })}
@@ -169,7 +229,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="buffer">{t("settingsModule.bufferBetween")}</Label>
+              <Label htmlFor="buffer" className="flex items-center gap-1.5">
+                {t("settingsModule.bufferBetween")}
+                <InfoHint text="Dodatkowy czas automatycznie blokowany po każdej wizycie — na sprzątanie stanowiska, dezynfekcję, krótką przerwę. Bufor nie jest widoczny dla klientki, ale chroni Cię przed nakładającymi się wizytami." />
+              </Label>
               <Select
                 value={formData.bufferBetweenAppointments.toString()}
                 onValueChange={(v) => setFormData({ ...formData, bufferBetweenAppointments: parseInt(v) })}
@@ -349,7 +412,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="cancelPolicy">{t("settingsModule.cancellationLimit")}</Label>
+            <Label htmlFor="cancelPolicy" className="flex items-center gap-1.5">
+              {t("settingsModule.cancellationLimit")}
+              <InfoHint text="Do ilu godzin przed wizytą klientka może bezpłatnie anulować rezerwację. Po tym czasie anulacja wymaga kontaktu z salonem (i może oznaczać utratę zaliczki, jeśli była pobrana)." />
+            </Label>
             <Select
               value={formData.cancellationPolicyHours.toString()}
               onValueChange={(v) => setFormData({ ...formData, cancellationPolicyHours: parseInt(v) })}
@@ -373,40 +439,91 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         </CardContent>
       </Card>
 
-      {/* Additional Options */}
+      {/* Confirmation Mode */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-primary" />
-            {t("settingsModule.additionalOptions")}
+            <UserCheck className="w-5 h-5 text-primary" />
+            Tryb potwierdzania wizyt
           </CardTitle>
+          <CardDescription>
+            Wybierz, jak nowe rezerwacje trafiają do grafiku — automatycznie czy po akceptacji personelu.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>{t("settingsModule.autoConfirmBookings")}</Label>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.autoConfirmDesc")}
-              </p>
-            </div>
-            <Switch
-              checked={formData.autoConfirmBookings}
-              onCheckedChange={(checked) => setFormData({ ...formData, autoConfirmBookings: checked })}
-            />
-          </div>
+        <CardContent className="space-y-3">
+          {([
+            {
+              id: "auto" as const,
+              icon: Zap,
+              title: "Automatyczne",
+              badge: "Zalecane",
+              desc: "Rezerwacja od razu trafia do grafiku jako potwierdzona. Klientka dostaje natychmiastowy SMS/email z potwierdzeniem. Najlepsze dla większości salonów.",
+            },
+            {
+              id: "manual" as const,
+              icon: UserCheck,
+              title: "Ręczne — wymaga akceptacji w panelu",
+              desc: "Każda nowa rezerwacja trafia jako „Oczekująca\" do listy w Grafiku. Personel jednym kliknięciem akceptuje lub odrzuca (możesz wcześniej zadzwonić do klientki). Klientka dostaje SMS dopiero po akceptacji.",
+            },
+            {
+              id: "hybrid" as const,
+              icon: Users,
+              title: "Hybrydowe — auto dla stałych, ręczne dla nowych",
+              desc: "Stałe klientki (z co najmniej jedną ukończoną wizytą) trafiają od razu do grafiku. Nowe i anonimowe rezerwacje wymagają akceptacji personelu — chroni Cię przed fałszywymi rezerwacjami.",
+            },
+          ]).map((mode) => {
+            const Icon = mode.icon;
+            const isActive = confirmationMode === mode.id;
+            return (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => setConfirmationMode(mode.id)}
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                  isActive
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-border/60 hover:border-primary/40 hover:bg-muted/30"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                      isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="text-sm font-semibold text-foreground">{mode.title}</span>
+                      {mode.badge && (
+                        <span className="text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-primary/15 text-primary">
+                          {mode.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{mode.desc}</p>
+                  </div>
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
+                      isActive ? "border-primary bg-primary" : "border-border"
+                    }`}
+                  >
+                    {isActive && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>{t("settingsModule.requirePhoneConfirm")}</Label>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.requirePhoneConfirmDesc")}
+          {confirmationMode !== "auto" && (
+            <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs text-muted-foreground flex gap-2">
+              <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p>
+                Niezatwierdzone rezerwacje wygasają po <strong>24 godzinach</strong>, jeśli nikt z personelu ich nie zaakceptuje. Klientka otrzymuje wtedy powiadomienie i może wybrać inny termin.
               </p>
             </div>
-            <Switch
-              checked={formData.requirePhoneConfirmation}
-              onCheckedChange={(checked) => setFormData({ ...formData, requirePhoneConfirmation: checked })}
-            />
-          </div>
+          )}
         </CardContent>
       </Card>
 
