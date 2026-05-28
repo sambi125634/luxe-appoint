@@ -1,0 +1,1 @@
+ALTER VIEW public.autopilot_module_stats SET (security_invoker = true);
