@@ -149,15 +149,17 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Replace variables
     const smsMessage = template
-      .replace(/{imie}/g, client.first_name)
-      .replace(/{nazwisko}/g, client.last_name)
-      .replace(/{data}/g, formattedDate)
-      .replace(/{godzina}/g, formattedTime)
-      .replace(/{usluga}/g, service.name)
-      .replace(/{specjalista}/g, staff.name)
-      .replace(/{adres}/g, salon.address || "")
-      .replace(/{nazwa_salonu}/g, salon.name)
-      .replace(/{telefon}/g, salon.phone || "");
+      .replace(/{imie}/g, client.first_name ?? "")
+      .replace(/{nazwisko}/g, client.last_name ?? "")
+      .replace(/{data}/g, formattedDate ?? "")
+      .replace(/{godzina}/g, formattedTime ?? "")
+      .replace(/{usluga}/g, service?.name ?? "")
+      .replace(/{specjalista}/g, staff?.name ?? "")
+      .replace(/{adres}/g, salon.address ?? "")
+      .replace(/{nazwa_salonu}/g, salon.name ?? "")
+      .replace(/{telefon}/g, salon.phone ?? "")
+      .replace(/{cena}/g, service?.price != null ? `${service.price} zł` : "")
+      .replace(/{czas_trwania}/g, service?.duration != null ? `${service.duration} min` : "");
 
     // Send SMS via SMSAPI.pl
     const smsResult = await sendSmsViaSmsapi(
