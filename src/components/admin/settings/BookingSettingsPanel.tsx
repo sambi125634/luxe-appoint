@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Calendar, Clock, Ban, CreditCard, Save, Loader2, AlertTriangle, Percent, Banknote } from "lucide-react";
+import { Calendar, Clock, Ban, CreditCard, Save, Loader2, AlertTriangle, Percent, Banknote, HelpCircle, Zap, UserCheck, Users, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { BookingSettings, PrepaymentSettings } from "@/hooks/useSalonSettings";
 
 interface BookingSettingsPanelProps {
@@ -23,6 +24,25 @@ const defaultPrepayment: PrepaymentSettings = {
   requireForHighRisk: true,
   requireForNewClients: false,
 };
+
+type ConfirmationMode = "auto" | "manual" | "hybrid";
+
+const InfoHint = ({ text }: { text: string }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <button
+        type="button"
+        className="inline-flex items-center justify-center text-muted-foreground/60 hover:text-primary transition-colors"
+        aria-label="Wyjaśnienie"
+      >
+        <HelpCircle className="w-3.5 h-3.5" />
+      </button>
+    </TooltipTrigger>
+    <TooltipContent side="top" className="max-w-xs text-xs leading-relaxed">
+      {text}
+    </TooltipContent>
+  </Tooltip>
+);
 
 export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: BookingSettingsPanelProps) {
   const { t } = useTranslation();
@@ -47,6 +67,32 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
       ...formData,
       prepayment: { ...formData.prepayment, ...updates },
     });
+  };
+
+  const confirmationMode: ConfirmationMode = formData.autoConfirmReturningOnly
+    ? "hybrid"
+    : formData.autoConfirmBookings
+      ? "auto"
+      : "manual";
+
+  const setConfirmationMode = (mode: ConfirmationMode) => {
+    setFormData({
+      ...formData,
+      autoConfirmBookings: mode !== "manual",
+      autoConfirmReturningOnly: mode === "hybrid",
+    });
+  };
+
+  const advanceLabel = (days: number) =>
+    days === 0
+      ? "Klientki mogą rezerwować bez limitu czasowego."
+      : `Klientki mogą rezerwować do ${days} dni naprzód.`;
+
+  const minAdvanceLabel = (hours: number) => {
+    if (hours === 0) return "Rezerwacja możliwa nawet na ostatnią chwilę.";
+    if (hours < 1) return `Klientka musi zarezerwować min. ${Math.round(hours * 60)} minut przed wizytą.`;
+    if (hours === 1) return "Klientka musi zarezerwować min. 1 godzinę przed wizytą.";
+    return `Klientka musi zarezerwować min. ${hours} godzin przed wizytą.`;
   };
 
   if (isLoading) {
