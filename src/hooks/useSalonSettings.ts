@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { Json } from "@/integrations/supabase/types";
+import type { CompensationType } from "@/lib/compensation";
 
 export interface SalonProfile {
   id: string;
@@ -93,11 +94,21 @@ export interface AutomationSettings {
   dataRetentionYears: number;
 }
 
+export interface TeamSettings {
+  defaultCompensationType: CompensationType;
+  defaultHourlyRate: number;
+  defaultCommissionRate: number;
+  showStaffInWidget: boolean;
+  allowStaffSelection: boolean;
+  autoAssignMode: 'first_available' | 'round_robin' | 'by_specialization';
+}
+
 export interface SalonSettings {
   booking: BookingSettings;
   notifications: NotificationSettings;
   integrations: IntegrationSettings;
   automation: AutomationSettings;
+  team: TeamSettings;
 }
 
 const defaultPrepaymentSettings: PrepaymentSettings = {
@@ -199,6 +210,15 @@ const defaultAutomationSettings: AutomationSettings = {
   dataRetentionYears: 3,
 };
 
+const defaultTeamSettings: TeamSettings = {
+  defaultCompensationType: 'hourly',
+  defaultHourlyRate: 35,
+  defaultCommissionRate: 30,
+  showStaffInWidget: true,
+  allowStaffSelection: true,
+  autoAssignMode: 'first_available',
+};
+
 export function useSalonSettings() {
   const [profile, setProfile] = useState<SalonProfile | null>(null);
   const [settings, setSettings] = useState<SalonSettings>({
@@ -206,6 +226,7 @@ export function useSalonSettings() {
     notifications: defaultNotificationSettings,
     integrations: defaultIntegrationSettings,
     automation: defaultAutomationSettings,
+    team: defaultTeamSettings,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -245,6 +266,7 @@ export function useSalonSettings() {
             notifications: { ...defaultNotificationSettings, ...(savedSettings.notifications || {}) },
             integrations: { ...defaultIntegrationSettings, ...(savedSettings.integrations || {}) },
             automation: { ...defaultAutomationSettings, ...(savedSettings.automation || {}) },
+            team: { ...defaultTeamSettings, ...(savedSettings.team || {}) },
           });
         }
       }
@@ -307,7 +329,7 @@ export function useSalonSettings() {
 
   const updateSettings = async (
     section: keyof SalonSettings,
-    updates: Partial<BookingSettings | NotificationSettings | IntegrationSettings | AutomationSettings>
+    updates: Partial<BookingSettings | NotificationSettings | IntegrationSettings | AutomationSettings | TeamSettings>
   ) => {
     if (!profile?.id) return false;
 

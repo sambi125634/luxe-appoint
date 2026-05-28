@@ -1,103 +1,81 @@
-## Cel
+# Naprawa spójności danych wynagrodzeń + rozbudowa zakładki Zespół
 
-Dać właścicielom salonów pełną swobodę konfiguracji okna rezerwacji, dodać czytelne objaśnienia trudniejszych pojęć i naprawić mylącą opcję „potwierdzenia telefonicznego".
+## Diagnoza problemu
 
-Zakres dotyczy wyłącznie zakładki **Ustawienia → Rezerwacje** (`BookingSettingsPanel.tsx`).
+W bazie `staff_members` mamy 5 modeli wynagrodzeń (`compensation_type`):
+- `commission` (% od usługi)
+- `salary` (pensja miesięczna)
+- `hourly` (stawka godzinowa)
+- `salary_plus_commission` (pensja + %)
+- `flat_per_service` (kwota za zabieg)
 
----
+Pełny moduł **Zespół** (`StaffManagement.tsx`) poprawnie pozwala wybrać model i zapisuje go do bazy. Natomiast:
 
-## 1. Maksymalne wyprzedzenie rezerwacji
+1. **`TeamSettings.tsx`** (Ustawienia → Zespół) pokazuje sztywno `35 zł/h` przy każdym pracowniku ignorując `compensation_type` — stąd absurd: pracownik ma w pełnym module 30% prowizji, a tutaj „35 zł/h".
+2. **`useTrueProfit.ts`** używa `DEFAULT_HOURLY_RATE = 35` zamiast czytać `compensation_type/hourly_rate/commission_rate` z `staff_members` (komentarz w kodzie: `// future: check staff_members.hourly_rate`).
+3. **Karta "Średnia stawka"** w `TeamSettings` liczy średnią z `hourly_rate` nawet dla osób na prowizji — bez sensu.
 
-Obecnie: 7 / 14 / 30 / 60 / 90 dni.
+## Zakres zmian
 
-Nowe opcje:
-- 7 dni
-- 14 dni
-- 30 dni
-- 60 dni
-- 90 dni
-- 180 dni (6 miesięcy)
-- 365 dni (1 rok)
-- **Bez limitu** (zapisywane jako `0` lub bardzo duża wartość — patrz sekcja techniczna)
+### 1. `src/components/admin/settings/TeamSettings.tsx` — przebudowa karty pracownika
+- Pobierać dodatkowo: `compensation_type, commission_rate, base_salary, flat_rate_per_service`.
+- Zamiast „35 zł/h" pokazywać **rzeczywisty model**:
+  - `commission` → „30% prowizji"
+  - `hourly` → „40 zł/h"
+  - `salary` → „4 500 zł/mies"
+  - `salary_plus_commission` → „3 500 zł + 15%"
+  - `flat_per_service` → „100 zł/zabieg"
+  - brak / `—` → badge „Nieustawione" z mini-CTA „Ustaw"
+- Karta KPI „Średnia stawka" → zastąpić **3 mini-statystykami**:
+  - „X na prowizji", „Y na stawce", „Z na pensji" (rozkład modeli)
+  - Druga karta: średni **koszt osobogodziny** policzony spójnie (jeśli prowizja, używamy szacunku z średniej ceny usługi × %; jeśli godziny — wprost; jeśli pensja — base/160h). Ten sam wzór trafia do `useTrueProfit`.
+- Alert „Domyślna stawka 35 zł/h" zostaje, ale przeformułowany: „używamy jej tylko gdy pracownik nie ma uzupełnionego modelu wynagrodzenia".
 
-Pod selectem zostaje opis dynamiczny („Klientki mogą rezerwować do X dni naprzód" / „Bez limitu czasowego").
+### 2. Nowe sekcje ustawień w `TeamSettings` (realna wartość, nie tylko podgląd)
+Dodaję 3 bloki ustawień **salon-wide**, które obecnie nie mają domu:
 
-## 2. Minimalne wyprzedzenie
+- **Polityka domyślnych wynagrodzeń** — domyślny `compensation_type` i wartość, używane przy zakładaniu nowego pracownika i jako fallback w True Profit. Zapis do `salon_settings.team` (JSONB, klucze: `default_compensation_type`, `default_hourly_rate`, `default_commission_rate`).
+- **Widoczność w widgecie rezerwacji** — globalny toggle: „Pokazuj imiona/zdjęcia pracowników w widgecie" + „Pozwól klientowi wybrać pracownika". (Dziś jest tylko per-pracownik `visible_in_widget`).
+- **Auto-przypisanie wizyt** — radio: „Pierwszy wolny", „Rotacyjne (równy load)", „Wg specjalizacji" — używane gdy klient nie wybiera pracownika.
 
-Obecnie: brak limitu / 1h / 2h / 4h / 24h.
+Wszystko trzymane w istniejącej tabeli `salon_settings` w nowej sekcji `team` (JSONB — bez migracji schematu). Hook `useSalonSettings` rozszerzony o `TeamSettings` interface.
 
-Nowe opcje (granularne dla last-minute + większy zakres dla salonów premium):
-- Bez limitu (rezerwacja możliwa nawet za chwilę)
-- 15 minut
-- 30 minut
-- 45 minut
-- 1 godzina
-- 2 godziny
-- 4 godziny
-- 12 godzin
-- 24 godziny
-- 48 godzin
-- 72 godziny
+### 3. `src/hooks/useTrueProfit.ts` — realny koszt pracy zamiast `35 zł/h`
+Zamiast `DEFAULT_HOURLY_RATE`:
+- Pobierać `staff_members` z polami wynagrodzeń.
+- Dla każdej wizyty liczyć koszt na podstawie `compensation_type` przypisanego pracownika:
+  - `hourly` → `hourly_rate × duration/60`
+  - `commission` → `service.price × commission_rate/100`
+  - `flat_per_service` → `flat_rate_per_service`
+  - `salary` → `base_salary/160 × duration/60`
+  - `salary_plus_commission` → suma j.w.
+- Jeśli pracownik nie ma modelu → fallback do `salon_settings.team.default_*` → dopiero potem do `35 zł/h`.
+- Flaga `hasStaffRates` ustawiana realnie (true gdy ≥1 pracownik ma uzupełniony model). Banner „uzupełnij stawki" znika sam, gdy dane są kompletne.
 
-## 3. Tooltipy / objaśnienia (interwał slotów, bufor)
+### 4. Skan spójności w innych modułach (poprawki jednorazowe)
+- `StaffCompensationReport.tsx` — już używa `compensation_type` poprawnie. Sprawdzam tylko, czy gdy `commission_rate` jest null nie używa hardcoded 30 (linia 82: `?? 30`) — zmieniam na fallback do `salon_settings.team.default_commission_rate`.
+- Wszystkie miejsca pokazujące „stawkę" pracownika w UI (sidebar grafiku, modal wizyty, raporty) — przegląd i ujednolicenie formatera `formatCompensation(staff)` w `src/lib/compensation.ts` (nowy helper). Tak będzie jedno źródło prawdy formatowania.
+- `grep` po projekcie: `35` jako liczba w kontekście stawek, `hourly_rate || 35`, `commission_rate ?? 30` → wszystkie zastąpić wywołaniami helpera lub fallbackiem z ustawień.
 
-Przy etykietach **Interwał slotów** i **Bufor między wizytami** dodaję ikonę `HelpCircle` z `Tooltip` (shadcn) — kliknięcie/hover pokazuje krótkie wyjaśnienie:
+### 5. Demo mode
+- `DEMO_STAFF` w `TeamSettings.tsx` dostaje pola `compensation_type` i odpowiednie wartości, żeby demo prezentowało mieszankę modeli (Maria — salary 5500, Kasia — commission 35%, Anna — hourly 35) zamiast wszędzie „35 zł/h".
 
-- **Interwał slotów** — „Co ile minut pojawia się nowy slot do rezerwacji. Np. interwał 15 min = klientka widzi godziny 10:00, 10:15, 10:30… Mniejszy interwał = więcej możliwości wyboru, ale też więcej drobnych okienek w grafiku."
-- **Bufor między wizytami** — „Dodatkowy czas automatycznie blokowany po każdej wizycie — na sprzątanie stanowiska, dezynfekcję, krótką przerwę. Bufor nie jest widoczny dla klientki, ale chroni Cię przed nakładającymi się wizytami."
+## Pliki do zmiany
 
-Analogiczny tooltip dodaję też do **Maksymalnego/minimalnego wyprzedzenia** i **Polityki anulacji** — dla spójności.
+```text
+src/components/admin/settings/TeamSettings.tsx          (przepisać karty + dodać 3 sekcje ustawień)
+src/components/admin/settings/types.ts                  (dodać TeamSettings do typu)
+src/hooks/useSalonSettings.ts                           (TeamSettings + load/save)
+src/hooks/useTrueProfit.ts                              (realny koszt pracy z compensation_type)
+src/components/admin/accounting/StaffCompensationReport.tsx  (fallback z ustawień zamiast 30)
+src/lib/compensation.ts                                 (NOWY: formatCompensation + computeStaffCostForAppointment)
+```
 
-## 4. Uporządkowanie sekcji potwierdzeń (najważniejsze)
+## Czego NIE robię
+- Bez migracji schematu DB (wszystko mieści się w istniejących polach `staff_members` + `salon_settings` JSONB).
+- Bez zmian w widgecie rezerwacji w tej iteracji — tylko zapis ustawień; ich efektywne użycie w widgecie zrobimy osobno jeśli potwierdzisz.
+- Bez przebudowy pełnego modułu `StaffManagement` (działa poprawnie).
 
-Obecnie w sekcji „Dodatkowe opcje" są dwa przełączniki, które się dublują i wprowadzają w błąd:
+## Pytanie
 
-- **Automatyczne potwierdzenie rezerwacji** (`autoConfirmBookings`)
-- **Wymagaj potwierdzenia telefonicznego** (`requirePhoneConfirm`) — **bez mechanizmu w systemie**, bo nie ma jak technicznie wykryć, że klient zadzwonił i potwierdził
-
-### Proponowane rozwiązanie
-
-Zamieniam dwa zduplikowane toggle na **jedną grupę „Tryb potwierdzania wizyt"** z trzema wyraźnymi opcjami (RadioGroup w stylu kart):
-
-1. **Automatyczne (zalecane)** — rezerwacja od razu trafia do grafiku jako potwierdzona. Klientka dostaje natychmiastowe potwierdzenie SMS/email. Najlepsze dla większości salonów.
-2. **Ręczne — wymaga akceptacji w panelu** — każda nowa rezerwacja trafia jako „Oczekująca" do listy w module Grafik (badge „Do potwierdzenia"). Personel jednym kliknięciem akceptuje lub odrzuca. Klientka dostaje SMS dopiero po akceptacji. (To zastępuje mylące „potwierdzenie telefoniczne" — w praktyce dokładnie taki workflow daje swobodę zadzwonienia do klientki przed akceptacją.)
-3. **Hybrydowe — automatyczne dla stałych, ręczne dla nowych** — stali klienci (≥1 ukończona wizyta) idą automatem, nowi/anonimowi wymagają akceptacji personelu.
-
-Pod opcją „Ręczne" i „Hybrydowe" dodaję info-box: „Niezatwierdzone rezerwacje wygasają po 24h, jeśli nikt z personelu ich nie zaakceptuje. Klientka dostaje o tym powiadomienie i może zarezerwować inny termin."
-
-Stary `requirePhoneConfirm` zostaje wycofany z UI (kolumna w DB zostaje na razie nietknięta — bez migracji destrukcyjnej, ignorujemy w odczycie). Logika `autoConfirmBookings` w bazie pokrywa tryby 1 i 2; tryb 3 mapuje się na nową kolumnę boolean `auto_confirm_returning_only` (patrz sekcja techniczna).
-
----
-
-## Sekcja techniczna (dla devów)
-
-### Zmiany pliku
-- `src/components/admin/settings/BookingSettingsPanel.tsx` — rozszerzone opcje selectów, tooltipy, nowa sekcja „Tryb potwierdzania".
-- `src/locales/pl.json` / `en.json` — nowe klucze (`bookingMode.auto`, `bookingMode.manual`, `bookingMode.hybrid`, opisy tooltipów, opisy „365 dni" / „bez limitu" / „15/30/45 min" itd.).
-- `src/hooks/useSalonSettings.ts` — dodać `autoConfirmReturningOnly: boolean` do `BookingSettings`, czytać/zapisywać z `salon_settings`.
-- `src/integrations/supabase/types.ts` — wygenerowane po migracji.
-
-### Migracja
-- `ALTER TABLE public.salon_settings ADD COLUMN auto_confirm_returning_only boolean NOT NULL DEFAULT false;`
-- (opcjonalnie później) `requirePhoneConfirm` zostaje w DB jako legacy, ignorowane przez UI.
-
-### Walidacja
-- `advanceBookingDays`: dopuszczalne `7, 14, 30, 60, 90, 180, 365, 0` (gdzie `0` = bez limitu). Front mapuje „Bez limitu" → `0`; w logice wyznaczania dostępnych slotów `0` interpretujemy jako „brak górnej granicy" (ograniczeniem zostaje tylko grafik pracy).
-- `minAdvanceHours`: zmiana typu wartości — zostaje liczba godzin, ale pozycje submożdzinowe zapisujemy jako ułamki (`0.25`, `0.5`, `0.75`). Wymaga zmiany pola w DB z `integer` na `numeric(5,2)` — uwzględnione w tej samej migracji.
-
-### Zgodność wstecz
-- Salony z istniejącą wartością `autoConfirmBookings=true` mapują się na tryb „Automatyczne".
-- `autoConfirmBookings=false` mapuje się na „Ręczne".
-- `autoConfirmReturningOnly=true` (po włączeniu) override'uje powyższe i pokazuje tryb „Hybrydowe".
-- Stary `requirePhoneConfirm` znika z UI bez utraty danych w DB.
-
-### QA
-- Sprawdzić, że widget rezerwacji (`/s/[slug]`) honoruje nowe maksymalne wyprzedzenie 365/∞ i minimalne 15 min.
-- Sprawdzić, że nowe rezerwacje w trybie „Ręczne" trafiają z `status='pending'` i są widoczne w module Grafik z badge'em do akceptacji (już istniejąca logika — wymaga jedynie potwierdzenia ścieżki).
-- Brak regresji w mobile collapsible sidebar (poprzednia zmiana).
-
----
-
-## Pytanie do zatwierdzenia
-
-Czy zgadzasz się na zastąpienie mylącego „potwierdzenia telefonicznego" trybem **Automatyczne / Ręczne / Hybrydowe** (tryb 3 wymaga drobnej migracji DB)? Jeśli wolisz prościej — mogę zostawić tylko **Automatyczne / Ręczne** bez hybrydowego, bez migracji.
+Czy zatwierdzasz pełny zakres (1–5), czy wolisz tylko pkt 1+3+4 (sama spójność danych, bez nowych ustawień salon-wide w pkt 2)?

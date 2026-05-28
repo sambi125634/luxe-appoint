@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useSalonId } from "@/hooks/useSalonId";
 import { useStaffMembers } from "@/hooks/useStaffMembers";
+import { useSalonSettings } from "@/hooks/useSalonSettings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +45,7 @@ const DEMO_ROWS: StaffRow[] = [
 export function StaffCompensationReport({ dateRange, isDemo = false }: StaffCompensationReportProps) {
   const { salonId } = useSalonId();
   const { data: staffMembers } = useStaffMembers();
+  const { settings } = useSalonSettings();
 
   const { data: completedAppointments } = useQuery({
     queryKey: ["compensation-appointments", salonId, dateRange.from.toISOString(), dateRange.to.toISOString()],
@@ -78,10 +80,10 @@ export function StaffCompensationReport({ dateRange, isDemo = false }: StaffComp
     if (!staffMembers || !completedAppointments) return [];
 
     return staffMembers.map((staff): StaffRow => {
-      const compType = (staff.compensation_type as CompensationType) || "commission";
-      const commRate = staff.commission_rate ?? 30;
+      const compType = (staff.compensation_type as CompensationType) || settings.team.defaultCompensationType as CompensationType;
+      const commRate = staff.commission_rate ?? settings.team.defaultCommissionRate;
       const baseSalary = Number(staff.base_salary) || 0;
-      const hourlyRate = Number(staff.hourly_rate) || 0;
+      const hourlyRate = Number(staff.hourly_rate) || settings.team.defaultHourlyRate;
       const bonusThreshold = Number(staff.salary_bonus_threshold) || 0;
       const bonusRate = Number(staff.salary_bonus_rate) || 0;
       const flatRate = Number(staff.flat_rate_per_service) || 0;
@@ -143,7 +145,7 @@ export function StaffCompensationReport({ dateRange, isDemo = false }: StaffComp
         details,
       };
     });
-  }, [isDemo, staffMembers, completedAppointments, workingHoursData, dateRange]);
+  }, [isDemo, staffMembers, completedAppointments, workingHoursData, dateRange, settings.team]);
 
   const totalPay = rows.reduce((s, r) => s + r.calculatedPay, 0);
 
