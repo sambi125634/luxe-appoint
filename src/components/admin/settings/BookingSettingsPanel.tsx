@@ -412,7 +412,10 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="cancelPolicy">{t("settingsModule.cancellationLimit")}</Label>
+            <Label htmlFor="cancelPolicy" className="flex items-center gap-1.5">
+              {t("settingsModule.cancellationLimit")}
+              <InfoHint text="Do ilu godzin przed wizytą klientka może bezpłatnie anulować rezerwację. Po tym czasie anulacja wymaga kontaktu z salonem (i może oznaczać utratę zaliczki, jeśli była pobrana)." />
+            </Label>
             <Select
               value={formData.cancellationPolicyHours.toString()}
               onValueChange={(v) => setFormData({ ...formData, cancellationPolicyHours: parseInt(v) })}
