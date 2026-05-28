@@ -242,19 +242,66 @@ export function SalonProfileSettings({ profile, isLoading, isSaving, onSave, isD
           <div className="space-y-2">
             <Label>{t("settingsModule.salonLogo")}</Label>
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-lg border-2 border-dashed border-border flex items-center justify-center bg-muted/50">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading || isSaving}
+                className="relative w-20 h-20 rounded-lg border-2 border-dashed border-border hover:border-primary/60 flex items-center justify-center bg-muted/50 transition-colors overflow-hidden disabled:opacity-60"
+                aria-label="Wgraj logo salonu"
+              >
                 {formData.logoUrl ? (
                   <img src={formData.logoUrl} alt="Logo" className="w-full h-full object-cover rounded-lg" />
                 ) : (
                   <Upload className="w-6 h-6 text-muted-foreground" />
                 )}
-              </div>
+                {uploading && (
+                  <div className="absolute inset-0 bg-background/70 flex items-center justify-center">
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  </div>
+                )}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                className="hidden"
+                onChange={handleLogoSelect}
+              />
               <div className="space-y-2">
-                <Button variant="outline" size="sm" disabled>
-                  <Upload className="w-4 h-4 mr-2" />
-                  {t("settingsModule.selectFile")}
-                </Button>
-                <p className="text-xs text-muted-foreground">{t("settingsModule.fileFormat")}</p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading || isSaving}
+                  >
+                    {uploading ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    {formData.logoUrl ? "Zmień logo" : t("settingsModule.selectFile")}
+                  </Button>
+                  {formData.logoUrl && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleLogoRemove}
+                      disabled={uploading || isSaving}
+                    >
+                      <X className="w-4 h-4 mr-1" />
+                      Usuń
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">PNG, JPG, SVG lub WEBP · maks. 2 MB</p>
+                {isDemo && (
+                  <p className="text-[11px] text-muted-foreground/70 italic">
+                    Dostępne po założeniu konta.
+                  </p>
+                )}
               </div>
             </div>
           </div>
