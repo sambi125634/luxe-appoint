@@ -33,6 +33,7 @@ export const DEMO_AUTOPILOT_DATA = {
 
   historyActions: [
     { time: "dziś 15:10", type: "Flash Oferta™", clientName: "8 klientek", status: "success" as const, statusLabel: "✓ 2 rezerwacje", effect: 280 },
+    { time: "pt 23 maj 08:30", type: "Pogodowy Trigger™", clientName: "34 klientki (deszcz 78%)", status: "success" as const, statusLabel: "✓ 6 rezerwacji", effect: 840 },
     { time: "dziś 14:23", type: "VIP na jutro", clientName: "—", status: "success" as const, statusLabel: "✓ Wysłano", effect: null },
     { time: "dziś 13:41", type: "No-show Recovery", clientName: "Kasia M.", status: "success" as const, statusLabel: "✓ Wróciła", effect: 180 },
     { time: "dziś 12:15", type: "Cichy Ambasador", clientName: "Magda W.", status: "success" as const, statusLabel: "✓ Opinia ★×5", effect: null },
