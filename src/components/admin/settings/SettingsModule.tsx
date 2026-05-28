@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, CreditCard, Scale } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, CreditCard, Scale, ChevronRight } from "lucide-react";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
@@ -43,53 +42,93 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
   const isLoading = isDemo ? false : realLoading;
 
   const tabs = [
-    { id: "profile" as const, label: t("settingsModule.salonProfile"), icon: Building2 },
-    { id: "booking" as const, label: t("settingsModule.booking"), icon: Calendar },
-    { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell },
-    { id: "communication" as const, label: "Komunikacja", icon: Radio },
-    { id: "team" as const, label: "Zespół", icon: Users },
-    { id: "payments" as const, label: "Płatności", icon: CreditCard },
-    { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug },
-    { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap },
-    { id: "legal" as const, label: "Prawne", icon: Scale },
-    { id: "export" as const, label: "Eksport danych", icon: Download },
+    { id: "profile" as const, label: t("settingsModule.salonProfile"), icon: Building2, group: "Salon", description: "Dane, branding, godziny" },
+    { id: "booking" as const, label: t("settingsModule.booking"), icon: Calendar, group: "Salon", description: "Polityka rezerwacji" },
+    { id: "team" as const, label: "Zespół", icon: Users, group: "Salon", description: "Pracownicy i stawki" },
+    { id: "notifications" as const, label: t("settingsModule.notifications"), icon: Bell, group: "Komunikacja", description: "Email, SMS, push" },
+    { id: "communication" as const, label: "Komunikacja", icon: Radio, group: "Komunikacja", description: "Kanały i szablony" },
+    { id: "payments" as const, label: "Płatności", icon: CreditCard, group: "Operacje", description: "Przelewy24, VAT, zaliczki" },
+    { id: "integrations" as const, label: t("settingsModule.integrations"), icon: Plug, group: "Operacje", description: "Google, Meta, kalendarze" },
+    { id: "automation" as const, label: t("settingsModule.automation"), icon: Zap, group: "Operacje", description: "AI Autopilot" },
+    { id: "legal" as const, label: "Prawne", icon: Scale, group: "Zgodność", description: "Regulamin, RODO, cookies" },
+    { id: "export" as const, label: "Eksport danych", icon: Download, group: "Zgodność", description: "Backup i RODO export" },
   ];
+
+  const groups = ["Salon", "Komunikacja", "Operacje", "Zgodność"];
+  const activeMeta = tabs.find((t) => t.id === activeTab)!;
 
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as SettingsTabType)}>
-        <TabsList className="grid w-full grid-cols-3 md:grid-cols-5 lg:grid-cols-10 h-auto gap-2 bg-transparent p-0">
-          {tabs.map((tab) => (
-            <TabsTrigger
-              key={tab.id}
-              value={tab.id}
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground px-4 py-2.5 rounded-lg border border-border data-[state=active]:border-primary transition-all"
-            >
-              <tab.icon className="w-4 h-4" />
-              <span className="hidden sm:inline">{tab.label}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
 
-        <div className="mt-6">
-          <TabsContent value="profile" className="m-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+        {/* Sidebar navigation — premium SaaS pattern */}
+        <aside className="lg:sticky lg:top-6 lg:self-start">
+          <nav className="space-y-6">
+            {groups.map((group) => (
+              <div key={group}>
+                <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
+                  {group}
+                </h3>
+                <div className="space-y-0.5">
+                  {tabs.filter((t) => t.group === group).map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
+                          isActive
+                            ? "bg-primary/8 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.15)]"
+                            : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                        }`}
+                      >
+                        <Icon
+                          className={`w-4 h-4 shrink-0 transition-colors ${
+                            isActive ? "text-primary" : "text-muted-foreground/60 group-hover:text-foreground"
+                          }`}
+                        />
+                        <span className="text-sm font-medium flex-1 truncate">{tab.label}</span>
+                        {isActive && <ChevronRight className="w-3.5 h-3.5 text-primary/60" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Content area */}
+        <div className="min-w-0">
+          <div className="mb-6 pb-5 border-b border-border/60">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/80 mb-1.5">
+              <span>{activeMeta.group}</span>
+              <ChevronRight className="w-3 h-3" />
+              <span className="text-foreground/70">{activeMeta.label}</span>
+            </div>
+            <h2 className="text-2xl font-serif tracking-tight text-foreground">{activeMeta.label}</h2>
+            <p className="text-sm text-muted-foreground mt-1">{activeMeta.description}</p>
+          </div>
+
+          {activeTab === "profile" && (
             <SalonProfileSettings
               profile={profile}
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={updateProfile}
             />
-          </TabsContent>
-          <TabsContent value="booking" className="m-0">
+          )}
+          {activeTab === "booking" && (
             <BookingSettingsPanel
               settings={settings.booking}
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={(updates) => updateSettings("booking", updates)}
             />
-          </TabsContent>
-          <TabsContent value="notifications" className="m-0">
+          )}
+          {activeTab === "notifications" && (
             <NotificationSettings
               settings={settings.notifications}
               integrationSettings={settings.integrations}
@@ -98,30 +137,26 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               onSave={(updates) => updateSettings("notifications", updates)}
               onSaveIntegration={(updates) => updateSettings("integrations", updates)}
             />
-          </TabsContent>
-          <TabsContent value="communication" className="m-0">
+          )}
+          {activeTab === "communication" && (
             <CommunicationSettings
               isLoading={isLoading}
               isSaving={isSaving}
               isDemo={isDemo}
               onNavigateToModule={onNavigateToModule}
             />
-          </TabsContent>
-          <TabsContent value="team" className="m-0">
-            <TeamSettings isDemo={isDemo} onNavigateToModule={onNavigateToModule} />
-          </TabsContent>
-          <TabsContent value="payments" className="m-0">
-            <PaymentsSettings isDemo={isDemo} />
-          </TabsContent>
-          <TabsContent value="integrations" className="m-0">
+          )}
+          {activeTab === "team" && <TeamSettings isDemo={isDemo} onNavigateToModule={onNavigateToModule} />}
+          {activeTab === "payments" && <PaymentsSettings isDemo={isDemo} />}
+          {activeTab === "integrations" && (
             <IntegrationSettings
               settings={settings.integrations}
               isLoading={isLoading}
               isSaving={isSaving}
               onSave={(updates) => updateSettings("integrations", updates)}
             />
-          </TabsContent>
-          <TabsContent value="automation" className="m-0">
+          )}
+          {activeTab === "automation" && (
             <AutomationSettings
               settings={settings.automation}
               isLoading={isLoading}
@@ -130,15 +165,11 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
               onNavigateToModule={onNavigateToModule}
               isDemo={isDemo}
             />
-          </TabsContent>
-          <TabsContent value="legal" className="m-0">
-            <LegalSettings isDemo={isDemo} />
-          </TabsContent>
-          <TabsContent value="export" className="m-0">
-            <ExportModule />
-          </TabsContent>
+          )}
+          {activeTab === "legal" && <LegalSettings isDemo={isDemo} />}
+          {activeTab === "export" && <ExportModule />}
         </div>
-      </Tabs>
+      </div>
     </div>
   );
 }
