@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, CreditCard, Scale, ChevronRight } from "lucide-react";
+import { Building2, Calendar, Bell, Plug, Zap, Radio, Download, Users, CreditCard, Scale, ChevronRight, ChevronDown, SlidersHorizontal } from "lucide-react";
 import { SalonProfileSettings } from "./SalonProfileSettings";
 import { BookingSettingsPanel } from "./BookingSettingsPanel";
 import { NotificationSettings } from "./NotificationSettings";
@@ -37,6 +37,8 @@ const demoProfile = {
 export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab }: SettingsModuleProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<SettingsTabType>((initialTab as SettingsTabType) || "profile");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
   const { profile: realProfile, settings, isLoading: realLoading, isSaving, updateProfile, updateSettings } = useSalonSettings();
   const profile = isDemo ? demoProfile : realProfile;
   const isLoading = isDemo ? false : realLoading;
@@ -57,14 +59,105 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
   const groups = ["Salon", "Komunikacja", "Operacje", "Zgodność"];
   const activeMeta = tabs.find((t) => t.id === activeTab)!;
 
+  const handleTabClick = (tabId: SettingsTabType) => {
+    setActiveTab(tabId);
+    setMobileOpen(false);
+    // Scroll to content on mobile after state updates
+    setTimeout(() => {
+      contentRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
+  };
+
+  // Close mobile drawer on outside click or escape
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileOpen]);
+
   return (
     <div className="space-y-6">
       <SectionGuide sectionKey="settings" />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-        {/* Sidebar navigation — premium SaaS pattern */}
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-8">
+        {/* Desktop sidebar / Mobile collapsible drawer */}
         <aside className="lg:sticky lg:top-6 lg:self-start">
-          <nav className="space-y-6">
+          {/* Mobile header toggle */}
+          <div className="lg:hidden">
+            <button
+              onClick={() => setMobileOpen((p) => !p)}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-card border border-border/60 shadow-sm"
+            >
+              <SlidersHorizontal className="w-4 h-4 text-muted-foreground" />
+              <div className="flex-1 text-left">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">
+                  {activeMeta.group}
+                </div>
+                <div className="text-sm font-medium text-foreground flex items-center gap-2">
+                  {activeMeta.label}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${mobileOpen ? "rotate-180" : ""}`}
+                  />
+                </div>
+              </div>
+            </button>
+
+            {/* Mobile overlay backdrop */}
+            {mobileOpen && (
+              <div
+                className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
+                onClick={() => setMobileOpen(false)}
+              />
+            )}
+
+            {/* Mobile navigation panel */}
+            <div
+              className={`mt-2 z-50 relative lg:hidden overflow-hidden rounded-xl border border-border/60 bg-card shadow-lg transition-all ${
+                mobileOpen ? "max-h-[70vh] opacity-100" : "max-h-0 opacity-0 border-transparent shadow-none"
+              }`}
+            >
+              <nav className="p-3 space-y-5 overflow-y-auto">
+                {groups.map((group) => (
+                  <div key={group}>
+                    <h3 className="px-3 mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/60">
+                      {group}
+                    </h3>
+                    <div className="space-y-0.5">
+                      {tabs.filter((t) => t.group === group).map((tab) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        return (
+                          <button
+                            key={tab.id}
+                            onClick={() => handleTabClick(tab.id)}
+                            className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all ${
+                              isActive
+                                ? "bg-primary/8 text-foreground shadow-[inset_0_0_0_1px_hsl(var(--primary)/0.15)]"
+                                : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                            }`}
+                          >
+                            <Icon
+                              className={`w-4 h-4 shrink-0 transition-colors ${
+                                isActive ? "text-primary" : "text-muted-foreground/60 group-hover:text-foreground"
+                              }`}
+                            />
+                            <span className="text-sm font-medium flex-1 truncate">{tab.label}</span>
+                            {isActive && <ChevronRight className="w-3.5 h-3.5 text-primary/60" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </nav>
+            </div>
+          </div>
+
+          {/* Desktop navigation (always visible) */}
+          <nav className="hidden lg:block space-y-6">
             {groups.map((group) => (
               <div key={group}>
                 <h3 className="px-3 mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground/70">
@@ -101,7 +194,7 @@ export function SettingsModule({ isDemo = false, onNavigateToModule, initialTab 
         </aside>
 
         {/* Content area */}
-        <div className="min-w-0">
+        <div ref={contentRef} className="min-w-0">
           <div className="mb-6 pb-5 border-b border-border/60">
             <div className="flex items-center gap-2 text-xs text-muted-foreground/80 mb-1.5">
               <span>{activeMeta.group}</span>
