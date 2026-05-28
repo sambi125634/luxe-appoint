@@ -439,40 +439,91 @@ export function BookingSettingsPanel({ settings, isLoading, isSaving, onSave }: 
         </CardContent>
       </Card>
 
-      {/* Additional Options */}
+      {/* Confirmation Mode */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-primary" />
-            {t("settingsModule.additionalOptions")}
+            <UserCheck className="w-5 h-5 text-primary" />
+            Tryb potwierdzania wizyt
           </CardTitle>
+          <CardDescription>
+            Wybierz, jak nowe rezerwacje trafiają do grafiku — automatycznie czy po akceptacji personelu.
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>{t("settingsModule.autoConfirmBookings")}</Label>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.autoConfirmDesc")}
-              </p>
-            </div>
-            <Switch
-              checked={formData.autoConfirmBookings}
-              onCheckedChange={(checked) => setFormData({ ...formData, autoConfirmBookings: checked })}
-            />
-          </div>
+        <CardContent className="space-y-3">
+          {([
+            {
+              id: "auto" as const,
+              icon: Zap,
+              title: "Automatyczne",
+              badge: "Zalecane",
+              desc: "Rezerwacja od razu trafia do grafiku jako potwierdzona. Klientka dostaje natychmiastowy SMS/email z potwierdzeniem. Najlepsze dla większości salonów.",
+            },
+            {
+              id: "manual" as const,
+              icon: UserCheck,
+              title: "Ręczne — wymaga akceptacji w panelu",
+              desc: "Każda nowa rezerwacja trafia jako „Oczekująca\" do listy w Grafiku. Personel jednym kliknięciem akceptuje lub odrzuca (możesz wcześniej zadzwonić do klientki). Klientka dostaje SMS dopiero po akceptacji.",
+            },
+            {
+              id: "hybrid" as const,
+              icon: Users,
+              title: "Hybrydowe — auto dla stałych, ręczne dla nowych",
+              desc: "Stałe klientki (z co najmniej jedną ukończoną wizytą) trafiają od razu do grafiku. Nowe i anonimowe rezerwacje wymagają akceptacji personelu — chroni Cię przed fałszywymi rezerwacjami.",
+            },
+          ]).map((mode) => {
+            const Icon = mode.icon;
+            const isActive = confirmationMode === mode.id;
+            return (
+              <button
+                key={mode.id}
+                type="button"
+                onClick={() => setConfirmationMode(mode.id)}
+                className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+                  isActive
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-border/60 hover:border-primary/40 hover:bg-muted/30"
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                      isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <span className="text-sm font-semibold text-foreground">{mode.title}</span>
+                      {mode.badge && (
+                        <span className="text-[10px] uppercase tracking-wider font-semibold px-1.5 py-0.5 rounded bg-primary/15 text-primary">
+                          {mode.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{mode.desc}</p>
+                  </div>
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
+                      isActive ? "border-primary bg-primary" : "border-border"
+                    }`}
+                  >
+                    {isActive && <div className="w-2 h-2 rounded-full bg-primary-foreground" />}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>{t("settingsModule.requirePhoneConfirm")}</Label>
-              <p className="text-xs text-muted-foreground">
-                {t("settingsModule.requirePhoneConfirmDesc")}
+          {confirmationMode !== "auto" && (
+            <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs text-muted-foreground flex gap-2">
+              <Info className="w-4 h-4 text-blue-500 shrink-0 mt-0.5" />
+              <p>
+                Niezatwierdzone rezerwacje wygasają po <strong>24 godzinach</strong>, jeśli nikt z personelu ich nie zaakceptuje. Klientka otrzymuje wtedy powiadomienie i może wybrać inny termin.
               </p>
             </div>
-            <Switch
-              checked={formData.requirePhoneConfirmation}
-              onCheckedChange={(checked) => setFormData({ ...formData, requirePhoneConfirmation: checked })}
-            />
-          </div>
+          )}
         </CardContent>
       </Card>
 
