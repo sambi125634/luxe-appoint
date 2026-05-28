@@ -729,6 +729,80 @@ export type Database = {
           },
         ]
       }
+      booking_attempts: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          metadata: Json
+          phone: string | null
+          reminded_at: string | null
+          salon_id: string
+          service_id: string | null
+          staff_id: string | null
+          started_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          metadata?: Json
+          phone?: string | null
+          reminded_at?: string | null
+          salon_id: string
+          service_id?: string | null
+          staff_id?: string | null
+          started_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          metadata?: Json
+          phone?: string | null
+          reminded_at?: string | null
+          salon_id?: string
+          service_id?: string | null
+          staff_id?: string | null
+          started_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_attempts_salon_id_fkey"
+            columns: ["salon_id"]
+            isOneToOne: false
+            referencedRelation: "salons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_attempts_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_attempts_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_attempts_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_public_view"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_widgets: {
         Row: {
           advanced_settings: Json | null
@@ -3394,6 +3468,7 @@ export type Database = {
           deposit_percent: number | null
           description: string | null
           email: string | null
+          google_review_url: string | null
           id: string
           is_active: boolean
           logo_url: string | null
@@ -3443,6 +3518,7 @@ export type Database = {
           deposit_percent?: number | null
           description?: string | null
           email?: string | null
+          google_review_url?: string | null
           id?: string
           is_active?: boolean
           logo_url?: string | null
@@ -3492,6 +3568,7 @@ export type Database = {
           deposit_percent?: number | null
           description?: string | null
           email?: string | null
+          google_review_url?: string | null
           id?: string
           is_active?: boolean
           logo_url?: string | null
