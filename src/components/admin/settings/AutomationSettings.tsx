@@ -192,77 +192,12 @@ export function AutomationSettings({
             </p>
           </div>
 
-          <div className="space-y-2">
-            <Label>{t("settingsModule.dataRetention")}</Label>
-            <Select
-              value={String(localSettings.dataRetentionYears)}
-              onValueChange={(v) => updateLocal("dataRetentionYears", Number(v))}
-            >
-              <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">{t("settingsModule.year1")}</SelectItem>
-                <SelectItem value="2">{t("settingsModule.years2")}</SelectItem>
-                <SelectItem value="3">{t("settingsModule.years3")}</SelectItem>
-                <SelectItem value="5">{t("settingsModule.years5")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           {hasChanges && (
             <Button onClick={handleSaveDefaults} disabled={isSaving} className="gap-2">
               {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
               {t("settingsModule.saveSettings")}
             </Button>
           )}
-        </CardContent>
-      </Card>
-
-      {/* Module Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-primary" />
-            {t("settingsModule.moduleStatus")}
-          </CardTitle>
-          <CardDescription>
-            {t("settingsModule.moduleStatusDesc")}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {moduleStatuses.map((mod) => (
-              <div
-                key={mod.key}
-                className="flex items-center justify-between p-3 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-md ${mod.configured ? 'bg-green-500/10 text-green-600' : 'bg-orange-500/10 text-orange-600'}`}>
-                    {mod.icon}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">{t(mod.labelKey)}</p>
-                    <Badge variant={mod.configured ? "default" : "secondary"} className="text-xs mt-0.5">
-                      {mod.configured ? (
-                        <span className="flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> {t("settingsModule.moduleConfigured")}</span>
-                      ) : (
-                        <span className="flex items-center gap-1"><AlertCircle className="w-3 h-3" /> {t("settingsModule.moduleNeedsConfig")}</span>
-                      )}
-                    </Badge>
-                  </div>
-                </div>
-                {onNavigateToModule && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onNavigateToModule(mod.targetTab)}
-                    className="text-xs"
-                  >
-                    {t("settingsModule.goToModule")}
-                  </Button>
-                )}
-              </div>
-            ))}
-          </div>
         </CardContent>
       </Card>
     </div>
