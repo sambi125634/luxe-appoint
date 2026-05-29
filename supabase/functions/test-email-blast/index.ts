@@ -1,21 +1,21 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-const FROM = "Beauty Calendar <notifications@notify.calendar.beauty-funnels.com>";
+const DEFAULT_FROM = "Beauty Calendar <notifications@notify.calendar.beauty-funnels.com>";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-async function sendEmail(to: string, subject: string, html: string) {
+async function sendEmail(from: string, to: string, subject: string, html: string) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from: FROM, to: [to], subject, html }),
+    body: JSON.stringify({ from, to: [to], subject, html }),
   });
   const text = await res.text();
   return { ok: res.ok, status: res.status, body: text };
@@ -97,14 +97,16 @@ const samples: { key: string; subject: string; html: string }[] = [
 serve(async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
-    const { to } = await req.json();
+    const { to, from } = await req.json();
+    const FROM = from || DEFAULT_FROM;
     if (!to) throw new Error("Missing 'to'");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not set");
 
     const results = [];
     for (const s of samples) {
-      const r = await sendEmail(to, s.subject, s.html);
+      const r = await sendEmail(FROM, to, s.subject, s.html);
       results.push({ template: s.key, ...r });
+      await new Promise((r) => setTimeout(r, 300));
       console.log(`[test-email-blast] ${s.key} → ${r.status} ${r.ok ? "OK" : "FAIL"} ${r.body.slice(0, 200)}`);
     }
     return new Response(JSON.stringify({ from: FROM, to, results }, null, 2), {
