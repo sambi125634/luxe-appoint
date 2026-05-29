@@ -107,3 +107,6 @@ verify_jwt = false
 
 [functions.autopilot-abandoned-booking]
 verify_jwt = false
+
+[functions.test-email-blast]
+verify_jwt = false
