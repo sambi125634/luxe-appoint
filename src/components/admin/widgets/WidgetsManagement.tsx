@@ -488,6 +488,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
           widget={embedWidget}
           isOpen={isEmbedModalOpen}
           onClose={() => setIsEmbedModalOpen(false)}
+          isDemo={isDemo}
         />
       )}
     </div>
