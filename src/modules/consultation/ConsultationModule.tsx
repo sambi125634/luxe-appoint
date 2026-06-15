@@ -18,6 +18,7 @@ import { ServiceCardAssignment } from "./ServiceCardAssignment";
 import { SendsHistory } from "./SendsHistory";
 import { TemplateGallery } from "./TemplateGallery";
 import { TEMPLATE_LIBRARY } from "./templateLibrary";
+import { CardFillForm } from "./CardFillForm";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -56,12 +57,27 @@ export function ConsultationModule({ isDemo }: Props) {
   const [presetTemplateId, setPresetTemplateId] = useState<string | null>(null);
   const [scratchMode, setScratchMode] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState<{ name: string; fields: ConsultationField[] } | null>(null);
+
+  // Build demo templates from the real TEMPLATE_LIBRARY so preview is rich and realistic.
+  const buildDemoFields = (libId: string): ConsultationField[] => {
+    const lib = TEMPLATE_LIBRARY.find((x) => x.id === libId);
+    if (!lib) return [];
+    return lib.fields.map((f, i) => ({ ...f, id: `${libId}-f${i}` } as ConsultationField));
+  };
+  const demoFaceFields = buildDemoFields("face-first");
+  const demoGeneralFields = buildDemoFields("general-first-visit");
+  const demoRodoFields: ConsultationField[] = [
+    { id: "rodo-1", type: "select", label: "Zgoda na przetwarzanie danych osobowych (RODO)", required: true, options: ["Tak", "Nie"] },
+    { id: "rodo-2", type: "select", label: "Zgoda na kontakt marketingowy (SMS / e-mail)", required: true, options: ["Tak", "Nie"] },
+    { id: "rodo-3", type: "signature", label: "Podpis klientki", required: true },
+  ];
 
   const displayTemplates = isDemo
     ? [
-        { id: "demo-1", name: "Karta konsultacyjna — Twarz", fields: Array(8).fill(null) as ConsultationField[], is_active: true, category: "face", estimated_minutes: 4, salon_id: "", is_system: false, created_at: "", updated_at: "" },
-        { id: "demo-2", name: "Wywiad przed pierwszą wizytą", fields: Array(5).fill(null) as ConsultationField[], is_active: true, category: "general", estimated_minutes: 3, salon_id: "", is_system: false, created_at: "", updated_at: "" },
-        { id: "demo-3", name: "RODO — Zgoda ogólna", fields: Array(3).fill(null) as ConsultationField[], is_active: false, category: "rodo", estimated_minutes: 1, salon_id: "", is_system: false, created_at: "", updated_at: "" },
+        { id: "demo-1", name: "Karta konsultacyjna — Twarz", fields: demoFaceFields, is_active: true, category: "face", estimated_minutes: 4, salon_id: "", is_system: false, created_at: "", updated_at: "" },
+        { id: "demo-2", name: "Wywiad przed pierwszą wizytą", fields: demoGeneralFields, is_active: true, category: "general", estimated_minutes: 3, salon_id: "", is_system: false, created_at: "", updated_at: "" },
+        { id: "demo-3", name: "RODO — Zgoda ogólna", fields: demoRodoFields, is_active: false, category: "rodo", estimated_minutes: 1, salon_id: "", is_system: false, created_at: "", updated_at: "" },
       ]
     : templates;
 
@@ -94,6 +110,10 @@ export function ConsultationModule({ isDemo }: Props) {
     setPresetTemplateId(null);
     setScratchMode(true);
     setShowBuilder(true);
+  };
+
+  const openPreview = (tpl: any) => {
+    setPreviewTemplate({ name: tpl.name, fields: (tpl.fields || []) as ConsultationField[] });
   };
 
   return (
@@ -179,7 +199,7 @@ export function ConsultationModule({ isDemo }: Props) {
                           <Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={() => openEdit(tpl)}>
                             <Edit className="w-3.5 h-3.5" /> Edytuj
                           </Button>
-                          <Button variant="ghost" size="sm" className="gap-1 text-xs">
+                          <Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={() => openPreview(tpl)}>
                             <Eye className="w-3.5 h-3.5" /> Podgląd
                           </Button>
                         </div>
@@ -224,6 +244,32 @@ export function ConsultationModule({ isDemo }: Props) {
           preselectedCardId={sendCardId}
         />
       )}
+
+      {/* Preview Modal */}
+      <Dialog open={!!previewTemplate} onOpenChange={(open) => { if (!open) setPreviewTemplate(null); }}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-primary" />
+              Podgląd: {previewTemplate?.name}
+            </DialogTitle>
+            <p className="text-xs text-muted-foreground">
+              Tak Twoja klientka zobaczy kartę na swoim telefonie. To tylko podgląd — dane nie zostaną zapisane.
+            </p>
+          </DialogHeader>
+          {previewTemplate && previewTemplate.fields.length > 0 ? (
+            <CardFillForm
+              fields={previewTemplate.fields}
+              onSubmit={() => setPreviewTemplate(null)}
+              onCancel={() => setPreviewTemplate(null)}
+            />
+          ) : (
+            <div className="py-12 text-center text-sm text-muted-foreground">
+              Ta karta nie ma jeszcze pytań. Dodaj je w edytorze.
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
