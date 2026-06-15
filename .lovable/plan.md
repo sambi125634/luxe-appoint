@@ -1,33 +1,42 @@
 ## Cel
 
-W wersji demo (`/demo`) zrobić dwie rzeczy:
-1. Zmienić nazwę zakładki **„Widgety"** na **„Widgety rezerwacji"** (czytelniej dla klienta).
-2. Przyciski **„Otwórz / Podgląd"** w karcie widgetu mają w demo prowadzić na produkcyjną domenę `https://calendar.beauty-funnels.com/s/demo-salon` (a nie na osadzony preview Lovable, który blokuje iframe).
+W panelu demo → zakładka "Aplikacja klienta" obecny mockup telefonu (`PhonePreview.tsx`) pokazuje uproszczoną statyczną kartę przypominającą widget rezerwacji. Klient ogląda demo i nie widzi, jak naprawdę wygląda aplikacja na telefonie klientki. Podmieniamy mockup na żywy podgląd realnej aplikacji klienta (ten sam, który już istnieje pod `MobilePreview.tsx`).
 
-## Zmiany
+## Zakres zmian
 
-### 1. Nazwa zakładki
-- `src/i18n/locales/pl.json` — klucz `admin.widgets`: `"Widgety"` → `"Widgety rezerwacji"`
-- `src/i18n/locales/en.json` — `admin.widgets`: `"Widgets"` → `"Booking widgets"`
+**Plik:** `src/components/admin/client-app/preview/PhonePreview.tsx`
 
-(Klucz jest używany w sidebarze i w tytule strony w `DemoPage`, więc jedna zmiana pokrywa wszystkie miejsca.)
+Przepisujemy komponent tak, by renderował telefon z iframe wskazującym na realne trasy aplikacji klienta z parametrem `?preview=true` (bypass auth, znany z pamięci projektu „Admin Mobile Preview").
 
-### 2. Link „Podgląd / Kopiuj link" w demo
-W `src/components/admin/widgets/WidgetsManagement.tsx`, funkcja `getDemoOrRealUrl`:
+### Struktura nowego PhonePreview
 
-```ts
-if (isDemo) {
-  return "https://calendar.beauty-funnels.com/s/demo-salon";
-}
-```
+1. **Toggle zakładek nad telefonem** (3 widoki — to są realne ekrany aplikacji klienta):
+   - `Profil salonu` → `/s/demo-salon` (publiczny profil/booking — bez zmian)
+   - `Dla Ciebie` → `/app/for-you?preview=true`
+   - `Wizyty` → `/app/bookings?preview=true`
 
-To samo dla embed (modal `EmbedCodeModal`) — kiedy `isDemo` jest aktywne, podawać domenę `calendar.beauty-funnels.com` zamiast `window.location.origin`. Przekażę `isDemo` jako prop do `EmbedCodeModal` i użyję jej w `getWidgetUrl`.
+   Domyślny tab = `Dla Ciebie` (to jest „prawdziwy" ekran aplikacji klienta z telefonu — nie widget rezerwacji).
 
-Dzięki temu kliknięcie „Otwórz" / „Kopiuj link" / kod embed w demo wskazuje na realnie działający widget na podpiętej domenie.
+2. **Ramka telefonu** — zachowujemy obecny styl (border 8px, notch, rounded-[2.5rem], 280×580, shadow-2xl, brand color via CSS niepotrzebny bo iframe sam ładuje branding salonu z bazy).
 
-## Co zostaje bez zmian
-- Routing, RLS, dane demo, panel admin produkcyjny — bez zmian.
-- Domena `calendar.beauty-funnels.com` jest już aktywna w projekcie (potwierdzone w `project_urls`), więc nic nie trzeba dokładać po stronie deploya.
+3. **Iframe wewnątrz** — skalowany transformem `scale(0.718)` z `transformOrigin: top left`, źródłowy viewport 390×808 jak w `MobilePreview.tsx`. Key + cache-bust `?t=refreshKey` żeby przycisk odświeżania działał.
 
-## Po wdrożeniu
-Trzeba kliknąć **Publish → Update** żeby zmiany trafiły na `admin.beauty-funnels.com` i `calendar.beauty-funnels.com` (frontend wymaga publikacji).
+4. **Mały przycisk odświeżania** (RefreshCw, jak w `MobilePreview`) i podpis „Podgląd na żywo" z zielonym pulsującym indykatorem (zachowujemy obecny tekst „Ostatnia synchronizacja: właśnie teraz ✓").
+
+5. **Props pozostają bez zmian** (`config`) — interfejs nie wymaga modyfikacji w `ClientAppPage.tsx`. `config` przestaje wpływać na zawartość (branding pochodzi z `demo-salon` w bazie), ale zostawiamy parametr dla kompatybilności (zignorowany).
+
+### Co znika
+
+- Statyczne tablice `DEMO_SERVICES`, `DEMO_HISTORY`.
+- Toggle „Nowa / Stała" (dwa stany mockupu) — zastępujemy zakładkami realnych ekranów aplikacji.
+- Cały ręcznie rysowany layout salonu i historii — robi to teraz iframe.
+
+## Czego NIE ruszamy
+
+- `ClientAppPage.tsx` (już używa `PhonePreview` poprawnie).
+- `MobilePreview.tsx` (niepowiązany duplikat — pozostawiamy bez zmian).
+- Edycji brandingu w lewej kolumnie (zakładki Marka/Komunikacja/...) — pozostają bez zmian. Branding zapisany w bazie demo-salon jest tym, co widzi iframe.
+
+## Po publikacji
+
+Zmiana frontendowa — wymaga Publish → Update, żeby zadziałała na `admin.beauty-funnels.com`.
