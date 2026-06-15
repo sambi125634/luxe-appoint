@@ -20,9 +20,10 @@ interface EmbedCodeModalProps {
   widget: BookingWidget;
   isOpen: boolean;
   onClose: () => void;
+  isDemo?: boolean;
 }
 
-export function EmbedCodeModal({ widget, isOpen, onClose }: EmbedCodeModalProps) {
+export function EmbedCodeModal({ widget, isOpen, onClose, isDemo = false }: EmbedCodeModalProps) {
   const [copiedType, setCopiedType] = useState<string | null>(null);
   const [responsive, setResponsive] = useState(true);
   const [width, setWidth] = useState(600);
@@ -37,7 +38,8 @@ export function EmbedCodeModal({ widget, isOpen, onClose }: EmbedCodeModalProps)
   };
 
   const productionBaseUrl = "https://calendar.beauty-funnels.com";
-  const widgetUrl = `${productionBaseUrl}/s/${widget.slug}`;
+  const effectiveSlug = isDemo ? "demo-salon" : widget.slug;
+  const widgetUrl = `${productionBaseUrl}/s/${effectiveSlug}`;
   
   const getIframeCode = () => {
     if (responsive) {

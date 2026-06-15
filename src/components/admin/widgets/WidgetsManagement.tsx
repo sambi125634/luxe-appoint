@@ -123,7 +123,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
 
   const getDemoOrRealUrl = (widget: BookingWidget) => {
     if (isDemo) {
-      return `${window.location.origin}/book/demo-salon`;
+      return "https://calendar.beauty-funnels.com/s/demo-salon";
     }
     return getWidgetUrl(widget.slug);
   };
@@ -488,6 +488,7 @@ export function WidgetsManagement({ isDemo = false }: WidgetsManagementProps) {
           widget={embedWidget}
           isOpen={isEmbedModalOpen}
           onClose={() => setIsEmbedModalOpen(false)}
+          isDemo={isDemo}
         />
       )}
     </div>
